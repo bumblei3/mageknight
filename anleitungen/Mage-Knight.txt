@@ -1,0 +1,2014 @@
+﻿Dieses Heft besteht aus zwei Teilen, dem Regelheft und Es kann sein, dass sich das Szenario auf allgemeine 
+dem Szenarioheft. Im Regelheft stehen die kompletten Szenarioregeln bezieht (wie den Dummyspieler oder Inhaltsverzeichnis
+Spielregeln des Mage Knight Brettspiels. Es eignet sich die Wertung), solche Regeln stehen am Anfang des 
+nicht zum Erlernen des Spiels und erst recht nicht dazu, das Szenariohefts. REGELHEFT
+Spiel anderen beizubringen. Es ist äußerst ratsam, zuerst •  Wenn du irgendeine allgemeine Regel nachlesen willst 
+mit der Schritt-für-Schritt-Anleitung zu beginnen, in der die Spielablauf .......................................................................................................1
+
+(also nichts, was mit einem speziellen Ort oder einem 
+Regeln so angeordnet sind, wie man ihnen im Spiel begeg- Szenario zu tun hat), nimm dieses Regelheft. Es ist streng Spielaufbau für das vollständige Spiel....................................................3
+net, mit vielen Beispielen und Abbildungen. systematisch geordnet, und sobald du seinen Aufbau Eine Spielrunde (Tag oder Nacht) ............................................................4
+Wenn du die Schritt-für-Schritt-Anleitung gelesen und verstanden hast, wirst du problemlos alles Gesuchte fin-
+das erste Szenario gespielt hast, und du mit dem Material den: Wenn du eine bestimmte Regel oder Situation nach- Grundsätzliches Spielkonzept ...................................................................4
+und den Grundideen vertraut bist, liefert dir dieses Regel- schlagen willst, schaue zuerst hier im Inhaltsverzeichnis Ein Spielerzug .................................................................................................5
+heft die kompletten Regeln des Spiels (ausgenommen sind nach, zu welcher Phase des Spiels sie gehört. Wenn das 
+Spezialregeln bestimmter Szenarien, die man im Szenario- Bewegung ........................................................................................................6
+
+Gesuchte keiner Phase zuzuordnen ist, dürfte es im 
+heft findet und Regeln für bestimmte Orte, die man auf den Abschnitt des grundsätzlichen Spielkonzepte zu finden Interaktion mit Bewohnern........................................................................7
+Übersichten findet). sein. Kampf gegen Feinde.....................................................................................7
+Das Spiel ist komplex und selbst nach einer Reihe von Par- • Dasselbe gilt, wenn du nach weiteren Details zu einer 
+tien wirst du immer wieder einmal im Regelheft nachschla- Ende des Zugs ................................................................................................9
+
+Ortsregel suchst (wenn du z. B. wissen willst, wie ein 
+gen müssen. Damit das Spielerlebnis so flüssig wie möglich Magierturm die Bewegung beeinflusst, siehst du im Be- Verletzungen und Heilung .......................................................................10
+ist, mache Folgendes: wegungsabschnitt nach). Das Regelheft bezieht sich auf Kampf Spieler-gegen-Spieler ...................................................................10
+• Beim Spiel lässt du die Übersichtskarten aller Orte griff- Orte, wenn sein Text so wie hier aussieht. Beachte, dass 
+
+bereit liegen. Jede Ortsübersicht fasst die Regeln des Orte einige gemeinsame Regeln haben (befestigte Orte, Gemeinsamer Stadtüberfall .....................................................................11
+jeweiligen Orts griffig zusammen. Manches ist stark ver- Abenteuerorte und umherziehende Feinde).
+knappt – schlage dann im Regelheft nach. • Versuche nie, Regeln in der Schritt-für-Schritt-Anleitung 
+
+• Beim Spiel lässt du die letzte Seite dieses Heftes immer nachzuschlagen. Du wirst jede Regel entweder in die- SZENARIOHEFT
+
+sichtbar liegen. Sie enthält eine nützliche Übersicht der sem Regelheft oder auf einer Ortsübersicht finden. Erst, Allgemeine Grundsätze .............................................................................12
+Spielphasen und eine Liste der Kampfeigenschaften. wenn du die Regel hier zwar gefunden hast, aber über die 
+
+• Szenariospezifische Dinge (Aufbau, Spezialregeln, End- korrekte Auslegung unsicher bist, solltest du dir weitere Varianten .......................................................................................................13
+
+bedingungen, Wertung) liest du im Szenarioheft nach. Erklärungen aus der Schritt-für-Schritt-Anleitung holen. Szenarien .......................................................................................................15
+
+1. Ein Szenario wählen – Sucht euch ein Szenario aus dem Sze-  • Wenn ein Spieler einen Helden nimmt, legt er dessen Zug- 3. Spielaufbau – Folgt der Anleitung im Abschnitt „Spielaufbau“ 
+narioheft aus. Ihr könnt außerdem Variantenregeln mit den folgeplättchen auf den Tisch. Zugfolgeplättchen werden der nächsten Seite, um die Spielfläche vorzubereiten. Bitte 
+anderen Spielern vereinbaren. untereinander in einer Spalte abgelegt, sodass das Plättchen überprüft, ob in dem gewählten Szenario Ausnahmen oder 
+
+2. Spielerreihenfolge/Heldenwahl – Legt eine Reihenfolge fest, des ersten Spielers ganz oben liegt, das des letzten Spielers Spezialregeln stehen, die vom Standardaufbau abweichen.
+in der die Spieler ihren Helden aussuchen und sich dessen zu- ganz unten. 4. Spielt das Spiel – Spielt die Runden des Spiels so lange durch, 
+gehörige Spielmaterialien nehmen. bis die Bedingungen für das Spielende erfüllt sind oder ihr die 
+
+maximal erlaubte Rundenzahl erreicht habt.
+5. Spielauswertung – Wenn das Spiel vorbei ist, befolgt die Wer-
+
+tungsregeln des Szenarios.
+
+1
+
+MK_rulebook_DEU_02.indd   1 2/23/2012   21:08:56 PM
+
+
+
+Deck der Fort- Zauberdeck Verletzungsdeck Artefaktdeck
+geschrittenen Stapel der Feind- und Ruinenplättchen
+
+Aktionen
+
+Stadtkarten und 
+-figuren
+
+Plätze für das A
+Angebot der nseh
+
+Ruhmanzeige ensa
+Fortgeschritte- nzeige Platz für das 
+nen Aktionen Zauberangebot
+
+Plätze für das Stapel der 
+Angebot der Spielplanteile
+allgemeinen 
+Fähigkeiten
+
+Ruhm- und Ansehenstafel
+Deck der Deck der 
+
+Eliteeinheiten Normalen 
+Einheiten Quelle
+
+Zugfolge
+
+Bewegungs- Unbenutzte 
+kosten Nacht-Taktiken Ortsübersicht 
+
+Tag-/Nachttafel und Wertungs-
+karte
+
+Plätze für das Späterer Platz für 
+Einheiten- Fortgeschrittene 
+
+angebot Aktionen (für Kloster)
+
+Manawürfel
+
+Vorrat Spielplan
+
+Manamarker
+
+Zu Spielbeginn 
+aufgedeckte 
+
+Teile
+
+Spielplanform, wenn Startteil B 
+genutzt wird
+
+Offene Tag-
+Taktikkarten
+
+2
+
+MK_rulebook_DEU_02.indd   2 2/23/2012   21:09:05 PM
+
+
+
+•  Ruhm- und Ansehenstafel. Die Spieler legen eins ihrer Schild- • Einheitenangebot. Decke so viele Einheiten vom Normalen  – die benötigten Landschaftsteile (grüne Rückseiten) wer-
+plättchen auf Feld 0 der Ruhmanzeige und eins auf das mittlere Deck (Silber) auf, wie echte Spieler (plus 2) teilnehmen. Später den zufällig gezogen. 
+Feld (0) der Ansehensanzeige. können beim Einheitenangebot zusätzlich Fortgeschrittene Ak-  –  Zentralteile (braune Rückseiten) werden erst in Teile mit 
+
+• Feind- und Ruinenplättchen-Stapel. Sortiere die Feind- tionskarten ausliegen (1 pro Kloster auf dem Spielplan). Stadt und in solche ohne Stadt sortiert (= ob sie ein Stadt-
+(rund) und die Ruinenplättchen (sechseckig) nach Rückseiten, • Zugfolgeplättchen. Jeder Spieler legt sein Zugfolgeplättchen symbol in der Mitte haben oder nicht). Aus diesen beiden 
+mische sie und lege sie in 7 Stapeln bereit. Daneben jeweils hier hin, derjenige, der als erster einen Helden gewählt hat, ganz Stapeln werden die benötigten Teile zufällig gezogen. 
+Platz für abgelegte Plättchen lassen. Ist ein Stapel aufge- nach oben.  – Um den Stapel zu bilden, mische die gezogenen braunen 
+braucht, Ablagestapel zu neuem verdeckten Stapel mischen. • Tag-/Nachttafel. Zu Spielbeginn ist die Tagseite sichtbar. Zu Teile alle miteinander und lege danach die gemischten grü-
+
+• Artefaktdeck. Mische die Artefakte und lege sie verdeckt ab. Beginn einer neuen Runde wird sie umgedreht. Tag und Nacht nen Teile oben drauf.
+Artefakte werden nie als Angebot ausgelegt. wechseln sich also ab. • Spielplan. Gemäß der Szenariobeschreibung lege das Startteil 
+
+• Verletzungsdeck. Alle Verletzungskarten sehen gleich aus.  – Auf der linken Seite dieser Tafel stehen die Bewegungskos- entweder mit der A- oder der B-Seite nach oben hin. 
+Lege sie offen hin. ten für die Geländetypen.  – Decke 2 (bei Startteil A) oder 3 (Startteil B) Teile vom Spiel-
+
+• Zauberdeck und Zauberangebot. Mische die Zauberkarten  –  Rechts ist die Quelle. Würfle mit so vielen Manawürfeln, plan-Stapel auf und lege sie wie gezeigt an. Die Teile müssen 
+und lege sie verdeckt hin. Decke die ersten drei als Angebot auf. wie echte Spieler (plus 2) teilnehmen und lege die Würfel die gleiche Ausrichtung wie das Startteil haben. 
+
+•  Deck und Angebot der Fortgeschrittenen Aktionen. Wie die hier ab. Mindestens die Hälfte muss eine Grundfarbe zeigen  – Bei aufgedeckten Orten lies die Ortsübersichtskarte, damit 
+Zauber vorbereiten. (rot, blau, weiß, grün). Falls nicht, würfle alle goldenen und du weißt, was beim Aufdecken passieren muss.
+
+schwarzen Würfel so oft neu, bis dies zutrifft.
+• Allgemeines Angebot der Fähigkeiten. Ein leerer Bereich, in • Ortsübersichten und Wertungskarte. Sie sollten griffbereit 
+
+den Fähigkeitsplättchen kommen, die beim Aufleveln abge- • Offene Tag-Taktikkarten. Breite diese an einem einfach er- liegen, damit die Spieler sie jederzeit ansehen können.
+lehnt werden. reichbaren Platz aus. 
+
+• Stadtkarten und Stadtfiguren. Diese müssen zu Spielbeginn 
+• Deck der Normalen Einheiten und Deck der Eliteeinheiten. • Unbenutzte Taktiken. Lege die Nacht-Taktikkarten hier zu- noch nicht griffbereit liegen.
+
+Mische die Karten mit goldener und silberner Rückseite ge- nächst hin. Du brauchst sie nicht zu mischen.
+• Vorrat. Lege die Manamarker für alle erreichbar hin. Lege 
+
+trennt und bilde daraus zwei Decks. • Spielplan-Stapel. Die Szenariobeschreibung sagt, wie viele Spiel- auch die unbenötigten Manawürfel dazu, denn manchmal 
+planteile jedes Typs du nehmen musst, um diesen Stapel zu bilden. wird im Spiel ein Würfelwurf gefordert.
+
+• Heldenkarte. Sie stellt die von dir gespielte Person dar. Unten Wenn du auf einen ungeraden Level aufsteigst, bekommst du • Schildplättchen. Eins kommt auf die Ruhmes-, eins auf die 
+ist dein Vorrat, in dem du die im Spiel errungenen Kristalle la- ein weiteres Befehlsplättchen, und die mögliche Anzahl deiner Ansehensanzeige. Die anderen werden benötigt, um deine Er-
+gerst. Einheiten erhöht sich. folge auf dem Spielplan zu markieren. Sie gelten als unbegrenzt 
+
+• Stapel der Levelplättchen. Lege fünf achteckige Levelplätt- •  Handlungsdeck. Jeder Spieler mischt die 16 Basis-Aktions- (nehmt einen Ersatz, falls sie euch jemals ausgehen sollten).
+chen in einem offenen Stapel hin, sortiert nach Zahlen, sodass karten seines Helden (achtet auf dessen Symbol in der oberen •  Fähigkeitsstapel. Jeder Spieler hat 10 Fähigkeitsplättchen in 
+die 1-2 ganz oben ist, die 9-10 ganz unten. Das aktuelle Plätt- rechten Ecke) und bildet daraus das Handlungsdeck seiner Farbe: Sie werden gemischt und als verdeckter Stapel 
+chen zeigt für die Level 1 und 2 deine Rüstung an (2) und dein • Spieler-(Karten)Hand. Zu Spielbeginn zieht jeder 5 Karten hingelegt.
+Hand(karten)limit (5). Das sechste, leere Plättchen kommt mit aus seinem Handlungsdeck (gemäß seinem Handlimit, was auf • Erworbene Fähigkeiten. Ein Bereich, in den du Fähigkeits-
+dem Schild nach oben in deinen Einheitenbereich. Es ist dein seinem obersten Levelplättchen angegeben ist). plättchen legst, die du beim Aufleveln erhältst.
+erstes Befehlsplättchen. 
+
+• Ablage. Hier legst du ausgespielte Karten am Ende deines Zu- • Fähigkeitsübersicht. Alle Fähigkeitsplättchen, die zu deinem 
+• Einheitenbereich. Hier kommen deine rekrutierten Einheiten ges ab (manchmal auch Karten während deines Zuges). Helden gehören, sind hier beschrieben.
+
+hin. Jede Einheit braucht ein eigenes Befehlsplättchen. Zur Zeit 
+hast du nur eins davon, also darfst du nur eine Einheit besitzen. •  Figur. Stelle deine Figur erst einmal hier hin. Sie kommt in dei- • Spielbereich. Lasse eine gewisse Tischfläche vor dir frei, auf 
+
+nem ersten Zug auf den Spielplan. der du die Karten während deines Zuges auslegst.
+
+Heldenkarte Erworbene 
+Fähigkeiten
+
+Stapel der Spielbereich
+Level-
+
+plättchen
+Schild-
+
+plättchen
+Vorrat
+
+Befehlsplättchen Heldenfigur
+
+Handlungsdeck
+Einheitenbereich
+
+Ablage 
+Stapel der (offen)
+
+Fähigkeits- Fähigkeits-
+plättchen übersicht
+
+(Karten-)Hand des Spielers
+
+3
+
+MK_rulebook_DEU_02.indd   3 2/23/2012   21:12:29 PM
+
+
+
+1. Runden sind entweder Tag oder Nacht. Die Spieler führen in-  d. Fülle das Angebot der Fortgeschrittenen Aktionen auf –   • Der Spieler mit dem niedrigsten Ruhm wählt zuerst, 
+nerhalb einer Runde ihre Züge aus. nimm die Karte auf der untersten Position weg und lege die- dann der mit dem zweitniedrigsten usw. Bei Gleichstand 
+
+2. Bereite die Runde vor (für die erste Spielrunde kannst du die- se unter das Deck der Fortgeschrittenen Aktionen. Verschie- ist der zuerst an der Reihe, dessen Zugfolgeplättchen 
+sen Schritt überspringen, da er bereits im Spielaufbau erledigt be jede andere Karte des Angebots um eine Position nach weiter unten liegt.
+wurde): unten, dann ziehe eine neue und lege diese an die oberste     Hinweis: In der ersten Runde bedeutet das, dass der 
+
+ a.  Drehe die Tag-/Nachttafel um: war die letzte Runde Tag, Position. Spieler, der seinen Helden zuletzt gewählt hat, als erster 
+deckst du Nacht auf, war sie Nacht, deckst du Tag auf.  e. Fülle das Zauberangebot auf – folge den Anweisungen für seine Taktik wählt.
+
+ b. Passe die Quelle an – Würfle mit allen Manawürfeln der das Erneuern der Fortgeschrittenen Aktionen.  b.  Befolgt die Anweisungen auf den Taktikkarten, die mit 
+Quelle, so wie beim Abschnitt Spielvorbereitung angege-  f. Taktikkarten einsammeln – Sammle alle Taktikkarten der „Wenn du diese Taktik wählst“ beginnen.
+ben. vorigen Runde ein und breite die jetzt aktuellen Taktikkar-  c. Sortiert die Zugfolgeplättchen gemäß der Taktiknummer 
+
+ c.  Bilde ein neues Einheitenangebot. ten in der Tischmitte offen aus. jedes Spielers um; der mit der niedrigsten Taktiknummer ist 
+  •  Nimm alle Einheiten, die gerade im Angebot liegen, und  g. Jeder Spieler: oben (erster), der mit der höchsten ganz unten (letzter).
+
+lege diese unter die entsprechenden Decks.   • deckt alle seine Banner-Artefakte und Fähigkeitsplätt-  d.  Nicht gebrauchte Taktikkarten legt ihr beiseite. 
+  • Wenn es Fortgeschrittene Aktionen bei den Karten des chen in seinem Spielbereich auf. Er darf (muss aber nicht) 4. Die Spieler spielen ihre Züge:
+
+Einheitenangebots geben sollte, lege diese unter das jetzt alle gewünschten Banner-Artefakte bei seinen Ein-  a. Die Spieler sind in der Reihenfolge der Zugfolgeplättchen 
+Deck der Fortgeschrittenen Aktionen. heiten auf seine Ablage legen; am Zug (von oben nach unten). Nach dem letzten Spieler ist 
+
+  • Lege so viele neue Einheiten in das Einheitenangebot,   • macht alle Einheiten in seinem Einheitenbereich bereit, der erste wieder am Zug.
+wie es echte Mitspieler gibt plus 2. auch die verletzten (verletzte Einheiten werden dadurch  b. Wenn das Handlungsdeck eines Spielers zu Beginn seines 
+
+  • Wenn noch kein Zentral-Spielplanteil aufgedeckt wurde, allerdings nicht geheilt); Zugs leer ist, kann dieser das Rundenende ansagen, statt 
+nimm nur Normale Einheiten (silberne Rückseite).   • mischt alle seine Handlungskarten, um ein neues Hand- seinen Zug auszuführen. Wenn er das macht, hat jeder an-
+
+  •  Wenn mindestens ein Zentral-Spielplanteil aufgedeckt lungsdeck zu bilden; dere Spieler noch einen Zug, dann ist die Runde vorüber.
+wurde, lege abwechselnd Elite- (gold) und Normale Ein-   •  zieht Karten nach, bis er sein Handlimit erreicht (es kann 5.  Prüft in der Szenariobeschreibung, ob das Spiel vorbei ist.
+heiten aus (Elite, Normal, Elite, usw.). erhöht sein, wenn er gerade nahe einer Burg oder Stadt  a. Wenn die Szenariobedingungen erfüllt sind oder das Run-
+
+  • Wenn irgendwelche Kloster auf dem Spielplan sind, lege steht – mehr in den Übersichten zu diesen Orten. Ist er denlimit erreicht wurde, ist das Spiel vorbei und ihr solltet 
+pro nicht niedergebranntem Kloster je eine Fortgeschrit- nahe zu beiden, nutzt er nur die stärkere Wirkung). gemäß der Szenariobeschreibung feststellen, wie es ausge-
+tene Aktion zu den Karten des Einheitenangebots. 3.  Taktikkarten werden gewählt. gangen ist.
+
+ a.  Jeder Spieler wählt eine der offen liegenden Taktikkarten für  b.  Wenn nicht, geht das Spiel mit der nächsten Runde weiter.
+diese Runde.
+
+ a. Wird eine Einheit zerstört oder ausgemustert, oder ordnest 
+HANDLUNGSKARTEN EINHEITEN BENUTZEN du ihr ein neues Banner zu, kommt das (alte) Banner auf dei-
+1. Alle Karten mit dieser Rückseite sind Hand- 1. Es gibt zwei Einheitendecks. Normale (silberne Rückseiten) ne Ablage.
+
+lungskarten: Aktionskarten (Basis und und Eliteeinheiten (golden). Sobald die Einheiten im Spiel sind,  b. Beim Rundenende kannst du wählen, ob du das Banner bei 
+Fortgeschritten), Zauber, Artefakte und haben deren Kartenrückseiten keine Bedeutung mehr. der Einheit lassen willst, oder ob du es in dein Handlungs-
+Verletzungen. Zu Beginn habt ihr nur Basis- 2. Zu Spielbeginn hat kein Spieler Einheiten. Einheiten, die im deck zurückmischst.
+Aktionskarten im Handlungsdeck. Spiel erworben (rekrutiert) werden, kommen immer vor den 8. Am Ende deines Zugs legst du verausgabte Einheiten weder ab, 
+
+2. In jedem Zug spielt ihr Handlungskarten Spieler in dessen Einheitenbereich (sie sind nie auf der Hand, noch machst du sie bereit. Einheiten werden automatisch be-
+aus eurer Hand aus. Um eine Karte zu spielen, legt ihr sie in eu- im Handlungsdeck oder der Ablage). reit am Ende jeder Runde.
+ren Spielbereich und führt die beschriebene Wirkung aus. 3. Jeder Einheit in deinem Einheitenbereich ist ein Befehlsplätt-
+
+3. Verschiedene Handlungskarten können in unterschiedlicher chen zugeordnet. Du darfst niemals mehr Einheiten als Be-
+Weise ausgespielt werden: fehlsplättchen in deinem Einheitenbereich haben. FÄHIGKEITEN BENUTZEN
+
+ a. Eine Aktionskarte (Basis oder Fortgeschritten) kann ge-  a. Einheiten mit Befehlsplättchen oberhalb der Karte gelten 1. Fähigkeiten werden durch Fähigkeitsplättchen dargestellt. Je-
+spielt werden, um ihre Einfache Wirkung zu nutzen oder sie als bereit. der Held hat seinen eigenen Satz Fähigkeitsplättchen.
+kann mit Mana der angegebenen Farbe verstärkt werden,  b. Einheiten mit Befehlsplättchen auf der Karte gelten als ver- 2. Zu Spielbeginn besitzen die Spieler keine Fähigkeitsplättchen. 
+um ihre Starke Wirkung zu nutzen. ausgabt. Jedes Mal, wenn ein Held einen geradzahligen Ruhmlevel er-
+
+ b. Die Einfache Wirkung eines Zaubers kann mit 1 Mana der  c. Einheiten mit quer darüber liegender Verletzungskarte gel- reicht, erhält er ein Fähigkeitsplättchen. 
+angegebenen Farbe ausgelöst werden. Bei Nacht kann die ten als verletzt.  a. Spieler legen die Fähigkeitsplättchen, die sie im Spielverlauf 
+Starke Wirkung eines Zaubers mit 1 Mana der angegebenen 4.  Neu rekrutierte Einheiten sind immer bereit und nie verletzt. erhalten, offen vor sich hin.
+Farbe plus 1 schwarzes Mana ausgelöst werden  a. Wenn du eine neue Einheit erhalten willst, aber alle deine Be-  b. Spieler können Fähigkeitsplättchen ihres eigenen Helden 
+
+ c. Ein Artefakt kann gespielt werden, um dessen Einfache Wir- fehlsplättchen sind benutzt, musst du eine deiner Einheiten haben, aber auch solche von anderen Helden im Spiel. 
+kung zu nutzen, oder es kann entfernt (= aus dem Spiel ge- ausmustern. Eine ausgemusterte Einheit kommt aus dem Wenn das der Fall ist, können diese Plättchen genauso ge-
+nommen) werden, um seine Starke Wirkung zu nutzen. Spiel. Die neu rekrutierte Einheit ist bereit und nicht verletzt, nutzt werden, wie die eigenen – sobald eine Fähigkeit im 
+
+ d. Verletzungskarten können niemals gespielt werden. egal, welchen Zustand die ausgemusterte Einheit hatte. Spiel ist, spielt es keine Rolle, zu welchem Helden sie gehört.
+ e. Jede Karte (außer Verletzungen) kann man quer spielen, 5. Eine Einheit, die bereit und nicht verletzt ist, kann zur Nutzung 3.  Benutzung und Wirkung jeder Fähigkeit ist an den Symbolen 
+
+um Bewegung 1, Einfluss 1, Angriff 1 oder Block 1 zu erhalten. einer ihrer Eigenschaften aktiviert werden. auf dem Plättchen zu erkennen. Ausführlich sind sie auf der 
+  • Sie kann so aber keinen Fernangriff, Belagerungsangriff Fähigkeitsübersicht des zugehörigen Helden beschrieben. 
+
+ a. Um eine Einheit zu aktivieren, legst du deren Befehlsplätt-
+oder irgendeine Art Elementangriff (Feuer, Eis oder Kal- chen auf die Karte – die Einheit ist nicht mehr bereit, son- 4.  Fähigkeiten gibt es in drei Grundtypen:
+tes Feuer) oder Elementblock erzeugen. dern bis zum Ende der Runde verausgabt.  a.   Fähigkeitsplättchen mit diesem Symbol können nur 
+
+4. Karten mit ähnlichen Wirkungen (sogar solche unterschiedli-  b. Dann wählst du eine der Eigenschaften , die auf der Einhei- 1x pro Runde benutzt werden, in deinem Zug (außer „Mo-
+cher Typen) können zusammen gespielt werden, damit die Wir- tenkarte stehen und wendest deren Wirkung an. Du kannst tivation“, die auch in Zügen anderer Spieler eingesetzt wer-
+kungen zusammengerechnet werden. Schichtet die Karten ein sie mit den Wirkungen von weiteren Einheiten, Handlungs- den darf). Wenn du eine solche Fähigkeit nutzt, drehst du 
+wenig übereinander und addiert deren Wirkungen. karten und Fähigkeiten kombinieren. das Plättchen bis zum Beginn einer neuen Runde um.
+
+5. Bei Zugende kommen alle gespielten Handlungskarten auf   • Um eine Eigenschaft mit einem Manasymbol davor wäh-  b.   Fähigkeitsplättchen mit diesem Symbol können einmal 
+eure Ablage. Ungespielte Karten könnt ihr auf der Hand behalten len zu können, musst du zuerst Mana in der geforderten pro Runde benutzt werden, allerdings bleibt deren Wir-
+oder eine oder mehrere davon ablegen (keine Verletzungen). Farbe bezahlen. kung bis zum Beginn deines nächsten Zugs bestehen. 
+
+6. Einige Kartenwirkungen erfordern die Bezahlung von Mana Solche Fähigkeiten betreffen, während sie aktiv sind, andere 
+6.  Immer, wenn eine Wirkung dir erlaubt, eine „Einheit bereit zu 
+
+oder, dass man eine andere Karte ablegt (auf die Ablage) oder Spieler in deren Zügen. Wenn du so eine Fähigkeit einsetzen 
+machen“, darfst du das Befehlsplättchen auf der Einheit wie-
+
+entfernt (aus dem Spiel nehmen). Solche Wirkungen darf man willst, sagst du das laut an und legst deren Plättchen in die 
+der oberhalb der Karte hinlegen. Die Einheit ist nun bereit und 
+
+nicht spielen, wenn man diese Voraussetzungen nicht erfüllen Tischmitte. Zu Beginn deines nächsten Zugs (oder wenn die 
+kann erneut aktiviert werden.
+
+kann. Runde endet, falls das zuerst eintritt), nimmst du es wieder 
+7. Banner-Artefakte können einer Einheit jederzeit in deinem an dich und legst es verdeckt hin. Zu Beginn der nächsten 
+
+ a. Verletzungen können niemals auf diese Weise abgelegt Zug zugeordnet werden. Schiebe die Bannerkarte teilweise un- Runde deckst du es wieder auf.
+oder entfernt werden, es sei denn, eine Wirkung lässt dies ter die Einheit, der du die Karte zuordnest. So lange das Banner 
+ausdrücklich zu. Also bezieht sich eine beliebige Karte auf  c. Fähigkeitsplättchen ohne besondere Symbole können ein-
+
+zu der Einheit gehört, profitiert die Einheit von dessen Einfacher 
+beliebige Karten deiner Hand, aber keine Verletzungskarte. mal pro Zug benutzt werden.
+
+Wirkung, die Starke Wirkung ist jedoch nicht nutzbar.
+
+4
+
+MK_rulebook_DEU_02.indd   4 2/23/2012   21:13:02 PM
+
+
+
+ b.  Wenn du eine Karte aus dem Einheitenangebot nimmst 
+MANA BENUTZEN WIRKUNGEN (eine Einheit oder eine Fortgeschrittene Aktion, die von 
+1. Es gibt 4 Mana-Grundfarben (rot, blau, weiß, grün). Das 1. Handlungskarten, Einheiten, Fähigkeitsplättchen und einige einem Kloster stammt), füllst du das Angebot nicht auf. Es 
+
+Mana kommt in zwei Formen vor: Taktikkarten bieten eine Vielzahl von Wirkungen, die innerhalb wird erst in der nächsten Runde erneuert.
+ a.  Reines Mana. Es wird durch einen Manawürfel oder Mana- eines Zugs genutzt werden können. 4. Jegliche Artefakte oder Belohnungen, die im Kampf gewonnen 
+
+marker im Spielbereich des Spielers dargestellt. Wenn man  a. Viele Wirkungen werden mit Kürzeln beschrieben, wie Be- wurden, erhältst du am Ende deines Zugs. Mehr im Abschnitt 
+es erhält, muss man es bis zum Ende seines Zuges aufbrau- wegung X (Du erhältst X Bewegungspunkte) oder Heilen Ende des Zuges.
+chen, sonst verschwindet es. X (Du erhältst X Heilungspunkte). Diese Kürzel sind in den 
+
+ b.  Kristalle. Sie werden durch einen Manamarker im Vorrat Regeln erklärt.
+des Spielers dargestellt (auf seiner Heldenkarte). Bis zu  b. Andere Wirkungen erlauben, die Regeln im Zug abzuändern ABLEGEN UND ENTFERNEN
+
+3 Marker jeder Farbe dürfen hier gelagert werden. oder etwas zu erhalten, was man normalerweise nicht be- 1. Wenn eine Wirkung besagt, dass du eine Karte ablegen sollst, 
+  • Ein Kristall kann jederzeit im Zug des Spielers in reines kommt. Bei solchen Wirkungen befolgt man den Kartentext. kommt die abzulegende Karte auf deine Ablage. Du darfst nie 
+
+Mana umgewandelt werden. Reines Mana kann jedoch   • Wenn eine Wirkung einige Werte oder Regeln ändert, hält eine Verletzungskarte ablegen, es sei denn, die Wirkung erlaubt 
+nur in einen Kristall umgewandelt werden, wenn eine diese Veränderung immer bis zum Ende des laufenden dies ausdrücklich.
+Wirkung dies zulässt. Zugs an (wenn nichts anderes gesagt wird). 2.  Wenn dir eine Wirkung erlaubt, eine Karte zu entfernen:
+
+2. Es gibt zwei besondere Farben (gold und schwarz), die nur in 2. Wenn euch eine Wirkung oder das Zusammenspiel mehrerer  a. lege sie zurück auf das Verletzungsdeck, wenn es eine Ver-
+reiner Form vorkommen (es gibt nie goldene oder schwarze Wirkungen Rätsel aufgibt, konsultiert das FAQ auf der Inter- letzung ist;
+Kristalle für die Vorräte der Spieler). netseite des Spiels.  b.  anderenfalls entferne die Karte aus dem Spiel (zurück in die 
+
+ a. In Tagrunden kann goldenes Mana als Mana beliebiger Schachtel).
+Grundfarbe benutzt werden (es gilt dann in jeder Hinsicht „ERHALTEN“-WIRKUNGEN
+als Mana der gewählten Farbe). Schwarzes Mana kann tags-
+über nie benutzt werden. 1. Wenn eine Wirkung besagt, dass du einen Manamarker er- RÜCKNAHME
+
+hältst, nimmst du einen Manamarker der angegebenen Farbe 1. Falls du nichts anderes vereinbarst (was nicht empfehlenswert 
+ b. In Nachtrunden kann schwarzes Mana benutzt werden, und legst ihn in deinen Spielbereich. ist), darf jeder während seines Zugs Aktionen und Entscheidun-
+
+um diverse Wirkungen auszulösen. Goldenes Mana kann 
+nachts nie benutzt werden. 2.  Wenn eine Wirkung besagt, dass du einen Kristall erhältst, gen zurücknehmen. Das Spiel läuft flotter, wenn man seinen 
+
+nimmst du einen Manamarker der angegebenen Farbe und Zug einfach durchführt und eventuell ändert, als wenn man 
+3. Die Quelle stellt das reine Mana der Welt dar. In jedem Zug legst ihn in deinen Vorrat. Wenn dort bereits 3 Kristalle dieser alles im Voraus durchdenkt.
+
+darf ein Spieler einen Manawürfel aus der Quelle nehmen und Farbe liegen, erhältst du stattdessen einen Manamarker für dei- 2.  Du darfst allerdings nie zu etwas zurückkehren, was vor dem 
+als Mana der Würfelfarbe benutzen. nen Spielbereich. Aufdecken einer neuen Information lag (Spielplanteil, Feind-
+
+ a. Würfel, die auf diese Weise genommen wurden, werden 3. Wenn eine Wirkung besagt, dass du in oder nach deinem Zug plättchen oder Karte) oder vor dem Würfeln oder vor einer 
+am Ende des Spielerzugs neu gewürfelt und in die Quelle eine neue Handlungskarte erhältst (Fortgeschrittene Aktion, Reaktion eines anderen Spielers auf deine Aktionen (normaler-
+zurückgelegt. Zauber oder Artefakt), kommt die neue Karte oben auf dein weise im Kampf Spieler-gegen-Spieler).
+
+ b. Spieler nehmen den Würfel in dem Moment, in dem sie das Handlungsdeck, wenn nicht anders beschrieben.  a. Sobald dies passiert, bleiben alle Entscheidungen, Bewe-
+Mana nutzen wollen. Es ist verboten, einen Würfel zu neh-  a. Immer, wenn du eine Karte vom Zauberangebot oder dem gungen, gespielten Karten, eingesetzten Fähigkeiten und 
+men und dann nicht zu nutzen. Angebot der Fortgeschrittenen Aktionen erhältst, füllst du Einheiteneigenschaften, bezahltes Mana usw. exakt, wie sie 
+
+das Angebot auf (Karten nach unten, 1 neue oben hinlegen). waren. 
+
+1. Einige Taktikkarten, Fähigkeitsplättchen und die Dorfübersicht 5. Einen normalen Zug zu spielen hat zwei freiwillige Teile: Be- Spielplanteile entdecken willst, musst du das vor deiner Ak-
+bieten dir Möglichkeiten, die als „vor deinem Zug“ oder „wäh- wegung und Aktion. tion tun. Du kannst dich nach einer Aktion nicht bewegen 
+rend des Zugs eines anderen Spielers“ bezeichnet sind.  a. Zuerst darfst du (musst aber nicht) dich bewegen. Du oder entdecken.
+
+ a.  Aus spieltechnischer Sicht sind beide identisch. Du kannst kannst bei der Bewegung neue Spielplanteile aufdecken.  e. Du darfst eine beliebige Anzahl Spezialwirkungen  
+sie spielen, während andere Spieler am Zug sind oder direkt Dazu später mehr im Abschnitt Bewegung. während deines Zugs spielen. Das gilt ebenso für Heilungs-
+vor deinem Zug.  b.  Deine Bewegung kann eine erzwungene Aktion auslösen: wirkungen , nur dass letztere nicht im Kampf gespielt 
+
+  Hinweis: Du darfst Wirkungen, die sich auf „während des   •  Wenn du deine Bewegung auf einem Feld beendest, werden dürfen.
+Zugs eines anderen Spielers“ beziehen, auch vor deinem auf dem ein anderer Spieler ist, musst du einen Kampf 6. Wenn du rastest, kannst du dich nicht bewegen, Kämpfe ein-
+ersten Zug nutzen, wenn du der erste Spieler einer Runde Spieler-gegen-Spieler einleiten. leiten oder mit Bewohnern interagieren. 
+bist.   • Wenn du einen befestigten Ort betrittst (also: Burg,  a. Abhängig von deiner Kartenhand kannst du entweder eine 
+
+ b. Diese Wirkungen erlauben dir meistens, Karten von deinem Magierturm oder Stadt überfallen), musst du alle dort normale Rast ausführen (wenn du mindestens eine Karte 
+Handlungsdeck zu ziehen. Die Bedingungen unter Punkt 2 stationierten Feinde bekämpfen. außer einer Verletzung auf der Hand hast) oder eine langsa-
+werden geprüft, nachdem diese Wirkungen erledigt sind.   • Wenn deine Bewegung endet, weil du von umherziehen- me Erholung (wenn du ausschließlich Verletzungen auf der 
+
+2.  Wenn dein Handlungsdeck zu Beginn deines Zugs leer ist und den Feinden angegriffen wirst, musst du diese Feinde Hand hast).
+das Rundenende noch nicht angesagt wurde, kannst du auf bekämpfen.   •  Normale Rast: Lege eine Nicht-Verletzungskarte und 
+deinen Zug verzichten und das Rundenende ansagen. Wenn  c. Wenn du keine erzwungene Aktion ausführen musst, darfst beliebig viele Verletzungskarten ab. 
+du das tust, hat jeder andere Spieler noch einen Zug und die du exakt eine der folgenden freiwilligen Aktionen ausfüh-    Hinweis: Das ist nicht dasselbe wie heilen, denn die Ver-
+Runde ist beendet. ren: letzungskarten kommen auf deine Ablage.
+
+ a. Du darfst das Rundenende nur ansagen, wenn dein Hand-   • Bei bewohnten Orten (Dorf, Kloster, Burg, Magier-   • Langsame Erholung: Zeige deine Handkarten, um zu 
+lungsdeck zu Beginn deines Zugs leer ist. turm, Stadt) kannst du mit den Einwohnern interagie- beweisen, dass du nur Verletzungen haben. Dann lege 
+
+ b. Du musst das Rundenende ansagen, wenn dein Hand- ren. Dazu später mehr unter Interaktion mit den Bewoh- eine davon auf deine Ablage.
+lungsdeck leer ist und du zu Beginn deines Zugs keine nern.  b. Vor oder nach deiner Rast in diesem Zug kannst du beliebig 
+Handkarten mehr hast.   • Bei einem Abenteuerort (Ruine, Dungeon, Grabmal, viele Heilungs- und Spezialwirkungen spielen.
+
+ c. Wenn du noch Handkarten hast, aber dein Handlungsdeck Monsterbehausung, Brutstätte) kannst du entschei- 7. Sobald du alles erledigt hast, was du in deinem Zug machen 
+leer ist, liegt es bei dir, ob du das Rundenende ansagst oder den, ob du ihn erkunden willst. Das führt normalerwei- wolltest (normal oder rasten), sage das Ende deines Zugs an.
+deinen Zug ausspielst. se zum Kampf.  a. Zuerst lege jegliche Manawürfel zurück in die Quelle. 
+
+ d. Wenn du keine Karten mehr auf der Hand und im Hand-   • Sollte es dort in einem oder mehr angrenzenden Feldern Davor würfle mit diesen. Das musst du als erstes machen, 
+lungsdeck hast, aber das Rundenende bereits von einem umherziehende Feinde geben (Ork-Marodeure, Drako- damit der nächste Spieler aufgrund dieser Würfelresultate 
+anderen Spieler angesagt wurde, verfällt dein Zug. nier), kannst du entscheiden, einen oder mehr davon seinen Zug planen kann
+
+3. Wenn dein Zug verfällt, endet dein Zug sofort; du kannst zum Kampf herauszufordern.  b.  Sage dem nächsten Spieler (gemäß Zugfolge), dass er 
+nicht einmal die Vorteile deines gerade besetzten Felds nutzen   • In einem Kloster kannst du dich entscheiden, dieses nie- jetzt mit seinem Zug beginnen kann.
+(Bergwerk oder Magische Lichtung). derzubrennen. Das führt zum Kampf.   • Das beschleunigt das Spiel. Wenn der nächste Spieler 
+
+4. Wenn dein Zug nicht verfällt, hat du zwei Möglichkeiten: ei-   • Wenn keine der obigen Aktionen verfügbar ist, oder du aber darauf besteht, kann er abwarten, bis du deinen 
+nen normalen Zug spielen oder rasten. keine davon ausführen möchtest, kannst du auch nichts Zug vollständig abgeschlossen hast, bevor er beginnt.
+
+ a. In beiden Fällen musst du mindestens 1 Karte während oder tun.  c. Beende deinen Zug, während der Folgespieler seinen be-
+am Ende deines Zugs spielen oder ablegen (außer, deine  d. Du kannst nur eine Aktion pro Zug ausführen (erzwungen ginnt. Siehe Ende des Zugs. 
+Hand ist leer, aber in deinem Handlungsdeck sind zu Beginn oder freiwillig). Wenn du dich bewegen und/oder neue 
+deines Zugs noch Karten).
+
+5
+
+MK_rulebook_DEU_02.indd   5 2/23/2012   21:13:15 PM
+
+
+
+1. Du darfst dich bei einem normalen Zug bewegen (nicht beim  d. Spielplanteile haben immer eine festgelegte Ausrichtung  b.  Einige Karten erlauben es dem Spieler, unpassierbares Ge-
+Rasten). Bei der Bewegung darfst du Spielplanteile aufdecken. (die Nummer in einer ihrer Ecken ist genauso ausgerichtet lände für bestimmte Kosten zu betreten – die Spieler sollten 
+Die gesamte Bewegung muss abgeschlossen sein, bevor du wie auf dem Startteil). Der Spieler hat also keine Wahl beim aber ihren Zug auf einem sicheren Platz beenden (unten 
+eine Aktion ausführst (Kampf oder Interaktion). Ausrichten des Teils. erklärt), ansonsten kommt der erzwungene Rückzug zum 
+
+2. Bei der Bewegung kannst du beliebig viele Bewegungswirkun-  e. Abhängig von der Rückseite des zu legenden Spielplanteils Einsatz (siehe Abschnitt Ende des Zuges , Seite 9).
+gen spielen. Die meisten davon erzeugen Bewegungs- gibt es zusätzliche Einschränkungen:  c.  Einige Wirkungen erlauben dir, dich um ein oder mehr Fel-
+punkte.   • Landschaftsteile (grüne Rückseite) können nur an min- der zu bewegen. Bei solchen bezahlst du nur die bei der 
+
+ a. Du darfst beliebig viele Bewegungskarten aus deiner Hand destens zwei bereits ausliegende Teile oder an ein Teil Wirkung angegebenen Kosten und du darfst sogar über 
+spielen (und diese mit dem Ihnen verfügbaren Mana ver- gelegt werden, das seinerseits an mindestens zwei Teilen unpassierbare Felder ziehen (auch solche, die von umher-
+stärken), Bewegungsfähigkeiten benutzen oder Einheiten anliegt. ziehenden Feinden besetzt sind oder mit Befestigten Orten), 
+mit Bewegungseigenschaften aktivieren. wenn nicht anders angegeben. 
+
+  • Zentralteile (braune Rückseite) können nur so angelegt 
+ b. Die Wirkung Bewegung X bedeutet, „Du erhältst X Bewe- werden, dass sie an mindestens zwei bereits ausliegen-   • Einige dieser Wirkungen weisen dich an, den Zug auf ei-
+
+gungspunkte“. den Teilen anliegen. nem sicheren Platz zu beenden (siehe unten).
+ c. Jede Karte (außer Verletzungen) kann quer in eine Bewe-   •  Falls keine Teile mehr im Spielplanteil-Stapel vorhanden  d. Ein Feld gilt als sicherer Platz:
+
+gungsspalte gespielt werden, um Bewegung 1 zu erzeugen. sind, wenn ein Spieler erkunden möchte, kann er ein   • wenn es unter normalen Bedingungen erreichbar ist 
+ d. Ein Spieler darf während der Bewegung außerdem beliebig zufälliges Landschaftsteil ziehen, das beim Spielaufbau (d. h., keine Spezialwirkungen sind nötig).
+
+viele Spezial-  und Heilungswirkungen  spielen. aussortiert wurde. Wenn alle Landschaftsteile bereits   • wenn es kein uneroberter befestigter Ort ist oder eine 
+ausgelegt sein sollten, kann er stattdessen aussortierte 
+
+3. Rechne die Bewegungspunkte aller deiner Karten und Wir- Burg eines anderen Spielers.
+Zentralteile benutzen. Auf diese Weise erkundete Spiel-
+
+kungen zusammen. Du bewegst dann deine Figur, Feld für Feld, planteile können aber nur so angelegt werden, dass sie   • wenn es keinen anderen Helden enthält, außer bei Or-
+gibst dabei Bewegungspunkte in Höhe der Kosten des Gelän- an mindestens drei anderen Teilen anliegen (um Lücken ten, an denen mehrere Helden erlaubt sind (Portal, er-
+des aus, in das du dich bewegst (wie auf der Tag-/Nachttafel zu füllen). Sind keine Teile mehr vorhanden, können oberte Stadt).
+angegeben). Du darfst dich nur auf passierbare angrenzende auch keine mehr erkundet werden. 8.  Andere Spieler:
+Felder bewegen. 
+
+ f. Wenn Orte auf einem neu aufgedeckten Spielplanteil  a. Du darfst durch Felder ziehen, die von den Figuren ande-
+ a. Die Felder mit dem X auf der Tag-/Nachttafel sind unpas- sind, lest den Abschnitt „sobald aufgedeckt“ auf der zugehö- rer Spielern besetzt sind, es sei denn, dort ist die Burg eines 
+
+sierbar. rigen Ortsübersicht und befolgt ihn. Besonders: anderen Spielers.
+  Hinweis: Die Kosten für die Bewegung in Wüste oder Wald   • Wenn ein Kloster aufgedeckt wird, zieht 1 Karte Fort-   • Es ist außerdem erlaubt, ein Feld mit einem anderen Spie-
+
+sind bei Tag und Nacht unterschiedlich. geschrittene Aktion und legt sie ins Einheitenangebot ler zu betreten, von dort aus ein oder mehrere Spielplan-
+  Hinweis: Die Kosten zur Bewegung in eine Stadt sind im- (nicht ins Angebot der Fortgeschrittenen Aktionen). teile aufzudecken und dann deine Bewegung fortzuset-
+
+mer 2, egal, auf welchem Gelände die Stadt steht.  g.  Wenn ein Spielplanteil mit Stadt aufgedeckt wird: zen.
+4. Einschränkungen:   • Nehmt die zugehörige Stadtkarte  b. Wenn du ein Feld mit einem anderen Spieler betrittst und 
+ a. Das Betreten eines Felds mit einem uneroberten Ort (Burg, und legt diese nahe zum Spielplan. deine Bewegung nicht fortsetzen kannst oder willst, gilt dies 
+
+Magierturm, Stadt) oder mit einer Burg, die einem ande- automatisch als Angriff auf diesen Spieler. Mehr dazu im 
+  • Prüft die Szenariobeschreibung, um 
+
+ren Spieler gehört, beendet deine Bewegung sofort und gilt Abschnitt Kampf Spieler-gegen-Spieler.
+zu erfahren, welchen Level die Stadt 
+
+als Überfall auf diesen Ort. hat. Nehmt die zugehörige Stadtfigur   • Das Betreten einer Burg eines anderen Spielers, wäh-
+ b. Du darfst ein Feld mit einem umherziehenden Feind (Ork- und dreht deren Basis so, dass der Level der Stadt im rend dieser dort anwesend ist, beendet deine Bewegung 
+
+Marodeur oder Drakonier) nicht betreten, bis dieser be- Fenster auftaucht. Stellt die Figur auf das Stadtfeld. sofort und gilt daher automatisch als Angriff auf diesen 
+siegt ist. Spieler.
+
+  • Die Basis zeigt Kreise in verschiedenen Farben. Pro Kreis 
+ c. Wenn du einen umherziehenden Feind provozierst (also zieht 1 Feindplättchen der angegebenen Farbe und legt  c. Ein Angriff auf einen anderen Spieler gilt als deine Aktion 
+
+von einem an sein Plättchen angrenzenden Feld zu einem es verdeckt auf die Stadtkarte. für diesen Zug. Es ist niemals erlaubt, eine andere Aktion auf 
+anderen ebenfalls daran angrenzenden Feld ziehst), wirst du dem Feld eines anderen Spielers auszuführen.
+
+6. Während der Bewegung darfst du so viele Felder gehen und so 
+von diesem Feind angegriffen und deine Bewegung endet viele Spielplanteile erkunden, wie du Bewegungspunkte be-  d. Auf einigen Feldern sind mehrere Figuren erlaubt. Auf sol-
+sofort. zahlst. chen kommt es nie zum Kampf:
+
+ d. Das Betreten eines Felds mit einem Abenteuerort (Ruine,  a. Du darfst zwischen Bewegen und Erkunden wechseln.   • Wenn du deinen Zug auf einem Portalfeld beendest, 
+Monsterbehausung, Brutstätte, Dungeon oder Grab- nimmst du deine Figur vom Spielplan und stellst sie vor 
+stätte) beendet deine Bewegung nicht zwingend, du kannst  b. Du darfst jederzeit während der Bewegung zusätzliche dich. Stelle die Figur wieder auf das Portal, wenn du dei-
+ihn ignorieren und das Feld als leer behandeln, selbst wenn Wirkungen spielen, um deiner Gesamtsumme Bewegungs- nen nächsten Zug beginnst.
+dort Feindplättchen liegen. punkte hinzuzufügen.
+
+  • Wenn du eine eroberte Stadt betrittst, stellst du deine 
+5. Während der Bewegung kannst du Spielplanteile aufdecken:   • Du darfst zusätzliche Karten spielen, nachdem du ein Figur außerhalb des Spielplans auf die zugehörige Stadt-
+
+neues Spielplanteil aufgedeckt hast.
+ a. Du kannst nur dann Spielplanteile aufdecken, wenn du karte. Stelle die Figur wieder auf den Spielplan, wenn sie 
+
+angrenzend zu einer Position stehst, an der ein neues Teil   • Bewegungspunkte der neu gespielten Wirkungen wer- sich aus der Stadt herausbewegt.
+angelegt werden darf. den zu eventuell von vorher übrig gebliebenen Bewe-  e. In bestimmten Situationen ist der Kampf Spieler-gegen-
+
+gungspunkten hinzugezählt.
+  • Spielplanteile müssen an durch deren Ecksymbole fest- Spieler verboten. Wenn du in solchen Situationen deine 
+
+gelegte Positionen gelegt werden.   •  Es ist nicht möglich, bereits gespielte Karten nachträglich Bewegung auf dem Feld eines anderen Spielers beendest, 
+mit Mana zu verstärken, um deren Starke Wirkung aus- kannst du in deinem Zug keine Aktion ausführen. Die 
+
+  • Kein Spielplanteil darf hinter der Meeresküste angelegt zulösen – dies muss beim Ausspielen der Karte gesche- Regeln für erzwungenen Rückzug gelten für dich am Ende 
+werden (siehe Abschnitt Spielaufbau und Definition der hen oder gar nicht. deines Zuges (siehe Abschnitt Ende des Zuges). Diese Situa-
+Spielplanform in der Szenariobeschreibung).
+
+7. Einige Wirkungen verändern die Bewegungsregeln. Sie gelten tionen sind:
+ b. Um ein Spielplanteil aufzudecken, muss der Spieler 2 Bewe- für alle Bewegungen, die nach dem Ausspielen dieser Wirkung   • Das Ende der Runde wurde angesagt und jeder Spieler 
+
+gungspunkte ausgeben. ausgeführt werden, bis zum Ende des Zuges. hat seinen letzten Zug für diese Runde.
+ c. Das neue Spielplanteil wird oben vom Spielplanteil-Stapel  a.  Einige Wirkungen verringern die Bewegungskosten auf   • Die Bedingungen für das Szenario wurden erfüllt und 
+
+gezogen. Falls der Spieler auf einem Feld steht, von dem aus bestimmtem Gelände. Wenn ein Spieler mehr als einen Typ jeder Spieler hat seinen letzten Zug für diese Runde.
+zwei erlaubte Positionen zum Anfügen eines Spielplanteils dieser Wirkungen spielt, kann er sie in beliebiger Reihenfol-
+möglich sind, muss er vor dem Ziehen des Teils sagen, wo er   • Ihr spielt ein kooperatives Szenario oder ihr habt euch 
+
+ge anwenden. Fallen die Bewegungskosten für ein Gelände 
+es anlegen will. geeinigt, Kämpfe Spieler-gegen-Spieler nicht zu erlau-
+
+auf 0, kann der Spieler dieses Gelände ohne Bewegungs- ben.
+punkte betreten. Die Bewegungskosten eines Geländes 
+können nie unter 0 fallen.   • Ihr spielt ein Teamszenario und der andere Spieler ist 
+
+dein Teamkollege.
+
+6
+
+MK_rulebook_DEU_02.indd   6 2/23/2012   21:13:27 PM
+
+
+
+1. Du kannst mit den Bewohnern an verschiedenen Orten auf 4. Sobald du deinen Gesamteinfluss berechnet hast, kannst du   •  In der Roten Stadt kannst du für je 12 
+den Spielplan interagieren (Dörfer, Kloster, Burgen in deinem ihn dafür ausgeben, was der Ort bietet. Auf der Ortsübersicht Einfluss Artefakte kaufen. Artefakte 
+Besitz und Magiertürme sowie Städte, die von irgend jemand oder der Stadtkarte steht, was möglich ist. werden am Ende deines Zugs gezogen, so als ob du diese 
+erobert wurden). Interaktion ist dann deine Aktion des Zugs.  a. Du kannst aus dem Einheitenangebot eine Einheit rekru- im Kampf gewonnen hättest (unter Ende des Zugs –
+
+2. Bei der Interaktion darfst du jede Anzahl Einflusswirkungen tieren, falls eines der Symbole des Einheitentyps (oben links Kampfbelohnungen).
+ spielen, um Einflusspunkte zu erzeugen. auf der Einheitenkarte) zu dem Symbol des Ortes passt (   • In der Blauen Stadt kannst du 
+
+ a. Du kannst Einflusskarten aus deiner Hand spielen (und die- Symbol oben rechts auf der Ortsübersicht). Die Einflusskos- + wie in einem Magierturm Zau-
+se mit deinem verfügbaren Mana verstärken). Einflussfähig- ten stehen oben links auf der Einheitenkarte. ber kaufen.
+keiten einsetzen oder Einheiten mit Einflusseigenschaften   •  Rekrutieren wird im Abschnitt Allgemeine Grundsätze –   • 
+aktivieren. Einheiten benutzen erklärt. + In der Weißen Stadt kannst du Ein-
+
+heiten jeden Typs rekrutieren. 
+ b. Die Wirkung Einfluss X bedeutet, „du erhältst X Einfluss-   • Du kannst eine neu rekrutierte Einheit sofort benutzen Außerdem kannst du für 2 Einfluss 
+
+punkte“. (allerdings kannst du keine etwaige Einflusswirkung der dem Einheitenangebot eine (golde-
+ c. Jede Karte (außer Verletzungen) kann quer in eine Spalte Einheit benutzen, damit diese Einheit sich selbst bezahlt). ne) Eliteeinheit-Karte hinzufügen.
+
+gespielt werden, um Einfluss 1 zu erzeugen.  b.  Heilungspunkte können in Dörfern für 3 Einfluss und in   •  / ? In der Grünen Stadt kannst du 
+ d. Der Spieler darf auch eine beliebige Anzahl Spezial-  Klostern für 2 Einfluss gekauft werden (siehe Übersichten Einflusspunkte zahlen, um eine 
+
+und Heilungswirkungen  während der Interaktion spie- dieser Orte). Mehr im Abschnitt Verletzungen und Heilung. Karte aus dem Angebot der 
+Fortgeschrittenen Aktionen zu erhalten (fülle das An-
+
+len.  c. Wie auf der Klosterübersicht beschrieben, kannst du dort gebot anschließend auf) oder die oberste Karte vom 
+3. Zähle die Einflusspunkte aus allen deinen Karten und Wir- für 6 Einfluss eine neue Fortgeschrittene Aktion erlernen. Deck der Fortgeschrittenen Aktionen zu ziehen. Lege 
+
+kungen zusammen. Die Gesamtzahl wird dann durch dein An- Die Fortgeschrittene Aktion muss aus dem Einheitenange- die gekaufte Karte oben auf dein Handlungsdeck.
+sehen modifiziert: bot stammen (nicht aus dem Angebot der Fortgeschrittenen 
+
+Aktionen) und wird oben auf dein Handlungsdeck gelegt. 5. Du kannst jede Anzahl von gleichen oder unterschiedlichen 
+ a. Schaue nach, wo dein Schildplättchen auf der Ansehens- Das Angebot wird aber nicht vor dem Beginn der nächsten Dingen innerhalb einer Interaktion erwerben, so lange du ge-
+
+anzeige liegt. Es kann einen positiven oder negativen Runde aufgefüllt. nug Einflusspunkte dafür zahlen kannst.
+Modifikator zeigen. Verändere deinen Einfluss ggf. ent-
+sprechend.  d. Du kannst in einem Magierturm aus dem Zauberangebot  a. Du wendest Bonus oder Abzug (für Ansehen oder Schild-
+
+neue Zauber lernen. Um einen Zauber zu bekommen, plättchen in einer Stadt) nur einmal pro Zug an, egal wie 
+  • Falls dein Plättchen auf dem X-Feld der Ansehensanzei- musst du 7 Einfluss bezahlen sowie 1 Mana der des zu er- viele Dinge du kaufst.
+
+ge liegt, darfst du überhaupt nicht interagieren! lernenden Zaubers bezahlen. Ein neu erworbener Zauber 
+ b. Wenn du in einer eroberten Stadt interagierst, zähle 1 zu wird oben auf dein Handlungsdeck gelegt und das Zauber-
+
+deinem Einfluss pro eigenem Schildplättchen dort. angebot wird aufgefüllt.
+  Hinweis: Sind deine Bonusse hoch genug, kannst du inter-  e. Jede Stadt hat eigene Interaktionsmöglichkeiten, die un-
+
+agieren, ohne überhaupt Einflusswirkungen zu spielen. ten auf der Stadtkarte beschrieben sind:
+
+1. Es gibt verschiedene Wege, den Kampf gegen einen Feind ein- mehr umherziehende Feinde provozieren. Du musst gleich- rungsangriffe, die du in der ersten Phase nicht gespielt hast), 
+zuleiten: zeitig die Verteidiger bekämpfen als auch die umherziehen- um zu versuchen, Feinde zu eliminieren.
+
+ a. Das Betreten eines Felds mit einem uneroberten befestig- den Feinde. Die umherziehenden Feinde sind allerdings 4. In jeder Phase kann der Spieler entsprechende Karten spielen, 
+ten Ort (Burg, Magierturm, Stadt). Dies gilt als Überfall nicht befestigt und du musst sie auch nicht zwingend besie- Fähigkeiten einsetzen und Einheiten aktivieren. Lege alle Wir-
+und du musst die Verteidiger an diesem Ort bekämpfen. Sie gen, um den Überfall erfolgreich auszuführen. kungen jeder Phase in einzelnen Spalten aus.
+sind immer befestigt (wird später erklärt). Jedes Mal, wenn  c. Wenn deine Bewegung einen Kampf ausgelöst hat und es 5. Falls dies durch keine Wirkung eingeschränkt ist, darfst du in 
+du einen Überfall einleitest, erhältst du Ansehen -1, unab- einen oder mehrere umherziehende Feinde angrenzend zu jeder dieser Phasen weitere Kampfwirkungen spielen (die 
+hängig vom Ausgang des Kampfes. dem Feld gibt, in das du gezogen bist, kannst du diese her- deine Einheiten, Feinde oder Kampfregeln betreffen). Wenn 
+
+  • Außerdem zählt das Betreten eines Felds mit Burg, die ei- ausfordern, ebenfalls zu kämpfen. Das heißt: nicht anders angegeben, bestehen diese Wirkungen bis zum 
+nem anderen Spieler gehört, als Überfall und du erhältst   • du kannst einen umherziehenden Feind durch deine Be- Ende des Zugs.
+Ansehen -1. Wenn sich der andere Spieler in der Burg wegung provozieren, dann einen oder mehrere umher-  a. Jede Nicht-Angriffs-/Blockwirkung von einer roten Karte, 
+aufhält, beginnst du einen Kampf Spieler-gegen-Spieler. ziehende Feinde herausfordern, die an das Feld angren- oder einer Einheiteneigenschaft, für die mit rotem Mana be-
+Wenn nicht, wird ein graues Feindplättchen als Besat- zen, in das du gezogen bist, und dann alle bekämpfen. zahlt wird, hat keine Auswirkung auf Feinde mit Feuer-Wi-
+zung der Burg gezogen (bringt nur den halben Ruhm).   • Beim Überfall auf einen befestigten Ort kannst du um- derstand . 
+
+ b. Wenn du auf einem Abenteuerort mit Feinden stehst herziehende Feinde, die an diesen Ort angrenzen, he-  b. Jede Nicht-Angriffs-/Blockwirkung von einer blauen Karte, 
+(Dungeon oder Grabstätte, uneroberte Monsterbehau- rausfordern. Diese schließen sich den Verteidigern im oder einer Einheiteneigenschaft, für die mit blauem Mana 
+sung oder Brutstätte, oder Ruine mit Feinden), kannst du Kampf an, sind aber nicht befestigt und du musst sie bezahlt wird, hat keine Auswirkung auf Feinde mit Eis-Wi-
+ansagen, dass du diesen Ort als deine Aktion betrittst. Das nicht besiegen, um den Ort erfolgreich zu überfallen. derstand . 
+löst einen Kampf mit allen Feinden auf diesem Ort aus.  d. Du kannst keine zusätzlichen Feinde herausfordern, wenn 6.  Spieler dürfen beliebig viele Spezialwirkungen  in der 
+
+ c. Wenn du auf einem Kloster stehst, kannst du ansagen, dass du einen Abenteuerort betrittst. Kampfphase spielen. Allerdings dürfen sie während des 
+du es niederbrennen willst. Wenn du das tust, erhältst du  e. Du kannst keine Feindplättchen und gleichzeitig einen Kampfs nicht heilen . 
+Ansehen -3, dann ziehst du ein violettes Feindplättchen als anderen Spieler bekämpfen. In deinem Zug hast du nur 1 
+Verteidiger. Aktion, und Kampf gegen Feinde und Spieler-gegen-Spieler 
+
+ d. Wenn du benachbart zu einem umherziehenden Feind- zählen als 2 verschiedenen Aktionen. FERN- UND BELAGERUNGS-
+
+plättchen stehst (Ork-Marodeur oder Drakonier), kannst 3. Der Kampf beginnt beim Ziehen und/oder Aufdecken der zu ANGRIFFPHASE
+du es zum Kampf herausfordern. Gibt es mehrere um- bekämpfenden Feinde. Danach läuft er in 4 Phasen ab: 1.  In dieser Phase führst du einen oder mehrere Angriffe aus oder 
+herziehende Feinde auf mehreren angrenzenden Feldern, du passt und machst nichts.
+kannst du einen oder mehrere davon herausfordern.  a.  Fern- und Belagerungsangriffphase – Fern- und/oder Be-
+
+lagerungsangriffe können benutzt werden, um einige Fein- 2. Um einen Angriff auszuführen, wählst du ein oder mehr 
+ e. Wenn du dich von einem an ein umherziehendes Feind- de zu eliminieren, bevor sie dir schaden können. Feindplättchen als Ziel des Angriffs.
+
+plättchen angrenzenden Feld zu einem anderen Feld be-
+wegst, das ebenfalls an diesen Feind angrenzt, provoziert  b. Blockphase – Feinde, die in der Fern- und Belagerungs- 3. Spiele eine beliebige Zahl Fern- und Belagerungsangriffe – 
+das diesen umherziehenden Feind dazu, dich anzugreifen. angriffphase nicht eliminiert wurden, greifen nun an. Du mit den Elementen Feuer, Eis, Kaltes Feuer oder physisch (phy-
+
+kannst Blockwirkungen spielen, um diese Angriffe zu blo- sische Angriffe haben keine spezielle Elementbezeichnung).
+2. Nur ein Kampf pro Zug ist erlaubt. Manchmal können jedoch cken.
+
+mehrere Feinde auf unterschiedlichen Feldern bekämpft wer-  a. Du darfst Karten aus deiner Hand spielen, die Fern- oder Be-
+den:  c. Schadenphase – Die ungeblockten Feinde erzeugen Scha- lagerungsangriffe bieten (und diese mit deinem verfügbaren 
+
+den. Schadenspunkte müssen deinem Helden und/oder Mana verstärken), Fern- oder Belagerungsangrifffähigkeiten 
+ a. Es kann vorkommen, dass eine einzige Bewegung 2 umher- deinen Einheiten zugewiesen werden. einsetzen oder Einheiten mit Fern- oder Belagerungsangriff-
+
+ziehende Feinde provoziert. Du musst beide bekämpfen.  d. Angriffphase – Greife Feinde an, indem du alle möglichen eigenschaften aktivieren. Schichte diese Wirkungen in einer 
+ b. Ein Überfall ist eine Bewegung, daher kann er einen oder Angriffe auf deiner Hand einsetzt (auch Fern- und Belage- Spalte übereinander, um den Überblick zu behalten.
+
+7
+
+MK_rulebook_DEU_02.indd   7 2/23/2012   21:13:39 PM
+
+
+
+  • Wenn einige der gewählten Feinde befestigt sind (entwe-  a. Spiele Karten aus deiner Hand, die Block liefern (mit deinem griffstypen hat (physischer Widerstand gegen normale (also 
+der weil sie einen befestigten Ort verteidigen oder weil verfügbaren Mana kannst du diese verstärken), benutze physische) Angriffe, Feuer-Widerstand gegen Feuer-Angrif-
+sie die Eigenschaft befestigt  auf ihrem Plättchen Blockfähigkeiten oder aktiviere deine Einheiten mit Block- fe, Eis-Widerstand gegen Eis-Angriffe und Kaltes-Feuer-
+haben), können nur Belagerungsangriffe gespielt wer- eigenschaften. Verbinde diese Wirkungen, indem du sie in Widerstand gegen Kaltes-Feuer-Angriffe):
+den. Du kannst Fernangriffe nur spielen, wenn keiner der einer Spalte auslegst (und um den Überblick zu behalten).   • Zuerst verringere den Schaden um den Rüstungswert 
+betroffenen Feinde befestigt ist.  b.  Jede Karte (außer Verletzungen) kann quer in diese Spalte als der Einheit (ohne die Einheit zu verletzen).
+
+  • Wenn kein gewählter Feind befestigt ist, kannst du Fern- Block 1 gespielt werden. Quer gespielte Karten sind immer   • Wenn das sämtlichen Schaden aufnimmt, passiert wei-
+und Belagerungsangriffe beliebig kombinieren. physischer Block 1, niemals ein Block eines Element-Typs. ter nichts.
+
+  • Feinde, die doppelt befestigt sind (weil sie die befestigt- 5.  Ermittle den gesamten Blockwert aller gespielten Wirkungen.   • Bleibt jedoch Schaden übrig, weise diesen wie üblich zu, 
+Eigenschaft besitzen und einen befestigten Ort vertei-  a. Gegen Elementangriffe sind nur bestimmte Blocks voll indem du die Einheit verletzt und den Schaden erneut 
+digen), können in dieser Phase kein Ziel von Angriffen wirksam: um deren Rüstungswert verringerst.
+werden, nicht einmal durch Belagerungsangriffe.
+
+  • Jede Art Block ist voll wirksam gegen physische Angriffe    – Einheiten mit Widerstand gegen bestimmte Angriffs-
+ b.  Karten können nicht quer gespielt werden, um als Fern- . typen können also Schaden in doppelter Höhe ihrer 
+
+und Belagerungsangriffe zu zählen. 
+  • Nur Eis- und Kaltes-Feuer-Blocks sind voll wirksam ge- Rüstung aufnehmen; sie werden nur verletzt, wenn 
+
+4. Jetzt rechne den Gesamt-Angriffswert aller gespielten Wir- gen Feuer-Angriffe . der Schaden größer war als ihre Rüstung. 
+kungen aus:
+
+  • Nur Feuer- und Kaltes-Feuer-Blocks sind voll wirksam   • Wenn einer Einheit Schaden zugewiesen wird, sie aber 
+ a. Wenn mindestens einer der betroffenen Feinde ein oder gegen Eis-Angriffe . durch ihren Widerstand keine Verletzung erhält, kann 
+
+mehrere Widerstandssymbole hat, dann sind alle Angriffe ihr im selben Kampf kein anderer Schaden zugewiesen 
+eines Typs, der zu diesem Symbol passt, ineffizient – ihre    • Nur Kaltes-Feuer-Blocks sind voll wirksam gegen Kal- werden.
+Stärke wird halbiert (alle betroffenen Angriffe zusammen- tes-Feuer-Angriffe .
+
+5.   Wenn du keiner Einheit Schaden zuweisen willst oder kannst, 
+zählen, das Ergebnis durch 2 teilen, abrunden).   b. Teilwirksame Blocks werden halbiert. Beim Berechnen oder noch Schaden übrig ist, nachdem du einen Teil deinen 
+
+  • Kaltes-Feuer-Angriffe werden nur dann halbiert, wenn des Gesamt-Blocks zähle alle teilwirksamen Blocks zusam- Einheiten zugewiesen hast, musst du den gesamten Rest 
+mindestens einer der Feinde sowohl über Eis- als auch men, teile durch 2 (abrunden) und zähle dann den Wert aller deinem Held zuweisen. Das wird mehrfach gemacht, bis aller 
+Feuer-Widerstand verfügt. voll wirksamen Blocks dazu. Schaden zugewiesen wurde.
+
+5.  Für einen erfolgreichen Angriff muss der Gesamt-Angriffswert 6. Der Block ist erfolgreich, wenn sein Gesamtwert mindestens so  a. Um deinem Held Schaden zuzuweisen, nimm eine eine Ver-
+mindestens so hoch sein wie der Gesamt-Rüstungswert  hoch ist wie der Angriffswert des gewählten Feinds. letzungskarte auf deine Hand und reduziere den Gesamt-
+aller betroffener Feinde. Wenn das zutrifft, sind die Feinde be-  a. Wenn der Feind die Eigenschaft flink  hat, wird sein schaden um den Rüstungswert deines Helden (die linke 
+siegt. Angriffswert für den Zweck des Blockens verdoppelt. Zahl auf dem Levelplättchen deines Helden).
+
+ a. Besiegte Feindplättchen werden sofort abgelegt (auf einen 7. Ein erfolgreich geblocktes Feindplättchen kommt beiseite.    • Wie bei Einheiten gilt: Selbst wenn der zugewiesene 
+Stapel neben dem zugehörigen Feindstapel; sie nehmen am Sein Angriff wurde aufgehalten und es wird in der nächsten Schaden unter deinem Rüstungswert liegt, erhält dein 
+weiteren Kampf nicht mehr teil). Kampfphase keinen Schaden verursachen. Es ist allerdings Held trotzdem eine Verletzung. 
+
+ b. Der angreifende Spieler erhält Ruhm in Höhe der Zahlen, noch nicht eliminiert. Dazu hast du in der Angriffphase Gele-  b.  Wiederhole diesen Vorgang, bis aller Schaden zugewiesen 
+die unten auf den Feindplättchen stehen. Bewege dein genheit. ist. Du erhältst also 1 Verletzung pro X Punkte Schaden (X ist 
+Schildplättchen auf der Ruhmanzeige entsprechend weiter.  a.  Wenn ein beschworenes Monster erfolgreich geblockt wur- deine Rüstung), aufgerundet.
+
+  • Wenn es das Ende einer Reihe überschreitet, levelst du de, kommt es auf den entsprechenden Ablagestapel (Du  c. Bewusstlosigkeit: Wenn die Anzahl der Verletzungen, die du 
+nicht sofort auf. Aufleveln geschieht erst am Ende des erhältst keinen Ruhm dafür). während eines Kampfs auf die Hand bekommen hast, grö-
+Zugs. 8. Wenn dein Gesamt-Block niedriger ist als der Angriffswert des ßer ist als dein unmodifiziertes Handlimit /die rechte Zahl auf 
+
+6. Ein Angriff mit niedrigerem Gesamtwert als der Gesamtrüs- Feinds, den du blocken willst, hat der Block keine Wirkung. Du deinem Levelplättchen) wirst du bewusstlos – lege sofort 
+tung der Feinde ist wirkungslos und jeglicher ausgeteilte Scha- kannst durch Blocks den Angriffswert eines Feinds nicht ver- alle Nicht-Verletzungskarten aus deiner Hand ab.
+den bleibt nicht für kommende Phasen oder Züge erhalten. ringern – entweder blockst du ihn vollständig oder der Angriff    • Verletzungen, die du aus anderen Gründen erhältst (z. B. 
+
+kommt mit voller Stärke durch.
+ a. Wenn du feststellst, dass deine Angriffe nicht genügen, um Wirkungen bestimmter Karten, die du im Kampf gespielt 
+
+die gewählten Feinde zu besiegen, musst du entweder zu-  a. Manchmal hat eine Blockkarte Wirkungen, die nichts mit hast), zählen ebenfalls zur Bewusstlosigkeitsregel.
+sätzliche Angriffe spielen oder deine Feindauswahl ändern dem Gesamtwert deines Blocks zu tun haben. Wenn nicht    • Während du bewusstlos bist, können deine Einheiten 
+oder deine Karten und damit deinen Angriff zurücknehmen. anders angegeben, gelten diese Wirkungen, egal, ob der weiterkämpfen, du kannst beliebige deiner Fähigkeiten 
+
+Block erfolgreich war oder nicht.
+7. Du kannst in dieser Phase keinen, einen oder mehrere Angriffe einsetzen und auch weiter Verletzungen nehmen, wenn 
+
+ankündigen. Bei jedem Angriff kannst du einen oder mehrere 9. Du darfst jede Anzahl von angreifenden Feinden in dieser Pha- du deinem Helden weiteren Schaden zuweisen musst.
+Feinde gleichzeitig besiegen. Gruppiere die Karten und Wir- se blocken. Jeder Feind muss aber einzeln geblockt werden; du 6. 1. Spezielle Feindeigenschaften für den Schaden:
+kungen, die du spielst, in separaten Spalten. darfst nicht mehrere Feinde zusammenfassen.
+
+ a.  Wenn ein Feind die Eigenschaft Gift  hat:
+ a. Wenn einige der Feinde befestigt sind und einige nicht, soll-   • Wenn einer Einheit Schaden durch einen giftigen Feind 
+
+test du die unbefestigten separat angreifen (um deine Fern- SCHADENPHASE zugewiesen wird, und sie 1 Verletzung erhalten würde, 
+angriffe nutzen zu können). 1.  Alle Feinde, die noch leben und nicht geblockt wurden, fügen erhält sie 2 Verletzungen. Man muss sie zwei Mal heilen, 
+
+ b. Wenn einige Feinde bestimmte Widerstände besitzen und dir jetzt den Schaden ihrer Angriffe zu. um beide Verletzungen zu entfernen.
+einige nicht, solltest du diese separat angreifen, weil die Teil-
+nahme eines Feinds mit Widerstand den Wert aller Angriffe  a.  Gibt es keine solche Feinde, überspringst du diese Phase.   • Wenn einem Held Schaden durch einen giftigen Feind 
+
+zugewiesen wird, muss er zusätzlich zu jeder Verlet-
+halbiert, gegen die er Widerstand hat.  b. Anderenfalls handelst du einen ungeblockten Feind nach zungskarte, die er dadurch erhält, 1 weitere Verletzung 
+
+dem anderen ab. auf seine Ablage legen.
+2.  Jeder Feind fügt dir Schaden in Höhe seines Angriffswerts zu.
+
+BLOCKPHASE  b.  Wenn ein Feind die Eigenschaft Versteinern  hat:
+ a. Hat der Feind die Eigenschaft brutal , fügt er dir Scha-
+
+1.  Nachdem du etwaige Fern- und Belagerungsangriffe ausge- den in doppelter Höhe seines Angriffswerts zu.   • Wenn einer Einheit Schaden durch einen versteinernden 
+führt hast, beginnt die Blockphase. Nun greifen dich alle Fein- Feind zugewiesen wird, und sie 1 Verletzung erhalten 
+de an, die noch nicht eliminiert wurden, jedoch kannst du mit 3.  Du musst sämtlichen Schaden zuweisen. Du kannst Schaden würde, ist sie sofort zerstört (sie kommt aus dem Spiel).
+Blocks den Angriff eines oder mehrerer Feinde aktiv kontern. einer oder mehreren deiner unverletzten Einheiten zuweisen. 
+Ein geblockter Feind erzeugt in der Schadenphase keinen Scha- Der Rest wird deinem Helden zugewiesen.   • Wenn einem Held Schaden durch einen versteinernden 
+
+Feind zugewiesen wird, muss er sofort sämtliche Nicht-
+den. 4.  Du kannst einer Einheit so lange Schaden zuweisen, wie die- Verletzungskarten, die er auf der Hand hat, ablegen.
+
+2.  Pro Feind mit dem Symbol herbeirufen  ziehst du ein brau- se unverletzt ist. Unverletzten verausgabten Einheiten kann  c.  Wenn ein Feind die Eigenschaft herbeirufen 
+nes Feindplättchen und legst es jetzt zur Gruppe der Feinde. Schaden zugewiesen werden.  hat, 
+
+weise den Schaden des herbeigerufenen Feindes zu (be-
+ a. Sowohl in der Block- und Schadenphase ersetzt dieses be-  a. Immer, wenn eine Einheit Schaden erhält, lege eine Verlet- rücksichtige sämtliche Eigenschaften, die dieser Feind mög-
+
+schworenen Monster den beschwörenden Feind. zungskarte auf diese Einheit. Eine Einheit wird verletzt, licherweise hat). Nach dem Angriff lege das beschworene 
+egal wie viel Schaden ihr zugewiesen wurde. Danach re- Feindplättchen auf dessen Ablagestapel.
+
+  b.  So lange das beschworene Monster anwesend ist, kann duziere den Gesamtschaden um den Rüstungswert dieser 
+keine Wirkung etwas gegen den Feind ausrichten, der es Einheit. 7. 1. Die Phase endet, sobald du sämtlichen Schaden aller un-
+beschworen hat. Das beschworene Monster wird aber ganz geblockten Feinde zugewiesen hast.
+normal behandelt.   • Einer Einheit mit hohem Rüstungswert nur 1 Punkt Scha-
+
+den zuzuweisen, verletzt diese Einheit. Der Rüstungs-
+3.  Wähle einen einzelnen Feind, den du blocken willst. wert bestimmt lediglich, wie viel Schaden übrig bleibt ANGRIFFPHASE
+4. Spiele beliebig viele Blocks beliebiger Typen – die Elemente (falls überhaupt), nachdem die Einheit verletzt wurde. 1. Die Angriffphase  funktioniert genau wie die Fern- und Bela-
+
+Feuer, Eis, Kaltes Feuer oder physisch.  b. Ausnahme: Wenn die Einheit Widerstand gegen die An- gerungsangriffphase, außer:
+
+8
+
+MK_rulebook_DEU_02.indd   8 2/23/2012   21:13:55 PM
+
+
+
+ a. Du kannst alle Angriffe kombinieren: Fern-, Belage- nehmen. Nimm die Belohnung nie vor deinem Zugende;  d. Wenn du nicht alle Verteidiger eines Befestigten Orts be-
+rungs- und normale Angriffe. Diese Phase macht keinen lasse dir Zeit damit, während der nächste Spieler an der Rei- siegen konntest, musst du dich auf das Feld zurückziehen, 
+Unterschied zwischen normalen, Fern- und Belagerungs- he ist. von dem aus du angegriffen hast. Falls dies kein sicherer 
+angriffen. Befestigungen spielen keine Rolle, du kannst  c. Wenn du alle Verteidiger eines befestigten Ortes besiegst, Platz ist, wende Erzwungener Rückzug an (siehe Ende des 
+jeden Feind mit einem beliebigen Angriff oder einer Angriffs- beendest du deinen Zug auf dem eroberten Feld. Zugs).
+kombination aufs Korn nehmen.
+
+  Hinweis: Wenn bei dem Überfall umherziehende Feinde 
+ b. Jede Nicht-Verletzungskarte kann in eine Angriffspalte als beteiligt waren, hat dies keinerlei Einfluss darauf, ob du den 
+
+physischer Angriff 1 quer gespielt werden. STADTÜBERFALL
+befestigten Ort eroberst.
+
+ c. Du kannst Wirkungen einsetzen, die als „nur in der Angriff-   • Wenn der Ort eine Burg oder ein Magierturm ist, mar- 1.  Stadtüberfälle funktionieren genau wie Überfälle auf ande-
+phase“ gekennzeichnet sind. kiere ihn mit einem Schildplättchen. re Befestigte Orte, doch eine Stadt verleiht ihren Verteidigern 
+
+2. Wie bei der Fern- und Belagerungsangriffphase kannst du meh- einen Bonus, ablesbar auf dem oberen Teil der Stadtkarte:
+  • Wenn es ein Magierturm ist, bekommst du am Ende dei-
+
+rere Feinde in einem Angriff eliminieren oder mehrere einzelne nes Zugs einen Zauber als Belohnung.  a.  Die Weiße Stadt gibt allen Verteidigern Rüs-
+Angriffe ansagen. Die Regeln für Widerstände bei Feinden blei- tung +1.
+ben gleich.   • War es eine Stadt, mehr unter Stadtüberfall (rechts).
+
+ d. Wenn du die Verteidiger eines Klosters besiegt hast, mar-  b.  Die Blaue Stadt gibt allen Verteidigern 
+kierst du das Kloster mit einem Schildplättchen. Das Klos- Angriff +2, wenn sie Eis-Angriff oder Feuer-
+
+KAMPFERGEBNIS ter ist nun niedergebrannt und wird für den Rest des Spiels Angriff haben, und Angriff +1, wenn sie 
+als leeres Feld behandelt. Du bekommst am Ende deines Kaltes-Feuer-Angriff haben
+
+1. Der Kampf endet nach der Angriffphase. Du kannst keinen, 
+einen oder mehrere Feinde im Kampf besiegt haben. Zugs ein Artefakt als Belohnung.  c.  Die Rote Stadt gibt allen Verteidigern mit 
+
+3. Wenn du nicht alle Feinde auf dem Feld besiegt hast: physischem Angriff die Eigenschaft brutal.
+ a. Wenn du eine Stadt überfallen hast, lege pro besiegtem 
+
+Feind ein Schildplättchen auf die Stadtkarte. Lege die  a. Wenn du einen umherziehende Feind nicht besiegt hast,  d.  Die Grüne Stadt gibt allen Verteidigern mit 
+Plättchen der Reihe nach so hin, dass man erkennt, in wel- bleibt er auf seinem Feld. physischem Angriff die Eigenschaft Gift.
+cher zeitlichen Reihenfolge sie dort abgelegt wurden.  b. Wenn du Feinde in einem Dungeon, Grabmal oder Kloster 2. Wird eine Stadt erobert, bestimmt man ihren Anführer.
+
+2. Wenn du alle Feinde auf diesem Feld besiegt hast, hängt das nicht besiegt hast, lege sie ab. Wer hier später wieder kämp-  a. Der Spieler mit den meisten Schildplättchen auf der Stadt-
+Weitere vom Feld ab: fen will, zieht neue Feinde des entsprechenden Typs. karte (bei Gleichstand derjenige, dessen erstes Plättchen 
+ a.  Hast du einen oder mehr umherziehende Feinde besiegt,  c. Wenn du den Feind in einer Monsterbehausung oder ein früher gelegt wurde) wird Stadtanführer.
+
+nimm deren Plättchen vom Spielplan: das Symbol auf dem bzw. beide Monster in einer Brutstätte oder Ruinen nicht  b. Der Anführer legt die Stadtkarte mit allen Schildplättchen 
+Feld ist nun bedeutungslos, behandele es als leer. Du mar- besiegt hast, lasse die übrig gebliebenen Monster offen auf vor sich hin. Wenn irgendein Spieler diese Stadt betritt, setzt 
+kierst das Feld nicht mit deinem Schild, erhältst aber Anse- dem Feld. Wer hier später wieder kämpfen will, bekämpft er seine Figur auf die Stadtkarte vor diesem Spieler, um zu 
+hen (+1 pro Ork-Marodeur, +2 pro Drakonier). dieselben Feinde. unterstreichen, dass er dort einen Besuch abstattet.
+
+ b. Wenn du alle Feinde auf einem Abenteuerort besiegt hast,   Hinweis: Du kannst die Feinde verdeckt hinlegen, damit sie 
+markiere das Feld mit einem Schild. Am Ende deines Zugs nicht mit umherziehende Feinden verwechselt werden, aber 
+kannst du die auf der Ortsübersicht angegebene Belohnung jeder darf sich zuvor offene Plättchen jederzeit ansehen.
+
+1. Du kannst deinen Zug abschließen, während der nächste Spie-  c. Zauber oder Fortgeschrittene Aktionen erhältst – wähle nimm die unterste Karte des Angebots der Fortge-
+ler seinen Zug beginnt. Das erste, was du machen musst, ist das diese aus den entsprechenden Angeboten und lege sie auf schrittenen Aktionen.
+Neuwürfeln und Zurücklegen jeglicher deiner benutzten dein Handlungsdeck, dann fülle die Angebote wieder auf   • In beiden Fällen lege die neu erworbene Fähigkeit offen 
+Manawürfel in die Quelle. (Karten nach unten verschieben, neue Karte nach oben). vor dich hin und die neue Aktion oben auf dein Hand-
+
+2.  Erzwungener Rückzug: Du musst deinen Zug auf einem Du darfst dir dabei keine Fortgeschrittene Aktion aus dem lungsdeck. Dann fülle das Angebot der Fortgeschritte-
+ sicheren Platz beenden (Seite 7, Abschnitt Bewegung, 7d). Einheitenangebot nehmen. nen Aktionen wieder auf (Karten nach unten verschie-
+
+ a. Wenn du dich nicht auf einem sicheren Feld befindest,  d. Einheiten erhältst – nimm dir irgendeine Einheit aus dem ben, neue Karte nach oben).
+musst du deine Bewegung zurücknehmen, bis du auf einem Angebot, unabhängig von Typ oder Kosten. Wenn du kein 7.  Neue Karten ziehen:
+sicheren Feld stehst. freies Befehlsplättchen hast, musst du eine deiner bisheri-
+
+gen Einheiten ausmustern oder auf die Belohnung verzich-  a. Vor dem Ziehen kannst du beliebig viele Nicht-Verletzungs-
+ b. Pro Feld, das du beim Zurückgehen betrittst, erhältst du ten. karten aus deiner Hand ablegen, wenn du willst.
+
+1 Verletzung auf deine Hand.
+  •  Ausnahme: Wenn du in diesem Zug ebenfalls auflevelst   • Wenn du keine Karten in deinem Zug gespielt oder abge-
+
+3.  Räume deinen Spielbereich auf: und dadurch ein neues Befehlsplättchen erhältst, kannst legt hast, musst du jetzt mindestens 1 Karte ablegen.
+ a. Lege alle Manamarker, benutzte und unbenutzte, aus dei- du das Erhalten einer neuen Einheit bis nach dem Aufle-  b. Ziehe Karten von deinem Handlungsdeck nach, bis dein 
+
+nem Spielbereich zurück in den Vorrat. veln verschieben, um keine Einheit ausmustern zu müssen. Handlimit erreicht ist (die Zahl rechts auf deinem Levelplätt-
+ b. Lege alle Karten, die du in diesem Zug gespielt hast, auf 6. Aufleveln: Wenn dein Schildplättchen eine oder mehrere Rei- chen).
+
+deine Ablage (außer solchen, die entfernt wurden – solche hen der Ruhmanzeige in diesem Zug überquert hat, erhältst du   • Wenn du auf oder neben einer Burg in deinem Besitz 
+kommen aus dem Spiel, im Fall von Verletzungen allerdings für jede Überquerung einen Level. stehst (mit deinem Schild markiert), ist dein Handlimit 
+zurück auf das Verletzungsdeck).  a.   Wenn du zu einem so markierten Level aufsteigst: um so viele Karten erhöht, wie du Burgen besitzt.
+
+4.  Nutze die Vorteile deines Feldes:   • Nimm dein oberstes Levelplättchen weg, wodurch dein   • Wenn du auf oder neben einer eroberten Stadt stehst, auf 
+ a. Wenn du deinen Zug auf einer Magischen Lichtung been- neuer Rüstungswert und dein neues Handkartenlimit der mindestens 1 deiner Schilde liegt, ist dein Handlimit 
+
+det hast, darfst du 1 Verletzungskarte aus deiner Hand oder sichtbar werden. um 1 Karte erhöht (2, wenn du der Stadtanführer bist).
+deiner Ablage entfernen. Einheiten können so jedoch nicht   •  Drehe das weggenommene Levelplättchen um, sodass   • Wenn sowohl Burg- als auch Stadtbonus möglich sind, 
+geheilt werden. dessen Schild zu sehen ist und lege es in deinen Einhei- gilt nur ein Bonus (der höhere).
+
+ b. Wenn du deinen Zug auf einem Bergwerk beendet hast, tenbereich. Es ist jetzt ein Befehlsplättchen, dein Befehls-   • Dein Handlimit kann sich auch durch die Tag-Taktikkarte 
+erhältst du 1 Kristall in der Farbe des Bergwerks für deinen limit erhöht sich um 1. „Planung“ erhöhen (mehr auf der Karte).
+Vorrat (es sei denn, du hast bereits 3 Kristalle dieser Farbe –  b.  Wenn du zu einem Level mit diesen Symbolen auf-  c. Wenn du mehr Karten auf der Hand hast, als deinem der-
+in dem Fall bekommst du nichts). steigst, erhältst du ein neues Fähigkeitsplättchen so- zeitigen Handlimit entspricht, musst du nicht unbedingt 
+
+5. Kampfbelohnungen: Wenn du dir irgendwelche Belohnun- wie eine neue Fortgeschrittene Aktion aus dem Ange- welche abwerfen (aber du darfst auch keine nachziehen).
+gen im Kampf verdient hast, nimmst du dir diese jetzt. Die Rei- bot. Decke die beiden obersten Fähigkeitsplättchen deines  d.  Wenn du beim Nachziehen plötzlich keine Karten mehr im 
+henfolge liegt bei dir. Wenn du: Stapels auf. Du hast zwei Möglichkeiten: Handlungsdeck hast, höre auf, nachzuziehen. Mische dei-
+
+ a. Kristalle erhältst – lege diese in deinen Vorrat (es sei   • Nimm eines der Plättchen und lege das andere in den ne Ablage nicht, es sei denn, du hast die Nacht-Taktikkarte 
+denn, du hast bereits 3 Kristalle dieser Farbe – dann pas- Bereich der Allgemeinen Fähigkeiten. Außerdem nimm „Lange Nacht“ (mehr auf dieser Karte).
+siert nichts). Wenn du irgendwelche zufälligen Kristalle eine beliebige Fortgeschrittene Aktion aus dem Ange-   Hinweis: Die Taktikkarte „Lange Nacht“ kann auch beim 
+bekommst, würfle deren Farben aus. Schwarz: Du erhältst bot der Fortgeschrittenen Aktionen. Kartenziehen genutzt werden: Sobald dein Handlungsdeck 
+stattdessen 1 Ruhm. Gold: freie Wahl der Farbe.   • Oder nimm ein Plättchen eines anderen Spielers aus leer ist, befolge deren Anweisungen und fahre mit dem 
+
+ b. Artefakte erhältst – ziehe entsprechend viele plus 1 aus dem Bereich der Allgemeinen Fähigkeiten (wenn dort Nachziehen fort.
+dem Artefaktdeck. Lege 1 davon unter das Artefaktdeck zu- welche sein sollten), dann lege beide deiner aufgedeck-
+rück, den Rest lege in beliebiger Reihenfolge auf dein Hand- ten Fähigkeitsplättchen in diesen Bereich. Außerdem 
+lungsdeck.
+
+9
+
+MK_rulebook_DEU_02.indd   9 2/23/2012   21:14:09 PM
+
+
+
+1. Wenn dein Held verletzt wird, nimmst du eine oder mehrere  b. Eine verletzte Einheit behält ihren Einsatzstatus bei (ob sie   • Um eine verletzte Einheit zu heilen, musst du Heilungs-
+Verletzungen vom Verletzungsdeck auf deine Hand. bereit oder verausgabt ist). Eine verletzte Einheit, die veraus- punkte in Höhe des Levels der Einheit bezahlen (die 
+
+ a. Verletzungen können nie abgelegt werden, es sei denn, gabt ist, wird weiterhin zu Beginn einer neuen Runde bereit Zahl oben rechts auf der Karte). Wenn du das tust, ent-
+eine Wirkung besagt ausdrücklich etwas anderes. Verlet- (kann aber nicht aktiviert werden, bevor sie geheilt ist). ferne die Verletzung von der Einheit und lege sie auf 
+zungen können nicht quer gespielt werden (als Bewegung 3. Spieler können während ihres Zuges heilen, selbst beim Ras- das Verletzungsdeck zurück.
+1, Einfluss 1, Angriff 1 oder Block 1) und können nicht am ten.   • Falls die Einheit 2 Verletzungskarten haben sollte (weil 
+Ende deines Zugs abgelegt werden.  a. Du kannst Wirkungen spielen, die Heilungspunkte erzeu- sie Ziel eines Gift-Angriffs war), muss sie 2mal geheilt 
+
+ b. Wenn du für den Rest deines Zuges rasten willst, oder wenn gen (Heilung X). werden, um vollständig geheilt zu sein.
+dir eine Wirkung erlaubt, Verletzungen abzulegen, kom-  b. Du darfst auch einen oder mehr Heilungspunkte in einem  d.  Spieler können jederzeit in ihrem Zug heilen, außer im 
+men sie auf deine Ablage. In der nächsten Runde können Dorf oder Kloster kaufen (Abschnitt Interaktion mit Be- Kampf. 
+diese also wieder auf deiner Hand landen. wohnern).   • Schaden aus einem Kampf kann im selben Zug geheilt 
+
+ c. Wenn die Runde endet, werden Verletzungen in deiner  c. Zähle alle gespielten und gekauften Heilungspunkte zu- werden, sobald der Kampf vorbei ist.
+Hand zusammen mit allen anderen deiner Handlungskar- sammen; sie können für folgende Heilungswirkungen be-   • Jegliche nicht benutzten Heilungspunkte verfallen, wenn 
+ten in dein Handlungsdeck eingemischt. nutzt werden: man in einen Kampf eintritt.
+
+2. Bei verletzten Einheiten werden Verletzungskarten quer über   • Benutze einen Heilungspunkt, um aus deiner Hand   Hinweis: Der Ort Magische Lichtung liefert keine Heilung. 
+die Einheitenkarte gelegt eine Verletzung wegzuwerfen (sie kommt auf das Ver- Seine Wirkung darf nicht auf Einheiten angewendet werden 
+
+ a. Verletzte Einheiten können nicht aktiviert werden und es letzungsdeck zurück). und kann nicht mit Heilungswirkungen kombiniert werden.
+kann ihnen kein Schaden im Kampf zugewiesen werden.
+
+1. Ein Spieler kann als seine Aktion in diesem Zug einen Kampf   • Wenn der Kampf vorbei ist, endet sein Teil dieses Zugs  c. Der Gesamtwert des Angriff wird um 1 pro 2 Punkte des 
+Spieler-gegen-Spieler einleiten, falls die folgenden Bedin- ebenfalls sofort. Er kann nach dem Kampf nicht heilen Werts der gespielten Blocks reduziert. 
+gungen erfüllt sind: oder andere Spezialwirkungen einsetzen.   • Das liegt daran, dass die Fern- und Belagerungsangriffe 
+
+ a. Er hat ein Feld betreten, auf dem ein anderer Spieler steht   •  Er führt nicht die übliche Prozedur am Ende des Zuges hier so wirken, wie die flink-Eigenschaft eines Feindes. 
+und kann oder möchte nicht weiterziehen. aus. Insbesondere zieht er keine neuen Karten. Jegliche Sollte der Blocker eine Wirkung nutzen, die sagt „ge-
+
+ b. Das Feld ist kein Portal- oder Stadtfeld (Kämpfe zwischen ungenutzten Manamarker verbleiben ihm bis zum Ende blockter Feind verliert flink“, dann funktioniert der Block 
+Spielern sind dort nicht erlaubt). seines Normalen Zugs. vollständig: der Angriff wird um 1 pro Block reduziert.
+
+ c. Das Rundenende wurde noch nicht angekündigt und die    Hinweis: Der Verteidiger kann immer noch die Angriffe   • Beispiel: Wenn der Angreifer einen Feuer-Fernangriff 4 
+Endbedingungen des Spiels sind noch nicht eingetreten. des Gegners blocken und seine eigene Angriffe ausfüh- benutzt, und du spielst Eis-Block 4, wird der Angriff auf 2 
+
+ren. Der Unterschied liegt nur darin, was er einsetzen reduziert. Spielst du Block 7, wird der Angriff auf 3 redu-
+ Hinweis: Es ist nicht erlaubt, ein Feld mit einem anderen Spie- darf und was nach dem Kampf passiert. ziert (Gesamtwert ihres teilwirksamen Blocks ist 3, was 
+
+ler zu betreten, wenn diese Bewegung einen umherziehenden 
+Feind zum Angriff provoziert. 4. Der Kampf Spieler-gegen-Spieler hat zwei Phasen: Fern- und den Angriff lediglich um 1 reduziert).
+
+Belagerungsangriffe und Nahkampfangriffe. Der Kampf en-  d. Wenn der Angriff nicht auf null reduziert wird, wandelt sich 
+2. Wenn ein Kampf Spieler-gegen-Spieler vorkommt, wird der det, wenn einer der Spieler zum Rückzug gezwungen wird oder der Rest in Schaden, der dem Blocker zugewiesen werden 
+
+angreifende Spieler als Aggressor bezeichnet, der verteidigen- wenn kein Spieler mehr weiter angreifen will. Wenn letzteres muss (entweder dem Helden oder dessen Einheiten). 
+de Spieler als Verteidiger. Der Verteidiger hat die Möglichkeit, der Fall ist, muss sich der Aggressor zurückziehen.
+seinen Zug entweder komplett oder teilweise im Zug des Ag- 5. Anders als beim Zuweisen des Schadens im normalen Kampf, 
+gressors zu spielen. Der Verteidiger darf sich bei diesem Kampf wählt der Angreifer, wie der Schaden zugewiesen wird. Im 
+nicht bewegen oder eine Aktion ausführen (Interaktion oder Gegensatz zum normalen Kampf muss der Angreifer so viel 
+Beginnen eines anderen Kampfs). Schaden verursachen, wie die Rüstung des gewählten Ziels 
+
+FERN- UND beträgt, um es zu verletzen (im Kampf gegen Feinde genügt ja 
+3. Wenn er angegriffen wird, kann der Verteidiger beliebige Wir- BELAGERUNGSANGRIFFE bereits 1 Schaden, um einen Helden oder eine Einheit zu verlet-
+
+kungen benutzen, die ihm normalerweise vor seinem Zug oder 
+während des Zugs anderer Spieler erlaubt sind (wie Plündern 1. In dieser Phase sind beide Spieler abwechselnd am Zug und zen).
+eines Dorfs). Danach hat er zwei Möglichkeiten. spielen Fern- und Belagerungsangriffe, beginnend beim Ver-  a. Der Angreifer kann eine beliebige unverletzte Einheit des 
+
+teidiger. Der Spieler, der einen Angriff ausführt, wird Angreifer Blockers verletzen, indem er dieser Schaden in Höhe ihres 
+ a.  Er kann sich dem Kampf komplett widmen. Ein Spieler genannt, der andere Spieler ist der Blocker, unabhängig davon, Rüstungswerts zuweist.
+
+kann sich entscheiden, seinen gesamten Zug im Voraus zu wer der Aggressor ist oder der Verteidiger.
+spielen. Wenn er das will,   • Wenn die Einheit einen Widerstand gegen irgend ein Ele-
+
+2. Wenn ein Spieler an der Reihe ist, einen Angriff auszuführen, ment aus dem Angriff hat, wird ihre Rüstung verdoppelt, 
+  • dreht er sein Zugfolgeplättchen auf die Rückseite. Solan- hat er die Wahl, den Angriff auszuführen oder zu passen. dann muss der Angreifer doppelt so viel Schaden zuwei-
+
+ge es verdeckt liegt, kann er nicht wieder angegriffen 
+werden. Wenn der Verteidiger später regulär am Zug 3. Um einen Angriff auszuführen, spielt der Angreifer beliebig sen, um die Einheit zu verletzen.
+wäre, wird sein Plättchen einfach wieder aufgedeckt und viele Fern- und Belagerungsangriffe (und Spezialwirkungen),  b. Der Angreifer kann den Helden des Blockers verletzen, 
+sein Zug wird übersprungen (er darf nicht einmal das wie in einem normalen Kampf. indem er diesem Schaden in Höhe von dessen Rüstungs-
+Rundenende ansagen).  a. Wenn der Blocker auch der Verteidiger ist und der Kampf wert zuweist. Das kann bei entsprechender Schadenshöhe 
+
+  • Er kann 1 Manawürfel aus der Quelle nutzen. an einem befestigten Ort stattfindet (einer Burg oder einem mehrfach wiederholt werden und der Blocker muss jedes 
+Magierturm), kann der Angreifer/Aggressor lediglich Bela- Mal eine Verletzungskarte auf seine Hand nehmen.
+
+  • Er kann Fähigkeiten einsetzten, die ihm normalerwei- gerungsangriffe einsetzen.   • Der Blocker kann bewusstlos werden, wenn er zu vie-
+se nur in seinem Zug erlaubt sind.
+
+ b.  Quer gespielte Karten sind bei diesem Angriff nicht zulässig. le Verletzungskarten auf die Hand bekommt – siehe 
+  • Nach dem Kampf kann er Spezial- und Heilungskarten 
+
+und -wirkungen spielen, wenn er möchte. 4. Danach kann der Blocker beliebig viele Blocks (und Spezialwir- Kampf gegen Feinde.
+kungen) spielen, wie in einem normalen Kampf.  c. Der Angreifer darf Angriffspunkte verfallen lassen. Er muss 
+
+  • Dann befolgt er die üblichen Schritte beim Ende des 
+Zugs (Benutzung von Bergwerk oder Magischer Lich-  a. Die Regeln für voll wirksames und teilwirksames Blocken das auf jeden Fall dann tun, wenn es kein Ziel mehr gibt, 
+
+tung, Aufleveln, Karten nachziehen, usw.). gelten wie beim normalen Kampf gegen Feinde. dessen Rüstung gleich hoch wie seine verbleibenden Scha-
+denspunkte ist (oder niedriger). 
+
+ b. Er kann sich dem Kampf teilweise widmen. Er über-   • Wenn der Angriff aus Angriffswirkungen verschiedener 
+springt seinen Zug dann nicht. In diesem Fall: Elemente besteht, ist der Block wirksam, wenn er gegen 6. Nach der Durchführung des Angriffs hat der andere Spieler die 
+
+mindestens ein Element des Angriffs wirksam ist. Gelegenheit, selber zum Angreifer zu werden. Die Fern- und Be-
+  • dreht er sein Zugfolgeplättchen nicht um und könnte lagerungsangriffphase geht so weiter – beide Spieler wechseln 
+
+auch von anderen Spielern noch angegriffen werden.  b. Anders als im normalen Kampf ist es nicht nötig, den ge- sich in den Rollen als Angreifer und Blocker ab. Sobald beide 
+Seinen nächsten Zug wird er normal ausführen. samten Angriff zu blocken, Angriffe dürfen hier zum Teil Spieler in dieser Phase nacheinander passen, endet die Phase.
+
+geblockt werden – daher kann es sinnvoll sein, dies auch zu 
+  • Er kann keinen Manawürfel aus der Quelle nutzen (es tun.
+
+sei denn, eine Wirkung besagt etwas anderes).
+  • Er kann seine Fähigkeitsplättchen nicht nutzen (nur 
+
+solche, die er im Zug anderer Spieler nutzen darf).
+
+10
+
+MK_rulebook_DEU_02.indd   10 2/23/2012   21:14:24 PM
+
+
+
+  • Der Blocker wird auf dieses Feld bewegt und der Kampf  a. Stammt die Wirkung von einer roten Karte, oder ist es eine 
+NAHKAMPFANGRIFFE ist vorbei. Diese Bewegung provoziert umherziehende Einheiteneigenschaft, die mit rotem Mana ausgelöst wurde, 
+1. Die Nahkampfangriffphase funktioniert ähnlich wie die Fern- Feinde niemals. hat sie keine Wirkung gegen Einheiten mit Feuer-Wider-
+
+und Belagerungsangriffphase, mit wenigen Unterschieden: 3.  Die Spieler wechseln sich so lange in den Rollen als Angreifer stand.
+ a. Der Aggressor beginnt als Angreifer statt dem Verteidiger. und Blocker ab, bis einer der Spieler zum Rückzug gezwungen  b. Stammt die Wirkung von einer blauen Karte, oder ist es 
+ b. Jede Kombination aus Angriffswirkungen kann gespielt wird oder bis beide Spieler nacheinander auf weitere Angriffe eine Einheiteneigenschaft, die mit blauem Mana ausgelöst 
+
+werden, inklusive Fern- und Belagerungsangriffe. Befesti- verzichten. wurde, hat sie keine Wirkung gegen Einheiten mit Eis-
+gungen werden in dieser Phase ignoriert. Widerstand.
+
+ c.  Es ist erlaubt, beliebige Karten quer zu spielen, um Angriff 1  c. Besagt die Wirkung „einen Feind zerstören“, wird die Einheit 
+zu erhalten. Beachtet, dass eine so gespielte Karte den ge- KAMPFERGEBNIS stattdessen verletzt.
+samten Angriff zu einem physischen Angriff macht (wenn er 1. Wenn ein Spieler zum Rückzug gezwungen wird, ist der  d.  Der Rüstungswert einer Einheit kann nie unter 1 fallen.
+das nicht ohnehin schon war), was jeden beliebigen Block Kampf vorbei. Der andere Spieler gilt als siegreich und erhält 
+gegen ihn wirksam werden lässt und die Rüstung von Ein- ein bisschen Ruhm.  e. Die Spezialwirkungen von Blocks, die geblockte Feinde be-
+
+treffen, können auf jede am Kampf beteiligte Einheit abzie-
+heiten mit physischem Widerstand verdoppelt.  a. Wenn der siegreiche Spieler einen niedrigeren Level als der- len, falls solche vorhanden sind. Wenn diese Wirkung durch 
+
+ d. Die Blocks wirken vollständig, d. h. der Angriff wird um 1 jenige hat, der zum Rückzug gezwungen wurde, erhält er einen erfolgreichen Block ausgelöst wird, funktioniert sie 
+pro Punkt des Gesamt-Blockwerts gesenkt. 1 Ruhm plus 2 Ruhm pro Level, den er niedriger ist. hier nur, nachdem der Blocker den Angriff auf null reduziert 
+
+2. Schaden kann wie in der Fern- und Belagerungskampfphase  b. Wenn er auf dem gleichen Level ist, aber niedrigeren Ruhm hat.
+genutzt werden, um Einheiten und/oder den gegnerischen hat, erhält er 1 Ruhm.  f. Die Stärke oder Kosten einiger Wirkungen können von der 
+Helden zu Verletzen. Außerdem gibt es zwei weitere Verwen-  c. Wenn er mehr Ruhm besitzt und auf dem gleichen oder ei- Zahl der Feinde abhängen. Beim Kampf Spieler-gegen-
+dungen für Schaden: nem höheren Level ist, erhält er nichts. Spieler ist dies die Zahl der bereiten unverletzten Einheiten 
+
+ a. Der Angreifer kann 5 Schaden ausgeben, um 1 Artefakt 2. Wenn der Kampf endet, weil keiner der beiden Spieler weiter des Gegners und der Einheiten, die beim aktuellen Kampf 
+vom Blocker zu stehlen und es auf seine eigene Ablage zu angreifen wollte, gilt der Kampf als unentschieden und nie- beteiligt sind, plus 1 für den gegnerischen Helden.
+legen: mand erhält Ruhm. 3. Wirkungen, die Werte oder Regeln ändern (wie das Ignorieren 
+
+  • Artefakte können gestohlen werden, wenn sie in der Ab-  a. Der Aggressor muss sich auf das Feld zurückziehen, von von Befestigungen) bleiben für den gesamten Kampf bestehen.
+lage des Spielers liegen, in dessen Spielbereich oder sie dem aus er angegriffen hat. Wenn das kein sicherer Platz 4. Wirkungen, die einen Feind daran hindern, anzugreifen, kannst 
+einer verletzten Einheit zugeordnet wurden (gilt auch bei ist, gelten die Regeln für Erzwungenen Rückzug. (siehe Ab- du spielen, wenn du blockst. Wähle eine Einheit, die am Angriff 
+Einheiten, die in diesem Kampf verletzt wurden). schnitt Ende des Zugs). beteiligt ist und ziehen deren Beteiligung am Gesamt-Angriffs-
+
+  • Artefakte auf der Hand des Blockers, in seinem Hand- wert ab. Die Einheit bleibt verausgabt. Du kannst aber nicht auf 
+lungsdeck oder solche, die einer seiner unverletzten Ein- diese Weise gegnerische Spezialwirkungen und Blocks annul-
+heiten zugeordnet sind, können nicht gestohlen werden. SPEZIELLE lieren.
+
+ b. Schaden kann in Bewegungspunkte umgewandelt werden, 5. Wirkungen, die es dir erlauben, die Block- und die Schadenpha-
+KAMPFWIRKUNGEN
+
+die dazu ausgegeben werden, den Blocker zum Rückzug se des Kampfs zu überspringen, kannst du nur nutzen, um ei-
+zu zwingen. Das funktioniert so: 1. m normalen Kampf kannst du verschiedene Wirkungen außer nen einzelnen Angriff zu annullieren (Fern-/Belagerungs- oder 
+
+Angriffen und Blocks spielen. Die meisten davon kannst du 
+  • Der Angreifer muss einen erreichbaren sicheren Platz Nahkampf). Bei diesen Angriff wird kein Schaden verursacht 
+
+ebenfalls beim Kampf gegen einen anderen Spieler einsetzen.
+angrenzend zum Feld des Kampfs wählen (d. h., der Platz (doch die Karten bleiben gespielt, die Einheiten bleiben veraus-
+darf den Blocker nicht dazu zwingen, eine Befestigung 2. Wirkungen, die auf Feinde abzielen, können auf die unverletz- gabt). Der Kampf geht natürlich weiter.
+anzugreifen oder einen Kampf gegen einen anderen ten Einheiten des Gegners gespielt werden. Du darfst sie nie-
+Spieler zu beginnen). mals auf den Helden des Gegners spielen.
+
+  • Der Angreifer muss Schaden in Höhe der unmodifizier-
+ten Bewegungskosten dieses Felds ausgeben.
+
+1. In kooperativen Szenarien (und ebenso in wettbewerbsorien- 4. Wenn die Spieler dem Vorschlag zustimmen, drehen alle Be-  d.  Wickelt den Überfall wie üblich ab (inklusive dem Anse-
+tierten, wenn alle zustimmen), können Spieler gemeinsam eine teiligten ihre Zugfolgeplättchen um, was anzeigt, dass sie auf hensverlust und dem Markieren der besiegten Feinde durch 
+Stadt erobern. ihren nächsten Zug verzichten. Ablage von Schilden in Spielerreihenfolge auf der Stadtkar-
+
+2. Ein Spieler kann in seinem Zug einen gemeinsamen Stadt- 5. D ann mischt ihr die Feindplättchen und verteilt sie (ohne die te).
+überfall einleiten, wenn: Vorderseiten anzusehen) zufällig an die Beteiligten, gemäß   • Jeder Spieler stellt sich nur den Feinden, die ihm zuge-
+
+ a. Das Rundenende noch nicht angesagt worden ist und die der vorher vereinbarten Anzahlen (stellt euch einfach vor, je- wiesen wurden und ignoriert die anderen.
+Szenariobedingungen noch nicht erfüllt wurden; dem Helden würde ein bestimmter Teil der Stadtmauer für den   • Wirkungen , die sich auf „alle Feinde“ beziehen, betreffen 
+
+Überfall zugeteilt, womit aber nicht automatisch klar ist, wel-
+ b.  er noch keine Aktion ausgeführt hat; nur die Feinde, die diesem Spieler zugewiesen wurden.
+
+che Verteidiger diesen Teil bewachen).
+ c.  seine Figur auf einem zur Stadt angrenzenden Feld steht 7. Die Stadt ist erobert, wenn alle Verteidiger besiegt wurden (un-
+
+6. Die Beteiligten sind beim Stadtüberfall in Zugfolge abwech-
+  (Hinweis: Er kann diesen Angriff auch einleiten, wenn er die abhängig davon, ob eventuell herausgeforderte umherziehen-
+
+selnd am Zug, beginnend beim Spieler, der den gemeinsamen 
+Stadt mit dem Zauber Untergrundangriff erreichen kann). Überfall angesagt hatte: de Feinde besiegt wurden).
+
+ d. einer oder mehr geeignete Helden anwesend sind. Ein Held  a. Jeder Spieler führt alle Phasen seines Kampfs durch, dann ist  a. Wenn die Stadt noch nicht erobert ist, müssen sich alle Spie-
+ist geeignet, wenn er auf einem Feld angrenzend zur Stadt der nächste Spieler an der Reihe ler auf das Feld zurückziehen, von dem sie kamen.
+steht und wenn sein Zugfolgeplättchen nicht verdeckt liegt  b. Jeder Spieler kann einen Würfel aus der Quelle benutzen 8. Danach beenden die Beteiligten wie üblich ihre Züge der 
+(entweder wegen eines anderen gemeinsamen Stadtüber- (diese werden aber erst zurückgelegt, wenn der Überfall Reihe nach in Zugfolge.
+falls oder wegen eines Spieler-gegen-Spieler-Kampfs). vorbei ist), sowie sämtliche Wirkungen, die er vor oder wäh-  a. Die Spieler können sämtliche Spezial- und Heilungswirkun-
+
+3. Der Spieler sagt an, dass er einen gemeinsamen Überfall durch- rend seiner Züge benutzen dürfte. gen vor dem Ende ihrer Züge spielen, genau wie bei einem 
+führen möchte:  c. Jeder Spieler muss damit beginnen, dass er sich direkt in die normalen Überfall.
+
+ a. Er lädt einen oder mehr geeignete Helden ein. Er darf Hel- Stadt bewegt. 
+den auch ausschließen, selbst wenn sie geeignet sind.   •  Keine andere Bewegung oder Aktion ist erlaubt.
+
+ b.  Er schlägt vor, wie die Menge der Feinde in der Stadt zu-   • Falls diese Bewegung umherziehende Feinde provoziert, 
+geteilt wird, bzw., wie vielen Feinden sich die jeweiligen werden diese zu den Feinden gelegt, denen sich der Spie-
+Spieler widmen sollen. Jedem muss mindestens ein Feind ler widmen soll.
+zugewiesen werden.
+
+  • Die Spieler können freiwillig jegliche umherziehenden 
+ c. Wenn alle eingeladenen Spieler zustimmen, kann der ge- Feinde herausfordern, die angrenzend zur überfallenen 
+
+meinsame Überfall beginnen. Wenn nicht, passiert nichts. Stadt sind und zu ihren Feinden hinzufügen.
+Der Spieler kann einen neuen Vorschlag machen oder mit 
+seinem Zug fortfahren, als ob kein Vorschlag gemacht wor-
+den wäre.
+
+11
+
+MK_rulebook_DEU_02.indd   11 2/23/2012   21:14:36 PM
+
+
+
+Das Szenarioheft ist dreiteilig. Zuerst kommen ein paar grundsätzliche Prinzipien, die bei allen oder bei bestimmten Gruppen von Szenarien gelten (wie bei kooperativen Szenarien). 
+Im zweiten Teil werden einige Varianten geschildert, die ihr benutzen könnt. Im dritten Teil sind die Szenarien aufgeführt 
+
+SPIELPLANFORM 
+
+Bei jeder Szenariobeschreibung gibt es eine empfohlene Spielplan-
+Vollständig freier Spielplan Freier Spielplan 
+
+form gemäß der erlaubten Spieleranzahlen. Ein vollständig freier Spielplan benötigt Startteil B und ihr legt so-
+auf 4 oder 3 Reihen beschränkt
+
+Keil-Spielplan fort drei weitere Teile daran an. Die Küstenlinie öffnet sich hier viel Dieselbe Form, aber beschränkt auf nur 3 oder 4 Reihen (bei 4 
+Diese Form benötigt Startteil A. Sie ähnelt dem Spielplan aus dem weiter. Das geht aber nicht ewig so – mehr als 5 parallele Reihen 
+Einführungsszenario, mit einer Zusatzregel: von Spielplanteilen sind nicht erlaubt. Stellt euch einfach vor, dass Reihen öffnet sich der Spielplan weiter nach rechts als nach links).
+
+die Küstenlinie abknickt, sobald ihr je 2 Spielplanteile seitlich an Siehe die Abbildung unten.
+• Zentralteile (braune Rückseite) dürfen nicht an die gedachte das Startteil angelegt habt. Der 4-reihige Spielplan ist für 3 Spieler geeignet, wenn es am An-
+
+Meeresküste angelegt werden (also nicht in die ganz linke oder fang nicht so eng zugehen soll, oder für 4, wenn ihr mehr Interakti-
+ganz rechte Reihe von Teilen). Siehe die Abbildung unten.
+
+on zwischen den Spielern wollt.
+Der Spielplan ist anfangs sehr eng, weitet sich aber recht schnell Ein vollständig freier Spielplan bietet ein angenehmes Spiel zu 
+
+Dementsprechend ist der 3-reihige Spielplan für 2 bis 3 Spieler ge-
+aus und kann bald sehr breit sein. Die Zusatzregel sorgt dafür, dass viert.
+die Städte nicht allzuweit auseinander liegen können. Für weniger Spieler ist die Form zu weitläufig und es kann sein, dacht, wenn ihr viel Interaktion erleben wollt. Hinweis: Wenn ihr 
+
+hier mit 3 oder 4 spielt, könnte einer vorpreschen und den anderen 
+Diese Form eignet sich für 2 oder 3 Spieler. Durch ihren schmalen dass darunter im späteren Spielverlauf die Interaktion zwischen kaum noch etwas Interessantes übrig lassen.
+Beginn ist sie nicht ratsam für Spieler mit unterschiedlicher Erfah- den Spielern leidet.
+rung. Zu dritt kann ein unerfahrener Spieler bereits zu Beginn sehr 
+ausgebremst werden. Bei 4 Spielern ist dieses Risiko sogar noch 
+höher und kaum zu vermeiden.
+
+KOOPERATIVE UND SOLOSZENARIEN 
+
+In Mage Knight - Das Brettspiel legen die Spieler selber das Spiel- • Mischt das Handlungsdeck dieses Helden – und der Dummy- wie er Kristalle dieser Farbe besitzt. Dann ist sein Zug vorbei 
+tempo fest. Wenn jemand auf die Tube drückt und die meisten spieler ist bereit! (die Farbe der zusätzlich aufgedeckten Karte(n) hat keine 
+seiner Karten in jedem Zug ausspielt, müssen sich die anderen 
+anpassen, oder bleiben beim Rundenende auf dem Großteil ihrer Beim Wählen der Taktiken: Auswirkung).
+
+• Hinweis: Wenn nicht genug Karten in seinem Handlungsdeck 
+Karten sitzen. Wenn die Spieler kooperieren, wäre es vorteilhaft, • Lest in der Szenariobeschreibung nach, wie der Dummyspieler sind, deckt so viel auf wie möglich. In seinem nächsten Zug sagt 
+ein behutsames Spiel zu vereinbaren, um aus jeder Karte das zu Beginn jeder Runde seine Taktikkarte wählt. der Dummyspieler das Rundenende an.
+Maximum herauszuholen – der Aspekt des erzwungenen Tempo- • Er profitiert nicht von der Taktik, sie legt bloß fest, wann er an 
+Anpassens ginge verloren. Um das zu vermeiden, gibt es für jede der Reihe ist: Die Zugfolgeplättchen ordnet ihr also wie üblich Wenn eine neue Runde vorbereitet wird:
+kooperative oder Solomission einen Dummyspieler. gemäß den Taktiknummern an. • Wenn ihr die unterste Karte des Angebots der Fortgeschritte-
+
+Dummyspieler •Wenn der Dummyspieler am Zug ist: nen Aktionen wegnehmt, kommt sie ins Deck des Dummyspie-
+lers. Sein Deck wird gemischt.
+
+Bei Spielbeginn: • Wenn sein Handlungsdeck leer ist, sagt er das Rundenende an. • Wenn ihr die unterste Karte des Zauberangebots wegnehmt, 
+•  Nachdem die Helden gewählt wurden, sucht aus den übrigen Jeder andere Spieler hat noch einen Zug, dann ist die Runde kommt sie wie üblich unter das Zauberdeck. Außerdem erhält 
+
+Helden einen aus, der zum Dummyspieler-Helden wird. Ihr vorbei. der Dummyspieler einen Kristall der Farbe dieser Karte in sei-
+benötigt bloß dessen Heldenkarte, sein Zugfolgeplättchen und • Wenn sein Handlungsdeck nicht leer ist, deckt ihr drei Karten nen Vorrat. Im Gegensatz zu anderen Spielern darf er mehr als 
+sein Startdeck mit 16 Karten. davon auf und legt sie auf seine Ablage. Seht nach, welche Far- 3 Kristalle einer Farbe haben.
+
+• Seht euch seine Heldenkarte an. Unten sind drei farbige Punkte be die letzte aufgedeckte Karte hatte (oberste Karte der Abla- Hinweis 1: Der Dummyspieler spielt nicht allzu aggressiv, also wer-
+(Goldyx z. B. hat grün, grün und blau). Legt 3 Kristalle in diesen ge): det ihr genug Zeit haben, effizient zu spielen. Manchmal sorgen die 
+Farben (1 pro Farbe) auf seinen Vorrat. Hinweis: Das gilt nur für  – Wenn der Dummyspieler keine Kristalle dieser Farbe im zufällig aufgedeckten Karten jedoch dafür, dass er sein Deck sehr 
+den Dummyspieler, die richtigen Spieler beginnen ohne Kristal- Vorrat hat, ist sein Zug vorbei. schnell abbaut. Beobachtet das Deck des Dummyspielers, um euer 
+le.  – Wenn er Kristalle dieser Farbe hat, deckt so viele Karten auf, Spieltempo anzupassen!
+
+12
+
+MK_rulebook_DEU_02.indd   12 2/23/2012   21:14:49 PM
+
+
+
+Hinweis 2: Ihr habt eine gewisse Kontrolle über das Deck und die und Kreuz ist blau, o. ä.), oder einfach farbig markierte Papierchen Immer, wenn dein Held ein Fähigkeitsplättchen erhält, deckst du 
+Kristalle des Dummyspielers. Es kann vorteilhaft sein, zu verhin- als Handlungsdeckkarten des Dummyspielers und seine während ebenfalls eine Fähigkeit des Dummyspielers auf und legst sie in das 
+dern, das er Kristalle und Karten derselben Farbe erhält. des Spiels hinzukommenden Karten. Angebot der allgemeinen Fähigkeiten – wenn du das nächste Mal 
+Hinweis 3: Das Deck für den Dummyspieler ist der Hauptgrund eine Fähigkeit erhalten solltest, kannst du auch ein solches Plätt-
+dafür, dass kooperative Szenarien immer nur für bis zu drei Spieler Fähigkeiten im Solospiel chen wählen. Wenn du ein solches Plättchen aus dem allgemeinen 
+angeboten werden. Wenn ihr tatsächlich auch mit vier Spielern ein Im Solospiel kannst du den Satz der zehn Fähigkeitsplättchen, die Angebot nimmst, gilt wie bei den üblichen Auflevel-Regeln, dass 
+kooperatives Szenario spielen möchtet, nehmt ihr irgendwelche zum Helden des Dummyspielers gehören, ebenfalls benutzen. Mi- du die unterste Karte des Angebots der Fortgeschrittenen Aktio-
+Ersatzspielkarten (vielleicht: Pik ist grün, Herz ist rot, Karo ist weiß sche diese und lege sie verdeckt neben seine Heldenkarte. nen nehmen musst.
+
+TEAMREGELN 
+
+Einige Szenarios für 4 Spieler werden in zwei Teams gespielt. Vor genseitig sagen, welche Karten sie auf der Hand haben, und • Bei der Wertung hat jedes Team einen gemeinsamen Punkte-
+der Wahl der Helden könnt ihr die Aufteilung vereinbaren oder sich auch nicht gegenseitig beim Ausspielen ihres Zugs helfen stand
+nach Zufall bestimmen . (wie man die Karten am besten spielt, seine Einheiten benutzt,  – Die Basispunktzahl ist der Ruhm des Spielers, der weniger 
+• Die interaktiven Fähigkeiten (sie sind auf der Übersicht dunkel wann Mana bezahlt werden sollte, usw.). Jeder Spieler ist selber davon hat. Der Ruhm des anderen Spielers wird nicht ge-
+
+unterlegt) gelten nicht für deinen Teamkollegen. für seine Spielweise verantwortlich. zählt.
+• Allerdings machen interaktive Zauber (solche, die andere Spie- • Verbündete Spieler dürfen am Ende ihres Zuges nicht auf dem-  – Für Erfolge und ähnliche Wertungen wird immer nur die 
+
+ler betreffen) nicht Halt vor deinem Teamkollegen. Magie kann selben Feld stehen (außer auf Städten und dem Portal). Wenn höhere Wertung der beiden Spieler in diesem Bereich ge-
+eben Freund nicht von Feind unterscheiden das doch passieren sollte, gelten die Regeln für den erzwunge- nommen. Die niedrigere Wertung des anderen Spielers 
+
+• Verbündete Spieler dürfen keine Kristalle, Artefakte, Einheiten, nen Rückzug bei dem Spieler, der als letzter auf das Feld kam. zählt nicht. Beim größten Prügelknaben zählt nur der größte 
+usw. tauschen. Mage Knights sind extreme Eigenbrötler, es ist • Verbündete Spieler dürfen sich nicht gegenseitig in einen Punktabzug.
+ein Wunder, dass sie überhaupt kooperieren. Kampf Spieler-gegen-Spieler verwickeln  – Verleiht die Ehrentitel wie üblich (vergleicht nur den jeweils 
+
+• Regeln für den gemeinsamen Stadtüberfall sind empfohlen, • Ein Spieler kann ein leere Burg betreten, die seinem Teamkolle- höchsten Wert, der innerhalb jedes Teams erreicht wurde).
+aber ihr könnt auch in anderer Hinsicht zusammenarbeiten: gen gehört und er kann dort Einheiten rekrutieren. Wenn er bei Hinweis: Deshalb ist es günstig, wenn sich jeder Spieler im Team 
+Ihr könnt euch absprechen, wer welchen Weg gehen soll, wer oder in einer Burg seines Verbündeten steht, ist sein Handlimit auf eine andere Sache konzentriert, so lange keiner stark im Ruhm 
+welche Taktik benötigt, wer welche Karten aus den Angeboten erhöht, allerdings nur für die Burgen, die sich in seinem eige- zurückfällt oder zu stark verletzt ist.
+haben möchte, wer eine bestimmte Farbe in der Quelle braucht nen Besitz befinden. Das heißt also: ist er bei einer Burg seines 
+usw. Immer jedoch dürfen verbündete Spieler sich nicht ge- Teamkollegen, besitzt aber keine eigene, wird sein Handlimit 
+
+nicht modifiziert.
+
+Damit ihr noch mehr Abwechslung ins Spiel bringen könnt und •  Ihr solltet euch auf ein Szenario einigen und klären, welche Va- • Wenn ihr eine Variantenregel derart mögt, dass ihr nie mehr 
+um es euren Erwartungen anzupassen, folgen ein paar Varianten. riantenregeln zur Anwendung kommen sollen, BEVOR ihr mit ohne sie spielen wollt, könnt ihr vereinbaren, diese als Stan-
+Beim Auswählen von Varianten gelten diese Regeln: dem Spiel beginnt, d. h. auch vor der Wahl der Helden. dardregel anzusehen; die Hinweise hier sind dann ungültig.
+• Die ersten paar Spiele solltet ihr ausschließlich nach den Stan- • Sucht euch nicht zu viele Variantenregeln auf einmal aus. Ihr • Selbst wenn eure Gruppe einige Variantenregeln grundsätzlich 
+
+dardregeln spielen, um das Spiel besser zu verstehen. werdet sonst durcheinander kommen, welche Regel gültig ist benutzt, solltet ihr darauf verzichten, sobald ihr das Spiel Neu-
+• Eine Variantenregel darf nur angewendet werden, wenn ihr alle und welche nicht. lingen beibringt. Spielt das Szenario Die ersten Erkundungen 
+
+Spieler zustimmen. ohne Zusatzregeln. Die Neuen werden genug damit zu tun 
+haben, die Standardregeln zu verinnerlichen.
+
+HELDEN VERSTEIGERN 
+
+Vielleicht erscheint euch ein Held stärker als die anderen, vielleicht • Wer aber noch keinen Helden hat, kann widersprechen, und nichts und machen auf diese Weise weiter, mit dem nächsten 
+passt er auch nur besser zu eurem Spielstil. In einigen Szenarien anbieten, 1 oder mehr Ruhm zu opfern, um sich selber diesen Spieler (oder demselben, falls dieser keinen Helden erhalten 
+oder Varianten kann es sein, dass bestimmte Helden tatsächlich Helden zu nehmen. Der Spieler, der ursprünglich diesen Hel- hat), der einen der noch vorhandenen Helden aussucht.
+ein bisschen stärker sind als andere. Nach den Standardregeln den haben wollte, kann nun ebenfalls so viel Ruhm opfern oder •  Der verlorene Ruhm wird mit einem Schildplättchen in der 
+wird dieser mögliche Vorteil dadurch ausgeglichen, dass derjenige, er muss auf diesen Helden verzichten. letzten Ruhmreihe markiert (wenn du 2 Ruhm geboten hast, 
+der früher seinen Helden wählt, erst später eine Taktikkarte wäh- • Wenn noch mehr Spieler an diesem Helden interessiert sind, kommt das Plättchen auf Feld 118 der Tafel). Solch ein Held ist 
+len darf. Wenn euch dieser Nachteil zu schwach vorkommt, könnt muss das jeweils nächste Gebot immer größer ausfallen als natürlich immer noch Level 1 und sobald das Plättchen die Rei-
+ihr diese Regeln einsetzen: das vorige. So geht das rundenweise immer weiter, wie bei he überschreitet, levelt er nicht auf, das Plättchen kommt dann 
+• Legt die Reihenfolge für die Heldenwahl zufällig fest, wie bei einer normalen Auktion, außer, dass Spieler, die früher in der bloß auf die oberste Reihe der Tafel.
+
+den Standardregeln. Wahlreihenfolge stehen, im Gebot nur gleichziehen müssen, sie • Die Taktikkarten der ersten Runde werden in umgekehrter 
+• Wenn ein Spieler einen Helden aussucht, fragt er die anderen, müssen nicht unbedingt erhöhen. Reihenfolge der Heldenwahl ausgesucht (unabhängig vom 
+
+ob diese einverstanden sind. Wenn alle zustimmen, nimmt er • Sobald keiner mehr erhöhen will, erhält der meistbietende (bei Ruhm), was Spieler bevorzugt, die bei den Auktionen später an 
+sich den Helden und seine Wahl ist vorbei. gleichen Geboten derjenige, der früher wählen durfte) den Hel- der Reihe waren.
+
+den und verliert den gebotenen Ruhm. Die anderen verlieren 
+
+SPIELPLAN VARIIEREN 
+
+zu wiederkehrenden Mustern führt. Dann kann diese Variante story, welche die Städte individuell macht, nicht nur durch deren 
+Spielplanform und Zahl der Teile
+
+Die Spielplanformen und Zahl der Spielplanteile jedes Szenarios helfen: Besatzungen und Bonusse. Wenn ihr dabei aber mehr Vielfalt ha-
+sind nur empfohlene Richtwerte. Wenn ihr merkt, dass euch be- • Beim Aufdecken eines Teils (zu Beginn oder während des ben wollt, könnt ihr anders vorgehen :
+stimmte Spielplanformen besser gefallen oder ihr zu Beginn oder Spiels) wird das Teil zufällig ausgerichtet. Legt es verdeckt •  Immer wenn eine Stadt aufgedeckt wird, zieht ihr eine zufällige 
+im Verlauf des Spiels weniger Interaktion haben wollt, oder wenn an den Spielplan an und wendet es dann um eine vorher be- Stadtkarte und stellt die Stadt dieser Farbe auf das Stadtfeld, 
+ihr mehr oder weniger Spielplanteile entdecken wollt, könnt ihr stimmte Achse (die Achse muss natürlich vor dem Umdrehen egal, welche Farbe dieses hat.
+einfach andere Formen nehmen und auch andere Mengen. bestimmt werden). Hinweis: Ihr könnt zufällige Städte auch in Szenarien benutzen, in 
+
+Hinweis: Die Symbole an den Rändern müssen weiterhin anein- denen eine bestimmte Stadt vorgegeben ist (z. B. die Grüne Stadt 
+Spielplanteile zufällig ausrichten ander liegen, auch wenn jetzt Sterne an Kreisen anliegen können, im Szenario Druidennächte), weil es eigentlich auf das Spielplan-
+Die Ausrichtung der Spielplanteile ist eigentlich festgelegt, der an- was zu unregelmäßigen Symbolformen führen darf. teil ankommt, nicht so sehr auf die Stadtfarbe. In diesen Fällen 
+legende Spieler kann das Teil also nicht beliebig drehen. Immerhin nehmt ihr also das angegebene Stadt-Zentralteil, setzt aber eine 
+entdeckt ihr ein unbekanntes Königreich – ihr baut nicht etwa Zufallsstädte nach Zufall bestimmte Stadt darauf.
+eine mittelalterliche Stadt im, sagen wir mal, Süden Frankreichs! Die Städte liegen an festgelegten Plätzen. Die Weiße Stadt ist im-
+Sobald ihr einen Haufen Spiele hinter euch habt, könnte euch mer neben einem See und einer Burg, die Rote liegt in der Wüste 
+auffallen, dass die begrenzte Zahl an Spielplanteilen manchmal und ist von Drakoniern umgeben, usw. Das ist nun mal die Spiel-
+
+13
+
+MK_rulebook_DEU_02.indd   13 2/23/2012   21:16:21 PM
+
+
+
+TAGESZEITEN VARIIEREN
+
+Jedes Szenario ist Tag, Nacht, Tag, Nacht … Das könntet ihr zur Ab- reisen, außerdem seht ihr nicht, wer Burgen und Türme verteidigt 
+Die Dunkelheit naht!
+
+wechslung mal ändern. und welche Gefahren in Ruinen lauern. Ihr beginnt mit einer Tagrunde. Am Ende der Runde würfle mit 2 
+Wenn ihr das wirklich ausprobieren wollt, empfiehlt es sich, zu 
+
+Ankunft bei Nacht Manawürfeln. Wenn einer davon Schwarz zeigt, bricht die Nacht 
+Beginn die Manawürfel so lange zu würfeln, bis kein Gold und 
+
+Ihr beginnt mit einer Nachtrunde. Beachtet, dass das schwieriger herein und sie hört bis zum Ende des Spiels nicht auf. Wenn nicht, 
+Schwarz mehr erscheint.
+
+ist: Es ist viel schwerer, Mana einzusetzen und durch Wälder zu geht es mit einer weiteren Tagrunde weiter, an deren Ende du er-
+neut würfelst. 
+
+STADTLEVEL 
+
+Die Stadtlevel jedes Szenarios sind in der Beschreibung vorge-
+geben. Sobald ihr an Erfahrung gewonnen habt, könnt ihr diese 
+anheben, insbesondere für den gemeinsamen Stadtüberfall. Bald 
+werdet ihr merken, dass auch eine Stadt mit Level 11 durch einen 
+einzelnen Spieler erobert werden kann, wenn er über starke Kar-
+ten und eine zum Stadtüberfall geeignete Armee verfügt.
+
+Megalopolis
+
+Wenn ihr merkt, dass euch nicht einmal mehr der höchste Stadt-
+level Schweißperlen auf die Stirn treibt oder ihr einfach mal an die 
+Grenzen gehen wollt, könnt ihr eine der Städte zu einer Megalo-
+polis machen. Hinweis: Das geht nur in Szenarien mit höchstens 
+drei Städten. wenn du irgendwo angrenzend zu einem oder beiden ihrer 
+• Sobald ihr euch auf die Level der normalen Städte geeinigt Felder stehst. 
+
+habt, legt ihr den Level der Megalopolis fest. Jeder zwischen 2  – Du kannst die Megalopolis überfallen, wenn du irgendwo 
+und 24 ist möglich; es muss nicht zwingend mehr als 11 sein. angrenzend zu einem oder beiden ihrer Felder stehst.
+
+•  Die Megalopolis sollte immer die letzte aufgedeckte Stadt des  – Du musst dich der gesamten Besatzung der Megalopolis 
+Spiels sein. auf einmal stellen. Alle sind befestigt und profitieren von Feld betrittst. Um einen umherziehenden Feind herausfor-
+
+Kampfbonussen beider Städte gleichzeitig. dern zu können, musst du selbstverständlich wie üblich auf 
+• Wenn eine Megalopolis aufgedeckt wird, stellt ihr wie üblich 
+
+deren Figur auf und nehmt deren Stadtkarte. Dann zieht ihr dem zu diesem Feind angrenzenden Feld stehen.
+ – Im Fall eines gemeinsamen Stadtüberfalls können Spieler 
+
+eine der verbleibenden Stadtkarten und legt sie rechts zur ers- dazu eingeladen werden, die irgendwo angrenzend zu ei-  –  Egal, in welchem Teil der Stadt dein Held steht, kannst du 
+ten Stadtkarte. Nehmt ebenfalls die Stadtfigur dieser Farbe und nem oder beiden der Stadtfelder stehen. Mischt und verteilt während deiner Interaktion die Einkaufsmöglichkeiten bei-
+stellt diese neben die erste Stadt, auf das Feld rechts daneben. die Feinde, egal welcher Spieler zu welchem Teil der Stadt der Städte benutzen.
+Das Gelände (im Fall der Grünen Stadt auch das Symbol) auf angrenzend steht.  – Bei der Wertung zählt eine Megalopolis nur als 1 Stadt. 
+dem Feld mit dieser Stadtfigur wird ignoriert.  – Die Megalopolis ist erobert, sobald alle Verteidiger elimi- Hinweis: Die Wertung nimmt auf den Level der Stadt keine 
+
+• Setzt den Level jeder Stadt auf die Hälfte des Megalopolis-
+Levels. Wenn das nicht glatt aufgeht, rundet für die Stadt links niert sind. Legt den Stadtanführer wie üblich fest. Rücksicht.
+
+ – Sobald sie erobert ist, wird die Megalopolis wie eine große • Wenn ihr ein Szenario mit zwei Megalopolis spielen wollt, stellt 
+auf, für die Stadt rechts ab (der Level der Megalopolis ist also 
+
+Stadt auf zwei Feldern behandelt. Du stellst deine Figur auf eine zufällige Stadt zum ersten aufgedeckten Stadt-Zentralteil. 
+die Summe beider Stadtlevel). Zieht Besatzungsplättchen für 
+
+die zugehörige Karte, um anzuzeigen, in welchem Teil der Die anderen beiden Städte werden auf das zweite Stadt-Zen-
+beide Städte und legt diese als Besatzung der Megalopolis zu-
+
+Stadt du gerade stehst. Du kannst dich in deiner Bewegung tralteil kommen, auch dann, wenn es der Farbe der zufällig ge-
+sammen (es ist egal, welche zu welcher Stadt gehören).
+
+von einem Teil zum anderen begeben (was die üblichen zogenen Stadt der ersten Megalopolis entspricht.
+•  Behandelt dieses Stadtpaar als eine große Stadt:
+ – Du deckst die gesamte Besatzung der Megalopolis auf, Stadtbewegungskosten von 2 erfordert), oder du kannst sie 
+
+verlassen, indem du ein zu deinem Stadtteil angrenzendes 
+
+UMHERZIEHENDES ÜBEL! 
+
+Eine Art Nebenaufgabe – ihr könnt damit jedes Szenario aufpep-  – Wenn sie golden ist, kommt außerdem noch ein brauner 
+Mehr umherziehendes Übel!
+
+pen. Feind zu dem üblichen grünen oder roten Plättchen. Wenn 
+Raubzüge erschüttern dieses Königreich. Die verängstigten Be- man also diesen Feind bekämpft, muss man auch den ande- Für eine noch extremere Version dieser Variante:
+wohner sind derart argwöhnisch, dass sie niemandem mehr trau- ren bekämpfen. Solange auf so einem Feld mindestens eines • Eure Helden beginnen mit Ansehen -4 (was bedeutet, dass sie 
+en. dieser Plättchen liegt, gilt es als Feld mit umherziehendem bei Interaktion 2 Punkte Abzug haben)
+• Eure Helden beginnen mit Ansehen -2 (was bedeutet, dass sie Feind. Du erhältst Ansehen +1 pro besiegtem Feindplätt- • Am Ende jedes Tags und jeder Nacht würfelt ihr für jeden um-
+
+bei Interaktion 1 Punkt Abzug haben). chen. herziehenden Feind wie eben beschrieben. Allerdings wird das 
+• Am Ende jedes Tages würfelt ihr mit einem Manawürfel pro • Am Ende der Nacht macht ihr dasselbe, allerdings zählen kalte Plättchen des umherziehenden Feinds immer ausgelegt, bei 
+
+Feld, auf dem ein umherziehender Feind besiegt wurde. Ist die Farben (weiß, blau oder schwarz), und der zusätzliche braune einer warmen (bei Tag) oder kalten (bei Nacht) gewürfelten 
+erwürfelte Farbe warm und lebendig (rot, grün oder golden), Feind kommt bei schwarz dazu. Farbe kommt auch das braune hinzu.
+wird ein neuer Feind für dieses Feld gezogen.
+
+SEID NETT ZUEINANDER 
+
+Wenn eure Gruppe nicht so sehr auf Konfrontation aus ist, oder 
+Keine interaktiven Fähigkeiten Manafreundlich
+
+wenn erfahrene und neue Spieler gemeinsam spielen, könnt ihr 
+eine dieser Regeln einsetzen. Ihr entfernt alle Fähigkeiten, die andere Spieler betreffen – sie ha- Ihr könnt vereinbaren, dass bei Tag kein Spieler einen goldenen 
+
+ben dieses Symbol  (außerdem ist ihre Beschreibung auf der Manawürfel als Ersatz für eine Farbe benutzen darf, die noch 
+Keine interaktiven Zauber Übersicht in anderer Farbe hinterlegt). unbenutzt in der Quelle liegt. Anders gesagt, wenn dort ein roter 
+Ihr entfernt alle Zauberkarten, die andere Spieler behindern, also Würfel liegt, darfst du keinen goldenen Würfel benutzen, um eine 
+
+Kein Kampf Spieler-gegen-Spieler
+die mit den Nummern 17 bis 20. rote Karte zu verstärken, du bist gezwungen, den roten Würfel zu 
+
+Ihr könnt verbieten, dass sich Spieler gegenseitig angreifen. Wenn nehmen. Auch darf ein goldener Würfel bei Tag nicht neu gewür-
+ein Spieler seine Bewegung auf dem Feld mit der Figur eines ande- felt oder geändert werden, so lange es einen weiteren nicht-golde-
+ren Spielers beendet (außer auf Städten oder dem Portal), wendet nen Würfel in der Quelle gibt.
+ihr auf ihn die Regel erzwungener Rückzug an.
+
+14
+
+MK_rulebook_DEU_02.indd   14 2/23/2012   21:16:34 PM
+
+
+
+INTERAKTIVER KAMPF 
+
+Bei dieser Variante überwacht ein anderer Spieler nicht nur deinen  – Wenn er weiß ist, hat der Feind Rüstung +1 in der Fern- und der Blockphase würde er entweder den roten Würfel aufde-
+Kampf, sondern er trifft auch gewisse Entscheidungen. Der Kampf Belagerungsangriffphase. cken oder sagen „er ist nicht rot“. Hat er den Würfel bis zum 
+ist weniger berechenbar und kann gelegentlich zu einem Verstan-  –  Wenn er rot ist, hat der Feind einen Angriff +1. Beginn der Angriffphase noch nicht aufgedeckt, macht er das 
+desduell ausarten.  – Wenn er blau ist, hat der Feind Rüstung +1 in der Angriffpha- jetzt, egal welche Farbe er hat.
+• Diese Variantenregel trifft immer dann zu, wenn ein Spieler se. Hinweis: Diese Variante empfiehlt sich vor allem beim Spiel zu 
+
+den Kampf mit einem einzelnen Feind beginnt (egal ob es ein  – In allen obigen Fällen bringt ein besiegter Feind 1 Ruhm zweit. Wenn ihr sie einsetzt, zahlt es sich aus, den Spielstil des an-
+umherziehender ist, ein Monster in einem Dungeon, oder der mehr als üblich ein. deren genau zu beobachten. Manchmal kannst du den Gegner da-
+einzige Verteidiger, der noch in einer Stadt nach diversen Über-
+fällen übrig geblieben ist, usw.).  – Wenn die Farbe Schwarz ist (oder auch Grün oder Gold, falls ran hindern, einen Feind abzuschießen, indem du den Würfel auf 
+
+der Spieler einen Fehler gemacht hat), hat der Feind keinen weiß stellst, manchmal kannst du für ernsthafte Probleme sorgen, 
+• Wenn das eintritt, nimmt sich der Spieler, der vor dem aktuellen Bonus, aber es gibt auch keinen Extraruhm dafür. indem du einen bösen Spezialangriff verstärkst und manchmal 
+
+Spieler am Zug war, einen unbenutzten Manawürfel und sucht kannst du den Feind retten, indem dieser durch die Rüstung +1, 
+sich geheim eine Farbe darauf aus. Er verbirgt sie mit seiner • Der Spieler, der die Farbe gewählt hat, deckt sie in der Phase des die er bekommt, überlebt (besonders bei Widerstand). Anderer-
+Hand, sodass der kämpfende Spieler sie nicht sehen kann. Kampfs auf, in der sie eine Auswirkung hat. Also würde er zu seits könnte der Spieler einfach genug Angriff oder Block spielen, 
+
+Beginn der Fern- und Belagerungsangriffphase entweder den und die Erhöhung um 1 würde den Ausgang nicht verändern. Man 
+weißen Würfel zeigen oder sagen „er ist nicht weiß“. Zu Beginn würde seinem Mitspieler bloß mehr Ruhm zuschanzen.
+
+MEHR DECKBAU
+
+Wenn ihr meint, dass ihr mehr Möglichkeiten zum Finetuning eu-  –  2 Punkte pro Artefakt oder Zauber. ren, dass es erlaubt ist, sich die Decks der anderen anzusehen. Im 
+res Decks während des Spiels braucht, könnt ihr eine der folgen-  –  1 Punkt pro Fortgeschrittene Aktionskarte. Spiel selbst wird dazu kaum Zeit sein.
+den Varianten benutzen. In den ersten paar Spielen sind sie nicht  –  1 Punkt pro 2 Kristalle.
+empfehlenswert. Außerdem erhöht sich die Stärke eurer Helden Zu Beginn Karten auswählen
+
+schneller, also solltet ihr den Schwierigkeitsgrad ebenfalls anhe-  – So viele Punkte pro Einheit, wie deren Level beträgt (verletz-
+te Einheiten zählen halb, abgerundet). Diese Variante erfordert Langzeitplanung. Ihr plant einige Verbes-
+
+ben, indem ihr die Stadtlevel erhöht. serungen für eure Helden im Voraus und müsst eure Entscheidun-
+Hinweis: Wenn ihr eine dieser Varianten benutzt, kann es insbe- • Zu dieser Punktzahl zählst du 3 Punkte für jeden Level, den du gen dann gegebenenfalls während des Spiels anpassen, damit euer 
+sondere bei 4 Spielern passieren, dass euch die Fortgeschrittenen weiter bist als der Spieler mit dem niedrigsten Level und sagst Plan aufgeht.
+Aktionskarten ausgehen, wenn früh Karten ins Spiel kommen, das Ergebnis an. • Nachdem die Helden verteilt worden sind (aber bevor der 
+die euch mehr Fortgeschrittene Aktionen liefern. In diesem Fall • Danach, beginnend beim Spieler mit dem niedrigsten Ergebnis Spielplan ausgelegt ist, gewürfelt wurde und die Angebote aus-
+gilt: Das Angebot der Kloster ist als erstes betroffen (wenn keine (bei Gleichstand derjenige mit dem niedrigsten Ruhm, falls liegen), teilst du vier zufällige Karten aus dem Deck der Fortge-
+Karten mehr da sind, legt ihr dort keine mehr aus). Wenn auch auch dabei Gleichstand derjenige, der in der letzten Runde schrittenen Aktionen verdeckt an jeden Spieler aus.
+das Angebot der Fortgeschrittenen Aktionen nicht mehr aufgefüllt später am Zug war), kann jeder Spieler eine der ausliegenden 
+
+Fortgeschrittenen Aktionen auf seine Hand nehmen (er muss • Jeder Spieler wählt eine dieser Karten und legt sie beiseite, und 
+werden kann, nehmt ihr einfach so viele wie es geht. Sind keine 
+
+nicht). Dafür muss er dann aber eine seiner Aktionskarten ent- gibt die übrigen Karten an den nächsten Spieler.
+Karten mehr da, bekommt ein Spieler, der eine nehmen müsste, 
+eben keine. fernen. Die neue Karte muss entweder dieselbe Farbe wie die • Macht so weiter, bis jeder Spieler drei Karten beiseite gelegt 
+
+entfernte haben oder bei mindestens einem Typsymbol (oben hat. Mischt die nicht gewählten Karten zurück ins Deck der 
+links auf den Karten) mit dieser übereinstimmen. Fortgeschrittenen Aktionen.
+
+Aktionsverbesserungen
+
+Diese Variante lässt euch nicht nur euer Deck während des Spiels • Dann wird/werden die Karte/n, die keiner gewählt hat, unter • Die Spieler halten die Karten an einem sicheren Platz von ihren 
+verbessern, sie gibt im Rückstand liegenden Spielern auch noch das Deck der Fortgeschrittenen Aktionen gelegt. übrigen Karten getrennt (am besten nicht am Spieltisch, damit 
+einen kleinen Vorteil. •  Die Spieler sollten ihre Decks vor der nächsten Runde gut mi- sie nicht versehentlich in ihre Decks gemischt werden):
+• Am Ende jeder Nacht außer der letzten (also 2mal während ei- schen. • Am Ende jeder Tagrunde, wenn die Spieler ihre Decks mischen, 
+
+nem normalen 6-Runden-Szenario) deckt so viele Fortgeschrit- Hinweis: Diese Variante könnte euch gefallen, wenn ihr ein etwas sucht sich jeder eine seiner gewählten Karten aus und mischt 
+tene Aktionen auf wie es Spieler gibt plus 1. gemächlicheres Spieltempo bevorzugt. Sie erlaubt es euch, ein sie in sein Deck ein.
+
+• Danach sollten die Spieler ihre Decks durchgehen und ihre oder zweimal im Spiel eine Pause einzulegen (abhängig von der • Hinweis: Ihr könnt diese Regel selbstverständlich auch in Sze-
+Stärke bewerten. Benutzt die ersten drei Zeilen der Erfolgswer- Rundenzahl), um euer Deck zu prüfen, damit ihr seht, was nötig narien mit weniger als 6 Runden benutzen. Ihr werdet in sol-
+tung: sein könnte, um es zu verbessern. Außerdem könnt ihr vereinba- chen Fällen eben nicht alle eurer gewählte Karten benutzen 
+
+können.
+
+DIE ERSTEN ERKUNDUNGEN 
+
+•  Spieler: 2 bis 4 (sowie als Solovariante) Spezialregeln Wertung
+•  Typ: Geringer Wettbewerb • Ein Spieler erhält 1 Ruhm, sobald er ein neues Spielplanteil auf- Wendet die normale Wertung für Erfolge an. Wer den meisten 
+• Dauer: drei Runden (2 Tage und 1 Nacht) deckt (der Typ des Spielplanteils spielt keine Rolle). Ruhm hat, gewinnt. Bei Gleichstand teilen sich diese Spieler den 
+• Zweck: Übungsszenario. Wärmstens empfohlen, um das Spiel • Der Kampf Spieler-gegen-Spieler ist nicht gestattet (es sei denn, Sieg.
+
+Neulingen beizubringen, da die Spielregeln beim Spiel erlernt ihr erlaubt ihn ausdrücklich). Solovariante
+und verinnerlicht werden. •  Goldene Einheiten werden in diesem Szenario nicht benötigt. Wenn du deine erste Mission solo spielen willst, nimm 8 Land-
+
+Bei eurer ersten Mission werdet ihr in einen unbekannten Bereich • Ihr solltet Zauber- und Fortgeschrittene Aktionskarten erst aus- schaftsteile (wie beim Spiel zu zweit), spiele aber 4 Runden lang 
+des Atlantischen Königreichs entsandt, um dessen Hauptstadt legen, wenn sie das erste Mal im Spiel benötigt werden. (2 Tage und 2 Nächte).
+zu finden. Das wär’s schon. Was ihr bei dieser Mission erwerbt – 
+Ruhm, Wissen und Schätze – gehört euch. Szenarioende Benutze einen Dummyspieler (siehe Seite 12) und die besonderen 
+
+Eine detaillierte Beschreibung dieses Szenarios steht in der Schritt- Sobald ein Spieler eine Stadt aufdeckt, haben alle Spieler (der Regeln zur Auswahl der Taktik von der Soloeroberungsmission 
+
+für-Schritt-Anleitung. Hier folgt nur eine Zusammenfassung: Entdecker eingeschlossen) noch einen Zug. Wenn die Runde wäh- (siehe Seite 17). Bei der Wertung gibt es keine Ehrentitel.
+renddessen endet, ist das Spiel sofort vorbei. Wenn du jedoch nur mit den Spielabläufen vertraut werden willst, 
+
+Aufbau (für 2, 3 oder 4 Spieler) kannst du auf den Dummyspieler in der ersten Partie verzichten, 
+•  Spielplanform: Keil ohne Beschränkungen und einfach das Spiel genießen, ohne dich unter Druck setzen zu 
+•  Landschaftsteile: 8, 9 oder 11, nach Nummern sortiert lassen.
+• Stadt-Zentralteile: 1
+•  Zentralteile ohne Stadt: 2
+•  Städte: können weder betreten noch erobert werden.
+
+15
+
+MK_rulebook_DEU_02.indd   15 2/23/2012   21:16:54 PM
+
+
+
+VOLLSTÄNDIGE EROBERUNG  
+
+•  Spieler: 2 bis 4 Szenarioende Varianten
+• Typ: Wettbewerb Wenn alle Städte erobert sind, haben alle Spieler (auch derjenige, Mit Erfahrung könnt ihr die Stadtlevel erhöhen. Aber Vorsicht – 
+•  Dauer: sechs Runden (3 Tage und 3 Nächte) welcher die letzte Stadt aufgedeckt hat) noch einen letzten Zug. selbst mit den vorgeschlagenen Werten dauert dieses Szenario 
+• Zweck: Standardszenario, in dem alle Spielelemente vorkom- Wenn die Runde währenddessen endet, ist das Spiel sofort vorbei sehr lang.
+
+men. Kann sehr lange dauern, besonders, wenn es zu viert oder Wertung Teamspiel
+mit unerfahrenen Spielern gespielt wird. Wendet die normale Wertung für Erfolge an. Zusätzlich wertet ihr Wenn ihr zu viert spielt, könnt ihr nach Teamregeln spielen (siehe 
+
+Eure Aufgabe ist es, innerhalb von drei Tagen und drei Nächten alle Städte, wie auf der Rückseite der Wertungskarte beschrieben. Abschnitt Varianten). 
+Städte zu finden und zu erobern. Jeder wird auf sich selbst gestellt 
+sein und, wie üblich, wird jeder so viel Ruhm , Wissen und Beute an •  Ein Spieler erhält 7 Ruhm pro Stadt, deren Anführer er ist. In diesem Fall kann man entweder die vier Städte im Spiel lassen, 
+sich raffen, wie möglich. Was für ein Glück, dass die Eroberung von • Ein Spieler erhält 4 Ruhm pro Stadt, in der er zwar nicht Anfüh- oder Anreiz zu gemeinsamen Stadtüberfällen schaffen, indem 
+Städten herrlich geeignet zum Ansammeln von Ruhm ist. rer ist, wo aber mindestens eines seiner Schildplättchen auf der man nur zwei Stadt-Zentralteile benutzt und den Level der Städte 
+
+Stadtkarte liegt. auf 10 stellt, oder höher. Ihr könnt auch zwei Megalopolis benut-
+Aufbau (für 2, 3 oder 4 Spieler) • Wer den meisten Ruhm für das oben genannte erhalten hat, zen (siehe unter Varianten).
+•  Spielplanform: Keil (für 2 oder 3 Spieler), komplett frei (4) erhält zusätzliche 5 Ruhm als größter Stadteroberer (Ruhm +2 
+• Landschaftsteile: 8, 9 oder 11 bei Gleichstand).
+•  Stadt-Zentralteile: 2, 3 oder 4 (entsprechend Spieleranzahl) Wenn ihr alle Städte erobert habt, war eure Mission erfolgreich. 
+•  Zentralteile ohne Stadt: 1, 2 oder 3 (eins weniger als Spieler) Egal, ob euch das gelungen ist oder nicht, gewinnt derjenige mit 
+•  Städte: Jede aufgedeckte Stadt hat Level 4. dem meisten Ruhm.
+
+BLITZEROBERUNG  
+
+•  Spieler: 2 bis 4 Spezialregeln Varianten
+• Typ: Wettbewerb • Ihr beginnt mit 1 Ruhm. Jedes Mal, wenn ihr eine Zeile auf der Ihr könnt den Level der Städte nach euren Vorlieben anpassen.
+•  Dauer: vier Runden (2 Tage und 2 Nächte) Ruhmanzeige überschreitet, erhaltet ihr 1 Ruhm zusätzlich.
+• Zweck: Kürzeres Szenario, in dem die meisten Spielelemente • Jeder beginnt auf dem zweiten positiven Feld der Ansehensan-
+
+dem Standardspiel entsprechen. Es ist aber schneller. zeige (d. h., er hat direkt zu Beginn einen Bonus von +1 beim 
+Wieder sollt ihr alle Städte erobern: Diesmal habt ihr nur zwei Tage Ansehen).
+und zwei Nächte, daher hat man euch mit größerer Macht ausge- • Es gibt einen zusätzlichen Manawürfel in der Quelle und eine 
+stattet. Und wieder: Wer den meisten Ruhm erringt, gewinnt. Einheit mehr im Angebot als üblich.
+
+Aufbau (für 2, 3 oder 4 Spieler) Szenarioende
+• Spielplanform: Keil (für 2 oder 3 Spieler) oder frei – beschränkt Wenn alle Städte erobert sind, haben alle Spieler (auch derjenige, 
+
+auf 4 Spalten (4 Spieler) welcher die letzte Stadt aufgedeckt hat) noch einen letzten Zug. 
+•  Landschaftsteile: 6, 7 oder 9 Wenn die Runde währenddessen endet, ist das Spiel sofort vorbei.
+•  Stadt-Zentralteile: 2, 3 oder 4 (entsprechend Spieleranzahl) Wertung
+•  Zentralteile ohne Stadt: 1, 2 oder 3 (eins weniger als Spieler) Normale Wertung für Erfolge und Städte (auf beiden Seiten der 
+•  Städte: Jede aufgedeckte Stadt hat Level 3. Wertungskarte), wie beim Standard-Eroberungsszenario.
+
+VOLLSTÄNDIGE KOOPERATION 
+
+•  Spieler: 2 oder 3 Spezialregeln Dann wertet ihr die Erreichung eures Ziels und die Zeit, die ihr da-
+• Typ: Kooperativ • Bei der Wahl der Taktiken zieht zuerst der Dummyspieler zufäl- für benötigt habt (Rückseite der Wertungskarte):
+•  Dauer: sechs Runden (3 Tage und 3 Nächte) lig eine Taktikkarte, dann wählen die anderen Spieler. •  Ihr erhaltet 10 Punkte für jede eroberte Stadt. 
+• Zweck: Standard-Kooperationsszenario – die ultimative He- • Am Ende von Tag oder Nacht wählt ihr gemeinsam eine der von • Ihr erhaltet zusätzliche 10 Punkte, falls jeder Spieler Anführer 
+
+raus forderung, wenn ihr das Spiel gemeinsam bestehen wollt. den echten Spielern (nicht dem Dummy) genutzten Taktiken von mindestens einer Stadt ist. 
+Eure Aufgabe ist es, alle Städte zu erobern. Ihr müsst als Team und entfernt sie aus dem Spiel (am Ende des letzten Tages oder • Ihr erhaltet zusätzliche 15 Punkte, wenn ihr alle Städte erobert 
+arbeiten und ihr werdet als Team belohnt, abhängig von eurem der letzten Nacht ist das nicht nötig). habt.
+schwächsten Mitstreiter und euren besten Erfolgen. • Es gelten Teamregeln, allerdings seid ihr alle in ein und demsel- •  Wenn ihr das Spiel eine oder mehr Runden vor dem Ende des 
+
+ben Team (siehe Abschnitt Allgemeine Grundsätze).
+Aufbau (für 2 oder 3 Spieler) Rundenlimits beendet habt, erhaltet ihr 30 Punkte pro Runde, 
+
+die ihr nicht benötigt habt.
+• Spielplanform: komplett frei Szenarioende
+
+• Ihr erhaltet 1 Punkt pro Karte im Handlungsdeck des Dummy-
+•  Landschaftsteile: 8 oder 10 Wenn alle Städte erobert sind, haben alle Spieler außer dem Dum- spielers (die in dieser Runde nicht umgedreht wurde). 
+•  Stadt-Zentralteile: 3 oder 4 (eins mehr als Spieler) myspieler noch einen letzten Zug.
+
+• Wenn das Rundenende in eurer letzten Runde nicht angekün-
+•  Zentralteile ohne Stadt: 2 oder 3 (so viele wie Spieler) Wertung digt wurde, bekommt ihr noch zusätzliche 5 Punkte.
+• Städte: Die Städte haben Level 5, außer der letzten, die aufge- Wenn es euch gelingt, alle Städte zu besiegen, waren alle siegreich. 
+
+deckt wird, sie hat Level 8 (2 Spieler) oder Level 11 (3 Spieler) Wenn nicht, haben alle verloren. In beiden Fällen könnt ihr eine Varianten
+• Dummyspieler: ein Standard-Dummyspieler (siehe Abschnitt Wertung durchführen, um vergleichen zu können, wie gut ihr ge- Passt die Stadtlevel so an, dass sie für eure Spielstärke die passen-
+
+Allgemeine Prinzipien). spielt habt. de Herausforderung sind. Zu zweit darf die letzte Stadt auch eine 
+Megalopolis sein – siehe Abschnitt Varianten.
+
+• Karten und Fähigkeiten: Entfernt die vier wettbewerbsorien- Ihr habt als Team einen gemeinsamen Punktestand. Als Basis 
+tierten Zauber aus dem Zauberdeck (mit 17 bis 20 numme- nehmt ihr den niedrigsten Ruhm, den einer der Spieler erzielt hat. Ihr könnt eine Wertungsvariante vereinbaren: bei den Erfolgen 
+riert) sowie eine interaktive Fähigkeit (die mit dem dunkleren Dann wendet ihr die normale Wertung für Erfolge an, aber: werden nur die niedrigsten Punktzahlen gewertet. Das wird zu 
+Hintergrund auf der Fähigkeitsübersicht aus dem Fähigkeits- •  In jeder Rubrik wertet ihr lediglich den Spieler, der dort die ausgeglichener Entwicklung der Helden führen, statt Spezialisie-
+stapel jedes Spielers. höchste Punktzahl erzielt hat (oder die meisten Minuspunkte rung (bei Größter Prügelknabe wird natürlich die höchste Punkt-
+
+bei Größter Prügelknabe). zahl genommen). 
+
+•  Es gibt keine Ehrentitel.
+
+16
+
+MK_rulebook_DEU_02.indd   16 2/23/2012   21:17:07 PM
+
+
+
+BLITZ-KOOPERATION  
+
+•  Spieler: 2 oder 3 Aufbau (für 2 oder 3 Spieler) Zusätzliche Spezialregeln
+• Typ: Kooperativ •  Landschaftsteile: 7 oder 8 • Jeder beginnt mit 1 Ruhm. Jedes Mal, wenn man eine Zeile auf 
+•  Dauer: vier Runden (2 Tage und 2 Nächte) •  Stadt-Zentralteile: 2 oder 3 (entsprechend Spieleranzahl) der Ruhmanzeige überschreitet, erhält man 1 Ruhm zusätzlich.
+• Zweck: Kürzeres, kooperatives Szenario, in dem die meisten • Zentralteile ohne Stadt: 1 oder 2 (eins weniger als Spieleran- • Ihr beginnt auf dem zweiten positiven Feld der Ansehensanzei-
+
+Spielelemente dem Standardspiel entsprechen. Es ist aber zahl) ge (d. h., ihr haben direkt zu Beginn einen Bonus von +1 beim 
+schneller und einfacher. • Städte: Abhängig von der Reihenfolge ihres Aufdeckens haben Ansehen).
+
+Wieder sollt ihr alle Städte erobern: Diesmal habt ihr nur zwei Tage die Städte Level 5 und 8 (2 Spieler) oder 5, 8 und 11 (3 Spieler). • Es gibt einen zusätzlichen Manawürfel in der Quelle und eine 
+und zwei Nächte, daher hat man euch mit größerer Macht ausge- Einheit mehr im Angebot als üblich.
+stattet.
+Alle Regeln und Aufbauanweisungen der Vollständigen Koopera-
+tion sind gültig, mit folgenden Ausnahmen:
+
+SOLOEROBERUNG  
+
+• Spieler: 1 Spezialregeln • Wenn du das Spiel eine oder mehr Runden vor dem Ende des 
+• Typ: Solo • Wenn Taktiken gewählt werden, bist du immer zuerst an der Rundenlimits beendet hast, erhältst du 30 Punkte pro Runde, 
+•  Dauer: sechs Runden (3 Tage und 3 Nächte) Reihe. Der Dummyspieler zieht dann zufällig eine der verblei- die du nicht benötigt hast.
+• Zweck: Solitärspiel,. Auch geeignet, um sich alleine mit dem benden Karten. • Du erhältst 1 Punkt pro Karte im Handlungsdeck des Dummy-
+
+Spiel auseinanderzusetzen, bevor man es anderen erklärt. • Am Ende jedes Tages und jeder Nacht entfernst du beide be- spielers (die in dieser Runde nicht umgedreht wurde). 
+Ja, du hast richtig gelesen: du bist allein. Den Rat stört das nicht, er nutzten Taktikkarten aus dem Spiel. Das bedeutet also, dass • Wenn das Rundenende in deiner letzten Runde nicht angekün-
+will trotzdem, dass diese Städte erobert werden. Viel Glück!! jede Karte genau einmal während des Spiels gewählt wird. digt wurde, bekommst du noch zusätzliche 5 Punkte.
+
+Aufbau Szenarioende Varianten
+• Spielplanform: Keil Wenn alle Städte erobert wurden, hast du noch einen letzten Zug Passe die Stadtlevel so an, dass sie für deine Spielstärke die pas-
+• Landschaftsteile: 7 (der Dummyspieler hat keinen mehr). sende Herausforderung sind. Du darfst auch eine Megalopolis 
+
+benutzen.
+• Stadt-Zentralteile: 2 Wertung
+•  Zentralteile ohne Stadt: 2 Wenn du erfolgreich alle Städte besiegt hast, warst du siegreich. Andere Szenarien als Solomission
+• Städte: Die erste aufgedeckte Stadt hat Level 5, die zweite auf- Wenn nicht, hast du versagt. In beiden Fällen kannst du eine Wer- Dies ist eine Standard-Solomission. Du kannst natürlich jede an-
+
+gedeckte Stadt hat Level 8. tung durchführen, um vergleichen zu können, wie gut du gespielt dere Mission auch solo spielen, benutze  einfach ähnliche Ände-
+• ein Standard-Dummyspieler (siehe Abschnitt Allgemeine Prin- hast. rungen beim Spielaufbau wie hier.
+
+zipien). Als Basis nimmst du deinen Ruhm. Dann wendest du die normale 
+• Karten und Fähigkeiten: Entferne die vier wettbewerbsorien- Wertung für Erfolge an, allerdings gibt es keine Ehrentitel.
+
+tierten Zauber aus dem Zauberdeck (mit 17 bis 20 numme- Dann wertest du die Erreichung deines Ziels und die Zeit, die du 
+riert) sowie die interaktive Fähigkeit (die mit dem dunkleren dafür benötigt hast (Rückseite der Wertungsübersicht):
+Hintergrund auf der Fähigkeitsübersicht aus deinem Fähig- •  Du erhältst 10 Punkte für jede eroberte Stadt. 
+keitsstapel. • Du erhältst zusätzliche 15 Punkte, wenn du alle Städte erobert 
+
+hast.
+
+FREIHEIT DEN BERGWERKEN!  
+
+•  Spieler: 2 bis 4 Spezialregeln • Hinweis: Wenn es nicht ausreichend braune Plättchen geben 
+• Typ: Wettbewerb • Wenn ein Bergwerk aufgedeckt wird, legt ein grünes (wenn auf sollte, nehmt einen vorläufigen Ersatz für die Monster, die noch 
+•  Dauer: vier Runden (2 Tage und 2 Nächte) einem Landschaftsteil) oder rotes (wenn auf einem Zentralteil) verdeckt auf dem Spielplan liegen. Zieht ein neues braunes 
+• Zweck: Ein kürzeres Szenario, ähnlich dem Standardszenario, Feindplättchen offen darauf. Außerdem legt ihr ein braunes Plättchen, sobald so ein Monster aufgedeckt wird.
+
+allerdings mit anderen Zielen. Kämpft in den Tunneln! Feindplättchen verdeckt dazu. Das sind die Feinde, die dieses Szenarioende
+Die Bergwerke in diesem befreundeten Königreich wurden von Bergwerk besetzt halten (einer versteckt sich im Dunkel der 
+
+Tiefe). Legt beide so hin, dass die Rückseite des braunen Plätt- Wenn alle Spielplanteile aufgedeckt sind und alle Bergwerke be-
+Feinden besetzt. Ohne Kristallnachschub können die Magier dem 
+
+chen auch noch zu sehen ist, damit man sie von umherziehen- freit, haben alle Spieler (auch derjenige, der das letzte Bergwerk 
+Land nicht dienen. Geht hin und holt euch alles zurück.
+
+den Feinden unterscheiden kann. befreit hat) noch einen letzten Zug. Wenn die Runde währenddes-
+Spielplan (für 2, 3 oder 4 Spieler) sen endet, ist das Spiel sofort vorbei.
+
+• Um ein Bergwerk zu befreien, kannst du es von seinem Feld 
+• Spielplanform: Keil (für 2 oder 3 Spieler) oder frei – beschränkt aus betreten (als Aktion). Bekämpfe beide Feinde. Nachtregeln Wertung
+
+auf 4 Spalten (4 Spieler) gelten wie in einem Dungeon (allerdings darfst du deine Ein- Wenn ihr alle Bergwerke befreit habt, war die Mission erfolgreich.
+• Landschaftsteile: 8, 9 oder 11 (sortiert nur die aus, auf denen heiten einsetzen). Wenn du beide Feinde nicht besiegen kannst, In jedem Fall gilt die Standardwertung für Erfolge. Außerdem:
+
+keine Bergwerke sind) bleibt/bleiben der/die übrige/n Plättchen auf dem Feld. Du • Ein Spieler erhält 4 Ruhm pro eigenem Bergwerk auf einem 
+•  Stadt-Zentralteile: 1 (immer die Rote Stadt) kannst sie später wieder angreifen. Landschaftsteil und 7 Ruhm pro eigenem Bergwerk auf einem 
+• Zentralteile ohne Stadt: 1, 2 oder 3 (das eine ohne Bergwerk ist • Wer den letzten Feind besiegt, befreit das Bergwerk. Er mar- Zentralteil.
+
+immer bei den aussortierten Teilen). kiert es und erhält Ansehen +1 (+2, falls auf einem Zentralteil). • Wer für das oben genannte den meisten Ruhm erhalten hat, 
+• Städte: Die Stadt ist freundlich gesinnt. Jeder Spieler legt ein • Bis zu ihrer Befreiung liefern Bergwerke keine Kristalle. Sobald erhält als Größter Befreier zusätzliche 5 Ruhm.
+
+Schildplättchen darauf, niemand ist Stadtanführer. sie befreit sind, liefern sie wie üblich (die Produktion startet au-
+genblicklich, also erhält der Befreier einen Kristall in dem Zug, 
+in dem ihm die Befreiung gelang). 
+
+• Zu Beginn von Tag oder Nacht bekommt jeder Spieler einen 
+Kristall aus jedem Bergwerk, das er bereits befreit hat, egal 
+wie weit er davon auf dem Spielplan ist. Es ist ein Geschenk der 
+überaus dankbaren Bergleute.
+
+17
+
+MK_rulebook_DEU_02.indd   17 2/23/2012   21:17:19 PM
+
+
+
+DRUIDENNÄCHTE 
+
+•  Spieler: 2 bis 4 Spezialregeln Szenarioende
+•  Typ: Geringer Wettbewerb, ein bisschen kooperativ • Wenn du deine Bewegung auf einer Magischen Lichtung be- Sobald alle Spieler den Gesang in der zweiten Nacht angestimmt 
+•  Dauer: vier Runden (2 Tage und 2 Nächte) endest, kannst du diese aktivieren – markiere sie mit einem haben (in diesem Fall hat jeder Spieler noch einen weiteren Zug), 
+• Zweck: Ein kürzeres Szenario, ähnlich dem Standardszenario, deiner Schildplättchen. Es können mehrere Plättchen auf jeder oder beim Ende der zweiten Nacht.
+
+allerdings mit anderen Zielen. An welche Herausforderungen Lichtung liegen, allerdings höchstens eins von jedem Spieler. Wertung
+traut ihr euch heran? • Einmal in der ersten Nacht, in einem beliebigen deiner Züge, 
+
+Habt ihr auf den Magischen Lichtungen schon einmal die geheim- kannst du einen Beschwörungsgesang anstimmen. Du darfst Wendet die normale Wertung für Erfolge an. Wer den meisten 
+
+nisvollen Obelisken mit den eingemeißelten Symbolen bemerkt? dabei nicht auf einem bewohntem Feld stehen und es zählt als Ruhm hat, gewinnt.
+
+Untersucht diese! deine Aktion in diesem Zug. Der Gesang beschwört ein Mons- Varianten
+ter pro Lichtung, auf der du ein Schildplättchen liegen hast – 
+
+Spielplan (für 2, 3 oder 4 Spieler) Ihr könnt wettbewerbsorientierter vorgehen: nur 1 Schildplätt-
+ziehe entsprechend viele braune Feinde und kämpfe gegen chen (bei 2 Spielern) oder 2 Plättchen (bei 3 oder 4 Spielern) ist pro 
+
+• Spielplanform: Keil (für 2 oder 3 Spieler) oder frei – beschränkt diese. Lichtung erlaubt. Wenn eine Lichtung bereits dieses Limit erreicht 
+auf 4 Spalten (4 Spieler)  – Die Plättchen, die von dir besiegt werden, bringen dir dop- hat, nimm ein Plättchen eines anderen Spielers weg (deine Wahl).
+
+• Landschaftsteile: 8, 9 oder 11 (sortiert nur die aus, auf denen pelt so viel Ruhm. Mit weniger Spielern könnt ihr auch die epische Variante probie-
+keine magischen Lichtungen sind).  – Die Plättchen, bei denen dir das nicht gelingt, verschwinden ren: 3 Tage und 3 Nächte. Benutzt alle Landschaftsteile und Zen-
+
+•  Stadt-Zentralteile: 1 (immer die Grüne Stadt) nach dem Kampf (die Verletzungen, die du erhalten hast, tralteile ohne Stadt. Entfernt die Schildplättchen auch nach der 
+• Zentralteile ohne Stadt: 1, 2 oder 3 (eins weniger als Spieler- dummerweise nicht). zweiten Nacht. In der dritten Nacht beschwört ihr einen braunen 
+
+zahl).  – Egal, wie viele davon du besiegt hast, am Ende deines Zu- und einen roten Feind pro Lichtung, die ihr markiert habt und er-
+• Städte: Die Stadt ist freundlich gesinnt. Jeder Spieler legt ein ges erhältst du einen zufälligen Kristall pro beschworenes haltet 3 Kristalle pro beschworenem Feindpaar. 
+
+Schildplättchen darauf, niemand ist Stadtanführer. Monster (würfle für jedes, wie bei einer Monsterbehau-
+sung).
+
+• Am Ende der ersten Nacht nimmst du alle Schildplättchen von 
+den Lichtungen weg. Die Spieler müssen sie erneut markieren, 
+wenn sie auch in der zweiten Nacht Beschwörungsgesänge an-
+stimmen wollen.
+
+• In der zweiten Nacht könnt ihr wie in der ersten vorgehen, aller-
+dings werden diesmal rote Feinde beschworen. Auch diesmal 
+erhaltet ihr für besiegte Feinde doppelten Ruhm, aber diesmal 
+sogar zwei zufällige Kristalle pro Feind.
+
+DUNGEON LORDS
+
+•  Spieler: 2 bis 4 Spezialregeln Szenarioende
+• Typ: Wettbewerb • Immer, wenn ein Spielplanteil mit Dorf aufgedeckt wird, sucht Sobald alle Spielplanteile aufgedeckt und alle Grabstätten und 
+• Dauer: fünf Runden (3 Tage und 2 Nächte) sich der Spieler, der es aufgedeckt hat, ein passierbares, zum Dungeons erobert sind, haben alle Spieler (auch derjenige, der die 
+• Zweck: Ein kürzeres Szenario, ähnlich dem Standardszenario, Dorf angrenzendes Feld aus. Das Feld darf auf einem benach- letzte Grabstätte bzw. den letzten Dungeon aufgedeckt hat) noch 
+
+allerdings mit anderen Zielen. Ab in den Untergrund! barten Spielplanteil liegen. Das Feld darf aber weder Sumpf einen letzten Zug. Wenn die Runde währenddessen endet, ist das 
+Wir glaubten das Land vollständig in unserem Besitz. Falsch! Es sein, noch einen Ort enthalten. Ab jetzt ist auf diesem Feld Spiel sofort vorbei.
+gibt ein weitverzweigtes Tunnelsystem unter dem Königreich. Wir ein geheimer Dungeoneingang. Er legt ein verdecktes braunes Wertung
+wissen nicht, wer diese Tunnel gegraben hat und warum, aber was Feindplättchen darauf, um es zu markieren.
+
+Wenn ihr alle Grabstätten und Dungeons erobert habt, war eure 
+kümmert es uns: Geht und bringt sie unter eure Kontrolle! • Ein geheimer Dungeoneingang funktioniert wie ein norma-
+
+ler Dungeon (siehe dessen Übersicht). Wenn du ihn eroberst, Mission erfolgreich.
+Spielplan (für 2, 3 oder 4 Spieler) markiere das Feld und nimm dir deine Belohnung. Wenn du In jedem Fall nehmt ihr eine normale Wertung vor, außer:
+• Spielplanform: Keil (für 2 oder 3 Spieler) oder frei – beschränkt versagst, lege das Monsterplättchen ab und lege einen anderen • Beim Werten der Abenteuer wertet auch die geheimen Grab-
+
+auf 4 Spalten (4 Spieler) braunen Feind auf das Spielplanteil. stätten und Dungeons. Alle Grabstätten und Dungeons brin-
+• Landschaftsteile: 8, 9 oder 11 (sortiert nur die aus, auf denen • Dasselbe gilt für Kloster – nur, dass du dort ein rotes Feind- gen in diesem Szenario 4 statt 2 Punkte.
+
+keine Dungeons sind). plättchen auf ein angrenzendes leeres Feld legst, um damit den • Es wird statt dem Ehrentitel Größter Abenteurer der Titel Größ-
+•  Stadt-Zentralteile: 1 (immer die Blaue Stadt) Eingang zu einer geheimen Grabstätte anzuzeigen. ter Dungeon-Crawler verliehen, der zusätzliche 5 Punkte bringt 
+• Zentralteile ohne Stadt: 1, 2 oder 3 (es muss immer das Wüs- • Diese geheime Grabstätte funktioniert wie normale Grabstät- (2 bei Gleichstand).
+
+tenteil mit Kloster und Grabstätte dabei sein). ten.
+• Stadt: Die Stadt ist freundlich gesinnt. Jeder Spieler legt ein • Eroberte Dungeons und Grabstätten (sowohl normale als auch 
+
+Schildplättchen darauf, niemand ist Stadtanführer. geheime) können in diesem Szenario kein zweites Mal betreten 
+werden, um sich weiteren Ruhm zu erkämpfen. 
+
+• Alle eroberten Grabstätten und Dungeons (auch die geheimen) 
+sind miteinander verbunden. 
+
+ –  Wenn du auf einem eroberten Grabstätten- oder Dunge-
+onfeld stehst, darfst du dich zu einem beliebigen anderen 
+eroberten Grabstätten- oder Dungeonfeld bewegen. 
+
+ – Beide Felder müssen nicht vom selben Typ sein (du kannst 
+dich von einem normalen Dungeon zu einer geheimen 
+Grabstätte bewegen usw.).
+
+ – Dazu musst du 2 Bewegungspunkte bezahlen plus 1 Bewe-
+gungspunkt pro Feld, das du zurücklegst.
+
+ – Beim Messen der Entfernung musst du aufgedeckte Felder 
+benutzen, und du darfst dich nicht durch Seen oder Sümpfe 
+bewegen. Wenn das nicht möglich sein sollte, darfst du dich 
+nicht auf diese Weise bewegen.
+
+18
+
+MK_rulebook_DEU_02.indd   18 2/23/2012   21:17:31 PM
+
+
+
+EROBERN UND HALTEN 
+
+•  Spieler: 2 oder 4 (in zwei Teams) Spezialregeln Teamregeln
+• Typ: Starker Wettbewerb • Lege ausschließlich Normale (silberne) Einheiten in der ersten • Wenn ihr zu viert spielt, gelten die Teamregeln (siehe Abschnitt 
+• Dauer: vier Runden (4 Spieler), sechs Runden (2 Spieler) Hälfte des Spiels aus. Lege Normale sowie Eliteeinheiten in der Varianten). 
+• Zweck: Ein sehr wettbewerbsorientiertes Szenario, das den zweiten Hälfte des Spiels aus (ab Runde 3 bei vier Spielern, ab • Beachtet insbesondere diese Regel (siehe Abschnitt Varianten): 
+
+Helden massenhaft Gelegenheit bietet, sich gegenseitig anzu- Runde 4 bei zwei Spielern). Ein Spieler darf eine Burg betreten, die seinem Teamkollegen 
+greifen. Siegpunkte für eroberte Orte statt Ruhm! • Einheiten, die man in Klostern rekrutieren kann, dürfen auch gehört und er kann dort Einheiten rekrutieren. Wenn er auf 
+
+In diese krisengeschüttelte Region hat euch der Rat des Nichts ent- in Magiertürmen rekrutiert werden. Einheiten, die man in Dör- oder angrenzend zu so einer Burg steht, ist sein Handkarten-
+sandt … ähm … also der rechtmäßige Teil des Rats … um sie unter fern rekrutieren kann, dürfen auch in Burgen rekrutiert werden. limit gleichfalls erhöht, aber nur für Burgen, die ihm gehören 
+Kontrolle zu bringen. Doch Vorsicht, es gibt eine andere Fraktion • Man verliert in diesem Szenario kein Ansehen, wenn man Bur- (falls vorhanden).
+verräterischer Ratsmitglieder, die genau dasselbe will. Lasst das gen und Magiertürme überfällt. •  Dasselbe gilt für Magiertürme und Extramana.
+keinesfalls zu! • Die Magiertürme funktionieren hier anders als sonst, sie äh- Der Gewinner
+Spielplan (für 2, 3 oder 4 Spieler) neln in diesem Szenario den Burgen.
+
+Das Szenario wird bis zum Ende des Rundenlimits gespielt oder 
+• Spielplanform: vorgege-  – Wenn du einen Magierturm eroberst, erhältst du keinen bis eine Seite den Sieg der anderen anerkennt. Jeder Besitz einer 
+
+ben. Siehe Abb. Nehmt die Zauber. Du kannst wie gehabt dort später Zauber kaufen. Burg zählt 3 Siegpunkte, jeder Besitz eines Magierturms zählt 
+B-Seite des Startteils, drei  – Wenn du einen Magierturm eroberst, gehört er dir, wie eine 2 Siegpunkte. Der Spieler oder das Team mit den meisten Sieg-
+aufgedeckte Landschafts- Burg. Andere Spieler dürfen ihn überfallen, wie eine Burg: punkten gewinnt das Spiel. Bei Gleichstand (wenn also einige Orte 
+teile und vorgegebene Du kämpfst gegen einen zufällig gezogenen befestigten vi- unerobert geblieben sind, da es genau 25 Punkte zu erringen gibt), 
+Positionen, an denen oletten Feind, für den halben Ruhm, aufgerundet. hat keiner gewonnen.
+weitere 2 Landschaftsteile  – Wenn du deinen Zug in oder angrenzend zu deinem 
+und 4 Zentral teile auf- Magierturm beginnst, erhältst du 1 goldenes Mana (bei Varianten
+gedeckt werden können Tag) oder schwarzes Mana (bei Nacht) pro Magierturm in • Das Spiel wird strategischer, wenn ihr den Spielplan von An-
+(ihr solltet sie bereits beim deinem Besitz. fang an auslegt (der Reiz des Erkundens geht dann verloren). 
+Spielaufbau verdeckt an diese Positionen legen). • Wenn du bei deiner Burg und deinem Magierturm sein solltest, • Ihr könnt dieses Szenario auch zu dritt spielen, aber es wird un-
+
+•  Landschaftsteile: 5 (alle mit Burgen oder Magiertürmen). profitierst du von beiden! ter dem „wenn zwei sich streiten, freut sich der dritte“-Syndrom 
+•  Stadt-Zentralteile: 1 (immer die Weiße Stadt) • Am zweiten Tag und in der zweiten Nacht ziehst du zwei zu- leiden. Wenn euch das nicht abschreckt, empfiehlt es sich, nur 
+
+•  Zentralteile ohne Stadt: 3 (alle mit Burgen oder Magiertürmen). fällige graue (bei Burgen) oder violette (bei Magiertürmen) vier Runden zu spielen, wie zu viert.
+
+• Stadt: Die Stadt war freundlich gesinnt, hat aber ihre Tore ge- Feindplättchen, wenn du eine Burg oder einen Magierturm 
+schlossen. Du darfst sie nicht betreten. eines anderen Spielers überfällst. Der gesamte Ruhm für das 
+
+Besiegen dieser Feinde wird zusammengerechnet und dann 
+• Einheiten: Entferne die Einheiten Level IV (man kann sie nur in halbiert (aufgerundet).
+
+Städten rekrutieren) aus dem Deck der Eliteeinheiten. •  Für den dritten Tag und die dritte Nacht (bei 2 Spielern) gilt das-
+selbe, allerdings werden je drei Plättchen gezogen.
+
+EINER KAM ZURÜCK  
+
+•  Spieler: 2 bis 4 Spezialregeln Teamvariante
+•  Typ: Starker Wettbewerb • Das Portal schließt sich am Ende von Tag 1 (wer also zu diesem Wenn ihr zu viert seid, könnt ihr dieses Szenario in Teams spielen. 
+•  Dauer: vier Runden (2 Tage und 2 Nächte) Zeitpunkt auf dem Portal stehen sollte, scheidet aus dem Spiel Alle Teamregeln gelten (siehe Abschnitt Allgemeine Grundsätze).
+• Zweck: Ein wettbewerbsorientiertes Szenario für Spieler, de- aus). Ab jetzt gilt das Portalfeld als leeres Ebenenfeld – nur ein Bei Spielbeginn wählt jedes der beiden Teams ein Schildplättchen 
+
+nen Spielereliminierung lieber ist, als eine Schlusswertung. Spieler darf dort stehen, und Kämpfe können dort eingeleitet eines seiner beiden Spieler aus (zufällig oder bewusst, wie ihr 
+Dies ist eure ultimative Prüfung. ihr werdet in einen unbekannten werden (inklusive Regeln für erzwungenen Rückzug). möchtet). Dieser Spieler ist der Auserwählte des Teams – derje-
+Teil des Königreichs entsandt und hinter euch wird das Portal ge- Der Gewinner nige, der zurückkehren muss. Sein Teamkollege muss ihm dabei 
+schlossen. Nach zwei Tagen und zwei Nächten wird sich das Por- helfen, vor allem, indem er das andere Team aufhält. 
+
+Das Szenario endet, sobald die zweite Nacht vorüber ist. Wer in 
+tal kurz öffnen. Nur derjenige Held, der in diesem Augenblick beim diesem Moment auf dem Portalfeld steht, hat gewonnen. Steht Das jeweilige andere Team sollte nicht erfahren, welcher Spieler 
+Portal steht, kann in die Heimat zurückkehren dort niemand, gibt es keinen Gewinner. Es gibt keine Wertung und gewählt wurde. Beide Schildplättchen (eins von jedem Team) 
+
+müsst ihr an einem sichern Ort aufbewahren.
+Spielplan (für 2, 3 oder 4 Spieler) Ruhm ist bedeutungslos.
+
+Am Ende der zweiten Nacht deckt ihr diese Schildplättchen auf. 
+•  Startteil: Keil (oder worauf ihr euch einigt) Hinweis: Nachdem das Ende der Nacht angekündigt wird, ist kein 
+
+Gehört eines davon zu dem Spieler, der jetzt gerade auf dem Portal 
+•  Landschaftsteile: 7, 8 oder 10 Kampf Spieler-gegen-Spieler mehr erlaubt. Daher hat ein Spieler, 
+
+der im Moment der Ankündigung des Endes der zweiten Nacht steht, hat sein Team gewonnen. Steht kein Spieler auf dem Portal 
+•  Stadt-Zentralteile: 1, 2 oder 3 (eins weniger als Spieleranzahl) dieses Feld besetzt haben sollte, bereits gewonnen. oder ein Spieler, dessen Plättchen nicht gewählt wurde, gewinnt 
+• Zentralteile ohne Stadt: 1, 2 oder 3 (eins weniger als Spieleran- niemand. 
+
+zahl) Varianten
+•  Städte: Jede aufgedeckte Stadt hat Level 3. Ihr könnt eine epische Version spielen, die 3 Tage und 3 Nächte 
+
+dauert. Fügt ein Spielplanteil jeder Sorte hinzu und erhöht den 
+Level der Städte auf 4.
+
+Spieltester: Filip, David, Hanka, Miloš, Aneken, Vítek, Kreten, Fanda, Michal, Flygon, Paul, 
+MAGE KNIGHT - DAS BRETTSPIEL
+
+Falco, Glee, Rumun, Monča, Ese, Yuyka, Jéňa, Bianco, Jirka Bauma und viele andere ais der 
+EIN SPIEL VON VLAADA CHVÁTIL Tschechischen Republik, den USA und dem Vereinigten Königreich.
+Cover und Kartenillustrationen: J. Lonnee Besonderer Dank an: Filip Murmak für seine Begeisterung und wertvolle Hilfe von dem 
+Zusätzliche Illustrationen: Milan Vavroň Augenblick an, in dem er das Spiel kennen lernte, bis zum Druck. David Korejtko für viele 
+Künstl. Leitung/Grafik-Design: Chris Raimo Stunden des Spieltestens und Ausbalancierens. Paul Grogan und seine Freunde für endlo- Pegasus Spiele, Straßheimer Str. 2, 
+Schachteldesign der deutschen Ausgabe: Hans-Georg Schneider se Tage (und Nächte) des Korrekturlesens und der Sprachkorrekturen. Bryan Kinsella und 61169 Friedberg, unter Lizenz von WizKids/
+Satz und Layout: Filip Murmak, Michael Kröhnert Wilson Price von WizKids für ihre Hilfe und wertvolle Hinweise. WizKids und Czech Games Neca, LLC. © 2012 WizKids/Neca, LLC. 
+Übersetzung: Michael Kröhnert Edition für ihre Unterstützung durch ausuferndes Spieltesten. Christian Pacher für wertvol- Alle Rechte vorbehalten.
+Lektorat: Henning Kröpke le Hinweise zur Terminologie für die deutsche Ausgabe. www.pegasus.de
+
+19
+
+MK_rulebook_DEU_02.indd   19 2/23/2012   21:17:43 PM
+
+
+
+•  Ende des Zuges:
+SPIEL  – Falls zutreffend: neu gewürfelten Manawürfel in die Quel- KAMPF
+•  Szenario und Varianten aussuchen. le zurück legen. Nächster kann jetzt Zug machen. SPIELER-GEGEN-SPIELER
+•  Spieler wählen Helden.  –  Erzwungener Rückzug, wenn nicht an sicherem Platz. •  Verteidiger erklärt seine Absicht:
+• Spielaufbau.  –  Gespielte Karten ablegen, Mana zurück (nicht Kristalle).  – Wenn er sich dem Kampf vollständig widmet, kann er al-
+•  Runden durchspielen, bis Rundenlimit oder Endbedingungen.  – Kampfbelohnungen nehmen, Aufleveln, falls zutreffend. les so machen, wie sonst in seinem Zug, inklusive den Ab-
+• Spielergebnis ermitteln.  –  0 bis X Handkarten ablegen (min. 1, wenn keine gespielt). läufen am Zugende; er ist bis zum Beginn seines nächsten 
+
+ –  Karten nachziehen bis zum (modifizierten) Handlimit. Zuges geschützt, verliert diesen nächsten Zug jedoch. 
+EINE RUNDE  – Widmet er sich dem Kampf nur teilweise, darf er weder 
+• Runde vorbereiten (nicht für die erste Runde): Mana noch Fähigkeiten einsetzen und seine Reaktion en-
+ –  Tag-/Nachttafel umdrehen und Quelle erneuern. KAMPF MIT FEINDEN det sofort nach dem Ende des Kampfs. 
+ –  Neues Einheitenangebot bilden. •  Fern- und Belagerungsangriffphase. • Fern- und Belagerungsangriffphase
+ – Auffüllen der Zauber- und Fortgeschr.-Aktionen-Angebote.  – Keinen, einen oder mehrere Angriffe ausführen. Du darfst  – Die Spieler sind abwechselnd am Zug, beginnend beim 
+ –  Spieler: Einheiten bereit machen, Fähigkeitsplättchen umdrehen. einen oder mehrere Feinde mit jedem Angriff besiegen. Verteidiger, und spielen so lange Fern- und Belagerungs-
+ –  Spieler: Decks mischen und neue Karten ziehen.  – Spiele Fern- und Belagerungsangriffe im Gesamtwert angriffe, bis beide damit aufhören möchten.
+• Spieler wählen Taktiken (oder höher) der Rüstung der gewählten Feinde, um sie  – Der jeweils angreifende Spieler spielt beliebig viele Fern- 
+ –  Niedrigster Ruhm (falls gleich: später in Zugfolge) zuerst. zu besiegen (sind einige dieser Feinde befestigt, sind nur und Belagerungsangriffe (nur Belagerungsangriffe, wenn 
+ –  Zugfolgeplättchen neu anordnen. Belagerungsangriffe erlaubt). der Verteidiger befestigt ist).
+• Spieler spielen in Zugfolge ihre Züge, bis jemand das Runden-  – Du erhältst Ruhm für jeden besiegten Feind (du levelst  – Der andere Spieler kann Blocks ausspielen, um den An-
+
+ende ansagt. aber noch nicht auf) und legst dessen Plättchen ab. griff zu verringern. Er wird pro 2 Blocks um 1 reduziert.
+ –  Die anderen Spieler haben dann je einen letzten Zug. • Blockphase.  – Der verbleibende Angriff wird von Angreifer dem Helden 
+
+ – Keinen, einen oder mehrere Blocks ausführen. Du darfst und/oder dessen Einheiten als Schaden zugewiesen. Es 
+mit jedem Block genau einen Feind aufhalten.
+
+EIN ZUG muss Schaden in Höhe des Rüstungswerts zugewiesen 
+• Wenn dein Handlungsdeck leer ist, kannst du deinen Zug ver-  – Spiele Blocks im Gesamtwert (oder höher) des Angriffs werden, um einen Held oder eine unverletzte Einheit zu 
+
+fallen lassen, um das Rundenende anzusagen. des gewählten Feinds, um ihn zu blocken. verletzen.
+ –  Wenn deine Hand ebenfalls leer ist, musst du das tun. • Schadenphase. • Nahkampfangriff-Phase
+• Normaler Zug: Optionale Bewegung und/oder Entdecken  – Für jeden nicht besiegten oder nicht geblockten Feind  – Die Spieler sind abwechselnd am Zug, beginnend beim 
+
+(= Aufdecken von Spielplanteilen, was nicht als Aktion gilt), musst du Schaden in Höhe des Angriffswerts zuweisen Aggressor, und spielen so lange Angriffe, bis sich einer zu-
+danach 1 optionale (manchmal zwingende) Aktion: (Reihenfolge beliebig). rückziehen muss oder beide damit aufhören möchten.
+
+ –  Kampf mit Feinden (Überfall auf befestigten Ort, Provo-  – Zuerst kannst du deinen unverletzten Einheiten Schaden  – Der jeweils angreifende Spieler spielt beliebig viele Angrif-
+zieren oder Herausfordern von umherziehenden Feinden, zuweisen. Lege eine Verletzung darauf und verringere den fe (auch Fern- und Belagerungsangriffe und quer gespielte 
+einen Abenteuerort betreten und dort ggf. kämpfen). Schaden um den Rüstungswert der Einheit. Karten).
+
+ – Interaktion mit Bewohnern (rekrutieren und/oder heilen  – Den Restschaden weist du deinem Helden zu. Pro Verlet-  – Der andere Spieler kann Blocks ausspielen, um den An-
+und/oder Kauf von Karten gegen Einfluss). zung, die du auf die Hand nimmst, verringere den Scha- griff zu verringern. Er wird pro 1 Block um 1 reduziert.
+
+ – Kampf Spieler-gegen-Spieler (wenn auf demselben Feld den um den Rüstungswert des Helden.  – Der verbleibende Angriff wird von Angreifer (wie oben) 
+wie Gegner). • Angriffphase. als Schaden zugewiesen und/oder in Bewegungspunkte 
+
+• Rast: keine Bewegung und keine Aktion erlaubt.  – Keinen, einen oder mehrere Angriffe ausführen. Du darfst umgewandelt, um den Spieler zu zwingen, sich auf einen 
+ – Normale Rast: 1 Nicht-Verletzungskarte und beliebig vie- einen oder mehrere Feinde mit jedem Angriff besiegen. angrenzenden sicheren Platz zurückzuziehen und/oder, 
+
+le Verletzungskarten ablegen.  –  Spiele beliebige Angriffe (auch Fern- und Belagerungsan- um benutzte Artefakte oder Banner auf verletzten Einhei-
+ –  Langsame Erholung (wenn du ausschließlich Verletzungs- griffe oder quer gespielte Karten) in Höhe der Rüstung der ten zu stehlen (5 Schaden pro Artefakt).
+
+karten hast): 1 Verletzungskarte ablegen. gewählten Feinde (oder höher), um sie zu besiegen. • Wenn dein Gegner zum Rückzug gezwungen ist: Du erhältst 
+• Bei jedem Zug (gilt nicht als Aktion):  – Du erhältst Ruhm für jeden besiegten Feind (du levelst 1 Ruhm, falls er mehr Ruhm als du hat, plus 2 pro Level, den 
+
+aber noch nicht auf) und legst dessen Plättchen ab.
+ –  Spiele beliebige Spezial- und (wenn nicht im Kampf) Hei- dein Gegner höher ist als du.
+
+lungswirkungen.
+ –  Benutze bis zu 1 Würfel aus der Quelle.
+
+Feindplättchen-Eigenschaften
+
+Verteidigung Angriff Widerstände von Einheiten
+
+Befestigt – Nur Belagerungsangrif- Feuer-Angriff – Nur Eis- und Kaltes-Feuer-Blocks sind hier beim Blo- Physischer Widerstand – Die Ein- Kampf mit Feinden:
+fe sind in der Fern- und Belagerungs- cken wirkungsvoll (andere werden halbiert). heit ist weniger anfällig gegen phy- Wenn der Einheit Schaden 
+angriffphase gegen diesen Feind Eis-Angriff – Nur Feuer- und Kaltes-Feuer-Blocks sind hier beim Blo- sische Angriffe  von Feinden/ aus einem Angriff zuge-
+einsetzbar (überhaupt keine, wenn Gegnern. wiesen wird, gegen den sie 
+er außerdem an befestigtem Ort ist). cken wirkungsvoll (andere werden halbiert).
+
+Widerstand hat,  wird der 
+Kaltes-Feuer-Angriff – Nur Kaltes-Feuer-Blocks sind hier beim Blo- Feuer-Widerstand – Die Einheit ist Schaden zuerst um ihren 
+
+Physischer Widerstand – Alle phy- cken wirkungsvoll (andere werden halbiert). weniger anfällig gegen Feuer-Angriffe Rüstungswert reduziert 
+sischen Angriffe (inkl. quer gespielte  von Feinden/Gegnern.
+Karten) sind ineffizient (halbieren). Angriff herbeirufen – zu Beginn der Blockphase ziehe 1 braunes Plätt- (ohne Verletzung). Bleibt 
+
+Sie ignoriert außerdem alle Wirkun-
+chen für diesen Feind. Dieser gezogene Feind ersetzt den Feind in der dann noch Schaden übrig, 
+
+Feuer-Widerstand – Alle Feuer- gen roter Karten des Gegners bzw. 
+Block- und Schadenphase, dann wird er abgelegt. fahre wie üblich fort (Ein-
+
+Angriffe sind ineffizient (halbieren). von Einheiteneigenschaften, die ro- heit Verletzen und Scha-
+– Der Feind ignoriert alle Nicht-An- Flink – Um diesen Feind zu blocken, benötigst du Block in doppelter tes Mana benutzen. den um deren Rüstungs-
+griffswirkungen roter Karten oder Höhe von dessen Angriffswert. Eis-Widerstand – Die Einheit ist we- wert reduzieren).
+mit rotem Mana ausgelöste Einhei-
+teneigenschaften. Brutal – Wenn er nicht geblockt wird, teilt dieser Feind Schaden in dop- niger anfällig gegen Eis-Angriffe  
+
+pelter Höhe seines Angriffswerts aus. von Feinden/Gegnern.
+Eis-Widerstand – Alle Eis-Angriffe 
+sind ineffizient (halbieren). – Der Gift – Wenn eine Einheit durch den Angriff eines Feinds mit Gift Verletzt ISie ignoriert außerdem alle Wir- Spieler-gegen-Spieler:
+
+Feind ignoriert alle Nicht-Angriffs- wird, erhält sie 2 Verletzungen statt 1. kungen blauer Karten des Gegners Wenn die Einheit Wider-
+wirkungen blauer Karten oder mit Für jede Verletzung, die ein Held auf die Hand nimmt, wenn er von einem bzw. von Einheiteneigenschaften, die stand gegen mindestens 
+blauem Mana ausgelöste Einheiten- Giftangriff betroffen ist, kommt eine weitere auf seine Ablage. blaues Mana benutzen. ein Element im Angriff
+eigenschaften. des Gegners hat, muss 
+
+Versteinern – Wird eine Einheit verletzt durch den Angriff eines Feinds Feuer- sowie Eis-Widerstand – der Gegner doppelt so viel 
+Feuer- sowie Eis-Widerstand – mit Versteinern, ist sie sofort zerstört (aus dem Spiel). Zählt außerdem als Widerstand ge- Schaden aufwenden, um 
+Alle Kaltes-Feuer-Angriffe sind inef- Erhält ein Held eine oder mehr Verletzungen aus einem Versteinernangriff, gen Kaltes-Feuer-Angriffe  von die Einheit zu verletzen.
+fizient (halbieren). muss er sofort jegliche Nicht-Verletzungen aus seiner Hand ablegen. Feinden/Gegnern.
+
+20
+
+MK_rulebook_DEU_02.indd   20 2/23/2012   21:18:16 PM

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mage Knight - Base Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <div class="header-left">
+                <h1>🗡️ MAGE KNIGHT</h1>
+            </div>
+            <div class="header-right">
+                <div class="stat-pill">
+                    <span class="stat-label">Ruhm</span>
+                    <span class="stat-value" id="fame-value">0</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-label">Ansehen</span>
+                    <span class="stat-value" id="reputation-value">0</span>
+                </div>
+                <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <div class="game-main">
+            <!-- Left Sidebar -->
+            <aside class="sidebar sidebar-left">
+                <div class="panel hero-panel">
+                    <h2>Held</h2>
+                    <div class="hero-info">
+                        <div class="hero-name" id="hero-name">Goldyx</div>
+                        <div class="hero-stats">
+                            <div class="stat-row">
+                                <span class="stat-icon">🛡️</span>
+                                <span class="stat-text">Rüstung: <strong id="hero-armor">2</strong></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-icon">🎴</span>
+                                <span class="stat-text">Handlimit: <strong id="hero-handlimit">5</strong></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-icon">💔</span>
+                                <span class="stat-text">Verletzungen: <strong id="hero-wounds">0</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel action-panel">
+                    <h2>Aktionen</h2>
+                    <button class="btn btn-primary" id="end-turn-btn">Zug beenden</button>
+                    <button class="btn btn-secondary" id="rest-btn">Rasten</button>
+                </div>
+
+                <div class="panel movement-panel">
+                    <h2>Bewegung</h2>
+                    <div class="movement-info">
+                        <div class="stat-row">
+                            <span class="stat-icon">👣</span>
+                            <span class="stat-text">Punkte: <strong id="movement-points">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel phase-panel">
+                    <h2>Aktuelle Phase</h2>
+                    <div class="phase-indicator" id="phase-indicator">
+                        <div class="phase-text">Erkundung</div>
+                        <div class="phase-hint" id="phase-hint">Spiele Karten oder bewege dich</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Game Board -->
+            <main class="game-board-container">
+                <div class="board-wrapper">
+                    <canvas id="game-board" width="800" height="600"></canvas>
+                </div>
+            </main>
+
+            <!-- Right Sidebar -->
+            <aside class="sidebar sidebar-right">
+                <div class="panel mana-panel">
+                    <h2>Mana-Quelle</h2>
+                    <div class="mana-dice" id="mana-source">
+                        <!-- Mana dice will be added dynamically -->
+                    </div>
+                </div>
+
+                <div class="panel combat-panel" id="combat-panel" style="display: none;">
+                    <h2>Kampf</h2>
+                    <div class="combat-info" id="combat-info">
+                        <!-- Combat information will be displayed here -->
+                    </div>
+                </div>
+
+                <div class="panel log-panel">
+                    <h2>Spielprotokoll</h2>
+                    <div class="game-log" id="game-log">
+                        <div class="log-entry">Spiel gestartet</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Keyboard Shortcuts Info -->
+        <div class="shortcuts-bar" id="shortcuts-bar">
+            <div class="shortcut-item">
+                <kbd>1-5</kbd> Karten spielen
+            </div>
+            <div class="shortcut-item">
+                <kbd>Space</kbd> Zug beenden
+            </div>
+            <div class="shortcut-item">
+                <kbd>H</kbd> Hilfe
+            </div>
+            <div class="shortcut-item">
+                <kbd>Esc</kbd> Abbrechen
+            </div>
+        </div>
+
+        <!-- Hand Cards Area -->
+        <div class="hand-area">
+            <h2>Handkarten</h2>
+            <div class="cards-container" id="hand-cards">
+                <!-- Cards will be added dynamically -->
+            </div>
+        </div>
+
+        <!-- Play Area -->
+        <div class="play-area" id="play-area" style="display: none;">
+            <h3>Gespielte Karten</h3>
+            <div class="played-cards" id="played-cards">
+                <!-- Played cards will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for card details -->
+    <div class="modal" id="card-modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-card-details"></div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal" id="help-modal">
+        <div class="modal-content help-modal-content">
+            <span class="modal-close" id="help-close">&times;</span>
+            <h2>🗡️ Mage Knight Hilfe</h2>
+
+            <div class="help-tabs">
+                <button class="help-tab active" data-tab="basics">Grundlagen</button>
+                <button class="help-tab" data-tab="cards">Karten</button>
+                <button class="help-tab" data-tab="movement">Bewegung</button>
+                <button class="help-tab" data-tab="combat">Kampf</button>
+                <button class="help-tab" data-tab="terrain">Terrain</button>
+            </div>
+
+            <div class="help-content">
+                <!-- Basics Tab -->
+                <div class="help-tab-content active" id="help-basics">
+                    <h3>Spielziel</h3>
+                    <p>Besiege alle Feinde auf der Karte, um zu gewinnen!</p>
+
+                    <h3>Spielablauf</h3>
+                    <ol>
+                        <li><strong>Karten spielen</strong> - Klicke auf Karten in deiner Hand</li>
+                        <li><strong>Bewegen</strong> - Klicke auf Hex-Felder um dich zu bewegen</li>
+                        <li><strong>Kämpfen</strong> - Betritt Felder mit Feinden</li>
+                        <li><strong>Zug beenden</strong> - Klicke "Zug beenden" für neue Karten</li>
+                    </ol>
+
+                    <h3>Wichtige Tastenbelegung</h3>
+                    <ul>
+                        <li><strong>Linksklick auf Karte</strong> - Spielt Basis-Wirkung</li>
+                        <li><strong>Rechtsklick auf Karte</strong> - Spielt Karte seitlich (+1)</li>
+                        <li><strong>Klick auf Hex</strong> - Bewegt Held oder wählt Feld aus</li>
+                    </ul>
+
+                    <h3>Held Stats</h3>
+                    <ul>
+                        <li><strong>🛡️ Rüstung</strong> - Reduziert erhaltenen Schaden</li>
+                        <li><strong>🎴 Handlimit</strong> - Max. Karten auf der Hand</li>
+                        <li><strong>💔 Verletzungen</strong> - Blockieren Kartenslots</li>
+                        <li><strong>⭐ Ruhm</strong> - Punkte für besiegte Feinde</li>
+                        <li><strong>💬 Ansehen</strong> - Beeinflusst Interaktionen</li>
+                    </ul>
+                </div>
+
+                <!-- Cards Tab -->
+                <div class="help-tab-content" id="help-cards">
+                    <h3>Kartentypen</h3>
+                    <div class="help-card-types">
+                        <div class="help-card-type">
+                            <span class="help-icon" style="color: #10b981;">🌿</span>
+                            <strong>Grüne Karten</strong>
+                            <p>Bewegungskarten - Geben Bewegungspunkte</p>
+                        </div>
+                        <div class="help-card-type">
+                            <span class="help-icon" style="color: #ef4444;">⚔️</span>
+                            <strong>Rote Karten</strong>
+                            <p>Angriffskarten - Fügen Feinden Schaden zu</p>
+                        </div>
+                        <div class="help-card-type">
+                            <span class="help-icon" style="color: #3b82f6;">🛡️</span>
+                            <strong>Blaue Karten</strong>
+                            <p>Block-Karten - Blocken Feindangriffe</p>
+                        </div>
+                        <div class="help-card-type">
+                            <span class="help-icon" style="color: #f3f4f6;">💬</span>
+                            <strong>Weiße Karten</strong>
+                            <p>Einfluss/Heilung - Für Interaktionen</p>
+                        </div>
+                    </div>
+
+                    <h3>Kartenwirkungen</h3>
+                    <ul>
+                        <li><strong>Basic</strong> - Grundwirkung ohne Mana</li>
+                        <li><strong>Strong</strong> - Verstärkte Wirkung mit Mana (in Entwicklung)</li>
+                        <li><strong>Seitlich spielen</strong> - Jede Karte kann für +1 Bewegung/Angriff/Block/Einfluss
+                            gespielt werden</li>
+                    </ul>
+
+                    <h3>Kartenverwaltung</h3>
+                    <p>Am Ende deines Zugs:</p>
+                    <ul>
+                        <li>Gespielte Karten → Ablage</li>
+                        <li>Ziehe neue Karten bis Handlimit</li>
+                        <li>Wenn Deck leer: Ablage wird gemischt</li>
+                    </ul>
+                </div>
+
+                <!-- Movement Tab -->
+                <div class="help-tab-content" id="help-movement">
+                    <h3>Bewegung Schritt für Schritt</h3>
+                    <ol>
+                        <li>Spiele eine oder mehrere <strong>grüne Bewegungskarten</strong></li>
+                        <li>Bewegungspunkte werden addiert (oben links im Panel)</li>
+                        <li>Erreichbare Felder werden <strong>violett hervorgehoben</strong></li>
+                        <li>Klicke auf ein hervorgehobenes Feld</li>
+                        <li>Dein Held bewegt sich dorthin</li>
+                        <li>Bewegungskosten werden abgezogen</li>
+                    </ol>
+
+                    <h3>Bewegungskosten</h3>
+                    <p>Jedes Terrain hat unterschiedliche Kosten:</p>
+                    <ul>
+                        <li>🌾 <strong>Ebenen</strong> - 2 Punkte</li>
+                        <li>🌲 <strong>Wald</strong> - 3 Punkte</li>
+                        <li>⛰️ <strong>Hügel</strong> - 3 Punkte</li>
+                        <li>🏔️ <strong>Berge</strong> - 5 Punkte</li>
+                        <li>🏜️ <strong>Wüste</strong> - 3 Punkte</li>
+                        <li>☠️ <strong>Ödland</strong> - 3 Punkte</li>
+                        <li>💧 <strong>Wasser</strong> - Unpassierbar</li>
+                    </ul>
+
+                    <h3>Tipps</h3>
+                    <ul>
+                        <li>Plane deine Route vorher durch</li>
+                        <li>Ebenen sind am günstigsten</li>
+                        <li>Vermeide Berge wenn möglich</li>
+                        <li>Du kannst mehrere Bewegungskarten kombinieren</li>
+                    </ul>
+                </div>
+
+                <!-- Combat Tab -->
+                <div class="help-tab-content" id="help-combat">
+                    <h3>Kampf starten</h3>
+                    <p>Ein Kampf beginnt automatisch, wenn du ein Feld mit einem Feind betrittst.</p>
+
+                    <h3>Kampfphasen</h3>
+                    <div class="combat-phases">
+                        <div class="combat-phase">
+                            <strong>1️⃣ Block-Phase</strong>
+                            <ul>
+                                <li>Spiele <strong>blaue Block-Karten</strong></li>
+                                <li>Blocke den Feind-Angriff vollständig</li>
+                                <li>Block ≥ Feind-Angriff → Feind geblockt</li>
+                                <li>Klicke "Zug beenden" für nächste Phase</li>
+                            </ul>
+                        </div>
+                        <div class="combat-phase">
+                            <strong>2️⃣ Schadens-Phase</strong>
+                            <ul>
+                                <li>Ungeblockte Feinde fügen Schaden zu</li>
+                                <li>Schaden / Deine Rüstung = Verletzungen (aufgerundet)</li>
+                                <li>Verletzungen kommen auf deine Hand</li>
+                                <li>Phase läuft automatisch ab</li>
+                            </ul>
+                        </div>
+                        <div class="combat-phase">
+                            <strong>3️⃣ Angriffs-Phase</strong>
+                            <ul>
+                                <li>Spiele <strong>rote Angriffs-Karten</strong></li>
+                                <li>Angriff ≥ Feind-Rüstung → Feind besiegt</li>
+                                <li>Erhalte Ruhm für besiegte Feinde</li>
+                                <li>Kampf endet automatisch</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Feind-Stats</h3>
+                    <ul>
+                        <li><strong>🛡️ Rüstung</strong> - Muss überwunden werden</li>
+                        <li><strong>⚔️ Angriff</strong> - Schaden den der Feind zufügt</li>
+                        <li><strong>⭐ Ruhm</strong> - Belohnung für Sieg</li>
+                    </ul>
+
+                    <h3>Kampf-Tipps</h3>
+                    <ul>
+                        <li>Blocke starke Gegner wenn möglich</li>
+                        <li>Spare Angriffskarten für schwere Feinde auf</li>
+                        <li>Kombiniere mehrere Karten für große Wirkungen</li>
+                        <li>Verletzungen können nur durch Rasten/Heilung entfernt werden</li>
+                    </ul>
+                </div>
+
+                <!-- Terrain Tab -->
+                <div class="help-tab-content" id="help-terrain">
+                    <h3>Terrain-Typen</h3>
+
+                    <div class="terrain-list">
+                        <div class="terrain-item">
+                            <span class="terrain-icon">🌾</span>
+                            <div>
+                                <strong>Ebenen</strong>
+                                <p>Kosten: 2 | Offenes Grasland, leicht zu durchqueren</p>
+                            </div>
+                        </div>
+
+                        <div class="terrain-item">
+                            <span class="terrain-icon">🌲</span>
+                            <div>
+                                <strong>Wald</strong>
+                                <p>Kosten: 3 | Dichter Wald, erschwert Bewegung</p>
+                            </div>
+                        </div>
+
+                        <div class="terrain-item">
+                            <span class="terrain-icon">⛰️</span>
+                            <div>
+                                <strong>Hügel</strong>
+                                <p>Kosten: 3 | Hügeliges Gelände</p>
+                            </div>
+                        </div>
+
+                        <div class="terrain-item">
+                            <span class="terrain-icon">🏔️</span>
+                            <div>
+                                <strong>Berge</strong>
+                                <p>Kosten: 5 | Hohe Berge, sehr schwer zu passieren</p>
+                            </div>
+                        </div>
+
+                        <div class="terrain-item">
+                            <span class="terrain-icon">🏜️</span>
+                            <div>
+                                <strong>Wüste</strong>
+                                <p>Kosten: 3 | Trockene Wüste</p>
+                            </div>
+                        </div>
+
+                        <div class="terrain-item">
+                            <span class="terrain-icon">☠️</span>
+                            <div>
+                                <strong>Ödland</strong>
+                                <p>Kosten: 3 | Verfluchtes, unwirtliches Land</p>
+                            </div>
+                        </div>
+
+                        <div class="terrain-item">
+                            <span class="terrain-icon">💧</span>
+                            <div>
+                                <strong>Wasser</strong>
+                                <p>Kosten: ∞ | <strong>Unpassierbar</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Strategie-Tipps</h3>
+                    <ul>
+                        <li>Plane deine Route entlang von Ebenen wenn möglich</li>
+                        <li>Vermeide Berge außer in Notfällen</li>
+                        <li>Manchmal ist eine längere Route über Ebenen schneller</li>
+                        <li>Spare Bewegungspunkte für den Kampf</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="help-footer">
+                <p><strong>Tipp:</strong> Drücke <kbd>Esc</kbd> oder klicke außerhalb, um die Hilfe zu schließen</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest Modal -->
+    <div class="modal" id="rest-modal">
+        <div class="modal-content rest-modal-content">
+            <span class="modal-close" id="rest-close">&times;</span>
+            <h2>💤 Rasten</h2>
+
+            <p class="rest-explanation">
+                Wähle Karten aus, die du ablegen möchtest. Du ziehst dann neue Karten bis zu deinem Handlimit.
+                <strong>Hinweis:</strong> Beim Rasten erhältst du keine neuen Mana-Würfel.
+            </p>
+
+            <div class="rest-cards" id="rest-cards">
+                <!-- Cards will be dynamically added here -->
+            </div>
+
+            <div class="rest-actions">
+                <button class="btn btn-secondary" id="rest-cancel">Abbrechen</button>
+                <button class="btn btn-primary" id="rest-confirm">Rasten bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial overlay -->
+    <div class="tutorial-overlay" id="tutorial-overlay" style="display: none;">
+        <div class="tutorial-box">
+            <h3 id="tutorial-title">Tutorial</h3>
+            <p id="tutorial-text"></p>
+            <div class="tutorial-buttons">
+                <button class="btn btn-secondary" id="tutorial-skip">Überspringen</button>
+                <button class="btn btn-primary" id="tutorial-next">Weiter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/game.js"></script>
+</body>
+
+</html>

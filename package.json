@@ -1,0 +1,7 @@
+{
+    "type": "module",
+    "scripts": {
+        "test": "node run_tests.js",
+        "test:watch": "node --watch run_tests.js"
+    }
+}

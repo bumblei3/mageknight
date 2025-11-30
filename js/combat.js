@@ -17,6 +17,11 @@ export class Combat {
         this.blockedEnemies = new Set();
         this.totalDamage = 0;
         this.woundsReceived = 0;
+
+        // Unit contribution tracking
+        this.unitAttackPoints = 0;
+        this.unitBlockPoints = 0;
+        this.activatedUnits = new Set();
     }
 
     // Start combat
@@ -51,27 +56,31 @@ export class Combat {
         };
     }
 
-    // Attempt to block an enemy
+    // Attempt to block an enemy (includes unit contributions)
     blockEnemy(enemy, blockValue) {
         if (this.phase !== COMBAT_PHASE.BLOCK) {
             return { success: false, error: 'Nicht in der Block-Phase' };
         }
 
         const blockRequired = enemy.getBlockRequirement();
+        const totalBlock = blockValue + this.unitBlockPoints;
 
-        if (blockValue >= blockRequired) {
+        if (totalBlock >= blockRequired) {
             this.blockedEnemies.add(enemy.id);
             return {
                 success: true,
                 blocked: true,
-                message: `${enemy.name} erfolgreich geblockt!`
+                totalBlock: totalBlock,
+                unitContribution: this.unitBlockPoints,
+                message: `${enemy.name} erfolgreich geblockt! (Block: ${totalBlock})`
             };
         }
 
         return {
             success: true,
             blocked: false,
-            message: `Block zu schwach (${blockValue} vs ${blockRequired})`
+            totalBlock: totalBlock,
+            message: `Block zu schwach (${totalBlock} vs ${blockRequired})`
         };
     }
 
@@ -134,7 +143,43 @@ export class Combat {
         };
     }
 
-    // Attempt to defeat enemies with attack
+    // Activate a unit to contribute to combat
+    activateUnit(unit) {
+        if (!unit.isReady()) {
+            return { success: false, message: 'Einheit nicht bereit' };
+        }
+
+        if (this.activatedUnits.has(unit.type)) {
+            return { success: false, message: 'Einheit bereits aktiviert' };
+        }
+
+        // Activate the unit
+        unit.activate();
+        this.activatedUnits.add(unit.type);
+
+        // Apply unit abilities based on phase
+        const abilities = unit.getAbilities();
+        let applied = [];
+
+        abilities.forEach(ability => {
+            if (this.phase === COMBAT_PHASE.BLOCK && ability.type === 'block') {
+                this.unitBlockPoints += ability.value;
+                applied.push(`+${ability.value} Block`);
+            } else if (this.phase === COMBAT_PHASE.ATTACK && ability.type === 'attack') {
+                this.unitAttackPoints += ability.value;
+                applied.push(`+${ability.value} Angriff`);
+            }
+        });
+
+        return {
+            success: true,
+            unit: unit,
+            applied: applied.join(', '),
+            message: `${unit.getName()} aktiviert: ${applied.join(', ')}`
+        };
+    }
+
+    // Attempt to defeat enemies with attack (includes unit contributions)
     attackEnemies(attackValue, targetEnemies = null) {
         if (this.phase !== COMBAT_PHASE.ATTACK) {
             return { error: 'Nicht in der Angriffs-Phase' };
@@ -142,8 +187,9 @@ export class Combat {
 
         const targets = targetEnemies || this.enemies;
         const totalArmor = targets.reduce((sum, enemy) => sum + enemy.armor, 0);
+        const totalAttack = attackValue + this.unitAttackPoints;
 
-        if (attackValue >= totalArmor) {
+        if (totalAttack >= totalArmor) {
             // Defeat all targeted enemies
             targets.forEach(enemy => {
                 this.defeatedEnemies.push(enemy);
@@ -157,13 +203,16 @@ export class Combat {
                 success: true,
                 defeated: targets,
                 fameGained: targets.reduce((sum, e) => sum + e.fame, 0),
-                message: `${targets.length} Feinde besiegt!`
+                totalAttack: totalAttack,
+                unitContribution: this.unitAttackPoints,
+                message: `${targets.length} Feinde besiegt! (Angriff: ${totalAttack})`
             };
         }
 
         return {
             success: false,
-            message: `Angriff zu schwach (${attackValue} vs ${totalArmor} Rüstung)`
+            totalAttack: totalAttack,
+            message: `Angriff zu schwach (${totalAttack} vs ${totalArmor} Rüstung)`
         };
     }
 

@@ -1,0 +1,71 @@
+
+export const SITE_TYPES = {
+    VILLAGE: 'village',
+    KEEP: 'keep',
+    MAGE_TOWER: 'mage_tower',
+    MONASTERY: 'monastery',
+    DUNGEON: 'dungeon',
+    CITY: 'city'
+};
+
+export const SITE_INFO = {
+    [SITE_TYPES.VILLAGE]: {
+        name: 'Dorf',
+        icon: '🏠',
+        color: '#fbbf24', // Amber
+        description: 'Ein friedliches Dorf. Hier kannst du heilen und Einheiten rekrutieren.',
+        actions: ['heal', 'recruit']
+    },
+    [SITE_TYPES.KEEP]: {
+        name: 'Festung',
+        icon: '🏰',
+        color: '#9ca3af', // Gray
+        description: 'Eine befestigte Burg. Besiege die Wachen, um sie zu erobern.',
+        actions: ['attack']
+    },
+    [SITE_TYPES.MAGE_TOWER]: {
+        name: 'Magierturm',
+        icon: '🔮',
+        color: '#8b5cf6', // Violet
+        description: 'Ein Turm voller magischer Energie. Lerne hier mächtige Zauber.',
+        actions: ['attack', 'learn']
+    },
+    [SITE_TYPES.MONASTERY]: {
+        name: 'Kloster',
+        icon: '⛪',
+        color: '#fcd34d', // Light Amber
+        description: 'Ein heiliger Ort. Heile Wunden oder lerne fortgeschrittene Techniken.',
+        actions: ['heal', 'train']
+    },
+    [SITE_TYPES.DUNGEON]: {
+        name: 'Verlies',
+        icon: '💀',
+        color: '#374151', // Dark Gray
+        description: 'Ein gefährliches Verlies. Betreten auf eigene Gefahr!',
+        actions: ['explore']
+    }
+};
+
+export class Site {
+    constructor(type) {
+        this.type = type;
+        this.conquered = false;
+        this.visited = false;
+    }
+
+    getInfo() {
+        return SITE_INFO[this.type];
+    }
+
+    getName() {
+        return SITE_INFO[this.type].name;
+    }
+
+    getIcon() {
+        return SITE_INFO[this.type].icon;
+    }
+
+    getColor() {
+        return SITE_INFO[this.type].color;
+    }
+}

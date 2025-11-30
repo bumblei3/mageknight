@@ -22,7 +22,7 @@ export class Terrain {
             },
             [TERRAIN_TYPES.FOREST]: {
                 name: 'Wald',
-                movementCost: { day: 3, night: 2 },
+                movementCost: { day: 3, night: 5 },
                 icon: '🌲',
                 color: '#22c55e',
                 description: 'Dichter Wald'
@@ -43,7 +43,7 @@ export class Terrain {
             },
             [TERRAIN_TYPES.DESERT]: {
                 name: 'Wüste',
-                movementCost: { day: 3, night: 2 },
+                movementCost: { day: 5, night: 3 },
                 icon: '🏜️',
                 color: '#fbbf24',
                 description: 'Trockene Wüste'

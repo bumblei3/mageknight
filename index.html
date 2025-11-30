@@ -24,6 +24,8 @@
                     <span class="stat-label">Ansehen</span>
                     <span class="stat-value" id="reputation-value">0</span>
                 </div>
+                <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)">💾</button>
+                <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)">📂</button>
                 <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
             </div>
         </header>
@@ -57,6 +59,8 @@
                     <h2>Aktionen</h2>
                     <button class="btn btn-primary" id="end-turn-btn">Zug beenden</button>
                     <button class="btn btn-secondary" id="rest-btn">Rasten</button>
+                    <button class="btn btn-secondary" id="explore-btn" disabled>Erkunden (2)</button>
+                    <button class="btn btn-primary" id="visit-btn" style="display: none;">Besuchen</button>
                 </div>
 
                 <div class="panel movement-panel">
@@ -74,6 +78,13 @@
                     <div class="phase-indicator" id="phase-indicator">
                         <div class="phase-text">Erkundung</div>
                         <div class="phase-hint" id="phase-hint">Spiele Karten oder bewege dich</div>
+                    </div>
+                </div>
+
+                <div class="panel units-panel">
+                    <h2>🎖️ Einheiten</h2>
+                    <div class="units-container" id="hero-units">
+                        <!-- Units will be rendered here -->
                     </div>
                 </div>
             </aside>
@@ -99,6 +110,9 @@
                     <div class="combat-info" id="combat-info">
                         <!-- Combat information will be displayed here -->
                     </div>
+                    <div class="combat-units" id="combat-units" style="margin-top: 1rem;">
+                        <!-- Units available in combat -->
+                    </div>
                 </div>
 
                 <div class="panel log-panel">
@@ -117,6 +131,18 @@
             </div>
             <div class="shortcut-item">
                 <kbd>Space</kbd> Zug beenden
+            </div>
+            <div class="shortcut-item">
+                <kbd>R</kbd> Rasten
+            </div>
+            <div class="shortcut-item">
+                <kbd>Ctrl+S</kbd> Speichern
+            </div>
+            <div class="shortcut-item">
+                <kbd>Ctrl+L</kbd> Laden
+            </div>
+            <div class="shortcut-item">
+                <kbd>T</kbd> Tutorial
             </div>
             <div class="shortcut-item">
                 <kbd>H</kbd> Hilfe
@@ -432,6 +458,22 @@
             <div class="tutorial-buttons">
                 <button class="btn btn-secondary" id="tutorial-skip">Überspringen</button>
                 <button class="btn btn-primary" id="tutorial-next">Weiter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Site Interaction Modal -->
+    <div class="modal" id="site-modal">
+        <div class="modal-content site-modal-content">
+            <span class="modal-close" id="site-close">&times;</span>
+            <div class="site-header">
+                <div class="site-icon" id="site-modal-icon"></div>
+                <h2 id="site-modal-title">Ort</h2>
+            </div>
+            <p id="site-modal-description" class="site-description"></p>
+
+            <div class="site-options" id="site-options">
+                <!-- Options injected here -->
             </div>
         </div>
     </div>

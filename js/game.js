@@ -7,6 +7,15 @@ import { createEnemies } from './enemy.js';
 import { Combat, COMBAT_PHASE } from './combat.js';
 import UI from './ui.js';
 import Terrain, { TERRAIN_TYPES } from './terrain.js';
+import SaveManager from './saveManager.js';
+import TutorialManager from './tutorialManager.js';
+import { TimeManager, TIME_OF_DAY } from './timeManager.js';
+import { MapManager } from './mapManager.js';
+import ParticleSystem from './particles.js';
+import { animator } from './animator.js';
+import { SiteInteractionManager } from './siteInteraction.js';
+import { createUnit } from './unit.js';
+import { DebugManager } from './debug.js'; // Ensure unit creation works
 
 class MageKnightGame {
     constructor() {
@@ -18,6 +27,10 @@ class MageKnightGame {
         this.manaSource = null;
         this.combat = null;
         this.ui = new UI();
+        this.saveManager = new SaveManager();
+        this.timeManager = new TimeManager();
+        this.mapManager = new MapManager(this.hexGrid);
+        this.tutorialManager = null;  // Will be initialized after game setup
         this.turnNumber = 0;
         this.gameState = 'playing'; // 'playing', 'victory', 'defeat'
 
@@ -25,12 +38,24 @@ class MageKnightGame {
         this.movementMode = false;
         this.reachableHexes = [];
 
+        // Particle System
+        this.particleCanvas = null;
+        this.particleSystem = null;
+
+        this.siteManager = new SiteInteractionManager(this);
+        this.debugManager = null;
+        this.debugTeleport = false;
+
         this.init();
     }
 
     init() {
         // Create initial game board
         this.createGameBoard();
+        this.setupParticleSystem();
+
+        // Init Debug
+        this.debugManager = new DebugManager(this);
 
         // Create hero
         this.hero = new Hero('Goldyx', { q: 0, r: 0 });
@@ -47,6 +72,14 @@ class MageKnightGame {
 
         // Initial render
         this.render();
+
+        // Initialize tutorial manager
+        this.tutorialManager = new TutorialManager(this);
+
+        // Show tutorial on first visit
+        if (!TutorialManager.hasCompleted()) {
+            setTimeout(() => this.tutorialManager.start(), 1000);
+        }
 
         this.ui.addLog('Willkommen bei Mage Knight!', 'info');
         this.ui.addLog('Spiel gestartet. Viel Erfolg!', 'info');
@@ -93,12 +126,63 @@ class MageKnightGame {
         ]);
     }
 
+    setupParticleSystem() {
+        // Create overlay canvas for particles
+        const container = document.querySelector('.board-wrapper');
+        this.particleCanvas = document.createElement('canvas');
+        this.particleCanvas.width = this.canvas.width;
+        this.particleCanvas.height = this.canvas.height;
+        this.particleCanvas.style.position = 'absolute';
+        this.particleCanvas.style.top = '0';
+        this.particleCanvas.style.left = '0';
+        this.particleCanvas.style.pointerEvents = 'none'; // Click through to game board
+        this.particleCanvas.style.zIndex = '10'; // Above game board
+
+        container.appendChild(this.particleCanvas);
+
+        this.particleSystem = new ParticleSystem(this.particleCanvas);
+
+        // Override clear to clear rect
+        this.particleSystem.clearCanvas = () => {
+            const ctx = this.particleCanvas.getContext('2d');
+            ctx.clearRect(0, 0, this.particleCanvas.width, this.particleCanvas.height);
+        };
+
+        // Hook into update loop
+        const originalUpdate = this.particleSystem.update.bind(this.particleSystem);
+        this.particleSystem.update = () => {
+            this.particleSystem.clearCanvas();
+            originalUpdate();
+        };
+    }
+
     setupEventListeners() {
         // End turn button
         this.ui.elements.endTurnBtn.addEventListener('click', () => this.endTurn());
 
         // Rest button
         this.ui.elements.restBtn.addEventListener('click', () => this.rest());
+
+        // Explore button
+        this.ui.elements.exploreBtn.addEventListener('click', () => this.explore());
+
+        // Visit Site button (will be added dynamically or reused?)
+        // Let's add a generic action button for sites if needed, or just use context menu?
+        // Plan: Add a "Visit Site" button to UI or reuse an existing slot?
+        // Better: Add a new button to index.html first.
+        // For now, let's assume we add it to UI class dynamically or use a new button.
+        // Let's add it to index.html in next step.
+        // Wait, I should have added it to index.html first.
+        // I will add it to index.html in the next step, but I can add the listener here now if I assume the ID.
+        // Visit Site button
+        const visitBtn = document.getElementById('visit-btn');
+        if (visitBtn) visitBtn.addEventListener('click', () => this.visitSite());
+
+        // Save/Load buttons
+        const saveBtn = document.getElementById('save-btn');
+        const loadBtn = document.getElementById('load-btn');
+        if (saveBtn) saveBtn.addEventListener('click', () => this.openSaveDialog());
+        if (loadBtn) loadBtn.addEventListener('click', () => this.openLoadDialog());
 
         // Canvas click for movement
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
@@ -147,6 +231,30 @@ class MageKnightGame {
                 e.preventDefault();
             }
 
+            // R for rest
+            if (e.key === 'r' || e.key === 'R') {
+                this.rest();
+                e.preventDefault();
+            }
+
+            // Ctrl+S for save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                this.openSaveDialog();
+            }
+
+            // Ctrl+L for load
+            if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+                e.preventDefault();
+                this.openLoadDialog();
+            }
+
+            // T for tutorial
+            if (e.key === 't' || e.key === 'T') {
+                this.showTutorial();
+                e.preventDefault();
+            }
+
             // Escape to exit movement mode or close modals
             if (e.key === 'Escape') {
                 if (this.movementMode) {
@@ -184,7 +292,8 @@ class MageKnightGame {
             phaseText.textContent = 'Bewegung';
             phaseHint.textContent = `👣 ${this.hero.movementPoints} Punkte - Klicke auf ein Feld`;
         } else {
-            phaseText.textContent = 'Erkundung';
+            const timeIcon = this.timeManager.isDay() ? '☀️' : '🌙';
+            phaseText.textContent = `Erkundung (${timeIcon})`;
             phaseHint.textContent = '🎴 Spiele Karten oder bewege dich (1-5)';
         }
     }
@@ -315,6 +424,16 @@ class MageKnightGame {
             return;
         }
 
+        // Debug Teleport
+        if (this.debugTeleport) {
+            this.hero.position = { q: hex.q, r: hex.r };
+            this.hero.displayPosition = { q: hex.q, r: hex.r };
+            this.render();
+            this.ui.addLog(`Debug: Teleported to ${hex.q},${hex.r}`, 'info');
+            this.debugTeleport = false;
+            return;
+        }
+
         if (this.movementMode) {
             this.moveHero(hex.q, hex.r);
         } else {
@@ -436,7 +555,7 @@ class MageKnightGame {
                 if (!this.hexGrid.hasHex(neighbor.q, neighbor.r)) return;
 
                 const hexData = this.hexGrid.getHex(neighbor.q, neighbor.r);
-                const moveCost = this.terrain.getMovementCost(hexData.terrain);
+                const moveCost = this.terrain.getMovementCost(hexData.terrain, this.timeManager.isNight());
                 const newCost = cost + moveCost;
 
                 if (newCost <= this.hero.movementPoints) {
@@ -458,19 +577,59 @@ class MageKnightGame {
         }
 
         const hexData = this.hexGrid.getHex(q, r);
-        const moveCost = this.terrain.getMovementCost(hexData.terrain);
+        const moveCost = this.terrain.getMovementCost(hexData.terrain, this.timeManager.isNight());
+
+        const startQ = this.hero.displayPosition.q;
+        const startR = this.hero.displayPosition.r;
 
         if (this.hero.moveTo(q, r, moveCost)) {
             const terrainName = this.terrain.getName(hexData.terrain);
             this.ui.addLog(`Bewegt nach ${q},${r} (${terrainName}) - ${moveCost} Kosten`, 'movement');
 
+            // Animate movement
+            animator.animateProperties(
+                this.hero.displayPosition,
+                { q: q, r: r },
+                500,
+                {
+                    easing: 'easeInOutQuad',
+                    onUpdate: () => {
+                        this.render();
+                        // Optional: Add trail particles during movement
+                        if (Math.random() > 0.7) {
+                            const pixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
+                            this.particleSystem.trailEffect(pixel.x, pixel.y);
+                        }
+                    },
+                    onComplete: () => {
+                        this.render();
+                    }
+                }
+            );
+
             // Check if there's an enemy on this hex
-            const enemy = this.enemies.find(e => e.position.q === q && e.position.r === r);
             if (enemy) {
                 this.ui.addLog(`Feind entdeckt: ${enemy.name}!`, 'combat');
                 this.exitMovementMode();
                 this.initiateCombat(enemy);
                 return;
+            }
+
+            // Check for site
+            if (hexData.site) {
+                this.ui.addLog(`Ort entdeckt: ${hexData.site.getName()}`, 'info');
+                // Show visit button
+                const visitBtn = document.getElementById('visit-btn');
+                if (visitBtn) {
+                    visitBtn.style.display = 'inline-block';
+                    visitBtn.disabled = false;
+                    // Highlight button to draw attention
+                    visitBtn.classList.add('pulse');
+                }
+            } else {
+                // Hide visit button if no site
+                const visitBtn = document.getElementById('visit-btn');
+                if (visitBtn) visitBtn.style.display = 'none';
             }
 
             if (this.hero.movementPoints === 0) {
@@ -480,7 +639,20 @@ class MageKnightGame {
             }
 
             this.updateStats();
-            this.render();
+            // Render is handled by animation
+        }
+    }
+
+    visitSite() {
+        const q = this.hero.position.q;
+        const r = this.hero.position.r;
+        const hexData = this.hexGrid.getHex(q, r);
+
+        if (hexData && hexData.site) {
+            const interactionData = this.siteManager.visitSite(hexData, hexData.site);
+            this.ui.showSiteModal(interactionData);
+        } else {
+            this.ui.addLog('Hier gibt es nichts zu besuchen.', 'info');
         }
     }
 
@@ -490,8 +662,11 @@ class MageKnightGame {
 
         this.ui.addLog(result.message, 'combat');
         this.ui.showCombatPanel(this.combat.enemies, this.combat.phase);
-        this.updatePhaseIndicator();
 
+        // Show units in combat
+        this.renderUnitsInCombat();
+
+        this.updatePhaseIndicator();
         this.renderHand();
     }
 
@@ -520,6 +695,12 @@ class MageKnightGame {
             if (result && result.effect.attack) {
                 this.ui.addLog(`Angriff gespielt: +${result.effect.attack}`, 'combat');
 
+                // Particle Impact on enemies
+                this.combat.enemies.forEach(enemy => {
+                    const pixelPos = this.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+                    this.particleSystem.impactEffect(pixelPos.x, pixelPos.y);
+                });
+
                 // Try to defeat enemies
                 const attackResult = this.combat.attackEnemies(result.effect.attack);
                 this.ui.addLog(attackResult.message, 'combat');
@@ -543,12 +724,51 @@ class MageKnightGame {
         }
     }
 
+    // Render units available for combat
+    renderUnitsInCombat() {
+        if (!this.combat) return;
+
+        // Get ready units that can act in this phase
+        const readyUnits = this.hero.units.filter(unit => unit.isReady() || true); // Show all for now
+
+        this.ui.renderUnitsInCombat(
+            readyUnits,
+            this.combat.phase,
+            (unit) => this.activateUnitInCombat(unit)
+        );
+    }
+
+    // Activate a unit in combat
+    activateUnitInCombat(unit) {
+        if (!this.combat) return;
+
+        const result = this.combat.activateUnit(unit);
+
+        if (result.success) {
+            this.ui.addLog(result.message, 'combat');
+
+            // Visual feedback
+            const heroPixel = this.hexGrid.axialToPixel(this.hero.position.q, this.hero.position.r);
+            this.particleSystem.buffEffect(heroPixel.x, heroPixel.y);
+
+            // Re-render units to show updated status
+            this.renderUnitsInCombat();
+            this.updateStats();
+        } else {
+            this.ui.addLog(result.message, 'info');
+        }
+    }
+
     endBlockPhase() {
         if (!this.combat) return;
 
         const result = this.combat.endBlockPhase();
         this.ui.addLog(result.message, 'combat');
         this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase);
+
+        // Update unit display for new phase
+        this.renderUnitsInCombat();
+
         this.updatePhaseIndicator();
         this.updateStats();
     }
@@ -571,12 +791,37 @@ class MageKnightGame {
     }
 
     handleManaClick(index, color) {
-        const mana = this.manaSource.takeDie(index);
+        const mana = this.manaSource.takeDie(index, this.timeManager.isNight());
         if (mana) {
-            this.ui.addLog(`Mana genommen: ${color}`, 'info');
-            // Store for later use
+            // Add to hero's mana inventory
+            this.hero.takeManaFromSource(mana);
+
+            this.ui.addLog(`Mana genommen: ${this.getManaEmoji(color)} ${color}`, 'info');
+
+            // Particle Effect
+            const heroPixel = this.hexGrid.axialToPixel(this.hero.position.q, this.hero.position.r);
+            this.particleSystem.manaEffect(heroPixel.x, heroPixel.y, color);
+
+            // Update UI
             this.renderMana();
+            this.updateHeroMana();
         }
+    }
+
+    getManaEmoji(color) {
+        const emojis = {
+            red: '🔥',
+            blue: '💧',
+            white: '✨',
+            green: '🌿',
+            gold: '💰',
+            black: '🌑'
+        };
+        return emojis[color] || '⬛';
+    }
+
+    updateHeroMana() {
+        this.ui.renderHeroMana(this.hero.getManaInventory());
     }
 
     endTurn() {
@@ -595,6 +840,24 @@ class MageKnightGame {
         this.manaSource.returnDice();
         this.exitMovementMode();
 
+        // Check for end of round (empty deck and empty hand)
+        // Note: hero.endTurn() draws new cards, so we check if hand is empty AFTER draw attempt?
+        // No, hero.endTurn() discards hand then draws. If deck was empty, hand might be smaller or empty.
+        // Standard rule: Round ends when a player has no cards in deck and announces end of round.
+        // Simplified: If deck is empty after drawing, trigger end of round next turn?
+        // Let's do: If deck is empty, trigger end of round.
+
+        if (this.hero.deck.length === 0) {
+            const roundInfo = this.timeManager.endRound();
+            this.ui.addLog(`🌙 Runde beendet! Es ist jetzt ${roundInfo.timeOfDay === TIME_OF_DAY.DAY ? 'Tag' : 'Nacht'}.`, 'info');
+
+            // Re-roll mana source completely for new round
+            this.manaSource.initialize();
+
+            // Shuffle hero deck for new round
+            this.hero.prepareNewRound();
+        }
+
         this.ui.addLog(`--- Zug ${this.turnNumber} beendet ---`, 'info');
         this.ui.addLog('Neue Karten gezogen', 'info');
         this.ui.hidePlayArea();
@@ -602,6 +865,9 @@ class MageKnightGame {
         this.renderHand();
         this.renderMana();
         this.updateStats();
+
+        // Auto-save after each turn
+        this.saveManager.autoSave(this.getGameState());
 
         // Check victory condition
         if (this.enemies.length === 0) {
@@ -628,6 +894,25 @@ class MageKnightGame {
         }
     }
 
+    explore() {
+        if (this.combat) return;
+
+        if (this.hero.movementPoints < 2) {
+            this.ui.addLog('Nicht genug Bewegungspunkte (Kosten: 2)', 'info');
+            return;
+        }
+
+        const result = this.mapManager.explore(this.hero.position.q, this.hero.position.r);
+        if (result.success) {
+            this.hero.movementPoints -= 2;
+            this.ui.addLog(result.message, 'info');
+            this.updateStats();
+            this.render();
+        } else {
+            this.ui.addLog(result.message, 'info');
+        }
+    }
+
     renderHand() {
         this.ui.renderHandCards(
             this.hero.hand,
@@ -639,18 +924,157 @@ class MageKnightGame {
     renderMana() {
         this.ui.renderManaSource(
             this.manaSource,
-            (index, color) => this.handleManaClick(index, color)
+            (index, color) => this.handleManaClick(index, color),
+            this.timeManager.isNight()
         );
     }
 
     updateStats() {
         this.ui.updateHeroStats(this.hero);
         this.ui.updateMovementPoints(this.hero.movementPoints);
+
+        // Update units display
+        this.ui.renderUnits(this.hero.units);
+
+        // Update Explore button
+        const canExplore = this.mapManager.canExplore(this.hero.position.q, this.hero.position.r);
+        const hasPoints = this.hero.movementPoints >= 2;
+        this.ui.setButtonEnabled(this.ui.elements.exploreBtn, canExplore && hasPoints && !this.combat);
+
+        if (canExplore && hasPoints) {
+            this.ui.elements.exploreBtn.title = "Erkunden (2 Bewegungspunkte)";
+        } else if (!canExplore) {
+            this.ui.elements.exploreBtn.title = "Kein unbekanntes Gebiet angrenzend";
+        } else {
+            this.ui.elements.exploreBtn.title = "Nicht genug Bewegungspunkte (2 benötigt)";
+        }
+
+        // Update Visit Button
+        const currentHex = this.hexGrid.getHex(this.hero.position.q, this.hero.position.r);
+        const visitBtn = document.getElementById('visit-btn');
+        if (visitBtn) {
+            const hasSite = currentHex && currentHex.site;
+            this.ui.setButtonEnabled(visitBtn, hasSite && !this.combat);
+            if (hasSite) {
+                visitBtn.textContent = `Besuche ${currentHex.site.getName()}`;
+                visitBtn.style.display = 'inline-block';
+            } else {
+                visitBtn.style.display = 'none';
+            }
+        }
+    }
+
+    visitSite() {
+        if (this.combat) return;
+
+        const currentHex = this.hexGrid.getHex(this.hero.position.q, this.hero.position.r);
+        if (!currentHex || !currentHex.site) return;
+
+        const site = currentHex.site;
+        this.ui.addLog(`Besuche ${site.getName()}...`, 'info');
+
+        // Get interaction data from manager
+        const interactionData = this.siteManager.visitSite(currentHex, site);
+
+        // Show UI
+        this.ui.showSiteModal(interactionData);
     }
 
     render() {
         this.hexGrid.render(this.hero, this.enemies);
         this.updateStats();
+    }
+
+    // Save/Load functionality
+    getGameState() {
+        return {
+            turn: this.turnNumber,
+            hero: this.hero,
+            enemies: this.enemies,
+            manaSource: this.manaSource,
+            terrain: this.terrain,
+            selectedHex: this.hexGrid.selectedHex || null,
+            movementMode: this.movementMode
+        };
+    }
+
+    loadGameState(state) {
+        this.turnNumber = state.turn || 0;
+
+        // Restore hero
+        this.hero.position = state.hero.position;
+        this.hero.deck = state.hero.deck;
+        this.hero.hand = state.hero.hand;
+        this.hero.discard = state.hero.discard;
+        this.hero.wounds = state.hero.wounds;
+        this.hero.fame = state.hero.fame;
+        this.hero.reputation = state.hero.reputation;
+        this.hero.crystals = state.hero.crystals;
+        this.hero.movementPoints = state.hero.movementPoints || 0;
+        this.hero.attackPoints = state.hero.attackPoints || 0;
+        this.hero.blockPoints = state.hero.blockPoints || 0;
+        this.hero.influencePoints = state.hero.influencePoints || 0;
+        this.hero.healingPoints = state.hero.healingPoints || 0;
+
+        // Restore enemies
+        this.enemies = createEnemies(state.enemies.map(e => ({
+            type: e.type,
+            position: e.position
+        })));
+
+        // Update UI
+        this.renderHand();
+        this.renderMana();
+        this.render();
+        this.ui.addLog('Spielstand geladen', 'info');
+    }
+
+    openSaveDialog() {
+        const saves = this.saveManager.listSaves();
+        let message = '💾 SPIELSTAND SPEICHERN\n\n';
+
+        saves.forEach(save => {
+            if (save.empty) {
+                message += `Slot ${save.slotId + 1}: [Leer]\n`;
+            } else {
+                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date}\n`;
+            }
+        });
+
+        message += '\nWähle Slot (1-5) oder Abbrechen:';
+        const slot = prompt(message);
+
+        if (slot && slot >= 1 && slot <= 5) {
+            const success = this.saveManager.saveGame(parseInt(slot) - 1, this.getGameState());
+            if (success) {
+                this.ui.addLog(`Spiel in Slot ${slot} gespeichert`, 'info');
+            }
+        }
+    }
+
+    openLoadDialog() {
+        const saves = this.saveManager.listSaves();
+        let message = '📂 SPIELSTAND LADEN\n\n';
+
+        saves.forEach(save => {
+            if (save.empty) {
+                message += `Slot ${save.slotId + 1}: [Leer]\n`;
+            } else {
+                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date}\n`;
+            }
+        });
+
+        message += '\nWähle Slot (1-5) oder Abbrechen:';
+        const slot = prompt(message);
+
+        if (slot && slot >= 1 && slot <= 5) {
+            const state = this.saveManager.loadGame(parseInt(slot) - 1);
+            if (state) {
+                this.loadGameState(state);
+            } else {
+                this.ui.addLog('Fehler beim Laden', 'info');
+            }
+        }
     }
 }
 

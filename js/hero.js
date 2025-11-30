@@ -1,24 +1,31 @@
 // Hero class for Mage Knight
 
 import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK } from './card.js';
+import { MANA_COLORS } from './mana.js';
 
 export class Hero {
     constructor(name, startingPosition = { q: 0, r: 0 }) {
         this.name = name;
         this.position = startingPosition;
+        this.displayPosition = { ...startingPosition };
 
         // Stats
         this.level = 1;
         this.armor = 2;
         this.handLimit = 5;
         this.fame = 0;
+        this.fame = 0;
         this.reputation = 0;
+        this.commandLimit = 1; // Start with 1 unit slot
 
         // Cards
         this.deck = [];
         this.hand = [];
         this.discard = [];
         this.wounds = [];
+
+        // Units
+        this.units = [];
 
         // Resources
         this.crystals = {
@@ -27,6 +34,7 @@ export class Hero {
             white: 0,
             green: 0
         };
+        this.tempMana = []; // Temporary mana for this turn (from dice)
 
         // Turn state
         this.movementPoints = 0;
@@ -86,6 +94,16 @@ export class Hero {
         }
 
         const card = this.hand.splice(cardIndex, 1)[0];
+
+        // If using strong effect, check and spend mana
+        if (useStrong && card.manaCost > 0) {
+            const success = this.spendMana(card.color);
+            if (!success) {
+                // Couldn't spend mana, fallback to basic
+                useStrong = false;
+            }
+        }
+
         const effect = card.getEffect(useStrong);
 
         // Apply effects
@@ -98,7 +116,7 @@ export class Hero {
         // Add card to discard pile
         this.discard.push(card);
 
-        return { card, effect };
+        return { card, effect, usedStrong: useStrong };
     }
 
     // Play card sideways for +1 movement/attack/block/influence
@@ -174,6 +192,9 @@ export class Hero {
         this.influencePoints = 0;
         this.healingPoints = 0;
 
+        // Clear temporary mana
+        this.clearTempMana();
+
         // Draw new hand
         this.drawCards();
     }
@@ -186,16 +207,26 @@ export class Hero {
     }
 
     // Heal a wound
-    healWound() {
-        if (this.healingPoints > 0 && this.wounds.length > 0) {
-            const woundIndex = this.hand.findIndex(card => card.isWound());
-            if (woundIndex !== -1) {
-                this.hand.splice(woundIndex, 1);
-                this.wounds.pop();
-                this.healingPoints--;
-                return true;
-            }
+    healWound(useHealingPoints = true) {
+        if (this.wounds.length === 0) {
+            return false;
         }
+
+        // Check if healingPoints required and available
+        if (useHealingPoints && this.healingPoints <= 0) {
+            return false;
+        }
+
+        const woundIndex = this.hand.findIndex(card => card.isWound());
+        if (woundIndex !== -1) {
+            this.hand.splice(woundIndex, 1);
+            this.wounds.pop();
+            if (useHealingPoints) {
+                this.healingPoints--;
+            }
+            return true;
+        }
+
         return false;
     }
 
@@ -241,9 +272,24 @@ export class Hero {
         this.blockPoints = 0;
         this.influencePoints = 0;
         this.healingPoints = 0;
+        this.healingPoints = 0;
         this.wounds = [];
+        this.units = [];
         this.initializeDeck();
         this.drawCards();
+    }
+
+    // Prepare for new round (shuffle discard into deck)
+    prepareNewRound() {
+        if (this.discard.length > 0) {
+            this.deck = shuffleDeck([...this.deck, ...this.discard]);
+            this.discard = [];
+        } else if (this.deck.length > 0) {
+            this.deck = shuffleDeck(this.deck);
+        }
+        // Note: Hand is already discarded by endTurn before this is called?
+        // In game.js: hero.endTurn() (discards hand) -> check deck empty -> prepareNewRound
+        // So yes, discard contains everything.
     }
 
     // Get current stats
@@ -258,8 +304,135 @@ export class Hero {
             wounds: this.wounds.length,
             deckSize: this.deck.length,
             handSize: this.hand.length,
-            discardSize: this.discard.length
+            handSize: this.hand.length,
+            discardSize: this.discard.length,
+            units: this.units.length,
+            commandLimit: this.commandLimit
         };
+    }
+
+    // Unit Management
+    addUnit(unit) {
+        if (this.units.length < this.commandLimit) {
+            this.units.push(unit);
+            return true;
+        }
+        return false;
+    }
+
+    removeUnit(index) {
+        if (index >= 0 && index < this.units.length) {
+            return this.units.splice(index, 1)[0];
+        }
+        return null;
+    }
+
+    getUnits() {
+        return this.units;
+    }
+
+    // Refresh units at end of round (or specific condition)
+    refreshUnits() {
+        this.units.forEach(unit => unit.refresh());
+    }
+
+    // Recruit a unit (deducts influence)
+    recruitUnit(unit, influenceCost) {
+        if (this.units.length >= this.commandLimit) {
+            return { success: false, message: 'Kein Platz für weitere Einheiten.' };
+        }
+
+        // Check influence (assuming influencePoints are used for this turn)
+        // In Mage Knight, recruiting usually uses Influence points generated by cards.
+        if (this.influencePoints < influenceCost) {
+            return { success: false, message: 'Nicht genug Einfluss.' };
+        }
+
+        this.influencePoints -= influenceCost;
+        this.units.push(unit);
+        return { success: true, message: `${unit.getName()} rekrutiert!` };
+    }
+
+    // Learn a spell (adds to deck)
+    learnSpell(spellCard, influenceCost) {
+        if (this.influencePoints < influenceCost) {
+            return { success: false, message: 'Nicht genug Einfluss.' };
+        }
+
+        this.influencePoints -= influenceCost;
+        // Spells usually go to top of deck or discard depending on source, 
+        // simplified: add to discard for now (standard for gaining cards)
+        this.discard.push(spellCard);
+        return { success: true, message: `${spellCard.name} gelernt!` };
+    }
+
+    // Learn Advanced Action
+    learnAdvancedAction(actionCard, influenceCost) {
+        if (this.influencePoints < influenceCost) {
+            return { success: false, message: 'Nicht genug Einfluss.' };
+        }
+
+        this.influencePoints -= influenceCost;
+        this.discard.push(actionCard);
+        return { success: true, message: `${actionCard.name} gelernt!` };
+    }
+
+    // ===== MANA MANAGEMENT =====
+
+    // Take mana from source (dice)
+    takeManaFromSource(color) {
+        if (!Object.values(MANA_COLORS).includes(color)) {
+            return false;
+        }
+        this.tempMana.push(color);
+        return true;
+    }
+
+    // Check if hero has required mana color
+    hasMana(requiredColor) {
+        if (!requiredColor) return false;
+        // Gold can substitute any color
+        return this.tempMana.some(m =>
+            m === requiredColor || m === MANA_COLORS.GOLD
+        );
+    }
+
+    // Check if hero can afford card's mana cost
+    canAffordMana(card) {
+        if (!card.manaCost || card.manaCost === 0) return true;
+
+        // For simplicity: need 1 mana matching card color (or gold)
+        return this.hasMana(card.color);
+    }
+
+    // Spend mana for a card (prefer exact match, fallback to gold)
+    spendMana(requiredColor) {
+        if (!requiredColor) return false;
+
+        // Try exact match first
+        let index = this.tempMana.indexOf(requiredColor);
+
+        // Fallback to gold wildcard
+        if (index === -1) {
+            index = this.tempMana.indexOf(MANA_COLORS.GOLD);
+        }
+
+        if (index !== -1) {
+            this.tempMana.splice(index, 1);
+            return true;
+        }
+
+        return false;
+    }
+
+    // Clear temporary mana (called at end of turn)
+    clearTempMana() {
+        this.tempMana = [];
+    }
+
+    // Get mana inventory for UI
+    getManaInventory() {
+        return [...this.tempMana];
     }
 }
 

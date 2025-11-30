@@ -10,6 +10,7 @@ export const CARD_COLORS = {
 export const CARD_TYPES = {
     ACTION: 'action',
     SPELL: 'spell',
+    ADVANCED_ACTION: 'advanced_action',
     ARTIFACT: 'artifact',
     WOUND: 'wound'
 };
@@ -240,3 +241,49 @@ export function createWoundCard() {
         description: 'Blockiert eine Karte in deiner Hand'
     });
 }
+
+export const SAMPLE_SPELLS = [
+    {
+        id: 'spell_fireball',
+        name: 'Feuerball',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.RED,
+        basicEffect: { attack: 4, element: 'fire' },
+        strongEffect: { attack: 8, element: 'fire' },
+        manaCost: 1, // Spells always cost mana for basic, +black for strong (simplified here)
+        description: 'Basic: 4 Feuer-Angriff | Strong: 8 Feuer-Angriff'
+    },
+    {
+        id: 'spell_heal',
+        name: 'Göttliche Heilung',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.WHITE,
+        basicEffect: { healing: 2 },
+        strongEffect: { healing: 4 },
+        manaCost: 1,
+        description: 'Basic: 2 Heilung | Strong: 4 Heilung'
+    }
+];
+
+export const SAMPLE_ADVANCED_ACTIONS = [
+    {
+        id: 'adv_training',
+        name: 'Hartes Training',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.WHITE,
+        basicEffect: { influence: 4 },
+        strongEffect: { influence: 8 },
+        manaCost: 1,
+        description: 'Basic: 4 Einfluss | Strong: 8 Einfluss'
+    },
+    {
+        id: 'adv_swiftness',
+        name: 'Elfen-Geschwindigkeit',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.GREEN,
+        basicEffect: { movement: 4 },
+        strongEffect: { movement: 8 },
+        manaCost: 1,
+        description: 'Basic: 4 Bewegung | Strong: 8 Bewegung'
+    }
+];

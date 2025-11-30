@@ -64,8 +64,8 @@ export class ManaSource {
     }
 
     // Take a die from the source
-    takeDie(index) {
-        if (index >= 0 && index < this.dice.length && !this.usedDice.has(index)) {
+    takeDie(index, isNight = false) {
+        if (this.isDieAvailable(index, isNight)) {
             this.usedDice.add(index);
             return this.dice[index];
         }
@@ -73,8 +73,18 @@ export class ManaSource {
     }
 
     // Check if a die is available
-    isDieAvailable(index) {
-        return index >= 0 && index < this.dice.length && !this.usedDice.has(index);
+    isDieAvailable(index, isNight = false) {
+        if (index < 0 || index >= this.dice.length || this.usedDice.has(index)) {
+            return false;
+        }
+
+        const color = this.dice[index];
+        // Gold is depleted at night
+        if (isNight && color === MANA_COLORS.GOLD) return false;
+        // Black is depleted during day
+        if (!isNight && color === MANA_COLORS.BLACK) return false;
+
+        return true;
     }
 
     // Return dice to source and re-roll
@@ -89,11 +99,11 @@ export class ManaSource {
     }
 
     // Get available dice
-    getAvailableDice() {
+    getAvailableDice(isNight = false) {
         return this.dice.map((color, index) => ({
             index,
             color,
-            available: !this.usedDice.has(index)
+            available: this.isDieAvailable(index, isNight)
         }));
     }
 

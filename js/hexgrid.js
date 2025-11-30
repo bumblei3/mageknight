@@ -6,9 +6,10 @@ export class HexGrid {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.hexSize = 40;
-        this.hexes = new Map(); // Map of "q,r" -> hex data
+        this.hexes = new Map(); // Store hex data by "q,r" key
         this.selectedHex = null;
         this.highlightedHexes = new Set();
+        this.debugMode = false;
     }
 
     // Axial to Pixel conversion
@@ -241,11 +242,22 @@ export class HexGrid {
 
             // Draw terrain icon
             if (hexData.terrain) {
-                this.drawHexIcon(hexData.q, hexData.r, this.getTerrainIcon(hexData.terrain), -10);
+                // If there is a site, draw site icon instead or in addition?
+                // Let's draw site icon prominent, terrain icon smaller or background?
+                // For now: Site icon replaces terrain icon if present
+                if (hexData.site) {
+                    this.drawHexIcon(hexData.q, hexData.r, hexData.site.getIcon(), -10);
+                    // Draw site name small below
+                    // this.drawHexText(hexData.q, hexData.r, hexData.site.getName(), { fontSize: 10, color: '#fff', align: 'center' });
+                } else {
+                    this.drawHexIcon(hexData.q, hexData.r, this.getTerrainIcon(hexData.terrain), -10);
+                }
             }
 
             // Draw coordinates (for debugging)
-            // this.drawHexText(hexData.q, hexData.r, `${hexData.q},${hexData.r}`, { fontSize: 10, color: '#666' });
+            if (this.debugMode) {
+                this.drawHexText(hexData.q, hexData.r, `${hexData.q},${hexData.r}`, { fontSize: 10, color: '#fff', align: 'center', offsetY: 15 });
+            }
         }
 
         // Draw enemies
@@ -256,9 +268,21 @@ export class HexGrid {
         });
 
         // Draw hero
-        if (hero && hero.position) {
-            this.drawHexIcon(hero.position.q, hero.position.r, '🧙', 0);
+        if (hero) {
+            const pos = hero.displayPosition || hero.position;
+            if (pos) {
+                // Use float coordinates for smooth movement
+                const pixel = this.axialToPixel(pos.q, pos.r);
+                this.drawHeroAt(pixel.x, pixel.y);
+            }
         }
+    }
+
+    drawHeroAt(x, y) {
+        this.ctx.font = '30px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🧙', x, y);
     }
 
     // Get terrain color

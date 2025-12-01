@@ -15,9 +15,12 @@ import ParticleSystem from './particles.js';
 import { animator } from './animator.js';
 import { SiteInteractionManager } from './siteInteraction.js';
 import { createUnit } from './unit.js';
-import { DebugManager } from './debug.js'; // Ensure unit creation works
+import { DebugManager } from './debug.js';
+import { getRandomSkills } from './skills.js';
+import { SAMPLE_ADVANCED_ACTIONS, createDeck } from './card.js';
+import SimpleTutorial from './simpleTutorial.js';
 
-class MageKnightGame {
+export class MageKnightGame {
     constructor() {
         this.canvas = document.getElementById('game-board');
         this.hexGrid = new HexGrid(this.canvas);
@@ -75,10 +78,11 @@ class MageKnightGame {
 
         // Initialize tutorial manager
         this.tutorialManager = new TutorialManager(this);
+        this.simpleTutorial = new SimpleTutorial(this);
 
-        // Show tutorial on first visit
-        if (!TutorialManager.hasCompleted()) {
-            setTimeout(() => this.tutorialManager.start(), 1000);
+        // Show interactive tutorial on first visit
+        if (this.simpleTutorial.shouldStart()) {
+            setTimeout(() => this.simpleTutorial.start(), 1500);
         }
 
         this.ui.addLog('Willkommen bei Mage Knight!', 'info');
@@ -86,35 +90,19 @@ class MageKnightGame {
     }
 
     createGameBoard() {
-        // Create a small hex map (simplified)
-        const hexes = [
-            // Center and immediate neighbors
-            { q: 0, r: 0, terrain: TERRAIN_TYPES.PLAINS },
-            { q: 1, r: 0, terrain: TERRAIN_TYPES.PLAINS },
-            { q: 0, r: 1, terrain: TERRAIN_TYPES.FOREST },
-            { q: -1, r: 1, terrain: TERRAIN_TYPES.PLAINS },
-            { q: -1, r: 0, terrain: TERRAIN_TYPES.FOREST },
-            { q: 0, r: -1, terrain: TERRAIN_TYPES.HILLS },
-            { q: 1, r: -1, terrain: TERRAIN_TYPES.PLAINS },
+        // Create starting map (just one tile initially)
+        this.mapManager.placeTile(0, 0, [
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.DESERT,
+            TERRAIN_TYPES.WATER
+        ]);
 
-            // Outer ring
-            { q: 2, r: 0, terrain: TERRAIN_TYPES.HILLS },
-            { q: 2, r: -1, terrain: TERRAIN_TYPES.FOREST },
-            { q: 1, r: 1, terrain: TERRAIN_TYPES.PLAINS },
-            { q: 0, r: 2, terrain: TERRAIN_TYPES.DESERT },
-            { q: -1, r: 2, terrain: TERRAIN_TYPES.FOREST },
-            { q: -2, r: 2, terrain: TERRAIN_TYPES.WASTELAND },
-            { q: -2, r: 1, terrain: TERRAIN_TYPES.MOUNTAINS },
-            { q: -2, r: 0, terrain: TERRAIN_TYPES.HILLS },
-            { q: -1, r: -1, terrain: TERRAIN_TYPES.PLAINS },
-            { q: 0, r: -2, terrain: TERRAIN_TYPES.MOUNTAINS },
-            { q: 1, r: -2, terrain: TERRAIN_TYPES.FOREST },
-            { q: 2, r: -2, terrain: TERRAIN_TYPES.DESERT }
-        ];
-
-        hexes.forEach(hex => {
-            this.hexGrid.setHex(hex.q, hex.r, { terrain: hex.terrain });
-        });
+        // Reveal starting area
+        this.mapManager.revealMap(0, 0, 2);
     }
 
     createEnemies() {
@@ -171,9 +159,7 @@ class MageKnightGame {
         // Plan: Add a "Visit Site" button to UI or reuse an existing slot?
         // Better: Add a new button to index.html first.
         // For now, let's assume we add it to UI class dynamically or use a new button.
-        // Let's add it to index.html in next step.
-        // Wait, I should have added it to index.html first.
-        // I will add it to index.html in the next step, but I can add the listener here now if I assume the ID.
+        // Let's add it to index.html in the next step, but I can add the listener here now if I assume the ID.
         // Visit Site button
         const visitBtn = document.getElementById('visit-btn');
         if (visitBtn) visitBtn.addEventListener('click', () => this.visitSite());
@@ -186,6 +172,12 @@ class MageKnightGame {
 
         // Canvas click for movement
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+
+        // Canvas hover for tooltips
+        this.canvas.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e));
+        this.canvas.addEventListener('mouseleave', () => {
+            this.ui.tooltipManager.hideTooltip();
+        });
 
         // Card selection
         this.renderHand();
@@ -260,6 +252,24 @@ class MageKnightGame {
                 if (this.movementMode) {
                     this.exitMovementMode();
                     this.ui.addLog('Bewegungsmodus abgebrochen', 'info');
+                }
+            }
+
+            // Tab to cycle cards (visual only for now)
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                // Logic to cycle selection could go here
+                // For now just log
+                // this.ui.addLog('Tab: Karte wählen (WIP)', 'info');
+            }
+
+            // M for Mana Panel highlight
+            if (e.key === 'm' || e.key === 'M') {
+                const manaPanel = document.querySelector('.mana-panel');
+                if (manaPanel) {
+                    manaPanel.scrollIntoView({ behavior: 'smooth' });
+                    manaPanel.classList.add('highlight-pulse');
+                    setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
                 }
             }
         });
@@ -441,6 +451,54 @@ class MageKnightGame {
         }
     }
 
+    handleCanvasMouseMove(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const hex = this.hexGrid.pixelToAxial(x, y);
+
+        // Check if hex exists
+        if (!this.hexGrid.hasHex(hex.q, hex.r)) {
+            this.ui.tooltipManager.hideTooltip();
+            return;
+        }
+
+        // Check for enemy
+        const enemy = this.enemies.find(e => e.position.q === hex.q && e.position.r === hex.r);
+        if (enemy) {
+            // Show enemy tooltip
+            const dummyEl = {
+                getBoundingClientRect: () => ({
+                    left: e.clientX,
+                    top: e.clientY,
+                    width: 0,
+                    height: 0,
+                    right: e.clientX,
+                    bottom: e.clientY
+                })
+            };
+            this.ui.tooltipManager.showEnemyTooltip(dummyEl, enemy);
+            return;
+        }
+
+        // Show terrain tooltip
+        const hexData = this.hexGrid.getHex(hex.q, hex.r);
+        if (hexData) {
+            const dummyEl = {
+                getBoundingClientRect: () => ({
+                    left: e.clientX,
+                    top: e.clientY,
+                    width: 0,
+                    height: 0,
+                    right: e.clientX,
+                    bottom: e.clientY
+                })
+            };
+            this.ui.tooltipManager.showTerrainTooltip(dummyEl, hexData.terrain, {});
+        }
+    }
+
     selectHex(q, r) {
         this.hexGrid.selectHex(q, r);
 
@@ -603,11 +661,28 @@ class MageKnightGame {
                     },
                     onComplete: () => {
                         this.render();
+                        // Reveal map at new position
+                        this.mapManager.revealMap(q, r, 2);
+
+                        // Check for exploration opportunity (if at edge)
+                        if (this.mapManager.canExplore(q, r)) {
+                            this.ui.showNotification('Neues Gebiet kann erkundet werden! (Klicke auf leeres Feld)', 'info');
+                            // For now, auto-explore if very close to edge? 
+                            // Or better: let user click. But we don't have a specific "Explore" button yet.
+                            // Let's auto-explore for smooth gameplay in this version.
+                            const exploreResult = this.mapManager.explore(q, r);
+                            if (exploreResult.success) {
+                                this.ui.addLog(exploreResult.message, 'success');
+                                // Reveal the new tile immediately
+                                this.mapManager.revealMap(exploreResult.center.q, exploreResult.center.r, 2);
+                            }
+                        }
                     }
                 }
             );
 
             // Check if there's an enemy on this hex
+            const enemy = this.enemies.find(e => e.position.q === q && e.position.r === r);
             if (enemy) {
                 this.ui.addLog(`Feind entdeckt: ${enemy.name}!`, 'combat');
                 this.exitMovementMode();
@@ -702,7 +777,8 @@ class MageKnightGame {
                 });
 
                 // Try to defeat enemies
-                const attackResult = this.combat.attackEnemies(result.effect.attack);
+                const attackElement = result.effect.element || 'physical';
+                const attackResult = this.combat.attackEnemies(result.effect.attack, attackElement);
                 this.ui.addLog(attackResult.message, 'combat');
 
                 if (attackResult.success) {
@@ -779,13 +855,48 @@ class MageKnightGame {
         const result = this.combat.endCombat();
         this.ui.addLog(result.message, result.victory ? 'info' : 'combat');
 
-        if (result.victory) {
-            this.ui.addLog(`Ruhm erhalten: +${result.fameGained}`, 'info');
+        this.render();
+    }
+
+    gainFame(amount) {
+        const result = this.hero.gainFame(amount);
+        if (result.leveledUp) {
+            this.ui.addLog(`🎉 STUFENAUFSTIEG! Stufe ${result.newLevel} erreicht!`, 'success');
+            this.ui.showNotification(`Stufe ${result.newLevel} erreicht!`, 'success');
+            this.triggerLevelUp(result.newLevel);
+        }
+    }
+
+    triggerLevelUp(newLevel) {
+        // Pause game / block input?
+
+        // Generate choices
+        const skills = getRandomSkills('GOLDYX', 2, this.hero.skills);
+
+        // Get 3 random advanced actions (simplified: just take samples)
+        const cards = createDeck(SAMPLE_ADVANCED_ACTIONS); // In real game, draw 3 from advanced deck
+
+        this.ui.showLevelUpModal(newLevel, { skills, cards }, (selection) => {
+            this.handleLevelUpSelection(selection);
+        });
+    }
+
+    handleLevelUpSelection(selection) {
+        // Apply Skill
+        if (selection.skill) {
+            this.hero.addSkill(selection.skill);
+            this.ui.addLog(`Fertigkeit gelernt: ${selection.skill.name}`, 'success');
         }
 
-        this.combat = null;
-        this.ui.hideCombatPanel();
-        this.updatePhaseIndicator();
+        // Apply Card
+        if (selection.card) {
+            this.hero.learnAdvancedAction(selection.card, 0); // Cost 0 for reward
+            this.ui.addLog(`Karte erhalten: ${selection.card.name}`, 'success');
+        }
+
+        // Apply Level Up stats
+        this.hero.levelUp();
+
         this.updateStats();
         this.render();
     }
@@ -844,8 +955,7 @@ class MageKnightGame {
         // Note: hero.endTurn() draws new cards, so we check if hand is empty AFTER draw attempt?
         // No, hero.endTurn() discards hand then draws. If deck was empty, hand might be smaller or empty.
         // Standard rule: Round ends when a player has no cards in deck and announces end of round.
-        // Simplified: If deck is empty after drawing, trigger end of round next turn?
-        // Let's do: If deck is empty, trigger end of round.
+        // Simplified: If deck is empty, trigger end of round.
 
         if (this.hero.deck.length === 0) {
             const roundInfo = this.timeManager.endRound();

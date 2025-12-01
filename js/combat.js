@@ -72,7 +72,7 @@ export class Combat {
                 blocked: true,
                 totalBlock: totalBlock,
                 unitContribution: this.unitBlockPoints,
-                message: `${enemy.name} erfolgreich geblockt! (Block: ${totalBlock})`
+                message: `${enemy.name} erfolgreich geblockt! ${enemy.swift ? '(Flink: Doppelter Block nötig)' : ''}`
             };
         }
 
@@ -180,13 +180,25 @@ export class Combat {
     }
 
     // Attempt to defeat enemies with attack (includes unit contributions)
-    attackEnemies(attackValue, targetEnemies = null) {
+    attackEnemies(attackValue, attackElement = 'physical', targetEnemies = null) {
         if (this.phase !== COMBAT_PHASE.ATTACK) {
             return { error: 'Nicht in der Angriffs-Phase' };
         }
 
         const targets = targetEnemies || this.enemies;
-        const totalArmor = targets.reduce((sum, enemy) => sum + enemy.armor, 0);
+
+        // Calculate effective armor based on resistances
+        const totalArmor = targets.reduce((sum, enemy) => {
+            const multiplier = enemy.getResistanceMultiplier(attackElement);
+            // If resistant, armor is effectively doubled (or damage halved, same result for threshold)
+            // Mage Knight rules: Resistance halves damage. 
+            // Here we compare Total Attack vs Armor. 
+            // So if resistant, we need 2x Attack to kill.
+            // Let's implement it as: Effective Armor = Armor / Multiplier
+            // e.g. Multiplier 0.5 -> Effective Armor = Armor * 2
+            return sum + (enemy.armor / multiplier);
+        }, 0);
+
         const totalAttack = attackValue + this.unitAttackPoints;
 
         if (totalAttack >= totalArmor) {
@@ -212,12 +224,113 @@ export class Combat {
         return {
             success: false,
             totalAttack: totalAttack,
-            message: `Angriff zu schwach (${totalAttack} vs ${totalArmor} Rüstung)`
+            message: `Angriff zu schwach (${totalAttack} vs ${totalArmor} Effektive Rüstung)`
         };
+    }
+
+    // Combo System - detects and applies bonuses for card combinations
+    detectCombo(playedCards) {
+        if (!playedCards || playedCards.length < 2) {
+            return null;
+        }
+
+        // Filter out wound cards
+        const validCards = playedCards.filter(c => !c.isWound());
+        if (validCards.length < 2) return null;
+
+        const colors = validCards.map(c => c.color);
+
+        // Check for Mono-Color Combo (3+ same color)
+        if (this.isMonoColor(colors) && colors.length >= 3) {
+            const multiplier = 1 + (colors.length * 0.15); // 15% per card
+            return {
+                type: 'mono_color',
+                color: colors[0],
+                multiplier: multiplier,
+                message: `${this.getColorName(colors[0]).toUpperCase()} COMBO! x${multiplier.toFixed(2)} Bonus!`
+            };
+        }
+
+        // Check for Rainbow Combo (all 4 colors)
+        if (this.hasAllColors(colors)) {
+            return {
+                type: 'rainbow',
+                multiplier: 2.0,
+                message: '🌈 RAINBOW COMBO! Effekt verdoppelt!'
+            };
+        }
+
+        // Check for Element Synergy (3+ cards with same element)
+        const elements = validCards.map(c => c.basicEffect?.element).filter(e => e);
+        if (elements.length >= 3 && this.isMonoElement(elements)) {
+            return {
+                type: 'element_synergy',
+                element: elements[0],
+                multiplier: 1.5,
+                message: `${elements[0].toUpperCase()} SYNERGY! +50% Elementarschaden!`
+            };
+        }
+
+        return null;
+    }
+
+    // Check if all cards are the same color
+    isMonoColor(colors) {
+        if (colors.length === 0) return false;
+        const firstColor = colors[0];
+        return colors.every(c => c === firstColor);
+    }
+
+    // Check if cards contain all 4 colors
+    hasAllColors(colors) {
+        const uniqueColors = new Set(colors.filter(c => c !== null));
+        return uniqueColors.size >= 4;
+    }
+
+    // Check if all elements are the same
+    isMonoElement(elements) {
+        if (elements.length === 0) return false;
+        const firstElement = elements[0];
+        return elements.every(e => e === firstElement);
+    }
+
+    // Get color name for display
+    getColorName(color) {
+        const names = {
+            'red': 'Rot',
+            'blue': 'Blau',
+            'green': 'Grün',
+            'white': 'Weiß'
+        };
+        return names[color] || color;
+    }
+
+    // Calculate critical hit chance
+    calculateCriticalHit(baseAttack, critChance = 0.15) {
+        if (Math.random() < critChance) {
+            return {
+                isCrit: true,
+                damage: Math.floor(baseAttack * 1.5),
+                multiplier: 1.5,
+                message: '💥 KRITISCHER TREFFER!'
+            };
+        }
+        return {
+            isCrit: false,
+            damage: baseAttack,
+            multiplier: 1.0
+        };
+    }
+
+    // Apply combo bonus to attack value
+    applyComboBonus(baseValue, combo) {
+        if (!combo) return baseValue;
+        return Math.floor(baseValue * combo.multiplier);
     }
 
     // End combat
     endCombat() {
+
         this.phase = COMBAT_PHASE.COMPLETE;
 
         const allDefeated = this.enemies.length === 0;

@@ -8,7 +8,33 @@ export class UI {
         this.elements = this.getElements();
         this.tooltipManager = new TooltipManager();
         this.setupEventListeners();
+        this.setupTooltips();
         this.setupToastContainer();
+    }
+
+    setupTooltips() {
+        // Hero Stats
+        this.tooltipManager.attachToElement(this.elements.heroArmor,
+            this.tooltipManager.createStatTooltipHTML('Rüstung', 'Reduziert den Schaden, den du im Kampf erleidest.'));
+
+        this.tooltipManager.attachToElement(this.elements.heroHandLimit,
+            this.tooltipManager.createStatTooltipHTML('Handlimit', 'Die maximale Anzahl an Karten, die du am Ende deines Zuges auf der Hand haben darfst.'));
+
+        this.tooltipManager.attachToElement(this.elements.heroWounds,
+            this.tooltipManager.createStatTooltipHTML('Verletzungen', 'Verletzungen blockieren deine Hand. Raste oder heile dich, um sie loszuwerden.'));
+
+        this.tooltipManager.attachToElement(this.elements.fameValue.parentElement,
+            this.tooltipManager.createStatTooltipHTML('Ruhm', 'Erfahrungspunkte. Sammle Ruhm durch Kämpfe und Erkundung, um im Level aufzusteigen.'));
+
+        this.tooltipManager.attachToElement(this.elements.reputationValue.parentElement,
+            this.tooltipManager.createStatTooltipHTML('Ansehen', 'Beeinflusst Interaktionen in Dörfern und Klöstern. Hohes Ansehen macht Rekrutierung günstiger.'));
+
+        // Phase Indicator
+        const phaseEl = document.getElementById('phase-indicator');
+        if (phaseEl) {
+            this.tooltipManager.attachToElement(phaseEl,
+                this.tooltipManager.createStatTooltipHTML('Aktuelle Phase', 'Zeigt an, was du gerade tun kannst. Beachte den Hinweis darunter.'));
+        }
     }
 
     setupToastContainer() {
@@ -51,9 +77,17 @@ export class UI {
             siteModal: document.getElementById('site-modal'),
             siteClose: document.getElementById('site-close'),
             siteModalIcon: document.getElementById('site-modal-icon'),
-            siteModalTitle: document.getElementById('site-modal-title'),
-            siteModalDescription: document.getElementById('site-modal-description'),
-            siteOptions: document.getElementById('site-options')
+            siteModalTitle: document.querySelector('#site-modal .modal-title'),
+            siteModalDescription: document.querySelector('#site-modal .site-description'),
+            siteOptions: document.getElementById('site-options'),
+            siteCloseBtn: document.getElementById('site-close-btn'),
+
+            // Level Up Modal
+            levelUpModal: document.getElementById('level-up-modal'),
+            newLevelDisplay: document.getElementById('new-level-display'),
+            skillChoices: document.getElementById('skill-choices'),
+            cardChoices: document.getElementById('card-choices'),
+            confirmLevelUpBtn: document.getElementById('confirm-level-up')
         };
     }
 
@@ -62,6 +96,26 @@ export class UI {
         if (this.elements.siteClose) {
             this.elements.siteClose.addEventListener('click', () => this.hideSiteModal());
         }
+    }
+
+    // Show floating text animation
+    showFloatingText(element, text, color = '#fff') {
+        if (!element) return;
+
+        const rect = element.getBoundingClientRect();
+        const floatEl = document.createElement('div');
+        floatEl.className = 'floating-text';
+        floatEl.textContent = text;
+        floatEl.style.color = color;
+        floatEl.style.left = `${rect.left + rect.width / 2}px`;
+        floatEl.style.top = `${rect.top}px`;
+
+        document.body.appendChild(floatEl);
+
+        // Remove after animation
+        floatEl.addEventListener('animationend', () => {
+            floatEl.remove();
+        });
     }
 
     // Update hero stats display
@@ -73,19 +127,36 @@ export class UI {
         const currentArmor = parseInt(this.elements.heroArmor.textContent) || 0;
         if (currentArmor !== stats.armor) {
             animateCounter(this.elements.heroArmor, currentArmor, stats.armor, 500, animator);
+            const diff = stats.armor - currentArmor;
+            if (diff !== 0) this.showFloatingText(this.elements.heroArmor, `${diff > 0 ? '+' : ''}${diff} 🛡️`, diff > 0 ? '#10b981' : '#ef4444');
         }
 
-        this.elements.heroHandLimit.textContent = stats.handLimit;
-        this.elements.heroWounds.textContent = stats.wounds;
+        const currentHand = parseInt(this.elements.heroHandLimit.textContent) || 0;
+        if (currentHand !== stats.handLimit) {
+            this.elements.heroHandLimit.textContent = stats.handLimit;
+            const diff = stats.handLimit - currentHand;
+            if (diff !== 0) this.showFloatingText(this.elements.heroHandLimit, `${diff > 0 ? '+' : ''}${diff} 🎴`, '#3b82f6');
+        }
+
+        const currentWounds = parseInt(this.elements.heroWounds.textContent) || 0;
+        if (currentWounds !== stats.wounds) {
+            this.elements.heroWounds.textContent = stats.wounds;
+            const diff = stats.wounds - currentWounds;
+            if (diff > 0) this.showFloatingText(this.elements.heroWounds, `+${diff} 💔`, '#ef4444');
+        }
 
         const currentFame = parseInt(this.elements.fameValue.textContent) || 0;
         if (currentFame !== stats.fame) {
             animateCounter(this.elements.fameValue, currentFame, stats.fame, 1000, animator);
+            const diff = stats.fame - currentFame;
+            if (diff > 0) this.showFloatingText(this.elements.fameValue, `+${diff} ⭐`, '#fbbf24');
         }
 
         const currentRep = parseInt(this.elements.reputationValue.textContent) || 0;
         if (currentRep !== stats.reputation) {
             animateCounter(this.elements.reputationValue, currentRep, stats.reputation, 800, animator);
+            const diff = stats.reputation - currentRep;
+            if (diff !== 0) this.showFloatingText(this.elements.reputationValue, `${diff > 0 ? '+' : ''}${diff} 💬`, '#f3f4f6');
         }
     }
 
@@ -130,47 +201,68 @@ export class UI {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card';
         cardDiv.dataset.index = index;
+        cardDiv.dataset.color = card.color; // For CSS styling
 
         if (card.isWound()) {
+            cardDiv.classList.add('wound-card');
             cardDiv.innerHTML = `
+                <div class="card-icon-large">💔</div>
                 <div class="card-header">
                     <span class="card-name">${card.name}</span>
                 </div>
                 <div class="card-effects">
-                    <div class="card-effect">💔 Verletzung</div>
+                    <div class="card-effect">Blockiert einen Kartenslot</div>
                 </div>
             `;
-            cardDiv.style.borderColor = '#ef4444';
             return cardDiv;
         }
 
-        const colorIndicator = document.createElement('div');
-        colorIndicator.className = 'card-color-indicator';
-        colorIndicator.style.backgroundColor = this.getColorHex(card.color);
+        // Get large icon based on card color/type
+        const cardIcon = this.getCardIcon(card);
+        const colorName = this.getColorName(card.color);
 
         const basicEffect = this.formatEffect(card.basicEffect);
         const strongEffect = this.formatEffect(card.strongEffect);
 
         cardDiv.innerHTML = `
+            <div class="card-icon-large">${cardIcon}</div>
+            <div class="card-type-badge" style="background: ${this.getColorHex(card.color)};">
+                ${colorName}
+            </div>
+            ${card.manaCost > 0 ? `<div class="card-mana-cost">${card.manaCost}</div>` : ''}
             <div class="card-header">
                 <span class="card-name">${card.name}</span>
             </div>
             <div class="card-effects">
                 <div class="card-effect"><strong>Basic:</strong> ${basicEffect}</div>
-                <div class="card-effect"><strong>Strong:</strong> ${strongEffect}</div>
+                ${strongEffect && strongEffect !== 'Keine' ?
+                `<div class="card-effect"><strong>Strong:</strong> ${strongEffect}</div>` : ''}
             </div>
+            <div class="card-hint">Rechtsklick: Seitlich (+1)</div>
         `;
 
-        cardDiv.querySelector('.card-header').appendChild(colorIndicator);
-
-        if (card.manaCost > 0) {
-            const manaCost = document.createElement('div');
-            manaCost.className = 'card-mana-cost';
-            manaCost.textContent = card.manaCost;
-            cardDiv.appendChild(manaCost);
-        }
-
         return cardDiv;
+    }
+
+    // Get large icon for card type
+    getCardIcon(card) {
+        // Determine icon based on card color and primary effect
+        if (card.color === 'red') return '⚔️';
+        if (card.color === 'blue') return '🛡️';
+        if (card.color === 'green') return '👣';
+        if (card.color === 'white') return '💬';
+        return '🎴';
+    }
+
+    // Get color name in German
+    getColorName(color) {
+        const names = {
+            red: 'Angriff',
+            blue: 'Block',
+            green: 'Bewegung',
+            white: 'Einfluss'
+        };
+        return names[color] || color;
     }
 
     // Format card effect for display
@@ -216,8 +308,25 @@ export class UI {
                 dieEl.addEventListener('click', () => onDieClick(index, die.color));
             }
 
+            // Add tooltip
+            const manaInfo = this.getManaTooltipInfo(die.color);
+            this.tooltipManager.attachToElement(dieEl,
+                this.tooltipManager.createStatTooltipHTML(manaInfo.title, manaInfo.desc));
+
             this.elements.manaSource.appendChild(dieEl);
         });
+    }
+
+    getManaTooltipInfo(color) {
+        const info = {
+            red: { title: 'Rotes Mana', desc: 'Verstärkt Angriffs- und Feuerzauber.' },
+            blue: { title: 'Blaues Mana', desc: 'Verstärkt Eiszauber und Block-Effekte.' },
+            green: { title: 'Grünes Mana', desc: 'Verstärkt Bewegungs- und Heilzauber.' },
+            white: { title: 'Weißes Mana', desc: 'Verstärkt Einfluss und spirituelle Effekte.' },
+            gold: { title: 'Goldenes Mana', desc: 'Joker! Kann als jede Farbe (außer Schwarz) verwendet werden. Nur tagsüber.' },
+            black: { title: 'Schwarzes Mana', desc: 'Mächtiges, aber gefährliches Mana. Verstärkt dunkle Zauber. Nur nachts.' }
+        };
+        return info[color] || { title: 'Mana', desc: 'Magische Energie.' };
     }
 
     // Get mana icon
@@ -300,20 +409,7 @@ export class UI {
         `;
 
         enemies.forEach(enemy => {
-            const enemyDiv = document.createElement('div');
-            enemyDiv.className = 'enemy-info';
-            enemyDiv.innerHTML = `
-                <div class="enemy-name">${enemy.icon} ${enemy.name}</div>
-                <div class="stat-row">
-                    <span>🛡️ Rüstung: ${enemy.armor}</span>
-                </div>
-                <div class="stat-row">
-                    <span>⚔️ Angriff: ${enemy.attack}</span>
-                </div>
-                <div class="stat-row">
-                    <span>⭐ Ruhm: ${enemy.fame}</span>
-                </div>
-            `;
+            const enemyDiv = this.renderEnemy(enemy); // Use the new renderEnemy method
             this.elements.combatInfo.appendChild(enemyDiv);
         });
     }
@@ -410,6 +506,29 @@ export class UI {
 
         this.elements.heroUnits.appendChild(grid);
     }
+
+    renderEnemy(enemy) {
+        const el = document.createElement('div');
+        el.className = 'enemy-card';
+        el.innerHTML = `
+            <div class="enemy-icon" style="color: ${enemy.color}">${enemy.icon}</div>
+            <div class="enemy-name">${enemy.name}</div>
+            <div class="enemy-stats">
+                <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
+                <div class="stat" title="Angriff">⚔️ ${enemy.attack}</div>
+            </div>
+            <div class="enemy-traits">
+                ${enemy.fortified ? '<span title="Befestigt">🏰</span>' : ''}
+                ${enemy.swift ? '<span title="Flink (Doppelter Block)">💨</span>' : ''}
+                ${enemy.fireResist ? '<span title="Feuer-Resistenz">🔥</span>' : ''}
+                ${enemy.iceResist ? '<span title="Eis-Resistenz">❄️</span>' : ''}
+                ${enemy.physicalResist ? '<span title="Physische Resistenz">🗿</span>' : ''}
+                ${enemy.brutal ? '<span title="Brutal (Doppelter Schaden)">💪</span>' : ''}
+            </div>
+        `;
+        return el;
+    }
+
     renderUnitsInCombat(units, phase, onUnitActivate) {
         if (!this.elements.combatUnits) return;
 

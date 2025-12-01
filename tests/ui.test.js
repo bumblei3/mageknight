@@ -1,0 +1,153 @@
+import { describe, it, expect, beforeEach } from './testRunner.js';
+import { UI } from '../js/ui.js';
+
+// Mock TooltipManager since UI imports it
+// We need to ensure the import in UI.js doesn't fail or use the real one if it has side effects.
+// Since we are in a module environment, we can't easily mock imports for the module under test without a bundler or loader hooks.
+// However, TooltipManager probably just attaches events.
+// Let's rely on the mock DOM to handle what TooltipManager does.
+
+describe('UI', () => {
+    let ui;
+    let mockElements;
+
+    beforeEach(() => {
+        // Reset DOM mocks if needed (setup.js does some global setup)
+        // UI constructor calls document.getElementById a lot.
+        // We need to make sure those return usable mocks.
+        // The mockDocument in setup.js returns new MockHTMLElement for any getElementById.
+        // So UI constructor should pass.
+
+        ui = new UI();
+    });
+
+    it('should initialize and get elements', () => {
+        expect(ui.elements).toBeDefined();
+        expect(ui.elements.fameValue).toBeDefined();
+        expect(ui.tooltipManager).toBeDefined();
+    });
+
+    it('should update hero stats', () => {
+        const mockHero = {
+            getStats: () => ({
+                name: 'TestHero',
+                armor: 5,
+                handLimit: 6,
+                wounds: 0,
+                fame: 10,
+                reputation: 2
+            })
+        };
+
+        // Pre-set some text content to test changes
+        ui.elements.heroArmor.textContent = '3';
+
+        ui.updateHeroStats(mockHero);
+
+        expect(ui.elements.heroName.textContent).toBe('TestHero');
+        expect(ui.elements.heroHandLimit.textContent).toBe(6);
+        // Armor and fame use animation, so immediate textContent might not update or might be handled by animator mock?
+        // In setup.js, requestAnimationFrame is setTimeout(cb, 0).
+        // animateCounter uses requestAnimationFrame.
+        // We might need to wait or mock animateCounter.
+        // Since animateCounter is imported, we can't easily mock it without interception.
+        // But we can check if the function ran without error.
+    });
+
+    it('should update movement points', () => {
+        ui.updateMovementPoints(5);
+        expect(ui.elements.movementPoints.textContent).toBe(5);
+    });
+
+    it('should render hand cards', () => {
+        const hand = [
+            { name: 'Card 1', color: 'red', isWound: () => false, basicEffect: {}, strongEffect: {} },
+            { name: 'Wound', color: 'none', isWound: () => true }
+        ];
+
+        let clickedIndex = -1;
+        const onCardClick = (index) => { clickedIndex = index; };
+
+        ui.renderHandCards(hand, onCardClick);
+
+        expect(ui.elements.handCards.children.length).toBe(2);
+
+        // Test click on first card (MockHTMLElement doesn't trigger event listeners automatically, 
+        // but we can manually invoke if we stored them, or just trust the logic adds them.
+        // To test the callback, we'd need to simulate the click.
+        // The MockHTMLElement in setup.js has addEventListener but it doesn't store callbacks in a way we can easily trigger them publicly 
+        // unless we modify MockHTMLElement or spy on it.
+        // For now, we verify the elements are created.
+    });
+
+    it('should render mana source', () => {
+        const mockManaSource = {
+            getAvailableDice: () => [
+                { color: 'red', available: true },
+                { color: 'blue', available: false }
+            ]
+        };
+
+        ui.renderManaSource(mockManaSource);
+
+        expect(ui.elements.manaSource.children.length).toBe(2);
+        // Check classes
+        // MockHTMLElement classList.add is a no-op spy.
+        // We can't easily check classList contents with the current simple mock.
+    });
+
+    it('should add log entry', () => {
+        ui.addLog('Test message', 'info');
+        expect(ui.elements.gameLog.children.length).toBe(1);
+        expect(ui.elements.gameLog.children[0].textContent).toBe('Test message');
+    });
+
+    it('should clear log', () => {
+        ui.addLog('Msg 1');
+        ui.clearLog();
+        expect(ui.elements.gameLog.innerHTML).toBe('');
+    });
+
+    it('should show combat panel', () => {
+        const enemies = [{ name: 'Orc', armor: 3, attack: 4, fame: 2, icon: 'O' }];
+        ui.showCombatPanel(enemies, 'attack');
+
+        expect(ui.elements.combatPanel.style.display).toBe('block');
+        expect(ui.elements.combatInfo.children.length).toBeGreaterThan(0);
+    });
+
+    it('should hide combat panel', () => {
+        ui.hideCombatPanel();
+        expect(ui.elements.combatPanel.style.display).toBe('none');
+    });
+
+    it('should render units', () => {
+        const units = [
+            {
+                getName: () => 'Peasant',
+                getIcon: () => 'P',
+                level: 1,
+                isReady: () => true,
+                wounds: 0,
+                getAbilities: () => [{ text: 'Farm' }],
+                armor: 2
+            }
+        ];
+
+        ui.renderUnits(units);
+
+        // renderUnits creates a grid div, then appends units to it.
+        // So heroUnits should have 1 child (the grid).
+        expect(ui.elements.heroUnits.children.length).toBe(1);
+    });
+
+    it('should show play area', () => {
+        ui.showPlayArea();
+        expect(ui.elements.playArea.style.display).toBe('block');
+    });
+
+    it('should hide play area', () => {
+        ui.hidePlayArea();
+        expect(ui.elements.playArea.style.display).toBe('none');
+    });
+});

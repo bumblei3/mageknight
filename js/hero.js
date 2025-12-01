@@ -2,6 +2,21 @@
 
 import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK } from './card.js';
 import { MANA_COLORS } from './mana.js';
+import { SKILLS } from './skills.js';
+
+// Fame thresholds for levels
+// Level 1 starts at 0
+// Level 2: 10 Fame (Reward: Skill + Advanced Action)
+// Level 3: 30 Fame (Reward: Command Token + Skill)
+// Level 4: 60 Fame (Reward: Advanced Action + Skill)
+// Level 5: 100 Fame (Reward: Command Token + Skill)
+export const LEVEL_TABLE = [
+    { level: 1, fame: 0 },
+    { level: 2, fame: 10, reward: 'skill_card' },
+    { level: 3, fame: 30, reward: 'unit_skill' },
+    { level: 4, fame: 60, reward: 'skill_card' },
+    { level: 5, fame: 100, reward: 'unit_skill' }
+];
 
 export class Hero {
     constructor(name, startingPosition = { q: 0, r: 0 }) {
@@ -14,9 +29,9 @@ export class Hero {
         this.armor = 2;
         this.handLimit = 5;
         this.fame = 0;
-        this.fame = 0;
         this.reputation = 0;
         this.commandLimit = 1; // Start with 1 unit slot
+        this.skills = [];
 
         // Cards
         this.deck = [];
@@ -243,7 +258,38 @@ export class Hero {
     // Gain fame
     gainFame(amount) {
         this.fame += amount;
-        // TODO: Check for level up
+
+        // Check for level up
+        const nextLevel = LEVEL_TABLE.find(l => l.level === this.level + 1);
+        if (nextLevel && this.fame >= nextLevel.fame) {
+            return { leveledUp: true, newLevel: nextLevel.level, reward: nextLevel.reward };
+        }
+        return { leveledUp: false };
+    }
+
+    // Level Up
+    levelUp() {
+        this.level++;
+        // Stat increases based on level could go here
+        // For now, rewards are handled by Game controller
+        if (this.level % 2 === 1) {
+            // Odd levels (3, 5) give Command Token (Command Limit +1)
+            this.commandLimit++;
+            this.armor++; // Bonus armor at higher levels
+        } else {
+            // Even levels (2, 4) give Hand Limit +1 (simplified)
+            this.handLimit++;
+        }
+    }
+
+    // Add Skill
+    addSkill(skill) {
+        this.skills.push(skill);
+
+        // Apply passive effects immediately if needed
+        if (skill.id === 'dragon_scales') {
+            this.armor += 1;
+        }
     }
 
     // Change reputation
@@ -307,7 +353,8 @@ export class Hero {
             handSize: this.hand.length,
             discardSize: this.discard.length,
             units: this.units.length,
-            commandLimit: this.commandLimit
+            commandLimit: this.commandLimit,
+            skills: this.skills
         };
     }
 

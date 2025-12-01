@@ -34,6 +34,17 @@ export class Enemy {
         // Visual
         this.icon = data.icon || '👹';
         this.color = data.color || '#ef4444';
+
+        // Attack Type
+        this.attackType = data.attackType || 'physical'; // physical, fire, ice, siege
+    }
+
+    // Calculate damage multiplier based on attack element
+    getResistanceMultiplier(attackElement) {
+        if (attackElement === 'fire' && this.fireResist) return 0.5;
+        if (attackElement === 'ice' && this.iceResist) return 0.5;
+        if (attackElement === 'physical' && this.physicalResist) return 0.5;
+        return 1.0;
     }
 
     // Get effective attack value (doubled if brutal)
@@ -107,6 +118,7 @@ export const ENEMY_DEFINITIONS = {
         fame: 4,
         swift: true,
         fireResist: true,
+        attackType: 'fire',
         icon: '🐲',
         color: '#dc2626'
     },
@@ -118,6 +130,63 @@ export const ENEMY_DEFINITIONS = {
         swift: true,
         icon: '🏹',
         color: '#78716c'
+    },
+    // New enemy types
+    mage: {
+        name: 'Magier',
+        armor: 3,
+        attack: 4,
+        fame: 4,
+        swift: true, // Can teleport after attack
+        physicalResist: true,
+        attackType: 'ice',
+        icon: '🧙',
+        color: '#8b5cf6'
+    },
+    dragon: {
+        name: 'Drache',
+        armor: 6,
+        attack: 5,
+        fame: 6,
+        brutal: true, // Fire breath - double damage
+        fireResist: true,
+        attackType: 'fire',
+        icon: '🐉',
+        color: '#dc2626'
+    },
+    phantom: {
+        name: 'Phantom',
+        armor: 2,
+        attack: 3,
+        fame: 4,
+        swift: true,
+        physicalResist: true, // Intangible - physical attacks less effective
+        attackType: 'physical',
+        icon: '👻',
+        color: '#a78bfa'
+    },
+    golem: {
+        name: 'Golem',
+        armor: 8,
+        attack: 2,
+        fame: 5,
+        fortified: true, // Very slow but tough
+        iceResist: true,
+        physicalResist: true,
+        attackType: 'physical',
+        icon: '🗿',
+        color: '#78716c'
+    },
+    vampire: {
+        name: 'Vampir',
+        armor: 4,
+        attack: 4,
+        fame: 5,
+        brutal: true, // Life steal - deals more damage
+        poison: true, // Drains life
+        attackType: 'physical',
+        icon: '🦇',
+        color: '#7c2d12'
     }
 };
 

@@ -3,11 +3,19 @@ export class TestRunner {
     constructor() {
         this.tests = [];
         this.currentSuite = 'Global';
+        this.beforeEachCallbacks = [];
     }
 
     describe(name, callback) {
         this.currentSuite = name;
         callback();
+    }
+
+    beforeEach(callback) {
+        this.beforeEachCallbacks.push({
+            suite: this.currentSuite,
+            callback: callback
+        });
     }
 
     it(name, callback) {
@@ -19,7 +27,7 @@ export class TestRunner {
     }
 
     expect(actual) {
-        return {
+        const matchers = {
             toBe: (expected) => {
                 if (actual !== expected) {
                     throw new Error(`Expected ${expected} but got ${actual}`);
@@ -29,7 +37,7 @@ export class TestRunner {
                 const actualStr = JSON.stringify(actual);
                 const expectedStr = JSON.stringify(expected);
                 if (actualStr !== expectedStr) {
-                    throw new Error(`Expected ${expectedStr} but got ${actualStr}`);
+                    throw new Error(`Expected ${actualStr} to equal ${expectedStr}`);
                 }
             },
             toBeTruthy: () => {
@@ -114,15 +122,35 @@ export class TestRunner {
                 }
             }
         };
+
+        // Add .not modifier
+        matchers.not = {
+            toBe: (expected) => {
+                if (actual === expected) {
+                    throw new Error(`Expected ${actual} not to be ${expected}`);
+                }
+            },
+            toBeNull: () => {
+                if (actual === null) {
+                    throw new Error(`Expected ${actual} not to be null`);
+                }
+            }
+        };
+
+        return matchers;
     }
 
     async run() {
-        const isBrowser = typeof document !== 'undefined';
+        // Robust browser check: must have document AND not be in a mock environment (heuristic)
+        // Or simply check if we are in Node.js by checking process
+        const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+        const isBrowser = !isNode && typeof document !== 'undefined';
+
         let resultsContainer;
 
         if (isBrowser) {
             resultsContainer = document.getElementById('test-results');
-            resultsContainer.innerHTML = '';
+            if (resultsContainer) resultsContainer.innerHTML = '';
         } else {
             console.log('🧪 Running Tests...');
         }
@@ -132,6 +160,12 @@ export class TestRunner {
 
         for (const test of this.tests) {
             try {
+                // Run beforeEach callbacks for this test's suite
+                const suiteBefore = this.beforeEachCallbacks.filter(b => b.suite === test.suite);
+                for (const before of suiteBefore) {
+                    await before.callback();
+                }
+
                 await test.callback();
                 passed++;
                 if (isBrowser) {
@@ -174,4 +208,5 @@ export class TestRunner {
 export const runner = new TestRunner();
 export const describe = runner.describe.bind(runner);
 export const it = runner.it.bind(runner);
+export const beforeEach = runner.beforeEach.bind(runner);
 export const expect = runner.expect.bind(runner);

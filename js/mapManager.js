@@ -6,6 +6,7 @@ export class MapManager {
         this.hexGrid = hexGrid;
         this.tilesDeck = [];
         this.initializeDeck();
+        this.revealedHexes = new Set();
     }
 
     initializeDeck() {
@@ -70,7 +71,7 @@ export class MapManager {
 
     placeTile(centerQ, centerR, terrains) {
         // Place center
-        this.hexGrid.setHex(centerQ, centerR, { terrain: terrains[0] });
+        this.hexGrid.setHex(centerQ, centerR, { terrain: terrains[0], revealed: false });
 
         // Place neighbors
         const neighbors = this.hexGrid.getNeighbors(centerQ, centerR);
@@ -78,7 +79,7 @@ export class MapManager {
             // Only place if empty to avoid overwriting existing map
             if (!this.hexGrid.hasHex(n.q, n.r)) {
                 const terrain = terrains[i + 1] || TERRAIN_TYPES.PLAINS;
-                const hexData = { terrain };
+                const hexData = { terrain, revealed: false };
 
                 // Randomly add a site based on terrain
                 // Chance: 20% per hex
@@ -109,5 +110,24 @@ export class MapManager {
             default:
                 return null;
         }
+    }
+
+    // Reveal map around a center point
+    revealMap(q, r, range = 2) {
+        const hexes = this.hexGrid.getHexesInRange(q, r, range);
+        let newReveals = 0;
+
+        hexes.forEach(hex => {
+            if (this.hexGrid.hasHex(hex.q, hex.r)) {
+                const hexData = this.hexGrid.getHex(hex.q, hex.r);
+                if (!hexData.revealed) {
+                    this.hexGrid.setHex(hex.q, hex.r, { ...hexData, revealed: true });
+                    this.revealedHexes.add(`${hex.q},${hex.r}`);
+                    newReveals++;
+                }
+            }
+        });
+
+        return newReveals;
     }
 }

@@ -712,6 +712,104 @@ body>* {
     justify-content: center;
     font-size: 0.75rem;
     font-weight: bold;
+    z-index: 2;
+}
+
+/* NEW: Enhanced Card Elements */
+.card-icon-large {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    font-size: 3.5rem;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.card-type-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+    letter-spacing: 0.5px;
+}
+
+/* Color-specific card backgrounds */
+.card[data-color="red"] {
+    border-color: rgba(239, 68, 68, 0.5);
+    background: linear-gradient(145deg,
+            rgba(239, 68, 68, 0.08) 0%,
+            #1a1a2e 100%);
+}
+
+.card[data-color="red"]:hover {
+    border-color: #ef4444;
+    box-shadow:
+        0 20px 40px rgba(239, 68, 68, 0.3),
+        0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.card[data-color="blue"] {
+    border-color: rgba(59, 130, 246, 0.5);
+    background: linear-gradient(145deg,
+            rgba(59, 130, 246, 0.08) 0%,
+            #1a1a2e 100%);
+}
+
+.card[data-color="blue"]:hover {
+    border-color: #3b82f6;
+    box-shadow:
+        0 20px 40px rgba(59, 130, 246, 0.3),
+        0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.card[data-color="green"] {
+    border-color: rgba(16, 185, 129, 0.5);
+    background: linear-gradient(145deg,
+            rgba(16, 185, 129, 0.08) 0%,
+            #1a1a2e 100%);
+}
+
+.card[data-color="green"]:hover {
+    border-color: #10b981;
+    box-shadow:
+        0 20px 40px rgba(16, 185, 129, 0.3),
+        0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.card[data-color="white"] {
+    border-color: rgba(156, 163, 175, 0.5);
+    background: linear-gradient(145deg,
+            rgba(156, 163, 175, 0.08) 0%,
+            #1a1a2e 100%);
+}
+
+.card[data-color="white"]:hover {
+    border-color: #9ca3af;
+    box-shadow:
+        0 20px 40px rgba(156, 163, 175, 0.3),
+        0 0 20px rgba(156, 163, 175, 0.2);
+}
+
+.card.wound-card {
+    border-color: #ef4444;
+    background: linear-gradient(145deg,
+            rgba(239, 68, 68, 0.15) 0%,
+            #1a1a2e 100%);
+    filter: grayscale(0.3);
+}
+
+.card.wound-card .card-icon-large {
+    font-size: 4rem;
+    opacity: 0.2;
 }
 
 /* Play Area */
@@ -1919,4 +2017,313 @@ kbd {
 
 .debug-section button:hover {
     background: #444;
+}
+
+/* ===================================
+   TUTORIAL STYLES
+   =================================== */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000;
+    pointer-events: none;
+    animation: tutorialFadeIn 0.3s ease-out;
+}
+
+.tutorial-overlay.hiding {
+    animation: tutorialFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes tutorialFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes tutorialFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.tutorial-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    pointer-events: all;
+}
+
+.tutorial-dialog {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    background: linear-gradient(145deg, #1e1e3a, #16162c);
+    border: 2px solid #fbbf24;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(251, 191, 36, 0.3);
+    pointer-events: all;
+    animation: tutorialSlideUp 0.4s var(--ease-bounce);
+}
+
+@keyframes tutorialSlideUp {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.tutorial-header {
+    margin-bottom: 1rem;
+    border-bottom: 2px solid rgba(251, 191, 36, 0.3);
+    padding-bottom: 0.75rem;
+}
+
+.tutorial-title {
+    font-size: 1.75rem;
+    color: #fbbf24;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+.tutorial-progress {
+    font-size: 0.9rem;
+    color: #9ca3af;
+}
+
+.tutorial-message {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #f3f4f6;
+    margin: 1.5rem 0;
+    white-space: pre-line;
+}
+
+.tutorial-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.btn-tutorial-skip {
+    background: transparent;
+    border: 1px solid #6b7280;
+    color: #9ca3af;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.btn-tutorial-skip:hover {
+    border-color: #9ca3af;
+    color: #f3f4f6;
+}
+
+.btn-tutorial-next {
+    background: linear-gradient(145deg, #fbbf24, #f59e0b);
+    border: none;
+    color: #1a1a2e;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s var(--ease-bounce);
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+
+.btn-tutorial-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+}
+
+.btn-tutorial-next:active {
+    transform: translateY(0);
+}
+
+.tutorial-highlight {
+    position: relative !important;
+    z-index: 9999 !important;
+    box-shadow:
+        0 0 0 4px #fbbf24,
+        0 0 20px 8px rgba(251, 191, 36, 0.6),
+        0 0 40px 12px rgba(251, 191, 36, 0.3) !important;
+    animation: tutorialPulse 2s ease-in-out infinite !important;
+    pointer-events: all !important;
+}
+
+@keyframes tutorialPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 4px #fbbf24,
+            0 0 20px 8px rgba(251, 191, 36, 0.6);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 8px #fbbf24,
+            0 0 30px 12px rgba(251, 191, 36, 0.8);
+    }
+}
+
+/* ===================================
+   UI IMPROVEMENTS
+   =================================== */
+
+/* Floating Text */
+.floating-text {
+    position: fixed;
+    font-weight: bold;
+    font-size: 1.2rem;
+    pointer-events: none;
+    z-index: 9999;
+    animation: floatUp 1.5s ease-out forwards;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-40px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Tooltip Stats */
+.tooltip-stat {
+    padding: 0.5rem;
+}
+
+.tooltip-stat strong {
+    display: block;
+    color: var(--color-accent-gold);
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.tooltip-stat p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Card Hint */
+.card-hint {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+}
+
+.card:hover .card-hint {
+    opacity: 1;
+}
+
+/* Modal Polish */
+.modal-content {
+    background: linear-gradient(145deg, #1e1e3a 0%, #16162c 100%);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(139, 92, 246, 0.2);
+}
+
+.site-modal-content {
+    border-left: 4px solid var(--color-accent-gold);
+}
+
+.site-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.site-icon {
+    font-size: 3rem;
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4));
+}
+
+.site-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #d1d5db;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.site-option-group {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.site-option-title {
+    display: block;
+    font-weight: bold;
+    color: var(--color-accent-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, 0.1);
 }

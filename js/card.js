@@ -285,5 +285,126 @@ export const SAMPLE_ADVANCED_ACTIONS = [
         strongEffect: { movement: 8 },
         manaCost: 1,
         description: 'Basic: 4 Bewegung | Strong: 8 Bewegung'
+    },
+    // New advanced actions
+    {
+        id: 'adv_flame_blast',
+        name: 'Flammenexplosion',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.RED,
+        basicEffect: { attack: 5, element: 'fire' },
+        strongEffect: { attack: 9, element: 'fire', aoe: true },
+        manaCost: 1,
+        description: 'Basic: 5 Feuer-Angriff | Strong: 9 Feuer AoE-Angriff'
+    },
+    {
+        id: 'adv_ice_armor',
+        name: 'Eisrüstung',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.BLUE,
+        basicEffect: { block: 4, element: 'ice' },
+        strongEffect: { block: 7, element: 'ice', freeze: true },
+        manaCost: 1,
+        description: 'Basic: 4 Eis-Block | Strong: 7 Block + Freeze'
+    },
+    {
+        id: 'adv_teleport',
+        name: 'Teleportation',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.GREEN,
+        basicEffect: { movement: 3, ignoresTerrain: true },
+        strongEffect: { movement: 6, ignoresTerrain: true },
+        manaCost: 1,
+        description: 'Basic: 3 Bewegung (ignoriert Terrain) | Strong: 6 Bewegung'
+    },
+    {
+        id: 'adv_storm_strike',
+        name: 'Sturmangriff',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.RED,
+        basicEffect: { attack: 3, movement: 2 },
+        strongEffect: { attack: 6, movement: 4 },
+        manaCost: 1,
+        description: 'Basic: 3 Angriff + 2 Bewegung | Strong: 6 Angriff + 4 Bewegung'
+    },
+    {
+        id: 'adv_mana_storm',
+        name: 'Mana-Sturm',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.WHITE,
+        basicEffect: { influence: 3, drawMana: 1 },
+        strongEffect: { influence: 6, drawMana: 2 },
+        manaCost: 0, // Free mana generation
+        description: 'Basic: 3 Einfluss + 1 Mana | Strong: 6 Einfluss + 2 Mana'
+    },
+    {
+        id: 'adv_berserker_rage',
+        name: 'Berserker-Wut',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.RED,
+        basicEffect: { attack: 6 },
+        strongEffect: { attack: 12, brutal: true },
+        manaCost: 1,
+        description: 'Basic: 6 Angriff | Strong: 12 Brutaler Angriff'
+    },
+    {
+        id: 'adv_shield_wall',
+        name: 'Schildwall',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.BLUE,
+        basicEffect: { block: 5, fortified: true },
+        strongEffect: { block: 10, fortified: true },
+        manaCost: 1,
+        description: 'Basic: 5 Block (Befestigt) | Strong: 10 Block (Befestigt)'
+    },
+    {
+        id: 'adv_heroic_charge',
+        name: 'Heroischer Ansturm',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.GREEN,
+        basicEffect: { movement: 5, attack: 2 },
+        strongEffect: { movement: 8, attack: 5 },
+        manaCost: 1,
+        description: 'Basic: 5 Bewegung + 2 Angriff | Strong: 8 Bewegung + 5 Angriff'
+    },
+    {
+        id: 'adv_crystal_magic',
+        name: 'Kristallmagie',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.WHITE,
+        basicEffect: { influence: 4, healing: 1 },
+        strongEffect: { influence: 8, healing: 3 },
+        manaCost: 1,
+        description: 'Basic: 4 Einfluss + 1 Heilung | Strong: 8 Einfluss + 3 Heilung'
+    },
+    {
+        id: 'adv_shadow_step',
+        name: 'Schattenschritt',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.GREEN,
+        basicEffect: { movement: 4, stealth: true },
+        strongEffect: { movement: 7, stealth: true, ignoreEnemies: true },
+        manaCost: 1,
+        description: 'Basic: 4 Verstohlen | Strong: 7 Bewegung (ignoriert Gegner)'
+    },
+    {
+        id: 'adv_divine_smite',
+        name: 'Göttlicher Schlag',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.RED,
+        basicEffect: { attack: 4, element: 'holy' },
+        strongEffect: { attack: 8, element: 'holy', piercing: true },
+        manaCost: 1,
+        description: 'Basic: 4 Heiliger Angriff | Strong: 8 Durchdringender Angriff'
+    },
+    {
+        id: 'adv_tactical_retreat',
+        name: 'Taktischer Rückzug',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.BLUE,
+        basicEffect: { block: 3, movement: 2 },
+        strongEffect: { block: 6, movement: 4 },
+        manaCost: 1,
+        description: 'Basic: 3 Block + 2 Bewegung | Strong: 6 Block + 4 Bewegung'
     }
 ];

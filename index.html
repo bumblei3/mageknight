@@ -478,6 +478,30 @@
         </div>
     </div>
 
+    <!-- Level Up Modal -->
+    <div id="level-up-modal" class="modal">
+        <div class="modal-content level-up-content">
+            <h2 class="modal-title">Stufenaufstieg!</h2>
+            <div class="level-up-message">Du hast Stufe <span id="new-level-display">2</span> erreicht!</div>
+
+            <div class="level-up-section">
+                <h3>Wähle eine Fertigkeit:</h3>
+                <div id="skill-choices" class="choices-grid">
+                    <!-- Skills will be rendered here -->
+                </div>
+            </div>
+
+            <div class="level-up-section">
+                <h3>Wähle eine Fortgeschrittene Aktion:</h3>
+                <div id="card-choices" class="choices-grid">
+                    <!-- Cards will be rendered here -->
+                </div>
+            </div>
+
+            <button id="confirm-level-up" class="btn btn-primary" disabled>Bestätigen</button>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script type="module" src="js/game.js"></script>
 </body>

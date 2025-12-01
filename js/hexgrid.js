@@ -83,7 +83,7 @@ export class HexGrid {
     // Draw a single hexagon
     drawHex(q, r, options = {}) {
         const pos = this.axialToPixel(q, r);
-        const { fillColor = '#1a1a2e', strokeColor = '#374151', lineWidth = 2, highlight = false } = options;
+        const { fillColor = '#1a1a2e', strokeColor = '#374151', lineWidth = 2, highlight = false, revealed = true } = options;
 
         // Draw hex path
         this.ctx.beginPath();
@@ -113,6 +113,19 @@ export class HexGrid {
 
         this.ctx.fillStyle = gradient;
         this.ctx.fill();
+
+        // Fog of War overlay
+        if (!revealed) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            this.ctx.fill();
+
+            // Question mark for unrevealed
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            this.ctx.font = '20px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText('?', pos.x, pos.y);
+        }
 
         // Add inner shadow for depth
         this.ctx.save();
@@ -201,7 +214,10 @@ export class HexGrid {
     // Add hex data to the grid
     setHex(q, r, data) {
         const key = this.getHexKey(q, r);
-        this.hexes.set(key, { q, r, ...data });
+        const existing = this.hexes.get(key) || {};
+        // Default revealed to false if not specified, preserve if existing
+        const revealed = data.revealed !== undefined ? data.revealed : (existing.revealed || false);
+        this.hexes.set(key, { q, r, ...data, revealed });
     }
 
     // Get hex data
@@ -237,8 +253,12 @@ export class HexGrid {
 
             this.drawHex(hexData.q, hexData.r, {
                 fillColor,
-                highlight: isHighlighted || isSelected
+                highlight: isHighlighted || isSelected,
+                revealed: hexData.revealed
             });
+
+            // If not revealed, skip drawing content
+            if (!hexData.revealed) continue;
 
             // Draw terrain icon
             if (hexData.terrain) {
@@ -260,10 +280,10 @@ export class HexGrid {
             }
         }
 
-        // Draw enemies
+        // Draw enemies with enhanced visuals
         enemies.forEach(enemy => {
             if (enemy.position) {
-                this.drawHexIcon(enemy.position.q, enemy.position.r, enemy.icon || '👹', 10);
+                this.drawEnemy(enemy.position.q, enemy.position.r, enemy);
             }
         });
 
@@ -275,6 +295,62 @@ export class HexGrid {
                 const pixel = this.axialToPixel(pos.q, pos.r);
                 this.drawHeroAt(pixel.x, pixel.y);
             }
+        }
+    }
+
+    // Draw enemy with circular 3D token
+    drawEnemy(q, r, enemy) {
+        const pos = this.axialToPixel(q, r);
+        const radius = 18;
+
+        // Outer glow based on enemy color
+        this.ctx.save();
+        this.ctx.shadowColor = enemy.color || '#ef4444';
+        this.ctx.shadowBlur = 10;
+
+        // Circle background with gradient
+        const gradient = this.ctx.createRadialGradient(
+            pos.x - radius * 0.3, pos.y - radius * 0.3, 0,
+            pos.x, pos.y, radius
+        );
+
+        const baseColor = enemy.color || '#ef4444';
+        gradient.addColorStop(0, this.lightenColor(baseColor, 40));
+        gradient.addColorStop(0.6, baseColor);
+        gradient.addColorStop(1, this.darkenColor(baseColor, 20));
+
+        this.ctx.beginPath();
+        this.ctx.arc(pos.x, pos.y + 10, radius, 0, Math.PI * 2);
+        this.ctx.fillStyle = gradient;
+        this.ctx.fill();
+
+        // Border with sheen
+        this.ctx.strokeStyle = this.lightenColor(baseColor, 60);
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        this.ctx.restore();
+
+        // Enemy icon
+        this.ctx.font = '28px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(enemy.icon || '👹', pos.x, pos.y + 10);
+
+        // HP/Armor indicator (small bar above)
+        if (enemy.armor) {
+            const barWidth = 30;
+            const barHeight = 3;
+            const barX = pos.x - barWidth / 2;
+            const barY = pos.y - 12;
+
+            // Background
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            this.ctx.fillRect(barX, barY, barWidth, barHeight);
+
+            // Armor bar
+            const armorPercent = Math.min(1, enemy.armor / 10); // Assume max 10
+            this.ctx.fillStyle = '#3b82f6';
+            this.ctx.fillRect(barX, barY, barWidth * armorPercent, barHeight);
         }
     }
 

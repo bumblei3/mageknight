@@ -105,6 +105,24 @@ export class TooltipManager {
     }
 
     /**
+     * Attach tooltip to an element
+     * @param {HTMLElement} element - Target element
+     * @param {string|Function} content - HTML content or function returning HTML
+     */
+    attachToElement(element, content) {
+        if (!element) return;
+
+        element.addEventListener('mouseenter', () => {
+            const html = typeof content === 'function' ? content() : content;
+            this.showTooltip(element, html);
+        });
+
+        element.addEventListener('mouseleave', () => {
+            this.hideTooltip(100);
+        });
+    }
+
+    /**
      * Position tooltip near element
      * @param {HTMLElement} element - Target element
      */
@@ -283,6 +301,20 @@ export class TooltipManager {
             'gold': '💰'
         };
         return `<span class="mana-icon ${color}">${colors[color] || '💎'}</span>`;
+    }
+    /**
+     * Create HTML for stat tooltip
+     * @param {string} statType - Type of stat
+     * @param {string} description - Description
+     * @returns {string} HTML string
+     */
+    createStatTooltipHTML(statType, description) {
+        return `
+            <div class="tooltip-stat">
+                <strong>${statType}</strong>
+                <p>${description}</p>
+            </div>
+        `;
     }
 }
 

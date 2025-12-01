@@ -1,4 +1,5 @@
 import { runner } from './tests/testRunner.js';
+import './tests/setup.js';
 
 // Import Test Suites
 import './tests/hero.test.js';
@@ -11,6 +12,23 @@ import './tests/mana.test.js';
 import './tests/terrain.test.js';
 import './tests/time.test.js';
 import './tests/unit.test.js';
+import './tests/saveManager.test.js';
+import './tests/card.test.js';
+import './tests/crystalStorage.test.js';
+import './tests/enemy.test.js';
+import './tests/siteInteraction.test.js';
+import './tests/tutorialManager.test.js';
+import './tests/hexgrid.test.js';
+import './tests/game.test.js';
+import './tests/animator.test.js';
+import './tests/particles.test.js';
+import './tests/tooltip.test.js';
+import './tests/debug.test.js';
+import './tests/combo.test.js';
+import './tests/newEnemies.test.js';
+await import('./tests/ui.test.js');
+await import('./tests/combat_advanced.test.js');
+await import('./tests/map_exploration.test.js');
 
 console.log('Starting tests...');
 runner.run();

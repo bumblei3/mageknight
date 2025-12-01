@@ -103,6 +103,10 @@ Das Spiel ist modular aufgebaut:
 - `js/mana.js` - Mana-Quelle und Kristall-Verwaltung
 - `js/terrain.js` - Terrain-Definitionen
 - `js/ui.js` - UI-Rendering und Interaktion
+- `js/tooltip.js` - Tooltip-Management
+- `js/soundManager.js` - Sound-Effekte und Musik
+- `js/skills.js` - Fähigkeiten-System
+- `js/simpleTutorial.js` - Interaktives Tutorial
 
 ### Technologie-Stack
 
@@ -114,25 +118,30 @@ Das Spiel ist modular aufgebaut:
 ## 🎨 Features der Basis-Version
 
 ✅ **Implementiert**:
-- Hex-basiertes Spielfeld
-- Held mit Starter-Deck (16 Karten)
-- Bewegungssystem mit Terrainkosten
-- Kampfsystem (Block, Schaden, Angriff)
-- Mana-Quelle mit Würfeln
-- Verletzungen und Heilung
-- Ruhm-Tracking
-- Gegner-KI (Basis)
+- Hex-basiertes Spielfeld mit verschiedenen Terraintypen
+- Held mit Starter-Deck und Deck-Management
+- Bewegungssystem mit Terrainkosten und Tag/Nacht-Zyklus
+- Kampfsystem (Block, Schaden, Angriff, Resistenzen)
+- Mana-Quelle mit Würfeln und Kristallen
+- Verletzungen, Heilung und Rasten
+- Ruhm-Tracking und Level-Aufstieg
+- Spielplan-Erkundung (neue Tiles aufdecken)
+- Städte, Burgen, Magiertürme und Klöster
+- Einheiten-Rekrutierung in Siedlungen
+- Interaktives Tutorial und Hilfesystem
 
 ❌ **Nicht in Basis-Version**:
-- Spielplan-Erkundung
-- Level-Aufstieg
-- Städte und Orte
-- Fern-/Belagerungsangriffe
-- Einheiten rekrutieren
-- Fortgeschrittene Aktionen/Zauber
+- Fern-/Belagerungsangriffe (teilweise)
+- Fortgeschrittene Aktionen/Zauber (teilweise)
 - Multiplayer
-- Tag/Nacht-Zyklus
+- Verschiedene Szenarien
 
+## ✨ Neue UI-Features
+
+- **Erweiterte Tooltips**: Detaillierte Infos zu Stats, Mana und Phasen via `TooltipManager`.
+- **Visuelles Feedback**: "Floating Text" für sofortiges Feedback bei Stat-Änderungen.
+- **Karten-UX**: Visuelle Hinweise für Rechtsklick-Aktionen (seitlich spielen).
+- **Polished UI**: Verbessertes Design für Modals und Interaktionen.
 ## 🔧 Entwicklung
 
 ### Lokaler Server
@@ -160,7 +169,7 @@ Dann öffne `http://localhost:8000` im Browser.
 
 - Mana-Verstärkung von Karten noch nicht voll implementiert
 - Einige Feind-Fähigkeiten sind vereinfacht
-- Keine Speicherfunktion
+- Speichern/Laden ist experimentell
 - KI ist deterministisch
 
 ## 🚧 Zukünftige Erweiterungen

@@ -37,6 +37,7 @@ await import('./tests/scenarios.test.js');
 await import('./tests/ai_movement.test.js');
 await import('./tests/game_integration.test.js');
 await import('./tests/cardAnimations.test.js');
+await import('./tests/combatAnimations.test.js');
 await import('./tests/combat_scenarios.test.js');
 await import('./tests/fuzz_game.test.js');
 await import('./tests/soundManager.test.js');

@@ -10,6 +10,8 @@ export class HexGrid {
         this.selectedHex = null;
         this.highlightedHexes = new Set();
         this.debugMode = false;
+        this.animationFrame = 0; // For animated water/lava
+        this.ambientLight = 1.0; // Global lighting (0.0-1.0)
     }
 
     // Axial to Pixel conversion
@@ -80,10 +82,14 @@ export class HexGrid {
         return results;
     }
 
+    setTimeOfDay(isNight) {
+        this.ambientLight = isNight ? 0.6 : 1.0; // Darker at night
+    }
+
     // Draw a single hexagon
     drawHex(q, r, options = {}) {
         const pos = this.axialToPixel(q, r);
-        const { fillColor = '#1a1a2e', strokeColor = '#374151', lineWidth = 2, highlight = false, revealed = true } = options;
+        const { fillColor = '#1a1a2e', strokeColor = '#374151', lineWidth = 2, highlight = false, revealed = true, terrain = null } = options;
 
         // Draw hex path
         this.ctx.beginPath();
@@ -99,20 +105,36 @@ export class HexGrid {
         }
         this.ctx.closePath();
 
-        // Create radial gradient for 3D effect
+        // Fill
+        this.ctx.fillStyle = fillColor;
+        this.ctx.fill();
+
+        // Apply Day/Night lighting
+        if (this.ambientLight < 1.0) {
+            this.ctx.fillStyle = `rgba(0, 0, 20, ${1 - this.ambientLight})`;
+            this.ctx.fill();
+        }
+        this.ctx.closePath();
+
+        // Create radial gradient for 3D effect with ambient lighting
         const gradient = this.ctx.createRadialGradient(
             pos.x, pos.y - this.hexSize * 0.3, 0,
             pos.x, pos.y, this.hexSize
         );
 
-        // Parse fill color and create gradient
-        const baseColor = fillColor;
-        gradient.addColorStop(0, this.lightenColor(baseColor, 20));
+        // Apply ambient lighting to colors
+        const baseColor = this.applyLighting(fillColor, this.ambientLight);
+        gradient.addColorStop(0, this.lightenColor(baseColor, 20 * this.ambientLight));
         gradient.addColorStop(0.6, baseColor);
         gradient.addColorStop(1, this.darkenColor(baseColor, 20));
 
         this.ctx.fillStyle = gradient;
         this.ctx.fill();
+
+        // Add terrain-specific texture overlay
+        if (revealed && terrain) {
+            this.drawTerrainTexture(pos, terrain);
+        }
 
         // Fog of War overlay
         if (!revealed) {
@@ -162,6 +184,141 @@ export class HexGrid {
             this.ctx.stroke();
             this.ctx.globalAlpha = 1.0;
         }
+    }
+
+    // Apply lighting to color
+    applyLighting(color, lightLevel) {
+        const num = parseInt(color.replace('#', ''), 16);
+        const factor = lightLevel;
+        const R = Math.floor(((num >> 16) & 0xFF) * factor);
+        const G = Math.floor(((num >> 8) & 0xFF) * factor);
+        const B = Math.floor((num & 0xFF) * factor);
+        return `#${((1 << 24) + (R << 16) + (G << 8) + B).toString(16).slice(1)}`;
+    }
+
+    // Draw terrain-specific texture overlay
+    drawTerrainTexture(pos, terrain) {
+        this.ctx.save();
+
+        // Create clipping region for hex
+        this.ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = 2 * Math.PI / 6 * i;
+            const x = pos.x + this.hexSize * Math.cos(angle);
+            const y = pos.y + this.hexSize * Math.sin(angle);
+            if (i === 0) {
+                this.ctx.moveTo(x, y);
+            } else {
+                this.ctx.lineTo(x, y);
+            }
+        }
+        this.ctx.clip();
+
+        switch (terrain) {
+            case 'water':
+                this.drawWaterTexture(pos);
+                break;
+            case 'forest':
+                this.drawForestTexture(pos);
+                break;
+            case 'mountains':
+                this.drawMountainTexture(pos);
+                break;
+            case 'desert':
+                this.drawDesertTexture(pos);
+                break;
+            case 'plains':
+                this.drawPlainsTexture(pos);
+                break;
+        }
+
+        this.ctx.restore();
+    }
+
+    // Water animation effect
+    drawWaterTexture(pos) {
+        const wave = Math.sin(this.animationFrame * 0.05 + pos.x * 0.01) * 0.1;
+        const wave2 = Math.cos(this.animationFrame * 0.03 + pos.y * 0.01) * 0.1;
+
+        // Animated ripples
+        this.ctx.globalAlpha = 0.15 + wave * 0.1;
+        this.ctx.fillStyle = '#60a5fa';
+        this.ctx.fillRect(pos.x - this.hexSize, pos.y - this.hexSize, this.hexSize * 2, this.hexSize * 2);
+
+        this.ctx.globalAlpha = 0.1 + wave2 * 0.1;
+        this.ctx.fillStyle = '#93c5fd';
+        this.ctx.fillRect(pos.x - this.hexSize / 2, pos.y - this.hexSize / 2, this.hexSize, this.hexSize);
+
+        this.ctx.globalAlpha = 1.0;
+    }
+
+    // Forest texture with subtle dots
+    drawForestTexture(pos) {
+        this.ctx.globalAlpha = 0.08;
+        this.ctx.fillStyle = '#166534';
+
+        // Randomized but consistent dots based on position
+        const seed = pos.x * 7 + pos.y * 13;
+        for (let i = 0; i < 15; i++) {
+            const x = pos.x + (((seed + i * 3) % 100) - 50) * 0.5;
+            const y = pos.y + (((seed + i * 7) % 100) - 50) * 0.5;
+            this.ctx.fillRect(x, y, 2, 2);
+        }
+
+        this.ctx.globalAlpha = 1.0;
+    }
+
+    // Mountain texture with lines
+    drawMountainTexture(pos) {
+        this.ctx.globalAlpha = 0.12;
+        this.ctx.strokeStyle = '#57534e';
+        this.ctx.lineWidth = 1;
+
+        // Diagonal lines for rocky appearance
+        for (let i = -3; i <= 3; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(pos.x + i * 10 - this.hexSize, pos.y - this.hexSize);
+            this.ctx.lineTo(pos.x + i * 10 + this.hexSize, pos.y + this.hexSize);
+            this.ctx.stroke();
+        }
+
+        this.ctx.globalAlpha = 1.0;
+    }
+
+    // Desert texture with sand pattern
+    drawDesertTexture(pos) {
+        this.ctx.globalAlpha = 0.1;
+        this.ctx.fillStyle = '#f59e0b';
+
+        // Wavy sand lines
+        const seed = pos.x * 11 + pos.y * 17;
+        for (let i = 0; i < 8; i++) {
+            const y = pos.y - this.hexSize / 2 + i * 5;
+            const offset = Math.sin((seed + i) * 0.5) * 3;
+            this.ctx.fillRect(pos.x - this.hexSize + offset, y, this.hexSize * 1.5, 1);
+        }
+
+        this.ctx.globalAlpha = 1.0;
+    }
+
+    // Plains texture with subtle grass
+    drawPlainsTexture(pos) {
+        this.ctx.globalAlpha = 0.06;
+        this.ctx.strokeStyle = '#15803d';
+        this.ctx.lineWidth = 1;
+
+        // Vertical grass strokes
+        const seed = pos.x * 5 + pos.y * 11;
+        for (let i = 0; i < 12; i++) {
+            const x = pos.x + (((seed + i * 5) % 100) - 50) * 0.4;
+            const y = pos.y + (((seed + i * 7) % 100) - 50) * 0.4;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, y);
+            this.ctx.lineTo(x, y - 3);
+            this.ctx.stroke();
+        }
+
+        this.ctx.globalAlpha = 1.0;
     }
 
     // Helper function to lighten color
@@ -239,6 +396,7 @@ export class HexGrid {
 
     // Render the entire grid
     render(hero = null, enemies = []) {
+        this.animationFrame++; // Increment for animations
         this.clear();
 
         // Draw all hexes
@@ -254,7 +412,8 @@ export class HexGrid {
             this.drawHex(hexData.q, hexData.r, {
                 fillColor,
                 highlight: isHighlighted || isSelected,
-                revealed: hexData.revealed
+                revealed: hexData.revealed,
+                terrain: hexData.terrain
             });
 
             // If not revealed, skip drawing content

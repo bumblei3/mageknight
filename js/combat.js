@@ -119,6 +119,23 @@ export class Combat {
             this.hero.takeWound();
         }
 
+        // Apply Special Abilities
+        unblockedEnemies.forEach(enemy => {
+            // Poison: Deals 1 extra wound
+            if (enemy.poison || (enemy.abilities && enemy.abilities.includes('poison'))) {
+                this.hero.takeWound();
+                this.woundsReceived++; // Track for reporting
+                // We might want to log this specifically
+            }
+
+            // Vampiric: Heals enemy if they deal damage
+            if (enemy.abilities && enemy.abilities.includes('vampiric')) {
+                if (enemy.currentHealth < enemy.maxHealth) {
+                    enemy.currentHealth = Math.min(enemy.maxHealth, enemy.currentHealth + 1);
+                }
+            }
+        });
+
         this.phase = COMBAT_PHASE.ATTACK;
 
         return {

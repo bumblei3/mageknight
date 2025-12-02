@@ -2,6 +2,7 @@
 
 import TooltipManager from './tooltip.js';
 import { animator, animateCounter } from './animator.js';
+import * as CardAnimations from './cardAnimations.js';
 
 export class UI {
     constructor() {
@@ -58,6 +59,7 @@ export class UI {
             endTurnBtn: document.getElementById('end-turn-btn'),
             restBtn: document.getElementById('rest-btn'),
             exploreBtn: document.getElementById('explore-btn'),
+            newGameBtn: document.getElementById('new-game-btn'),
 
             // Areas
             handCards: document.getElementById('hand-cards'),
@@ -172,14 +174,30 @@ export class UI {
         hand.forEach((card, index) => {
             const cardEl = this.createCardElement(card, index);
 
-            // Add drawing animation with stagger delay
-            cardEl.classList.add('drawing');
-            cardEl.style.animationDelay = `${index * 0.1}s`;
+            // Animate card draw with stagger
+            CardAnimations.animateCardDraw(cardEl, index);
 
             cardEl.addEventListener('click', () => onCardClick(index, card));
             cardEl.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 if (onCardRightClick) onCardRightClick(index, card);
+            });
+
+            // Add 3D tilt on mouse move
+            let isHovering = false;
+            cardEl.addEventListener('mouseenter', () => {
+                isHovering = true;
+            });
+
+            cardEl.addEventListener('mousemove', (e) => {
+                if (isHovering && !card.isWound()) {
+                    CardAnimations.animate3DTilt(cardEl, e.clientX, e.clientY);
+                }
+            });
+
+            cardEl.addEventListener('mouseleave', () => {
+                isHovering = false;
+                CardAnimations.reset3DTilt(cardEl);
             });
 
             // Add tooltip events
@@ -414,6 +432,46 @@ export class UI {
         });
     }
 
+    // Update combat totals (accumulated attack/block)
+    updateCombatTotals(attackTotal, blockTotal, phase) {
+        const totalsDiv = document.getElementById('combat-totals');
+        if (!totalsDiv) {
+            // Create totals div if it doesn't exist
+            const newTotalsDiv = document.createElement('div');
+            newTotalsDiv.id = 'combat-totals';
+            newTotalsDiv.style.cssText = 'margin: 1rem 0; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;';
+            this.elements.combatInfo.insertBefore(newTotalsDiv, this.elements.combatInfo.firstChild);
+        }
+
+        const totalsDisplay = document.getElementById('combat-totals');
+        if (totalsDisplay) {
+            const COMBAT_PHASE = { BLOCK: 'block', ATTACK: 'attack' };
+            let html = '<div style="display: flex; gap: 1rem; justify-content: space-around;">';
+
+            if (phase === COMBAT_PHASE.BLOCK) {
+                html += `<div style="text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8;">Total Block</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #4a9eff;">${blockTotal}</div>
+                </div>`;
+            } else if (phase === COMBAT_PHASE.ATTACK) {
+                html += `<div style="text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8;">Total Attack</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #ff4a4a;">${attackTotal}</div>
+                </div>`;
+            }
+
+            html += '</div>';
+            totalsDisplay.innerHTML = html;
+        }
+
+        // Show/hide execute attack button based on phase
+        const executeAttackBtn = document.getElementById('execute-attack-btn');
+        if (executeAttackBtn) {
+            const COMBAT_PHASE = { ATTACK: 'attack' };
+            executeAttackBtn.style.display = phase === COMBAT_PHASE.ATTACK ? 'block' : 'none';
+        }
+    }
+
     // Get combat phase name
     getCombatPhaseName(phase) {
         const names = {
@@ -604,7 +662,7 @@ export class UI {
 
     // Show played cards area
     showPlayArea() {
-        this.elements.playArea.style.display = 'block';
+        this.elements.playArea.style.display = 'flex';
     }
 
     // Hide played cards area
@@ -617,7 +675,6 @@ export class UI {
     addPlayedCard(card, effect) {
         const cardEl = this.createCardElement(card, -1);
         cardEl.classList.add('played');
-        cardEl.classList.add('playing'); // Trigger play animation
 
         const effectDiv = document.createElement('div');
         effectDiv.style.fontSize = '0.75rem';
@@ -627,6 +684,11 @@ export class UI {
         cardEl.appendChild(effectDiv);
 
         this.elements.playedCards.appendChild(cardEl);
+
+        // Animate card play to area
+        if (this.elements.playArea) {
+            CardAnimations.animateCardPlay(cardEl, this.elements.playArea);
+        }
     }
 
     // Show notification
@@ -759,6 +821,29 @@ export class UI {
 
             this.elements.siteOptions.appendChild(group);
         });
+    }
+
+    // Reset UI for new game
+    reset() {
+        this.clearLog();
+        this.elements.handCards.innerHTML = '';
+        this.elements.playedCards.innerHTML = '';
+        this.hidePlayArea();
+        this.elements.heroUnits.innerHTML = '';
+        this.elements.combatUnits.innerHTML = '';
+        this.hideCombatPanel();
+        this.elements.manaSource.innerHTML = '';
+
+        const heroMana = document.getElementById('hero-mana');
+        if (heroMana) heroMana.innerHTML = '';
+
+        // Reset stats display
+        this.elements.fameValue.textContent = '0';
+        this.elements.reputationValue.textContent = '0';
+        this.elements.movementPoints.textContent = '0';
+        this.elements.heroArmor.textContent = '2'; // Default
+        this.elements.heroHandLimit.textContent = '5'; // Default
+        this.elements.heroWounds.textContent = '0';
     }
 }
 

@@ -3,17 +3,26 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Mage Knight - Base Game</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="combat-effects.css">
+    <link rel="stylesheet" href="time-effects.css">
+    <link rel="stylesheet" href="mobile.css">
 </head>
 
 <body>
-    <div class="game-container">
+    <div class="game-container" id="game-container">
         <!-- Header -->
-        <header class="game-header">
+        <header>
             <div class="header-left">
-                <h1>🗡️ MAGE KNIGHT</h1>
+                <h1>Mage Knight</h1>
+                <div class="time-indicator-container">
+                    <span id="time-icon" class="time-icon">☀️</span>
+                    <span class="round-display">Runde <span id="round-number" class="round-number">1</span></span>
+                </div>
             </div>
             <div class="header-right">
                 <div class="stat-pill">
@@ -24,9 +33,12 @@
                     <span class="stat-label">Ansehen</span>
                     <span class="stat-value" id="reputation-value">0</span>
                 </div>
+                <button class="btn-icon" id="new-game-btn" title="Neues Spiel">🔄</button>
                 <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)">💾</button>
                 <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)">📂</button>
                 <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
+                <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen">🏆</button>
+                <button class="btn-icon" id="statistics-btn" title="Statistiken anzeigen">📊</button>
             </div>
         </header>
 
@@ -113,6 +125,11 @@
                     <div class="combat-units" id="combat-units" style="margin-top: 1rem;">
                         <!-- Units available in combat -->
                     </div>
+                    <div class="combat-actions"
+                        style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button class="btn btn-primary" id="execute-attack-btn" style="display: none;">⚔️ Angriff
+                            ausführen</button>
+                    </div>
                 </div>
 
                 <div class="panel log-panel">
@@ -152,19 +169,19 @@
             </div>
         </div>
 
-        <!-- Hand Cards Area -->
+        <!-- Hand Cards Area with integrated Play Area -->
         <div class="hand-area">
             <h2>Handkarten</h2>
             <div class="cards-container" id="hand-cards">
                 <!-- Cards will be added dynamically -->
             </div>
-        </div>
 
-        <!-- Play Area -->
-        <div class="play-area" id="play-area" style="display: none;">
-            <h3>Gespielte Karten</h3>
-            <div class="played-cards" id="played-cards">
-                <!-- Played cards will be shown here -->
+            <!-- Play Area - Integrated -->
+            <div class="play-area" id="play-area" style="display: none;">
+                <h3>Gespielt</h3>
+                <div class="played-cards" id="played-cards">
+                    <!-- Played cards will be shown here -->
+                </div>
             </div>
         </div>
     </div>
@@ -502,7 +519,51 @@
         </div>
     </div>
 
+    <!-- Achievements Modal -->
+    <div class="modal" id="achievements-modal">
+        <div class="modal-content achievements-modal-content">
+            <span class="modal-close" id="achievements-close">&times;</span>
+            <h2>🏆 Erfolge</h2>
+            <div class="achievements-summary">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="achievements-progress-bar" style="width: 0%"></div>
+                </div>
+                <span id="achievements-progress-text">0/0 Freigeschaltet</span>
+            </div>
+            <div class="achievements-tabs">
+                <button class="tab-btn active" data-category="all">Alle</button>
+                <button class="tab-btn" data-category="combat">Kampf</button>
+                <button class="tab-btn" data-category="exploration">Erkundung</button>
+                <button class="tab-btn" data-category="progression">Fortschritt</button>
+                <button class="tab-btn" data-category="mastery">Meisterschaft</button>
+            </div>
+            <div class="achievements-list" id="achievements-list">
+                <!-- Achievements will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div class="modal" id="statistics-modal">
+        <div class="modal-content statistics-modal-content">
+            <span class="modal-close" id="statistics-close">&times;</span>
+            <h2>📊 Statistiken</h2>
+            <div class="statistics-tabs">
+                <button class="tab-btn active" data-category="global">Global</button>
+                <button class="tab-btn" data-category="current">Aktuelles Spiel</button>
+            </div>
+            <div class="statistics-grid" id="statistics-grid">
+                <!-- Statistics will be injected here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <!-- Day/Night Transition Overlay -->
+    <div id="day-night-overlay" class="day-night-overlay">
+        <div id="day-night-message" class="day-night-message">Nacht bricht herein...</div>
+    </div>
+
     <script type="module" src="js/game.js"></script>
 </body>
 

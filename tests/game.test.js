@@ -102,12 +102,21 @@ describe('Game Core', () => {
     });
 
     it('should create enemies', () => {
+        // Place a tile further away to allow enemy spawning
+        // q=3, r=0 is far enough (dist > 1)
+        game.mapManager.placeTile(3, 0, [
+            'plains', 'plains', 'plains', 'plains', 'plains', 'plains', 'plains'
+        ]);
+        game.createEnemies();
         expect(game.enemies.length).toBeGreaterThan(0);
     });
 
     it('should handle canvas click (selection)', () => {
         // Mock click event
         const event = { clientX: 400, clientY: 300 }; // Center
+
+        // Mock pixelToAxial to return 0,0
+        game.hexGrid.pixelToAxial = () => ({ q: 0, r: 0 });
 
         // Should select hex at 0,0
         game.handleCanvasClick(event);
@@ -147,7 +156,20 @@ describe('Game Core', () => {
     });
 
     it('should initiate combat', () => {
-        const enemy = game.enemies[0];
+        // Create a mock enemy
+        const enemy = {
+            id: 'e1',
+            name: 'Orc',
+            color: 'green',
+            armor: 3,
+            attack: 4,
+            fame: 2,
+            icon: 'O',
+            getEffectiveAttack: () => 4,
+            getBlockRequirement: () => 4
+        };
+        game.enemies = [enemy];
+
         game.initiateCombat(enemy);
 
         expect(game.combat).toBeDefined();

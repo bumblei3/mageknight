@@ -4,7 +4,10 @@ export const ENEMY_TYPES = {
     ORC: 'orc',
     DRACONUM: 'draconum',
     MAGE_TOWER: 'magetower',
-    ROBBER: 'robber'
+    ROBBER: 'robber',
+    NECROMANCER: 'necromancer',
+    ELEMENTAL: 'elemental',
+    BOSS: 'boss'
 };
 
 export class Enemy {
@@ -187,6 +190,38 @@ export const ENEMY_DEFINITIONS = {
         attackType: 'physical',
         icon: '🦇',
         color: '#7c2d12'
+    },
+    [ENEMY_TYPES.NECROMANCER]: {
+        name: 'Nekromant',
+        armor: 4,
+        attack: 3,
+        fame: 5,
+        poison: true,
+        icon: '💀',
+        color: '#7c3aed'
+    },
+    [ENEMY_TYPES.ELEMENTAL]: {
+        name: 'Feuer-Elementar',
+        armor: 6,
+        attack: 5,
+        fame: 6,
+        fireResist: true,
+        attackType: 'fire',
+        icon: '🔥',
+        color: '#f97316'
+    },
+    [ENEMY_TYPES.BOSS]: {
+        name: 'Dunkler Lord',
+        armor: 10,
+        attack: 8,
+        fame: 20,
+        fortified: true,
+        brutal: true,
+        fireResist: true,
+        iceResist: true,
+        physicalResist: true,
+        icon: '👿',
+        color: '#000000'
     }
 };
 

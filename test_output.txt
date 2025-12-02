@@ -1,0 +1,105 @@
+Starting tests...
+🧪 Running Tests...
+Game saved to slot 0
+Game saved to slot 1
+No save found in slot 3
+Game saved to slot 0
+Game saved to slot 2
+Deleted save in slot 2
+No save found in slot 2
+Game saved to slot 0
+Game saved to slot 1
+Game saved to slot 2
+Game saved to slot 0
+All saves cleared
+No save found in slot 0
+Unknown enemy type: unknown_type
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should initialize game state
+   this.ctx.createRadialGradient is not a function
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should create game board
+   this.ctx.createRadialGradient is not a function
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should create enemies
+   this.ctx.createRadialGradient is not a function
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should handle canvas click (selection)
+   this.ctx.createRadialGradient is not a function
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should enter movement mode
+   this.ctx.createRadialGradient is not a function
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should exit movement mode
+   this.ctx.createRadialGradient is not a function
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should end turn
+   this.ctx.createRadialGradient is not a function
+Web Audio API not supported TypeError: (window.AudioContext || window.webkitAudioContext) is not a constructor
+    at new SoundManager (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/soundManager.js:12:33)
+    at new MageKnightGame (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/game.js:57:22)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game.test.js:86:16)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:166:34)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 0 enemies.
+❌ Game Core: should initiate combat
+   this.ctx.createRadialGradient is not a function
+❌ TooltipManager: should prevent tooltip overflow on right edge
+   Expected 1100 to be less than or equal to 1024
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+
+Total: 249 | Passed: 240 | Failed: 9

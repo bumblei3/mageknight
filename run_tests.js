@@ -25,10 +25,35 @@ import './tests/particles.test.js';
 import './tests/tooltip.test.js';
 import './tests/debug.test.js';
 import './tests/combo.test.js';
-import './tests/newEnemies.test.js';
+import './tests/skills.test.js';
+import './tests/timeManager.test.js';
 await import('./tests/ui.test.js');
 await import('./tests/combat_advanced.test.js');
 await import('./tests/map_exploration.test.js');
+await import('./tests/enemy_spawning.test.js');
+await import('./tests/game_reset.test.js');
+await import('./tests/ui_reset.test.js');
+await import('./tests/scenarios.test.js');
+await import('./tests/ai_movement.test.js');
+await import('./tests/game_integration.test.js');
+await import('./tests/cardAnimations.test.js');
+await import('./tests/combat_scenarios.test.js');
+await import('./tests/fuzz_game.test.js');
+await import('./tests/soundManager.test.js');
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const options = {};
+
+for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--grep' && i + 1 < args.length) {
+        options.grep = args[i + 1];
+        i++;
+    }
+}
 
 console.log('Starting tests...');
-runner.run();
+if (options.grep) {
+    console.log(`Filtering tests by: "${options.grep}"`);
+}
+runner.run(options);

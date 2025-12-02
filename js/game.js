@@ -3,7 +3,7 @@
 import { HexGrid } from './hexgrid.js';
 import Hero from './hero.js';
 import { ManaSource } from './mana.js';
-import { createEnemies } from './enemy.js';
+import { EnemyAI } from './enemyAI.js';
 import { Combat, COMBAT_PHASE } from './combat.js';
 import UI from './ui.js';
 import Terrain, { TERRAIN_TYPES } from './terrain.js';
@@ -17,8 +17,13 @@ import { SiteInteractionManager } from './siteInteraction.js';
 import { createUnit } from './unit.js';
 import { DebugManager } from './debug.js';
 import { getRandomSkills } from './skills.js';
-import { SAMPLE_ADVANCED_ACTIONS, createDeck } from './card.js';
+import { SAMPLE_ADVANCED_ACTIONS, createDeck, Card } from './card.js';
 import SimpleTutorial from './simpleTutorial.js';
+import SoundManager from './soundManager.js';
+import TouchController from './touchController.js';
+import AchievementManager from './achievements.js';
+import StatisticsManager from './statistics.js';
+import { createEnemy } from './enemy.js';
 
 export class MageKnightGame {
     constructor() {
@@ -49,16 +54,68 @@ export class MageKnightGame {
         this.debugManager = null;
         this.debugTeleport = false;
 
+        // Sound System
+        this.sound = new SoundManager();
+
+        // Touch Controller for mobile
+        this.touchController = null;
+
+        // Achievements and Statistics
+        this.achievementManager = new AchievementManager();
+        this.statisticsManager = new StatisticsManager();
+
+        // Enemy AI
+        this.enemyAI = new EnemyAI(this);
+
         this.init();
     }
 
     init() {
-        // Create initial game board
-        this.createGameBoard();
+        this.initializeSystem();
+        this.startNewGame();
+    }
+
+    initializeSystem() {
+        // Setup UI event listeners
+        this.setupEventListeners();
+
+        // Setup Time Manager Listener
+        this.setupTimeListener();
+
+        // Initialize tutorial manager
+        this.tutorialManager = new TutorialManager(this);
+        this.simpleTutorial = new SimpleTutorial(this);
+
+        // Initialize touch controls if on mobile device
+        if (TouchController.isTouchDevice()) {
+            this.touchController = new TouchController(this);
+            this.ui.addLog('Touch-Steuerung aktiviert', 'info');
+        }
+
         this.setupParticleSystem();
+        this.debugManager = new DebugManager(this);
+    }
+
+    startNewGame() {
+        // Reset Game State
+        this.turnNumber = 0;
+        this.gameState = 'playing';
+        this.selectedCard = null;
+        this.movementMode = false;
+        this.reachableHexes = [];
+
+        // Clear particles
+        if (this.particleSystem) {
+            this.particleSystem.clear();
+        }
+
+        // Create initial game board
+        this.mapManager = new MapManager(this.hexGrid); // Re-init map manager to clear map
+        this.createGameBoard();
+        // this.setupParticleSystem(); // Moved to initializeSystem
 
         // Init Debug
-        this.debugManager = new DebugManager(this);
+        // this.debugManager = new DebugManager(this); // Moved to initializeSystem
 
         // Create hero
         this.hero = new Hero('Goldyx', { q: 0, r: 0 });
@@ -70,15 +127,8 @@ export class MageKnightGame {
         // Create enemies
         this.createEnemies();
 
-        // Setup UI event listeners
-        this.setupEventListeners();
-
         // Initial render
         this.render();
-
-        // Initialize tutorial manager
-        this.tutorialManager = new TutorialManager(this);
-        this.simpleTutorial = new SimpleTutorial(this);
 
         // Show interactive tutorial on first visit
         if (this.simpleTutorial.shouldStart()) {
@@ -87,10 +137,21 @@ export class MageKnightGame {
 
         this.ui.addLog('Willkommen bei Mage Knight!', 'info');
         this.ui.addLog('Spiel gestartet. Viel Erfolg!', 'info');
+        this.updatePhaseIndicator();
+        this.renderHand();
+        this.renderMana();
+        this.ui.updateHeroStats(this.hero);
+    }
+
+    reset() {
+        if (confirm('Möchtest du wirklich ein neues Spiel starten? Der aktuelle Fortschritt geht verloren.')) {
+            this.ui.reset();
+            this.startNewGame();
+        }
     }
 
     createGameBoard() {
-        // Create starting map (just one tile initially)
+        // Create starting map (multiple tiles for enemy spawning)
         this.mapManager.placeTile(0, 0, [
             TERRAIN_TYPES.PLAINS,
             TERRAIN_TYPES.FOREST,
@@ -101,17 +162,73 @@ export class MageKnightGame {
             TERRAIN_TYPES.WATER
         ]);
 
-        // Reveal starting area
-        this.mapManager.revealMap(0, 0, 2);
+        // Add adjacent tiles for enemy spawning areas
+        this.mapManager.placeTile(3, 0, [
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.WASTELAND, // Was RUINS - use wasteland as base terrain
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.FOREST
+        ]);
+
+        this.mapManager.placeTile(0, 3, [
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.HILLS, // Was KEEP - use hills as base terrain
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.DESERT
+        ]);
+
+        this.mapManager.placeTile(-3, 0, [
+            TERRAIN_TYPES.DESERT,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.MOUNTAINS, // Was MAGE_TOWER - use mountains as base terrain
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.PLAINS
+        ]);
+
+        // Reveal starting area (increased radius to show all initial tiles)
+        this.mapManager.revealMap(0, 0, 4);
     }
 
     createEnemies() {
-        // Place a few enemies on the map
-        this.enemies = createEnemies([
-            { type: 'weakling', position: { q: 2, r: 0 } },
-            { type: 'orc', position: { q: -2, r: 1 } },
-            { type: 'guard', position: { q: 0, r: 2 } }
-        ]);
+        this.enemies = [];
+        // Generate enemies for all hexes that should have them
+        this.hexGrid.hexes.forEach((hex, key) => {
+            // Skip starting area (0,0) and adjacent
+            if (Math.abs(hex.q) <= 1 && Math.abs(hex.r) <= 1) return;
+
+            // Chance to spawn enemy based on terrain
+            let shouldSpawn = false;
+            const terrainName = this.terrain.getName(hex.terrain);
+
+            if (['ruins', 'keep', 'mage_tower', 'city'].includes(terrainName)) {
+                shouldSpawn = true;
+            } else if (Math.random() < 0.3 && terrainName !== 'water') {
+                shouldSpawn = true;
+            }
+
+            if (shouldSpawn) {
+                // Calculate level based on distance from center
+                const distance = Math.max(Math.abs(hex.q), Math.abs(hex.r), Math.abs(hex.q + hex.r));
+                const level = Math.max(1, Math.floor(distance / 2));
+
+                const enemy = this.enemyAI.generateEnemy(terrainName, level);
+                enemy.position = { q: hex.q, r: hex.r };
+                // Ensure unique ID
+                enemy.id = `enemy_${hex.q}_${hex.r}_${Date.now()}`;
+
+                this.enemies.push(enemy);
+            }
+        });
+
+        console.log(`Spawned ${this.enemies.length} enemies.`);
     }
 
     setupParticleSystem() {
@@ -164,11 +281,20 @@ export class MageKnightGame {
         const visitBtn = document.getElementById('visit-btn');
         if (visitBtn) visitBtn.addEventListener('click', () => this.visitSite());
 
+        // Execute Attack button (combat action)
+        const executeAttackBtn = document.getElementById('execute-attack-btn');
+        if (executeAttackBtn) executeAttackBtn.addEventListener('click', () => this.executeAttackAction());
+
         // Save/Load buttons
         const saveBtn = document.getElementById('save-btn');
         const loadBtn = document.getElementById('load-btn');
         if (saveBtn) saveBtn.addEventListener('click', () => this.openSaveDialog());
         if (loadBtn) loadBtn.addEventListener('click', () => this.openLoadDialog());
+
+        // New Game button
+        if (this.ui.elements.newGameBtn) {
+            this.ui.elements.newGameBtn.addEventListener('click', () => this.reset());
+        }
 
         // Canvas click for movement
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
@@ -179,20 +305,14 @@ export class MageKnightGame {
             this.ui.tooltipManager.hideTooltip();
         });
 
-        // Card selection
-        this.renderHand();
-
-        // Mana dice
-        this.renderMana();
-
         // Help system
         this.setupHelpSystem();
 
         // Keyboard shortcuts
         this.setupKeyboardShortcuts();
 
-        // Phase updates
-        this.updatePhaseIndicator();
+        // Sound toggle
+        this.setupSoundToggle();
     }
 
     setupKeyboardShortcuts() {
@@ -533,6 +653,7 @@ export class MageKnightGame {
         }
 
         if (card.isWound()) {
+            this.sound.error();
             this.ui.addLog('Verletzungen können nicht gespielt werden.', 'info');
             return;
         }
@@ -540,9 +661,17 @@ export class MageKnightGame {
         // Play card for basic effect
         const result = this.hero.playCard(index, false);
         if (result) {
+            this.sound.cardPlay();
             this.ui.addLog(`${result.card.name} gespielt: ${this.ui.formatEffect(result.effect)}`, 'info');
             this.ui.addPlayedCard(result.card, result.effect);
             this.ui.showPlayArea();
+
+            // Particle Effect
+            const rect = this.ui.elements.playedCards.getBoundingClientRect();
+            // Center of the last played card (approximate)
+            const x = rect.right - 50;
+            const y = rect.top + 75;
+            this.particleSystem.playCardEffect(x, y, result.card.color);
 
             // If movement was gained, enter movement mode
             if (result.effect.movement && result.effect.movement > 0) {
@@ -568,6 +697,14 @@ export class MageKnightGame {
             const effectType = options[chosen - 1];
             const result = this.hero.playCardSideways(index, effectType);
             if (result) {
+                this.sound.cardPlaySideways();
+
+                // Particle Effect
+                const rect = this.ui.elements.handCards.getBoundingClientRect();
+                const x = rect.left + (rect.width / 2);
+                const y = rect.top + 50;
+                this.particleSystem.playCardEffect(x, y, result.card.color);
+
                 this.ui.addLog(`${result.card.name} seitlich gespielt: ${this.ui.formatEffect(result.effect)}`, 'info');
                 this.renderHand();
                 this.updateStats();
@@ -641,6 +778,7 @@ export class MageKnightGame {
         const startR = this.hero.displayPosition.r;
 
         if (this.hero.moveTo(q, r, moveCost)) {
+            this.sound.move();
             const terrainName = this.terrain.getName(hexData.terrain);
             this.ui.addLog(`Bewegt nach ${q},${r} (${terrainName}) - ${moveCost} Kosten`, 'movement');
 
@@ -735,6 +873,10 @@ export class MageKnightGame {
         this.combat = new Combat(this.hero, enemy);
         const result = this.combat.start();
 
+        // Initialize combat accumulation
+        this.combatAttackTotal = 0;
+        this.combatBlockTotal = 0;
+
         this.ui.addLog(result.message, 'combat');
         this.ui.showCombatPanel(this.combat.enemies, this.combat.phase);
 
@@ -743,61 +885,56 @@ export class MageKnightGame {
 
         this.updatePhaseIndicator();
         this.renderHand();
+        this.updateCombatTotals();
     }
 
     playCardInCombat(index, card) {
         if (!this.combat || card.isWound()) return;
 
         const phase = this.combat.phase;
+        const result = this.hero.playCard(index, false);
 
-        if (phase === COMBAT_PHASE.BLOCK) {
-            // Play for block
-            const result = this.hero.playCard(index, false);
-            if (result && result.effect.block) {
-                this.ui.addLog(`Block gespielt: +${result.effect.block}`, 'combat');
+        if (!result) return;
 
-                // Try to block enemy
-                const enemy = this.combat.enemies[0];
-                const blockResult = this.combat.blockEnemy(enemy, result.effect.block);
-                this.ui.addLog(blockResult.message, 'combat');
+        // Particle Effect
+        const rect = this.ui.elements.playedCards.getBoundingClientRect();
+        const x = rect.right - 50;
+        const y = rect.top + 75;
+        this.particleSystem.playCardEffect(x, y, result.card.color);
 
-                this.renderHand();
-                this.updateStats();
-            }
-        } else if (phase === COMBAT_PHASE.ATTACK) {
-            // Play for attack
-            const result = this.hero.playCard(index, false);
-            if (result && result.effect.attack) {
-                this.ui.addLog(`Angriff gespielt: +${result.effect.attack}`, 'combat');
+        // Build effect description
+        const effectParts = [];
 
-                // Particle Impact on enemies
-                this.combat.enemies.forEach(enemy => {
-                    const pixelPos = this.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
-                    this.particleSystem.impactEffect(pixelPos.x, pixelPos.y);
-                });
-
-                // Try to defeat enemies
-                const attackElement = result.effect.element || 'physical';
-                const attackResult = this.combat.attackEnemies(result.effect.attack, attackElement);
-                this.ui.addLog(attackResult.message, 'combat');
-
-                if (attackResult.success) {
-                    // Remove defeated enemies from map
-                    this.enemies = this.enemies.filter(e =>
-                        !attackResult.defeated.includes(e)
-                    );
-
-                    // Check if combat is over
-                    if (this.combat.enemies.length === 0) {
-                        this.endCombat();
-                    }
-                }
-
-                this.renderHand();
-                this.updateStats();
-                this.render();
-            }
+        // Accumulate attack and block values
+        if (phase === COMBAT_PHASE.BLOCK && result.effect.block) {
+            this.combatBlockTotal += result.effect.block;
+            effectParts.push(`+${result.effect.block} Block`);
         }
+
+        if (phase === COMBAT_PHASE.ATTACK && result.effect.attack) {
+            this.combatAttackTotal += result.effect.attack;
+            effectParts.push(`+${result.effect.attack} Angriff`);
+        }
+
+        // Other effects (movement, influence, etc.) are also applied
+        if (result.effect.movement) {
+            effectParts.push(`+${result.effect.movement} Bewegung`);
+        }
+        if (result.effect.influence) {
+            effectParts.push(`+${result.effect.influence} Einfluss`);
+        }
+        if (result.effect.healing) {
+            effectParts.push(`+${result.effect.healing} Heilung`);
+        }
+
+        const effectDesc = effectParts.length > 0 ? effectParts.join(', ') : 'Effekt';
+        this.ui.addLog(`${result.card.name}: ${effectDesc}`, 'combat');
+        this.ui.addPlayedCard(result.card, result.effect);
+        this.ui.showPlayArea();
+
+        this.renderHand();
+        this.updateStats();
+        this.updateCombatTotals();
     }
 
     // Render units available for combat
@@ -838,15 +975,36 @@ export class MageKnightGame {
     endBlockPhase() {
         if (!this.combat) return;
 
+        // Use accumulated block values to block enemies
+        if (this.combatBlockTotal > 0) {
+            // Try to block enemies with accumulated block
+            this.combat.enemies.forEach(enemy => {
+                const blockResult = this.combat.blockEnemy(enemy, this.combatBlockTotal);
+                if (blockResult.blocked) {
+                    this.ui.addLog(`${enemy.name} geblockt mit ${this.combatBlockTotal} Block`, 'combat');
+                }
+            });
+        }
+
         const result = this.combat.endBlockPhase();
+
+        // Particle Effect for Damage
+        if (result.woundsReceived > 0) {
+            const heroPixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
+            this.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
+        }
         this.ui.addLog(result.message, 'combat');
         this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase);
+
+        // Reset block total, prepare for attack phase
+        this.combatBlockTotal = 0;
 
         // Update unit display for new phase
         this.renderUnitsInCombat();
 
         this.updatePhaseIndicator();
         this.updateStats();
+        this.updateCombatTotals();
     }
 
     endCombat() {
@@ -855,12 +1013,69 @@ export class MageKnightGame {
         const result = this.combat.endCombat();
         this.ui.addLog(result.message, result.victory ? 'info' : 'combat');
 
+        // Reset combat accumulation
+        this.combatAttackTotal = 0;
+        this.combatBlockTotal = 0;
+        this.combat = null;
+
         this.render();
+    }
+
+    // Update combat totals display in UI
+    updateCombatTotals() {
+        if (!this.combat) return;
+        this.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.combat.phase);
+    }
+
+    // Execute attack with accumulated attack values
+    executeAttackAction() {
+        if (!this.combat || this.combat.phase !== COMBAT_PHASE.ATTACK) return;
+
+        if (this.combatAttackTotal === 0) {
+            this.ui.addLog('Keine Angriffspunkte verfügbar!', 'info');
+            return;
+        }
+
+        // Particle Impact on enemies
+        this.combat.enemies.forEach(enemy => {
+            const pixelPos = this.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+            this.particleSystem.impactEffect(pixelPos.x, pixelPos.y);
+        });
+
+        // Try to defeat enemies
+        const attackResult = this.combat.attackEnemies(this.combatAttackTotal, 'physical');
+        this.ui.addLog(attackResult.message, 'combat');
+
+        if (attackResult.success) {
+            // Track defeated enemies
+            attackResult.defeated.forEach(enemy => {
+                this.statisticsManager.trackEnemyDefeated(enemy);
+            });
+
+            // Remove defeated enemies from map
+            this.enemies = this.enemies.filter(e =>
+                !attackResult.defeated.includes(e)
+            );
+
+            // Check if combat is over
+            if (this.combat.enemies.length === 0) {
+                this.endCombat();
+                return;
+            }
+        }
+
+        // Reset attack total after use
+        this.combatAttackTotal = 0;
+
+        this.render();
+        this.updateStats();
+        this.updateCombatTotals();
     }
 
     gainFame(amount) {
         const result = this.hero.gainFame(amount);
         if (result.leveledUp) {
+            this.statisticsManager.trackLevelUp(result.newLevel);
             this.ui.addLog(`🎉 STUFENAUFSTIEG! Stufe ${result.newLevel} erreicht!`, 'success');
             this.ui.showNotification(`Stufe ${result.newLevel} erreicht!`, 'success');
             this.triggerLevelUp(result.newLevel);
@@ -896,6 +1111,10 @@ export class MageKnightGame {
 
         // Apply Level Up stats
         this.hero.levelUp();
+
+        // Particle Effect
+        const heroPixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
+        this.particleSystem.levelUpExplosion(heroPixel.x, heroPixel.y);
 
         this.updateStats();
         this.render();
@@ -947,6 +1166,7 @@ export class MageKnightGame {
         }
 
         this.turnNumber++;
+        this.statisticsManager.trackTurn();
         this.hero.endTurn();
         this.manaSource.returnDice();
         this.exitMovementMode();
@@ -982,6 +1202,9 @@ export class MageKnightGame {
         // Check victory condition
         if (this.enemies.length === 0) {
             this.gameState = 'victory';
+            this.statisticsManager.endGame(true);
+            this.statisticsManager.set('turns', this.turnNumber);
+            this.checkAndShowAchievements();
             this.ui.addLog('🎉 SIEG! Alle Feinde wurden besiegt!', 'info');
             this.ui.setButtonEnabled(this.ui.elements.endTurnBtn, false);
         }
@@ -992,6 +1215,9 @@ export class MageKnightGame {
             this.ui.addLog('Kann nicht im Kampf rasten!', 'info');
             return;
         }
+        // Particle Effect
+        const heroPixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
+        this.particleSystem.healAura(heroPixel.x, heroPixel.y);
 
         // Simple rest: discard one card
         if (this.hero.hand.length > 0) {
@@ -1113,10 +1339,10 @@ export class MageKnightGame {
 
         // Restore hero
         this.hero.position = state.hero.position;
-        this.hero.deck = state.hero.deck;
-        this.hero.hand = state.hero.hand;
-        this.hero.discard = state.hero.discard;
-        this.hero.wounds = state.hero.wounds;
+        this.hero.deck = state.hero.deck.map(c => new Card(c));
+        this.hero.hand = state.hero.hand.map(c => new Card(c));
+        this.hero.discard = state.hero.discard.map(c => new Card(c));
+        this.hero.wounds = state.hero.wounds.map(c => new Card(c));
         this.hero.fame = state.hero.fame;
         this.hero.reputation = state.hero.reputation;
         this.hero.crystals = state.hero.crystals;
@@ -1127,10 +1353,26 @@ export class MageKnightGame {
         this.hero.healingPoints = state.hero.healingPoints || 0;
 
         // Restore enemies
-        this.enemies = createEnemies(state.enemies.map(e => ({
-            type: e.type,
-            position: e.position
-        })));
+        this.enemies = state.enemies.map(e => {
+            // We need to import createEnemy or use a helper
+            // Since we can't easily add import to top of file without reading it all,
+            // we'll assume we can add the import or use a workaround.
+            // Wait, I can add the import to the top of the file in a separate edit.
+            // For now, let's use a placeholder if I can't add import.
+            // Actually, I should add the import.
+            // But let's look at how I can fix this block first.
+            // If I can't import, I might be stuck.
+            // But I can use this.enemyAI.generateEnemy if I knew the terrain.
+            // But I have the type.
+            // Let's assume I will add the import.
+            const enemy = createEnemy(e.type);
+            if (enemy) {
+                enemy.position = e.position;
+                enemy.id = e.id || `enemy_${e.position.q}_${e.position.r}_${Date.now()}`;
+                if (e.currentHealth) enemy.currentHealth = e.currentHealth;
+            }
+            return enemy;
+        }).filter(e => e !== null);
 
         // Update UI
         this.renderHand();
@@ -1184,6 +1426,245 @@ export class MageKnightGame {
             } else {
                 this.ui.addLog('Fehler beim Laden', 'info');
             }
+        }
+    }
+
+    setupTimeListener() {
+        this.timeManager.addListener((state) => {
+            const isNight = state.timeOfDay === TIME_OF_DAY.NIGHT;
+
+            // Visual Transition
+            const overlay = document.getElementById('day-night-overlay');
+            const message = document.getElementById('day-night-message');
+
+            if (overlay && message) {
+                message.textContent = isNight ? 'Die Nacht bricht herein...' : 'Der Tag bricht an...';
+                overlay.classList.add('active');
+
+                // Play sound
+                // this.sound.playTone(isNight ? 200 : 600, 1.0, 'sine'); // Placeholder if sound not ready
+
+                setTimeout(() => {
+                    // Update Game State visuals behind curtain
+                    this.hexGrid.setTimeOfDay(isNight);
+                    document.body.classList.toggle('night-mode', isNight);
+
+                    // Update UI Icons
+                    const timeIcon = document.getElementById('time-icon');
+                    const roundNum = document.getElementById('round-number');
+                    if (timeIcon) {
+                        timeIcon.textContent = isNight ? '🌙' : '☀️';
+                        timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
+                    }
+                    if (roundNum) roundNum.textContent = state.round;
+
+                    this.render();
+
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                    }, 1500);
+                }, 1000);
+            } else {
+                // Fallback if no overlay
+                this.hexGrid.setTimeOfDay(isNight);
+                this.render();
+            }
+
+            this.ui.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
+        });
+    }
+
+    /**
+     * Check for new achievements and display notifications
+     */
+    checkAndShowAchievements() {
+        const stats = this.statisticsManager.getAll();
+        const newAchievements = this.achievementManager.checkAchievements(stats);
+
+        // Show notifications for new achievements
+        newAchievements.forEach(achievement => {
+            if (this.sound.success) this.sound.success();
+            this.ui.showNotification(
+                `🏆 ${achievement.name} freigeschaltet!`,
+                'success'
+            );
+            this.ui.addLog(`🏆 Achievement: ${achievement.name} - ${achievement.description}`, 'success');
+
+            // Apply rewards
+            if (achievement.reward && achievement.reward.fame) {
+                this.hero.gainFame(achievement.reward.fame);
+                this.ui.addLog(`Belohnung: +${achievement.reward.fame} Ruhm`, 'info');
+            }
+        });
+
+        return newAchievements;
+    }
+
+    setupSoundToggle() {
+        // Create sound toggle button if it doesn't exist
+        let soundBtn = document.getElementById('sound-toggle-btn');
+
+        if (!soundBtn) {
+            // Add to header
+            const headerRight = document.querySelector('.header-right');
+            if (!headerRight) return; // Guard if header doesn't exist
+
+            soundBtn = document.createElement('button');
+            soundBtn.id = 'sound-toggle-btn';
+            soundBtn.className = 'btn-icon';
+            soundBtn.title = 'Sound ein/aus';
+            soundBtn.innerHTML = this.sound.enabled ? '🔊' : '🔇';
+            headerRight.insertBefore(soundBtn, headerRight.firstChild);
+        }
+
+        // Toggle sound on click
+        soundBtn.addEventListener('click', () => {
+            const enabled = this.sound.toggle();
+            soundBtn.innerHTML = enabled ? '🔊' : '🔇';
+            this.ui.addLog(enabled ? 'Sound aktiviert' : 'Sound deaktiviert', 'info');
+        });
+
+        this.setupUIListeners();
+    }
+
+    setupUIListeners() {
+        // Achievements Modal
+        const achievementsBtn = document.getElementById('achievements-btn');
+        const achievementsModal = document.getElementById('achievements-modal');
+        const achievementsClose = document.getElementById('achievements-close');
+
+        if (achievementsBtn && achievementsModal) {
+            achievementsBtn.addEventListener('click', () => {
+                this.renderAchievements('all');
+                achievementsModal.style.display = 'block';
+            });
+
+            achievementsClose.addEventListener('click', () => {
+                achievementsModal.style.display = 'none';
+            });
+
+            // Tabs
+            const tabs = achievementsModal.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.renderAchievements(e.target.dataset.category);
+                });
+            });
+        }
+
+        // Statistics Modal
+        const statsBtn = document.getElementById('statistics-btn');
+        const statsModal = document.getElementById('statistics-modal');
+        const statsClose = document.getElementById('statistics-close');
+
+        if (statsBtn && statsModal) {
+            statsBtn.addEventListener('click', () => {
+                this.renderStatistics('global');
+                statsModal.style.display = 'block';
+            });
+
+            statsClose.addEventListener('click', () => {
+                statsModal.style.display = 'none';
+            });
+
+            // Tabs
+            const tabs = statsModal.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.renderStatistics(e.target.dataset.category);
+                });
+            });
+        }
+
+        // Close modals on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target === achievementsModal) achievementsModal.style.display = 'none';
+            if (e.target === statsModal) statsModal.style.display = 'none';
+        });
+    }
+
+    renderAchievements(category) {
+        const list = document.getElementById('achievements-list');
+        const progressBar = document.getElementById('achievements-progress-bar');
+        const progressText = document.getElementById('achievements-progress-text');
+
+        if (!list) return;
+
+        list.innerHTML = '';
+
+        // Update Progress
+        const progress = this.achievementManager.getProgress();
+        progressBar.style.width = `${progress.percentage}%`;
+        progressText.textContent = `${progress.unlocked}/${progress.total} Freigeschaltet (${progress.percentage}%)`;
+
+        // Filter and Render
+        const allAchievements = Object.values(this.achievementManager.achievements);
+        const filtered = category === 'all'
+            ? allAchievements
+            : allAchievements.filter(a => a.category === category);
+
+        filtered.forEach(ach => {
+            const isUnlocked = this.achievementManager.isUnlocked(ach.id);
+            const card = document.createElement('div');
+            card.className = `achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+
+            let dateStr = '';
+            if (isUnlocked) {
+                const timestamp = this.achievementManager.unlockedAchievements.get(ach.id);
+                if (timestamp) {
+                    const date = new Date(timestamp);
+                    dateStr = `<span class="achievement-date">Freigeschaltet: ${date.toLocaleDateString()}</span>`;
+                }
+            }
+
+            card.innerHTML = `
+                <div class="achievement-icon">${ach.icon || '🏆'}</div>
+                <div class="achievement-info">
+                    <h3>${ach.name}</h3>
+                    <p>${ach.description}</p>
+                    ${dateStr}
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    renderStatistics(category) {
+        const grid = document.getElementById('statistics-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        const stats = this.statisticsManager.getAll();
+
+        const createStatCard = (label, value) => {
+            const card = document.createElement('div');
+            card.className = 'stat-card';
+            card.innerHTML = `
+                <span class="value">${value}</span>
+                <span class="label">${label}</span>
+            `;
+            grid.appendChild(card);
+        };
+
+        if (category === 'global') {
+            createStatCard('Spiele gespielt', stats.gamesPlayed || 0);
+            createStatCard('Siege', stats.gamesWon || 0);
+            createStatCard('Niederlagen', stats.gamesLost || 0);
+            createStatCard('Feinde besiegt (Total)', stats.enemiesDefeated || 0);
+            createStatCard('Höchstes Level', stats.highestLevel || 1);
+            createStatCard('Perfekte Kämpfe', stats.perfectCombats || 0);
+        } else {
+            // Current Game Stats (some might need to be tracked separately per game if not reset)
+            // For now showing session stats
+            createStatCard('Runde', this.turnNumber || 1);
+            createStatCard('Ruhm', this.hero.fame || 0);
+            createStatCard('Verletzungen', this.hero.wounds || 0);
+            createStatCard('Deck Größe', this.hero.deck.length + this.hero.hand.length + this.hero.discard.length);
+            createStatCard('Einheiten', this.hero.units.length);
         }
     }
 }

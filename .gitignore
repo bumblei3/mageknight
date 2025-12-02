@@ -1,0 +1,21 @@
+# Coverage directory
+coverage/
+*.lcov
+.nyc_output/
+
+# Node modules
+node_modules/
+package-lock.json
+
+# Test outputs
+test_output*.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

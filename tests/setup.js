@@ -10,8 +10,10 @@ import {
 
 // Apply Mocks
 if (typeof document === 'undefined') {
+    const mockWindow = createMockWindow(1024, 768);
+
     global.document = createMockDocument();
-    global.window = createMockWindow(1024, 768);
+    global.window = mockWindow;
     global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
     global.cancelAnimationFrame = (id) => clearTimeout(id);
     global.localStorage = createMockLocalStorage();
@@ -22,4 +24,8 @@ if (typeof document === 'undefined') {
     };
     global.alert = () => { };
     global.confirm = () => true; // Mock confirm
+
+    // Expose AudioContext globally for SoundManager
+    global.AudioContext = mockWindow.AudioContext;
+    global.webkitAudioContext = mockWindow.webkitAudioContext;
 }

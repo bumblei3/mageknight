@@ -1,5 +1,10 @@
 # Mage Knight - Base Game
 
+[![Test Suite](https://github.com/bumblei3/mageknight/actions/workflows/test.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/bumblei3/mageknight/branch/master/graph/badge.svg)](https://codecov.io/gh/bumblei3/mageknight)
+![Tests: 361 passing](https://img.shields.io/badge/tests-361%20passing-brightgreen)
+![Coverage: 68.84%](https://img.shields.io/badge/coverage-68.84%25-yellow)
+
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
 ## 🎮 Über das Spiel
@@ -157,6 +162,40 @@ npx http-server
 ```
 
 Dann öffne `http://localhost:8000` im Browser.
+
+### Testing
+
+Das Projekt verfügt über eine umfassende Test-Suite mit **361 Tests** und **68.84% Code Coverage**.
+
+#### Tests ausführen
+
+```bash
+# Alle Tests ausführen
+npm test
+
+# Tests mit Coverage
+npm run test:coverage
+
+# Coverage-Report öffnen
+open coverage/index.html  # macOS
+xdg-open coverage/index.html  # Linux
+```
+
+#### Test-Struktur
+
+```
+tests/
+├── unit tests      - Einzelne Module (361 Tests)
+├── integration     - Modulübergreifende Tests
+└── test helpers    - Shared Mocks & Utilities
+```
+
+**Coverage-Highlights**:
+- ✅ 100% Coverage: `mapManager.js`, `skills.js`, `timeManager.js`, `sites.js`
+- 🎯 95%+ Coverage: `hexgrid.js`, `tooltip.js`, `card.js`, `enemy.js`
+- 📊 Gesamtabdeckung: 68.84% Statements, 84.66% Branches
+
+Siehe [COVERAGE_ANALYSIS.md](COVERAGE_ANALYSIS.md) für detaillierte Informationen.
 
 ### Browser-Kompatibilität
 

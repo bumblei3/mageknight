@@ -278,10 +278,93 @@ export function createMockLocalStorage() {
 }
 
 /**
+ * Mock AudioContext class
+ */
+class MockAudioContext {
+    constructor() {
+        this.destination = {
+            connect: () => { },
+            disconnect: () => { }
+        };
+        this.currentTime = 0;
+        this.sampleRate = 44100;
+        this.state = 'running';
+    }
+
+    createGain() {
+        return {
+            connect: () => { },
+            disconnect: () => { },
+            gain: {
+                value: 1,
+                setValueAtTime: () => { },
+                linearRampToValueAtTime: () => { },
+                exponentialRampToValueAtTime: () => { }
+            }
+        };
+    }
+
+    createOscillator() {
+        return {
+            connect: () => { },
+            disconnect: () => { },
+            start: () => { },
+            stop: () => { },
+            type: 'sine',
+            frequency: {
+                value: 440,
+                setValueAtTime: () => { },
+                linearRampToValueAtTime: () => { },
+                exponentialRampToValueAtTime: () => { }
+            },
+            detune: { value: 0 }
+        };
+    }
+
+    createBufferSource() {
+        return {
+            connect: () => { },
+            disconnect: () => { },
+            start: () => { },
+            stop: () => { },
+            buffer: null,
+            loop: false,
+            playbackRate: { value: 1 }
+        };
+    }
+
+    createBuffer(channels, length, sampleRate) {
+        return {
+            length,
+            sampleRate,
+            duration: length / sampleRate,
+            numberOfChannels: channels,
+            getChannelData: () => new Float32Array(length)
+        };
+    }
+
+    decodeAudioData(audioData) {
+        return Promise.resolve(this.createBuffer(2, 44100, 44100));
+    }
+
+    resume() {
+        return Promise.resolve();
+    }
+
+    suspend() {
+        return Promise.resolve();
+    }
+
+    close() {
+        return Promise.resolve();
+    }
+}
+
+/**
  * Creates a mock window object
  */
 export function createMockWindow(width = 1024, height = 768) {
-    return {
+    const mockWindow = {
         innerWidth: width,
         innerHeight: height,
         devicePixelRatio: 1,
@@ -296,17 +379,11 @@ export function createMockWindow(width = 1024, height = 768) {
         alert: () => { },
         confirm: () => true,
         prompt: () => '1',
-        AudioContext: class {
-            constructor() { this.destination = {}; }
-            createGain() { return { connect: () => { }, gain: { value: 0 } }; }
-            createOscillator() { return { connect: () => { }, start: () => { }, stop: () => { }, type: '', frequency: { value: 0 } }; }
-        },
-        webkitAudioContext: class {
-            constructor() { this.destination = {}; }
-            createGain() { return { connect: () => { }, gain: { value: 0 } }; }
-            createOscillator() { return { connect: () => { }, start: () => { }, stop: () => { }, type: '', frequency: { value: 0 } }; }
-        }
+        AudioContext: MockAudioContext,
+        webkitAudioContext: MockAudioContext
     };
+
+    return mockWindow;
 }
 
 /**

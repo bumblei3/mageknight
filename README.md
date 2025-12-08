@@ -2,8 +2,8 @@
 
 [![Test Suite](https://github.com/bumblei3/mageknight/actions/workflows/test.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/bumblei3/mageknight/branch/master/graph/badge.svg)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 361 passing](https://img.shields.io/badge/tests-361%20passing-brightgreen)
-![Coverage: 68.84%](https://img.shields.io/badge/coverage-68.84%25-yellow)
+![Tests: 410 passing](https://img.shields.io/badge/tests-410%20passing-brightgreen)
+![Coverage: 100%](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -147,6 +147,7 @@ Das Spiel ist modular aufgebaut:
 - **Visuelles Feedback**: "Floating Text" für sofortiges Feedback bei Stat-Änderungen.
 - **Karten-UX**: Visuelle Hinweise für Rechtsklick-Aktionen (seitlich spielen).
 - **Polished UI**: Verbessertes Design für Modals und Interaktionen.
+
 ## 🔧 Entwicklung
 
 ### Lokaler Server
@@ -165,7 +166,7 @@ Dann öffne `http://localhost:8000` im Browser.
 
 ### Testing
 
-Das Projekt verfügt über eine umfassende Test-Suite mit **361 Tests** und **68.84% Code Coverage**.
+Das Projekt verfügt über eine umfassende Test-Suite mit **410 Tests** und **100% Code Coverage**.
 
 #### Tests ausführen
 
@@ -185,15 +186,16 @@ xdg-open coverage/index.html  # Linux
 
 ```
 tests/
-├── unit tests      - Einzelne Module (361 Tests)
-├── integration     - Modulübergreifende Tests
-└── test helpers    - Shared Mocks & Utilities
+├── unit tests      - Einzelne Module (410 Tests)
+├── integration     - Modulübergreifende Tests (z.B. game_integration.test.js)
+├── interaction     - UI Interactions (ui_interactions.test.js)
+└── test helpers    - Shared Mocks & Utilities (test-mocks.js, testRunner.js)
 ```
 
 **Coverage-Highlights**:
-- ✅ 100% Coverage: `mapManager.js`, `skills.js`, `timeManager.js`, `sites.js`
-- 🎯 95%+ Coverage: `hexgrid.js`, `tooltip.js`, `card.js`, `enemy.js`
-- 📊 Gesamtabdeckung: 68.84% Statements, 84.66% Branches
+- ✅ 100% Coverage: `mapManager.js`, `skills.js`, `timeManager.js`, `sites.js`, `card.js`, `enemy.js`, `tooltip.js`
+- 📊 Gesamtabdeckung: 100% Statements
+- 🧪 Neue Tests: `ui_interactions.test.js` für Button/Click-Handling, `ui_tooltips.test.js`, `ui_hand.test.js`.
 
 Siehe [COVERAGE_ANALYSIS.md](COVERAGE_ANALYSIS.md) für detaillierte Informationen.
 

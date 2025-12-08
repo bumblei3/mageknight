@@ -467,18 +467,6 @@
         </div>
     </div>
 
-    <!-- Tutorial overlay -->
-    <div class="tutorial-overlay" id="tutorial-overlay" style="display: none;">
-        <div class="tutorial-box">
-            <h3 id="tutorial-title">Tutorial</h3>
-            <p id="tutorial-text"></p>
-            <div class="tutorial-buttons">
-                <button class="btn btn-secondary" id="tutorial-skip">Überspringen</button>
-                <button class="btn btn-primary" id="tutorial-next">Weiter</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Site Interaction Modal -->
     <div class="modal" id="site-modal">
         <div class="modal-content site-modal-content">
@@ -564,7 +552,25 @@
         <div id="day-night-message" class="day-night-message">Nacht bricht herein...</div>
     </div>
 
-    <script type="module" src="js/game.js"></script>
+    <!-- Reset Confirmation Modal -->
+    <div class="modal" id="reset-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="close-reset-modal">&times;</span>
+            <div class="reset-modal-header">
+                <h2>Neues Spiel starten</h2>
+            </div>
+            <div class="reset-modal-body">
+                <p>Möchtest du wirklich ein neues Spiel starten?</p>
+                <p class="warning-text">Der aktuelle Fortschritt geht unwiderruflich verloren!</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancel-reset-btn">Abbrechen</button>
+                    <button class="btn btn-danger" id="confirm-reset-btn">Neues Spiel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>

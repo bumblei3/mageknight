@@ -133,4 +133,95 @@ describe('Combat Scenarios', () => {
         const res3 = combat.attackEnemies(4, 'fire', [iceElemental]);
         expect(res3.success).toBe(true);
     });
+
+    it('should handle zero damage attack', () => {
+        const hero = new Hero('TestHero');
+        const enemy = createMockEnemy({ name: 'Orc', attack: 3, armor: 3 });
+
+        const combat = new Combat(hero, enemy);
+        combat.start();
+        combat.endBlockPhase();
+
+        // Attack with 0 damage
+        const result = combat.attackEnemies(0);
+        expect(result.success).toBe(false);
+        expect(combat.enemies.length).toBe(1);
+    });
+
+    it('should handle massive overkill damage', () => {
+        const hero = new Hero('TestHero');
+        const enemy = createMockEnemy({ name: 'Goblin', attack: 2, armor: 2 });
+
+        const combat = new Combat(hero, enemy);
+        combat.start();
+        combat.endBlockPhase();
+
+        // Attack with excessive damage
+        const result = combat.attackEnemies(9999);
+        expect(result.success).toBe(true);
+        expect(result.defeated.length).toBe(1);
+    });
+
+    it('should handle enemy with multiple abilities', () => {
+        const hero = new Hero('TestHero');
+        const enemy = createMockEnemy({
+            name: 'Elite Monster',
+            attack: 5,
+            armor: 4,
+            swift: true,
+            poison: true,
+            fortified: true
+        });
+
+        const combat = new Combat(hero, enemy);
+        combat.start();
+
+        // Try to block (should fail due to swift)
+        const blockResult = combat.blockEnemy(enemy, 5);
+        expect(blockResult.blocked).toBe(false);
+
+        combat.endBlockPhase();
+
+        // Should receive extra wound from poison
+        expect(combat.woundsReceived).toBeGreaterThan(1);
+    });
+
+    it('should handle combat with no enemies', () => {
+        const hero = new Hero('TestHero');
+        const combat = new Combat(hero, []);
+        combat.start();
+        combat.endBlockPhase();
+
+        const result = combat.endCombat();
+        expect(result.victory).toBe(true);
+        expect(result.woundsReceived).toBe(0);
+    });
+
+    it('should handle exact armor match', () => {
+        const hero = new Hero('TestHero');
+        const enemy = createMockEnemy({ name: 'Orc', attack: 3, armor: 5 });
+
+        const combat = new Combat(hero, enemy);
+        combat.start();
+        combat.endBlockPhase();
+
+        // Attack with exactly the armor value
+        const result = combat.attackEnemies(5);
+        expect(result.success).toBe(true);
+        expect(result.defeated.length).toBe(1);
+    });
+
+    it('should handle one-less-than-armor attack', () => {
+        const hero = new Hero('TestHero');
+        const enemy = createMockEnemy({ name: 'Orc', attack: 3, armor: 5 });
+
+        const combat = new Combat(hero, enemy);
+        combat.start();
+        combat.endBlockPhase();
+
+        // Attack with armor - 1
+        const result = combat.attackEnemies(4);
+        expect(result.success).toBe(false);
+        expect(combat.enemies.length).toBe(1);
+    });
 });

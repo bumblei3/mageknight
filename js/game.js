@@ -144,57 +144,38 @@ export class MageKnightGame {
     }
 
     reset() {
-        if (confirm('Möchtest du wirklich ein neues Spiel starten? Der aktuelle Fortschritt geht verloren.')) {
+        // Use custom modal instead of confirm
+        const modal = document.getElementById('reset-modal');
+        const confirmBtn = document.getElementById('confirm-reset-btn');
+        const cancelBtn = document.getElementById('cancel-reset-btn');
+        const closeBtn = document.getElementById('close-reset-modal');
+
+        const closeModal = () => {
+            modal.classList.remove('active');
+            // Clean up listeners to avoid duplicates
+            confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            closeBtn.replaceWith(closeBtn.cloneNode(true));
+        };
+
+        const onConfirm = () => {
+            closeModal();
             this.ui.reset();
             this.startNewGame();
-        }
+        };
+
+        // Wire up new listeners
+        // We need to re-query because of cloneNode
+        document.getElementById('confirm-reset-btn').addEventListener('click', onConfirm);
+        document.getElementById('cancel-reset-btn').addEventListener('click', closeModal);
+        document.getElementById('close-reset-modal').addEventListener('click', closeModal);
+
+        // Show modal
+        modal.classList.add('active');
     }
 
     createGameBoard() {
-        // Create starting map (multiple tiles for enemy spawning)
-        this.mapManager.placeTile(0, 0, [
-            TERRAIN_TYPES.PLAINS,
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.HILLS,
-            TERRAIN_TYPES.PLAINS,
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.DESERT,
-            TERRAIN_TYPES.WATER
-        ]);
-
-        // Add adjacent tiles for enemy spawning areas
-        this.mapManager.placeTile(3, 0, [
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.HILLS,
-            TERRAIN_TYPES.WASTELAND, // Was RUINS - use wasteland as base terrain
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.PLAINS,
-            TERRAIN_TYPES.HILLS,
-            TERRAIN_TYPES.FOREST
-        ]);
-
-        this.mapManager.placeTile(0, 3, [
-            TERRAIN_TYPES.HILLS,
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.PLAINS,
-            TERRAIN_TYPES.HILLS, // Was KEEP - use hills as base terrain
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.HILLS,
-            TERRAIN_TYPES.DESERT
-        ]);
-
-        this.mapManager.placeTile(-3, 0, [
-            TERRAIN_TYPES.DESERT,
-            TERRAIN_TYPES.PLAINS,
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.HILLS,
-            TERRAIN_TYPES.MOUNTAINS, // Was MAGE_TOWER - use mountains as base terrain
-            TERRAIN_TYPES.FOREST,
-            TERRAIN_TYPES.PLAINS
-        ]);
-
-        // Reveal starting area (increased radius to show all initial tiles)
-        this.mapManager.revealMap(0, 0, 4);
+        this.mapManager.createStartingMap();
     }
 
     createEnemies() {
@@ -584,8 +565,8 @@ export class MageKnightGame {
             return;
         }
 
-        // Check for enemy
-        const enemy = this.enemies.find(e => e.position.q === hex.q && e.position.r === hex.r);
+        // Check for enemy (BUG FIX: add null check for position)
+        const enemy = this.enemies.find(e => e.position && e.position.q === hex.q && e.position.r === hex.r);
         if (enemy) {
             // Show enemy tooltip
             const dummyEl = {
@@ -622,8 +603,8 @@ export class MageKnightGame {
     selectHex(q, r) {
         this.hexGrid.selectHex(q, r);
 
-        // Check if there's an enemy here
-        const enemy = this.enemies.find(e => e.position.q === q && e.position.r === r);
+        // Check if there's an enemy here (BUG FIX: add null check for position)
+        const enemy = this.enemies.find(e => e.position && e.position.q === q && e.position.r === r);
 
         if (enemy) {
             this.ui.addLog(`Feind gefunden: ${enemy.name} (Rüstung: ${enemy.armor}, Angriff: ${enemy.attack})`, 'combat');
@@ -666,12 +647,14 @@ export class MageKnightGame {
             this.ui.addPlayedCard(result.card, result.effect);
             this.ui.showPlayArea();
 
-            // Particle Effect
-            const rect = this.ui.elements.playedCards.getBoundingClientRect();
-            // Center of the last played card (approximate)
-            const x = rect.right - 50;
-            const y = rect.top + 75;
-            this.particleSystem.playCardEffect(x, y, result.card.color);
+            // Particle Effect (BUG FIX: add null check)
+            if (this.particleSystem) {
+                const rect = this.ui.elements.playedCards.getBoundingClientRect();
+                // Center of the last played card (approximate)
+                const x = rect.right - 50;
+                const y = rect.top + 75;
+                this.particleSystem.playCardEffect(x, y, result.card.color);
+            }
 
             // If movement was gained, enter movement mode
             if (result.effect.movement && result.effect.movement > 0) {
@@ -693,17 +676,21 @@ export class MageKnightGame {
         const options = ['movement', 'attack', 'block', 'influence'];
         const chosen = prompt(`${card.name} seitlich spielen für:\n1: +1 Bewegung\n2: +1 Angriff\n3: +1 Block\n4: +1 Einfluss\n\nWähle Option (1-4):`);
 
-        if (chosen >= 1 && chosen <= 4) {
-            const effectType = options[chosen - 1];
+        // BUG FIX: prompt() returns string, convert to number
+        const chosenNum = parseInt(chosen, 10);
+        if (chosenNum >= 1 && chosenNum <= 4) {
+            const effectType = options[chosenNum - 1];
             const result = this.hero.playCardSideways(index, effectType);
             if (result) {
                 this.sound.cardPlaySideways();
 
-                // Particle Effect
-                const rect = this.ui.elements.handCards.getBoundingClientRect();
-                const x = rect.left + (rect.width / 2);
-                const y = rect.top + 50;
-                this.particleSystem.playCardEffect(x, y, result.card.color);
+                // Particle Effect (BUG FIX: add null check)
+                if (this.particleSystem) {
+                    const rect = this.ui.elements.handCards.getBoundingClientRect();
+                    const x = rect.left + (rect.width / 2);
+                    const y = rect.top + 50;
+                    this.particleSystem.playCardEffect(x, y, result.card.color);
+                }
 
                 this.ui.addLog(`${result.card.name} seitlich gespielt: ${this.ui.formatEffect(result.effect)}`, 'info');
                 this.renderHand();
@@ -819,8 +806,8 @@ export class MageKnightGame {
                 }
             );
 
-            // Check if there's an enemy on this hex
-            const enemy = this.enemies.find(e => e.position.q === q && e.position.r === r);
+            // Check if there's an enemy on this hex (BUG FIX: add null check for position)
+            const enemy = this.enemies.find(e => e.position && e.position.q === q && e.position.r === r);
             if (enemy) {
                 this.ui.addLog(`Feind entdeckt: ${enemy.name}!`, 'combat');
                 this.exitMovementMode();

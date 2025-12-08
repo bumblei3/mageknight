@@ -25,6 +25,57 @@ export class MapManager {
         ];
     }
 
+    // Create the standard starting map layout
+    createStartingMap() {
+        // Create starting map (multiple tiles for enemy spawning) (0,0)
+        this.placeTile(0, 0, [
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.DESERT,
+            TERRAIN_TYPES.WATER
+        ]);
+
+        // Add adjacent tiles for enemy spawning areas
+        // East (3,0)
+        this.placeTile(3, 0, [
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.WASTELAND,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.FOREST
+        ]);
+
+        // South-West (0,3)
+        this.placeTile(0, 3, [
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.DESERT
+        ]);
+
+        // North-West (-3,0)
+        this.placeTile(-3, 0, [
+            TERRAIN_TYPES.DESERT,
+            TERRAIN_TYPES.PLAINS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.MOUNTAINS,
+            TERRAIN_TYPES.FOREST,
+            TERRAIN_TYPES.PLAINS
+        ]);
+
+        // Reveal starting area
+        this.revealMap(0, 0, 4);
+    }
+
     // Check if exploration is possible from a given hex
     canExplore(q, r) {
         // Check if any neighbor is missing

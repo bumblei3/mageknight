@@ -237,6 +237,17 @@ export class TestRunner {
                 if (!hasDefeated) {
                     throw new Error(`Expected to have defeated enemy ${enemy.name || enemy}`);
                 }
+            },
+            toMatchHTML: (expectedHTML) => {
+                // Normalize whitespace: remove newlines and extra spaces
+                const normalize = (html) => html.replace(/\s+/g, ' ').trim();
+                const actualNorm = normalize(actual);
+                const expectedNorm = normalize(expectedHTML);
+
+                if (actualNorm !== expectedNorm) {
+                    // For debugging, don't show full diff if too huge, but here it's fine
+                    throw new Error(`Expected HTML not matched.\nActual: ${actualNorm}\nExpected: ${expectedNorm}`);
+                }
             }
         };
 

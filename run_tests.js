@@ -41,6 +41,9 @@ await import('./tests/combatAnimations.test.js');
 await import('./tests/combat_scenarios.test.js');
 await import('./tests/fuzz_game.test.js');
 await import('./tests/soundManager.test.js');
+await import('./tests/ui_hand.test.js');
+await import('./tests/ui_interactions.test.js');
+await import('./tests/ui_tooltips.test.js');
 
 // Parse command line arguments
 const args = process.argv.slice(2);

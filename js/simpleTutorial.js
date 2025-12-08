@@ -153,8 +153,18 @@ export class SimpleTutorial {
 
         // Handle waited actions
         const nextBtn = this.overlay.querySelector('.btn-tutorial-next');
+
+        // Remove old 'highlight-pulse' from button if any
+        nextBtn.classList.remove('btn-disabled');
+        nextBtn.disabled = false;
+        nextBtn.title = "";
+
         if (step.waitForAction) {
-            nextBtn.style.display = 'none';
+            // Instead of hiding, we disable it and explain why
+            nextBtn.disabled = true;
+            nextBtn.classList.add('btn-disabled');
+            nextBtn.title = "Führe die Aktion aus um fortzufahren";
+            nextBtn.textContent = 'Aktion ausführen...';
             this.waitForAction(step.actionType);
         } else {
             nextBtn.style.display = 'inline-block';
@@ -209,9 +219,8 @@ export class SimpleTutorial {
 
     // Skip tutorial
     skip() {
-        if (confirm('Tutorial wirklich überspringen?')) {
-            this.complete();
-        }
+        // No confirmation needed - just skip
+        this.complete();
     }
 
     // Complete tutorial

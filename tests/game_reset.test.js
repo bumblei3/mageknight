@@ -23,8 +23,14 @@ describe('Game Reset', () => {
         game.turnNumber = 5;
         game.hero.movementPoints = 3;
 
-        // Call reset
+        // Call reset - this shows the modal
         game.reset();
+
+        // Simulate confirm click
+        const confirmBtn = document.getElementById('confirm-reset-btn');
+        if (confirmBtn) {
+            confirmBtn.click();
+        }
 
         // Verify reset
         expect(game.turnNumber).toBe(0);
@@ -38,15 +44,23 @@ describe('Game Reset', () => {
 
         game.reset();
 
+        // Simulate confirm
+        const confirmBtn = document.getElementById('confirm-reset-btn');
+        if (confirmBtn) confirmBtn.click();
+
         expect(game.hero).not.toBe(originalHeroId); // Should be new object
         expect(game.mapManager).not.toBe(originalMapManager);
     });
 
     it('should not reset if confirm is cancelled', () => {
-        global.confirm = () => false;
+        // global.confirm = () => false; // No longer used
         game.turnNumber = 5;
 
         game.reset();
+
+        // Simulate cancel
+        const cancelBtn = document.getElementById('cancel-reset-btn');
+        if (cancelBtn) cancelBtn.click();
 
         expect(game.turnNumber).toBe(5);
     });

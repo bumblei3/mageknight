@@ -126,6 +126,7 @@ export class MockHTMLElement {
     constructor(tagName = 'div') {
         this.tagName = tagName.toUpperCase();
         this.style = {};
+        this._listeners = new Map();
         this.classList = {
             add: (...classes) => {
                 this._classes = this._classes || new Set();
@@ -150,16 +151,49 @@ export class MockHTMLElement {
         };
         this.dataset = {};
         this.children = [];
-        this.innerHTML = '';
-        this.textContent = '';
         this.value = '';
         this.id = '';
         this.className = '';
         this.parentNode = null;
+        this._innerHTML = '';
     }
 
-    addEventListener() { }
-    removeEventListener() { }
+    get innerHTML() {
+        return this._innerHTML;
+    }
+
+    set innerHTML(html) {
+        this._innerHTML = html;
+        if (html === '') {
+            this.children = [];
+        }
+    }
+
+    addEventListener(event, callback) {
+        if (!this._listeners.has(event)) {
+            this._listeners.set(event, []);
+        }
+        this._listeners.get(event).push(callback);
+    }
+
+    dispatchEvent(event) {
+        const type = event.type;
+        if (this._listeners.has(type)) {
+            this._listeners.get(type).forEach(cb => {
+                try {
+                    cb(event);
+                } catch (e) {
+                    console.error('Error in mock listener:', e);
+                }
+            });
+        }
+        return true;
+    }
+
+    click() {
+        console.log(`[MockElement] .click() called on ${this.id || this.tagName}`);
+        this.dispatchEvent({ type: 'click', target: this, preventDefault: () => { } });
+    }
 
     appendChild(child) {
         this.children.push(child);
@@ -218,9 +252,36 @@ export class MockHTMLElement {
         return this[name] || null;
     }
 
-    click() { }
     focus() { }
     blur() { }
+
+    cloneNode(deep) {
+        const clone = new MockHTMLElement(this.tagName.toLowerCase());
+        clone.id = this.id;
+        clone.className = this.className;
+        clone.value = this.value;
+        clone._innerHTML = this._innerHTML;
+        // Copy other properties/datasets if needed
+        if (deep) {
+            this.children.forEach(child => {
+                if (child.cloneNode) {
+                    clone.appendChild(child.cloneNode(true));
+                }
+            });
+        }
+        return clone;
+    }
+
+    replaceWith(newNode) {
+        if (this.parentNode) {
+            const index = this.parentNode.children.indexOf(this);
+            if (index > -1) {
+                this.parentNode.children[index] = newNode;
+                newNode.parentNode = this.parentNode;
+                this.parentNode = null;
+            }
+        }
+    }
 }
 
 /**
@@ -229,16 +290,49 @@ export class MockHTMLElement {
 export function createMockDocument() {
     const elements = new Map();
 
-    return {
+    const doc = {
         getElementById: (id) => {
+            // Search in body
+            const findIn = (parent) => {
+                if (parent.id === id) return parent;
+                for (const child of parent.children) {
+                    const found = findIn(child);
+                    if (found) return found;
+                }
+                return null;
+            };
+
+            const found = findIn(doc.body);
+            if (found) return found;
+
+            // Fallback for tests expecting auto-creation (legacy behavior preservation)
             if (!elements.has(id)) {
                 const el = new MockHTMLElement();
                 el.id = id;
+                // Append to body to ensure it's in the tree
+                doc.body.appendChild(el);
                 elements.set(id, el);
             }
             return elements.get(id);
         },
-        querySelector: (selector) => new MockHTMLElement(),
+        querySelector: (selector) => {
+            if (selector.startsWith('.')) {
+                const className = selector.substring(1);
+                // Search in body children
+                const findIn = (parent) => {
+                    for (const child of parent.children) {
+                        if (child.classList && child.classList.contains(className)) return child;
+                        if (child.className && child.className.includes(className)) return child;
+                        const found = findIn(child);
+                        if (found) return found;
+                    }
+                    return null;
+                };
+                const found = findIn(doc.body);
+                if (found) return found;
+            }
+            return new MockHTMLElement();
+        },
         querySelectorAll: (selector) => [],
         createElement: (tag) => new MockHTMLElement(tag),
         createTextNode: (text) => ({ nodeValue: text, textContent: text }),
@@ -248,6 +342,7 @@ export function createMockDocument() {
         head: new MockHTMLElement('head'),
         documentElement: new MockHTMLElement('html')
     };
+    return doc;
 }
 
 /**

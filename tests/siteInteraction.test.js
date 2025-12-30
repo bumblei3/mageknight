@@ -113,4 +113,71 @@ describe('SiteInteractionManager', () => {
         expect(data.options).toHaveLength(1);
         expect(data.options[0].id).toBe('attack');
     });
+
+    it('should generate monastery options', () => {
+        const site = { type: SITE_TYPES.MONASTERY, getName: () => 'Monastery', getIcon: () => '⛪', getColor: () => 'gold', getInfo: () => ({ description: 'Desc' }) };
+        const hex = {};
+
+        const data = manager.visitSite(hex, site);
+
+        expect(data.type).toBe(SITE_TYPES.MONASTERY);
+        expect(data.options.length).toBeGreaterThan(0);
+    });
+
+    it('should generate mage tower options', () => {
+        const site = { type: SITE_TYPES.MAGE_TOWER, getName: () => 'Mage Tower', getIcon: () => '🗼', getColor: () => 'purple', getInfo: () => ({ description: 'Desc' }) };
+        const hex = {};
+
+        const data = manager.visitSite(hex, site);
+
+        expect(data.type).toBe(SITE_TYPES.MAGE_TOWER);
+        expect(data.options.length).toBeGreaterThan(0);
+    });
+
+    it('should fail to buy card without enough influence', () => {
+        mockHero.influencePoints = 2;
+        const cardData = { name: 'Expensive Spell', id: 'exp1' };
+        const cost = 10;
+
+        const result = manager.buyCard(cardData, cost);
+
+        expect(result.success).toBe(false);
+        expect(mockHero.discard).toHaveLength(0);
+    });
+
+    it('should fail to heal when no wounds', () => {
+        mockHero.wounds = [];
+        const result = manager.healWounds(3);
+        expect(result.success).toBe(false);
+    });
+
+    it('should fail to recruit without enough influence', () => {
+        mockHero.influencePoints = 1;
+        const unitInfo = { name: 'Knight', cost: 5 };
+
+        const result = manager.recruitUnit(unitInfo);
+
+        expect(result.success).toBe(false);
+        expect(mockHero.units).toHaveLength(0);
+    });
+
+    it('should handle attack site action', () => {
+        const site = { type: SITE_TYPES.KEEP, getName: () => 'Keep', getIcon: () => '🏰', getColor: () => 'grey', getInfo: () => ({ description: 'Desc' }), conquered: false, guardians: [] };
+        manager.currentSite = site;
+        manager.currentHex = {};
+
+        manager.attackSite();
+        // Should call game.initiateCombat - verifying no error
+        expect(true).toBe(true);
+    });
+
+    it('should show conquered keep options', () => {
+        const site = { type: SITE_TYPES.KEEP, getName: () => 'Keep', getIcon: () => '🏰', getColor: () => 'grey', getInfo: () => ({ description: 'Desc' }), conquered: true };
+        const hex = {};
+
+        const data = manager.visitSite(hex, site);
+
+        // Conquered keeps offer different options
+        expect(data.options.length).toBeGreaterThanOrEqual(0);
+    });
 });

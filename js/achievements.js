@@ -160,6 +160,7 @@ export class AchievementManager {
     constructor() {
         this.unlockedAchievements = new Set();
         this.notifications = [];
+        this.achievements = ACHIEVEMENTS;
         this.load();
     }
 
@@ -183,6 +184,13 @@ export class AchievementManager {
         });
 
         return newlyUnlocked;
+    }
+
+    /**
+     * Check if achievement is unlocked
+     */
+    isUnlocked(id) {
+        return this.unlockedAchievements.has(id);
     }
 
     /**

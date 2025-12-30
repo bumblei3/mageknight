@@ -168,8 +168,10 @@ export function createMockUI() {
         addPlayedCard: createSpy(),
         showPlayArea: createSpy(),
         reset: createSpy(),
-        showSiteModal: createSpy(),
+        reset: createSpy(),
+        showSiteModal: createSpy(), // Added
         showSiteInteraction: createSpy(),
+        updateCombatTotals: createSpy(), // Added
         updateMovementPoints: createSpy(),
         renderUnits: createSpy(),
         renderHandCards: createSpy(),
@@ -320,6 +322,17 @@ export class MockHTMLElement {
         return child;
     }
 
+    insertBefore(newNode, referenceNode) {
+        const index = this.children.indexOf(referenceNode);
+        if (index > -1) {
+            this.children.splice(index, 0, newNode);
+        } else {
+            this.children.push(newNode); // Fallback to append if ref not found
+        }
+        newNode.parentNode = this;
+        return newNode;
+    }
+
     removeChild(child) {
         const index = this.children.indexOf(child);
         if (index > -1) {
@@ -457,6 +470,7 @@ export class MockHTMLElement {
  */
 export function createMockDocument() {
     const elements = new Map();
+    const listeners = {};
 
     const doc = {
         getElementById: (id) => {
@@ -525,11 +539,25 @@ export function createMockDocument() {
         },
         createElement: (tag) => new MockHTMLElement(tag),
         createTextNode: (text) => ({ nodeValue: text, textContent: text }),
-        addEventListener: () => { },
-        removeEventListener: () => { },
+        addEventListener: (event, callback) => {
+            if (!listeners[event]) listeners[event] = [];
+            listeners[event].push(callback);
+        },
+        removeEventListener: (event, callback) => {
+            if (!listeners[event]) return;
+            listeners[event] = listeners[event].filter(cb => cb !== callback);
+        },
+        dispatchEvent: (event) => {
+            const type = typeof event === 'string' ? event : event.type;
+            if (listeners[type]) {
+                listeners[type].forEach(cb => cb(event));
+            }
+            return true;
+        },
         body: new MockHTMLElement('body'),
         head: new MockHTMLElement('head'),
-        documentElement: new MockHTMLElement('html')
+        documentElement: new MockHTMLElement('html'),
+        activeElement: { tagName: 'BODY' } // Added default
     };
     return doc;
 }
@@ -692,6 +720,13 @@ export function setupGlobalMocks() {
     global.window = createMockWindow();
     global.localStorage = createMockLocalStorage();
     global.HTMLElement = MockHTMLElement;
+
+    global.KeyboardEvent = class KeyboardEvent {
+        constructor(type, options = {}) {
+            this.type = type;
+            Object.assign(this, options);
+        }
+    };
 
     if (typeof prompt === 'undefined' || global.prompt.toString().includes('native')) {
         global.prompt = () => '1';

@@ -78,13 +78,16 @@ await import('./tests/save_logic_boost.test.js');
 await import('./tests/pbt_combat.test.js');
 await import('./tests/visual_snapshots.test.js');
 await import('./tests/architecture.test.js');
-await import('./tests/coverage_boost_v3.test.js');
-await import('./tests/coverage_boost_v4.test.js');
+await import('./tests/save_load_resilience.test.js');
+await import('./tests/game_flow_extended.test.js');
+await import('./tests/combat_edge_cases.test.js'); // Formerly v2
 await import('./tests/stability.test.js');
 await import('./tests/time_cycle.test.js');
 await import('./tests/ui_sync.test.js');
 await import('./tests/resilience.test.js');
-await import('./tests/coverage_boost_v5.test.js');
+await import('./tests/ui_and_combat_flow.test.js');
+await import('./tests/achievements_integration.test.js');
+await import('./tests/animator_stress.test.js');
 
 
 // Parse command line arguments

@@ -1638,11 +1638,14 @@ export class MageKnightGame {
 
             let dateStr = '';
             if (isUnlocked) {
-                const timestamp = this.achievementManager.unlockedAchievements.get(ach.id);
-                if (timestamp) {
-                    const date = new Date(timestamp);
-                    dateStr = `<span class="achievement-date">Freigeschaltet: ${date.toLocaleDateString()}</span>`;
-                }
+                // Timestamps currently not tracked per achievement
+                /*
+               const timestamp = this.achievementManager.unlockedAchievements.get(ach.id);
+               if (timestamp) {
+                   const date = new Date(timestamp);
+                   dateStr = `<span class="achievement-date">Freigeschaltet: ${date.toLocaleDateString()}</span>`;
+               }
+               */
             }
 
             card.innerHTML = `

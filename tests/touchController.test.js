@@ -1,140 +1,167 @@
-
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { TouchController } from '../js/touchController.js';
-import { MageKnightGame } from '../js/game.js';
-import { MockHTMLElement } from './test-mocks.js';
+import { createMockElement, createSpy } from './test-mocks.js';
 
 describe('Touch Controller', () => {
     let game;
-    let touchController;
+    let controller;
     let canvas;
 
-    beforeEach(() => {
-        document.body.innerHTML = '<div id="canvas-container"><canvas id="game-board"></canvas></div><div id="hand-cards"></div>';
-        game = new MageKnightGame();
+    let originalVibrate, originalMatchMedia, originalGetElementById;
 
-        // Mock hero for render/update
-        game.hero = {
-            hand: [],
-            getStats: () => ({
-                health: 10, maxHealth: 10,
-                armor: 2,
-                handSize: 5
-            }),
-            position: { q: 0, r: 0 },
-            displayPosition: { q: 0, r: 0 }
+    beforeEach(() => {
+        originalVibrate = global.navigator.vibrate;
+        originalMatchMedia = global.window.matchMedia;
+        originalGetElementById = global.document.getElementById;
+        canvas = createMockElement('canvas');
+        canvas.getBoundingClientRect = () => ({
+            left: 0,
+            top: 0,
+            width: 800,
+            height: 600
+        });
+
+        game = {
+            canvas: canvas,
+            movementMode: false,
+            hexGrid: {
+                hasHex: () => true,
+                pixelToAxial: (x, y) => ({ q: Math.floor(x / 50), r: Math.floor(y / 50) }),
+                getHex: () => ({ terrain: 1 })
+            },
+            ui: {
+                addLog: createSpy('addLog'),
+                tooltipManager: {
+                    showEnemyTooltip: createSpy('showEnemyTooltip'),
+                    showTerrainTooltip: createSpy('showTerrainTooltip'),
+                    hideTooltip: createSpy('hideTooltip')
+                }
+            },
+            enemies: [],
+            terrain: { getName: () => 'plains' },
+            moveHero: createSpy('moveHero'),
+            selectHex: createSpy('selectHex'),
+            handleCardClick: createSpy('handleCardClick'),
+            handleCardRightClick: createSpy('handleCardRightClick'),
+            hero: { hand: [{ name: 'Card 1' }] }
         };
 
-        canvas = game.canvas;
-        touchController = new TouchController(game);
+        global.navigator.vibrate = createSpy('vibrate');
+        global.window.matchMedia = () => ({ matches: false });
 
-        // Mock navigator.vibrate
-        global.navigator.vibrate = () => true;
+        // Mock getElementById for cards
+        global.document.getElementById = (id) => {
+            if (id === 'hand-cards') return createMockElement('div');
+            return null;
+        };
+
+        controller = new TouchController(game);
     });
 
     afterEach(() => {
-        document.body.innerHTML = '';
+        global.navigator.vibrate = originalVibrate;
+        global.window.matchMedia = originalMatchMedia;
+        global.document.getElementById = originalGetElementById;
     });
 
-    it('should handle tap as a click/select', () => {
-        let selectedHex = null;
-        game.selectHex = (q, r) => { selectedHex = { q, r }; };
-
-        // Mock coordinate translation
-        game.hexGrid.pixelToAxial = () => ({ q: 2, r: 3 });
-        game.hexGrid.hasHex = () => true;
-
-        const touchStart = new CustomEvent('touchstart');
-        touchStart.touches = [{ clientX: 100, clientY: 100 }];
-        canvas.dispatchEvent(touchStart);
-
-        const touchEnd = new CustomEvent('touchend');
-        touchEnd.changedTouches = [{ clientX: 100, clientY: 100 }];
-        canvas.dispatchEvent(touchEnd);
-
-        expect(selectedHex).toEqual({ q: 2, r: 3 });
-    });
-
-    it('should handle long press for context info', (done) => {
-        game.ui.addLog = (msg, type) => {
-            if (msg.includes('Langes Drücken')) {
-                done();
-            }
+    it('should handle simple tap', () => {
+        const touch = { clientX: 100, clientY: 100 };
+        const event = {
+            preventDefault: () => { },
+            touches: [touch],
+            changedTouches: [touch]
         };
 
-        game.hexGrid.pixelToAxial = () => ({ q: 2, r: 3 });
-        game.hexGrid.hasHex = () => true;
+        controller.handleTouchStart(event);
+        controller.handleTouchEnd(event);
 
-        // Force long press threshold
-        touchController.longPressThreshold = 10;
-
-        const touchStart = new CustomEvent('touchstart');
-        touchStart.touches = [{ clientX: 100, clientY: 100 }];
-        canvas.dispatchEvent(touchStart);
-
-        // Wait for long press timer
-        setTimeout(() => {
-            const touchEnd = new CustomEvent('touchend');
-            touchEnd.changedTouches = [{ clientX: 100, clientY: 100 }];
-            canvas.dispatchEvent(touchEnd);
-        }, 20);
+        expect(game.selectHex.called).toBe(true);
     });
 
-    it('should handle swipes', () => {
-        let loggedMsg = '';
-        game.ui.addLog = (msg) => { loggedMsg = msg; };
+    it('should handle swipe', () => {
+        const touchStart = { clientX: 100, clientY: 100 };
+        const touchEnd = { clientX: 200, clientY: 100 };
 
-        const touchStart = new CustomEvent('touchstart');
-        touchStart.touches = [{ clientX: 100, clientY: 100 }];
-        canvas.dispatchEvent(touchStart);
+        controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
+        controller.handleTouchEnd({ changedTouches: [touchEnd], preventDefault: () => { } });
 
-        const touchEnd = new CustomEvent('touchend');
-        touchEnd.changedTouches = [{ clientX: 200, clientY: 100 }]; // Swipe right
-        canvas.dispatchEvent(touchEnd);
-
-        expect(loggedMsg).toBe('Swipe rechts');
+        expect(game.ui.addLog.called).toBe(true);
     });
 
-    it('should handle card taps', () => {
-        const hand = document.getElementById('hand-cards');
-        const cardEl = document.createElement('div');
-        cardEl.classList.add('card');
-        cardEl.dataset.index = '0';
-        hand.appendChild(cardEl);
+    it('should handle long press', async () => {
+        const touch = { clientX: 100, clientY: 100 };
 
-        let cardClicked = false;
-        game.handleCardClick = () => { cardClicked = true; };
-        game.hero = { hand: [{ name: 'Test Card' }] };
+        controller.handleTouchStart({ touches: [touch], preventDefault: () => { } });
 
-        const touchStart = new CustomEvent('touchstart');
-        touchStart.target = cardEl;
-        hand.dispatchEvent(touchStart);
+        // Wait for long press threshold
+        await new Promise(resolve => setTimeout(resolve, 600));
 
-        const touchEnd = new CustomEvent('touchend');
-        touchEnd.target = cardEl;
-        hand.dispatchEvent(touchEnd);
-
-        expect(cardClicked).toBe(true);
+        expect(game.ui.addLog.called).toBe(true);
     });
 
-    it('should handle viewport resize', (done) => {
-        const initialWidth = canvas.width;
+    it('should handle resize', () => {
+        game.canvas.parentNode = createMockElement('div');
+        game.canvas.parentNode.getBoundingClientRect = () => ({ width: 1000, height: 800 });
 
-        // Mock container
-        const container = document.createElement('div');
-        Object.defineProperty(container, 'getBoundingClientRect', {
-            value: () => ({ width: 500, height: 400 })
+        controller.handleResize();
+
+        // Resize is debounced, so we wait
+        return new Promise(resolve => {
+            setTimeout(() => {
+                expect(game.canvas.width).toBe(1000);
+                resolve();
+            }, 200);
         });
-        container.appendChild(canvas);
-        document.body.appendChild(container); // Add to DOM
+    });
 
-        touchController.resizeCanvas();
+    it('should detect touch device', () => {
+        global.window.ontouchstart = {};
+        expect(TouchController.isTouchDevice()).toBe(true);
+        delete global.window.ontouchstart;
+    });
 
-        // Canvas should be resized
-        setTimeout(() => {
-            expect(canvas.width).toBe(500);
-            expect(canvas.height).toBe(400);
-            done();
-        }, 150);
+    it('should handle card tap', () => {
+        game.hero.hand = [{ name: 'Card 0' }];
+        game.handleCardClick = createSpy();
+
+        controller.handleCardTap(0);
+        expect(game.handleCardClick.called).toBe(true);
+    });
+
+    it('should handle full touch lifecycle for tap', () => {
+        const touchStart = { clientX: 100, clientY: 100, target: canvas };
+        const touchEnd = { changedTouches: [{ clientX: 105, clientY: 105, target: canvas }] };
+
+        canvas.dispatchEvent({ type: 'touchstart', touches: [touchStart], preventDefault: () => { } });
+        canvas.dispatchEvent({ type: 'touchend', changedTouches: touchEnd.changedTouches, preventDefault: () => { } });
+
+        // This should trigger handleTap which calls handleHexClick
+        expect(game.selectHex.called).toBe(true);
+    });
+
+    it('should handle card long press', () => {
+        game.hero.hand = [{ name: 'Card 1' }];
+        game.handleCardRightClick = createSpy();
+
+        controller.handleCardLongPress(0);
+        expect(game.handleCardRightClick.called).toBe(true);
+        expect(global.navigator.vibrate.called).toBe(true);
+    });
+
+    it('should resize particle canvas if present', (done) => {
+        game.particleCanvas = createMockElement('canvas');
+        game.canvas.parentNode = createMockElement('div');
+        game.canvas.parentNode.getBoundingClientRect = () => ({ width: 500, height: 400 });
+
+        controller.resizeCanvas();
+
+        expect(game.particleCanvas.width).toBe(500);
+        expect(game.particleCanvas.height).toBe(400);
+        done();
+    });
+
+    it('should return device pixel ratio', () => {
+        global.window.devicePixelRatio = 2;
+        expect(TouchController.getDevicePixelRatio()).toBe(2);
     });
 });

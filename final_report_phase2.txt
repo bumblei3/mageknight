@@ -1,0 +1,371 @@
+
+> test:coverage
+> c8 --reporter=html --reporter=text --reporter=lcov node run_tests.js
+
+Starting tests...
+🧪 Running Tests...
+Game saved to slot 0
+Game saved to slot 1
+No save found in slot 3
+Game saved to slot 0
+Game saved to slot 2
+Deleted save in slot 2
+No save found in slot 2
+Game saved to slot 0
+Game saved to slot 1
+Game saved to slot 2
+Game saved to slot 0
+All saves cleared
+No save found in slot 0
+Unknown enemy type: unknown_type
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 3 enemies.
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 4 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+Spawned 4 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 10 enemies.
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+Spawned 5 enemies.
+Game saved to slot 0
+Canvas resized to 1000x800
+Canvas resized to 500x400
+Canvas resized to 500x400
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 12 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 4 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+[MockElement] .click() called on confirm-reset-btn
+Spawned 2 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+[MockElement] .click() called on confirm-reset-btn
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+[MockElement] .click() called on cancel-reset-btn
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 4 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+Game saved to slot 0
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 4 enemies.
+    Running 200 fuzz iterations...
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 3 enemies.
+[MockElement] .click() called on save-btn
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+Game saved to slot 0
+[MockElement] .click() called on DIV
+[MockElement] .click() called on DIV
+[MockElement] .click() called on DIV
+[MockElement] .click() called on DIV
+[MockElement] .click() called on confirm-level-up
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 10 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 11 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 10 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 10 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 11 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+Unknown enemy type: invalid_key
+Unknown boss type: invalid_boss
+[MockElement] .click() called on DIV
+❌ Global ➔ UI Boost: should render site options with subItems
+   Expected true but got false
+Error: Expected true but got false
+    at Object.toBe (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:47:27)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/ui_boost.test.js:68:34)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+[MockElement] .click() called on DIV
+❌ Global ➔ UI Boost: should render simple button options
+   Expected true but got false
+Error: Expected true but got false
+    at Object.toBe (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:47:27)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/ui_boost.test.js:82:34)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+Spawned 1 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 4 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 11 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+Game saved to slot 0
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 9 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 8 enemies.
+[MockElement] .click() called on sound-toggle-btn
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 6 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 7 enemies.
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 1 enemies.
+❌ Global ➔ Game UI Boost: should render session statistics
+   Expected "" to contain 50
+Error: Expected "" to contain 50
+    at Object.toContain (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:107:27)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game_ui_boost.test.js:91:32)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+🔧 Debug Tools initialized. Access via window.game or window.debug
+Spawned 5 enemies.
+❌ Global ➔ Game UI Boost: should handle modal toggle buttons
+   game.setupModals is not a function
+TypeError: game.setupModals is not a function
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/game_ui_boost.test.js:100:14)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+❌ Global ➔ Site Interaction Boost: should handle village visit
+   site.getName is not a function
+TypeError: site.getName is not a function
+    at SiteInteractionManager.visitSite (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/siteInteraction.js:22:24)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/siteInteraction_boost.test.js:42:17)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+❌ Global ➔ Site Interaction Boost: should allow recruiting units
+   this.game.hero.addUnit is not a function
+TypeError: this.game.hero.addUnit is not a function
+    at SiteInteractionManager.recruitUnit (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/siteInteraction.js:251:32)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/siteInteraction_boost.test.js:55:17)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+❌ Global ➔ Site Interaction Boost: should handle buying cards at Mage Tower
+   this.game.hero.getManaInventory is not a function
+TypeError: this.game.hero.getManaInventory is not a function
+    at SiteInteractionManager.buyCard (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/siteInteraction.js:278:46)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/siteInteraction_boost.test.js:88:17)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+❌ Global ➔ Site Interaction Boost: should handle healing at Monastery
+   this.game.hero.healWound is not a function
+TypeError: this.game.hero.healWound is not a function
+    at SiteInteractionManager.healWounds (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/siteInteraction.js:157:32)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/siteInteraction_boost.test.js:97:17)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+❌ Global ➔ Site Interaction Boost: should handle attacking sites
+   this.game.initiateCombat is not a function
+TypeError: this.game.initiateCombat is not a function
+    at SiteInteractionManager.attackSite (file:///home/tobber/.gemini/antigravity/scratch/mageknight/js/siteInteraction.js:329:19)
+    at Object.callback (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/siteInteraction_boost.test.js:104:17)
+    at file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:314:44
+    at new Promise (<anonymous>)
+    at TestRunner.run (file:///home/tobber/.gemini/antigravity/scratch/mageknight/tests/testRunner.js:304:21)
+
+Total: 625 | Passed: 616 | Failed: 9
+---------------------|---------|----------|---------|---------|-------------------------------------
+File                 | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                   
+---------------------|---------|----------|---------|---------|-------------------------------------
+All files            |   86.56 |     86.8 |   81.76 |   86.56 |                                     
+ achievements.js     |   95.19 |    83.33 |   92.59 |   95.19 | ...,237-240,282-283,297-299,306-309 
+ animator.js         |   83.51 |    89.28 |   45.45 |   83.51 | ...,201-203,207-209,213-218,257-261 
+ card.js             |   97.81 |    94.73 |    87.5 |   97.81 | 46-56                               
+ cardAnimations.js   |     100 |      100 |     100 |     100 |                                     
+ combat.js           |   83.35 |    91.52 |   70.37 |   83.35 | ...,543-544,548-549,553-554,620-628 
+ combatAnimations.js |   97.41 |    87.17 |     100 |   97.41 | 17-19,61-63,82-83                   
+ debug.js            |   85.18 |    94.73 |   73.68 |   85.18 | 117-118,131-146,156-160,163-167     
+ enemy.js            |   97.31 |    94.36 |   94.11 |   97.31 | 123-126,180-186,200-201             
+ enemyAI.js          |   97.16 |     86.2 |     100 |   97.16 | 36,39-40                            
+ game.js             |   68.42 |       75 |   86.56 |   68.42 | ...67,1671,1677-1681,1687-1688,1776 
+ hero.js             |   85.02 |    84.53 |   79.48 |   85.02 | ...,390-391,395-408,413-414,426-427 
+ hexgrid.js          |   96.86 |    91.13 |   91.17 |   96.86 | ...,114-116,347-355,438-439,572-573 
+ mana.js             |   96.44 |      100 |    87.5 |   96.44 | 112-115,119-120                     
+ mapManager.js       |     100 |      100 |     100 |     100 |                                     
+ particles.js        |   84.69 |    95.95 |   88.09 |   84.69 | ...,324-350,356-391,624-630,849-879 
+ saveManager.js      |   91.84 |    75.67 |     100 |   91.84 | ...0-62,79-80,95-97,109-111,155-157 
+ simpleTutorial.js   |   96.52 |    89.47 |     100 |   96.52 | 101,105,140,150-151,175,242,253-254 
+ siteInteraction.js  |   98.79 |    90.24 |   42.85 |   98.79 | 44,295-296,312                      
+ sites.js            |     100 |      100 |     100 |     100 |                                     
+ skills.js           |     100 |      100 |     100 |     100 |                                     
+ soundManager.js     |     100 |      100 |      45 |     100 |                                     
+ statistics.js       |   95.56 |    88.23 |   84.61 |   95.56 | ...,263,289,303-304,318-319,334-335 
+ statusEffects.js    |   89.85 |    89.58 |   77.41 |   89.85 | ...-229,234-235,255-265,319,337-338 
+ terrain.js          |      88 |       75 |   42.85 |      88 | 69-70,79-82,90-92,95-97             
+ timeManager.js      |     100 |      100 |     100 |     100 |                                     
+ tooltip.js          |   98.13 |    97.56 |   93.75 |   98.13 | 57-59,116-117,121                   
+ touchController.js  |   67.53 |    71.42 |   78.26 |   67.53 | ...,260-269,273-290,294-297,362-363 
+ tutorialManager.js  |   82.96 |       80 |   92.85 |   82.96 | ...,119-121,145-146,162-164,216-217 
+ ui.js               |   80.09 |       75 |   95.12 |   80.09 | ...-777,804,865-870,873-880,895-901 
+ unit.js             |   96.75 |      100 |   92.85 |   96.75 | 174-179                             
+---------------------|---------|----------|---------|---------|-------------------------------------

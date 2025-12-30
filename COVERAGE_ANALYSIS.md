@@ -4,10 +4,10 @@
 
 | Metric     | Coverage |
 |------------|----------|
-| Statements | **68.84%** |
-| Branches   | **84.66%** |
-| Functions  | **62.80%** |
-| Lines      | **68.84%** |
+| Statements | **79.48%** |
+| Branches   | **86.21%** |
+| Functions  | **72.02%** |
+| Lines      | **79.48%** |
 
 ---
 
@@ -44,11 +44,6 @@ Need more tests:
 - **simpleTutorial.js** - 64.80%
 - **enemyAI.js** - 61.32%
 - **game.js** - 54.38% ⚠️ Core module!
-
-### 🔴 Low Coverage (0-49%)
-Critical gaps:
-- **cardAnimations.js** - 46.01%
-- **particles.js** - 46.71%
 - **touchController.js** - 13.33% ⚠️
 - **combatAnimations.js** - 0% ⚠️ Not tested at all!
 

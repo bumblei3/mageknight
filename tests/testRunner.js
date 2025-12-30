@@ -343,6 +343,7 @@ export class TestRunner {
                 } else {
                     console.error(`❌ ${suiteName}: ${test.name}`);
                     console.error(`   ${e.message}`);
+                    console.error(e.stack); // Added stack trace
                 }
             } finally {
                 // Run all matching afterEach hooks (hierarchy: child -> parent -> global)

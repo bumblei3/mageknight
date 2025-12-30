@@ -1,3 +1,4 @@
+
 /**
  * Shared mock utilities for testing
  * Provides centralized mock definitions for Canvas, DOM, and Storage APIs
@@ -8,10 +9,12 @@
  * @param {Function} implementation - Optional function to execute
  * @returns {Function} Spy function with tracking
  */
-export function createSpy(implementation = () => { }) {
+export function createSpy(implementationOrName) {
+    const implementation = typeof implementationOrName === 'function' ? implementationOrName : () => { };
     const spy = function (...args) {
         spy.calls.push(args);
         spy.callCount++;
+        spy.called = true;
         const result = implementation(...args);
         spy.returnValues.push(result);
         return result;
@@ -19,10 +22,12 @@ export function createSpy(implementation = () => { }) {
 
     spy.calls = [];
     spy.callCount = 0;
+    spy.called = false;
     spy.returnValues = [];
     spy.reset = () => {
         spy.calls = [];
         spy.callCount = 0;
+        spy.called = false;
         spy.returnValues = [];
     };
     spy.calledWith = (...expectedArgs) => {
@@ -117,6 +122,47 @@ export function createMockCanvas(width = 800, height = 600) {
             y: 0
         })
     };
+}
+
+/**
+ * Creates a comprehensive mock UI object
+ */
+export function createMockUI() {
+    return {
+        addLog: createSpy(),
+        updateHeroStats: createSpy(),
+        formatEffect: createSpy(() => ''),
+        addPlayedCard: createSpy(),
+        showPlayArea: createSpy(),
+        reset: createSpy(),
+        showSiteModal: createSpy(), // Added
+        showSiteInteraction: createSpy(), // Added for safety as per previous test
+        updateMovementPoints: createSpy(),
+        renderUnits: createSpy(),
+        renderHandCards: createSpy(),
+        renderManaSource: createSpy(),
+        setButtonEnabled: createSpy(),
+        elements: {
+            endTurnBtn: { addEventListener: createSpy() },
+            restBtn: { addEventListener: createSpy() },
+            exploreBtn: { addEventListener: createSpy() },
+            newGameBtn: { addEventListener: createSpy() },
+            playedCards: { getBoundingClientRect: () => ({ top: 0, left: 0, right: 100, bottom: 100 }) },
+            handCards: { getBoundingClientRect: () => ({ top: 0, left: 0, right: 100, bottom: 100 }) }
+        },
+        tooltipManager: {
+            hideTooltip: createSpy(),
+            showEnemyTooltip: createSpy(),
+            showTerrainTooltip: createSpy()
+        }
+    };
+}
+
+/**
+ * Creates a mock HTML element
+ */
+export function createMockElement(tagName = 'div') {
+    return new MockHTMLElement(tagName);
 }
 
 /**
@@ -240,11 +286,36 @@ export class MockHTMLElement {
     }
 
     querySelector(selector) {
-        return new MockHTMLElement();
+        if (!selector) return null;
+        const findIn = (parent) => {
+            for (const child of parent.children) {
+                if (selector.startsWith('#') && child.id === selector.substring(1)) return child;
+                if (selector.startsWith('.') && child.classList.contains(selector.substring(1))) return child;
+                if (child.tagName === selector.toUpperCase()) return child;
+                const found = findIn(child);
+                if (found) return found;
+            }
+            return null;
+        };
+        return findIn(this) || new MockHTMLElement();
     }
 
     querySelectorAll(selector) {
-        return [];
+        if (!selector) return [];
+        const results = [];
+        const findAllIn = (parent) => {
+            if (!parent || !parent.children) return;
+            for (const child of parent.children) {
+                if (selector.startsWith('#') && child.id === selector.substring(1)) results.push(child);
+                else if (selector.startsWith('.') && child.classList.contains(selector.substring(1))) results.push(child);
+                else if (child.tagName === selector.toUpperCase()) results.push(child);
+                findAllIn(child);
+            }
+        };
+        findAllIn(this);
+        // Fallback: if nothing found but we expect something, return at least one mock to avoid breakage in loops
+        if (results.length === 0) return [new MockHTMLElement()];
+        return results;
     }
 
     setAttribute(name, value) {

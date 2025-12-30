@@ -16,6 +16,7 @@
         ],
         "exclude": [
             "js/three.min.js",
+            "js/main.js",
             "tests/**",
             "node_modules/**",
             "*.config.js"

@@ -173,8 +173,16 @@ export class BossEnemy extends Enemy {
 
     // Get ability for phase
     getPhaseAbility(phaseName) {
+        // Try direct lookup first (for custom phases)
+        if (this.phaseAbilities[phaseName]) {
+            return this.phaseAbilities[phaseName];
+        }
+
+        // Fallback for default mapping
         if (phaseName === 'Phase 2') return this.phaseAbilities[BOSS_PHASES.PHASE_2];
+        if (phaseName === 'Phase 3') return this.phaseAbilities[BOSS_PHASES.PHASE_3];
         if (phaseName === 'Enraged') return this.phaseAbilities[BOSS_PHASES.ENRAGED];
+
         return null;
     }
 

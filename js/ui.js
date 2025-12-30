@@ -17,9 +17,16 @@ export class UI {
     setupGlobalListeners() {
         this._logAddedHandler = ({ message, type }) => this.addLog(message, type);
         this._toastShowHandler = ({ message, type }) => this.showToast(message, type);
+        this._notificationHandler = ({ message, type }) => this.showNotification(message, type);
+        this._statsHandler = (hero) => {
+            this.updateHeroStats(hero);
+            this.updateMovementPoints(hero.movementPoints);
+        };
 
         eventBus.on(GAME_EVENTS.LOG_ADDED, this._logAddedHandler);
         eventBus.on(GAME_EVENTS.TOAST_SHOW, this._toastShowHandler);
+        eventBus.on(GAME_EVENTS.NOTIFICATION_SHOW, this._notificationHandler);
+        eventBus.on(GAME_EVENTS.STAMP_STATS_UPDATED, this._statsHandler);
     }
 
     destroy() {

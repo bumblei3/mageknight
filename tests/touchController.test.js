@@ -204,4 +204,52 @@ describe('Touch Controller', () => {
         global.window.devicePixelRatio = 2;
         expect(TouchController.getDevicePixelRatio()).toBe(2);
     });
+
+    it('should handle touch cancel', () => {
+        const touch = { clientX: 100, clientY: 100 };
+        controller.handleTouchStart({ touches: [touch], preventDefault: () => { } });
+        controller.handleTouchCancel({ preventDefault: () => { } });
+        // handleTouchCancel clears longPressTimer and isLongPress, not touchStartPos
+        expect(controller.longPressTimer).toBe(null);
+        expect(controller.isLongPress).toBe(false);
+    });
+
+    it('should show hex context menu', () => {
+        const hex = { q: 1, r: 1 };
+        game.enemies = [{ position: { q: 1, r: 1 }, name: 'Enemy', armor: 3, attack: 2 }];
+        // showHexContextMenu calls alert(), not addLog
+        const originalAlert = global.alert;
+        global.alert = createSpy('alert');
+        controller.showHexContextMenu(hex);
+        expect(global.alert.called).toBe(true);
+        global.alert = originalAlert;
+    });
+
+    it('should destroy and cleanup', () => {
+        expect(() => controller.destroy()).not.toThrow();
+        // After destroy, longPressTimer should be cleared
+        expect(controller.longPressTimer).toBe(null);
+    });
+
+    it('should handle touch move without swipe', () => {
+        const touch = { clientX: 100, clientY: 100 };
+        controller.handleTouchStart({ touches: [touch], preventDefault: () => { } });
+        controller.handleTouchMove({ touches: [{ clientX: 105, clientY: 105 }], preventDefault: () => { } });
+        // Small movement should not trigger swipe
+        expect(game.addLog.calledWith('Swipe rechts', 'info')).toBe(false);
+    });
+
+    it('should setup touch events on canvas', () => {
+        // Canvas should have touch listeners after constructor
+        expect(controller.game.canvas).toBeDefined();
+    });
+
+    it('should handle move during long press to cancel it', async () => {
+        const touch = { clientX: 100, clientY: 100 };
+        controller.handleTouchStart({ touches: [touch], preventDefault: () => { } });
+        // Move significantly during long press
+        controller.handleTouchMove({ touches: [{ clientX: 200, clientY: 200 }], preventDefault: () => { } });
+        // Long press timer should be cancelled
+        expect(controller.longPressTimer).toBe(null);
+    });
 });

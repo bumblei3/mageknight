@@ -108,4 +108,55 @@ describe('Combat Animations', () => {
         combatAnimations.enemyDefeatedExplosion(100, 100, particleSystem);
         expect(particleSystem.explosion.called).toBe(true);
     });
+
+    // Edge cases
+    it('should handle screen shake with no container', async () => {
+        global.document.querySelector = () => null;
+        const promise = combatAnimations.triggerScreenShake(5, 50);
+        await promise; // Should resolve without error
+    });
+
+    it('should handle health bar with null element', async () => {
+        await combatAnimations.animateHealthBar(null, 100, 50, 100);
+        // Should resolve without error
+    });
+
+    it('should handle pulse element with null', () => {
+        combatAnimations.pulseElement(null, '#ff0000');
+        // Should not throw
+    });
+
+    it('should handle impact without particle system', () => {
+        combatAnimations.animateImpact(100, 100, '#ff0000', null);
+        expect(global.document.body.appendChild.called).toBe(true);
+    });
+
+    it('should handle block without particle system', () => {
+        combatAnimations.animateBlock(100, 100, null);
+        expect(global.document.body.appendChild.called).toBe(true);
+    });
+
+    it('should handle enemy explosion without particle system', () => {
+        combatAnimations.enemyDefeatedExplosion(100, 100, null);
+        // Should not throw, only triggers screen shake
+    });
+
+    it('should handle health bar healing (to > from)', async () => {
+        const bar = createMockElement('div');
+        bar.style.width = '50%';
+        await combatAnimations.animateHealthBar(bar, 50, 100, 100);
+        expect(bar.style.width).toBe('100%');
+    });
+
+    it('should use default color for impact', () => {
+        const particleSystem = { impactEffect: createSpy('impactEffect') };
+        combatAnimations.animateImpact(100, 100, undefined, particleSystem);
+        expect(particleSystem.impactEffect.called).toBe(true);
+    });
+
+    it('should use default color for pulse', () => {
+        const el = createMockElement('div');
+        combatAnimations.pulseElement(el);
+        expect(el.style.animation).toBe('elementPulse 0.5s ease-in-out');
+    });
 });

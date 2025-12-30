@@ -463,6 +463,10 @@ export function createMockDocument() {
             // Search in body
             const findIn = (parent) => {
                 if (parent.id === id) return parent;
+                if (!parent.children) {
+                    // Handle text nodes or other non-element children if any
+                    return null;
+                }
                 for (const child of parent.children) {
                     const found = findIn(child);
                     if (found) return found;
@@ -644,12 +648,25 @@ class MockAudioContext {
  * Creates a mock window object
  */
 export function createMockWindow(width = 1024, height = 768) {
+    const listeners = {};
     const mockWindow = {
         innerWidth: width,
         innerHeight: height,
         devicePixelRatio: 1,
-        addEventListener: () => { },
-        removeEventListener: () => { },
+        addEventListener: (event, callback) => {
+            if (!listeners[event]) listeners[event] = [];
+            listeners[event].push(callback);
+        },
+        removeEventListener: (event, callback) => {
+            if (!listeners[event]) return;
+            listeners[event] = listeners[event].filter(cb => cb !== callback);
+        },
+        dispatchEvent: (event) => {
+            const type = typeof event === 'string' ? event : event.type;
+            if (listeners[type]) {
+                listeners[type].forEach(cb => cb(event));
+            }
+        },
         requestAnimationFrame: (callback) => setTimeout(callback, 16),
         cancelAnimationFrame: (id) => clearTimeout(id),
         setTimeout,

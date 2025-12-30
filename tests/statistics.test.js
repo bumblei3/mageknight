@@ -152,5 +152,99 @@ describe('StatisticsManager', () => {
             stats.reset();
             expect(stats.get('gamesPlayed')).toBe(0);
         });
+
+        it('should export stats as JSON', () => {
+            stats.increment('gamesPlayed');
+            const exported = stats.export();
+            expect(exported).toContain('gamesPlayed');
+            expect(exported).toContain('1');
+        });
+    });
+
+    describe('Additional Tracking', () => {
+        it('should track exploration', () => {
+            stats.trackExploration();
+            expect(stats.get('tilesExplored')).toBe(1);
+        });
+
+        it('should track site visit', () => {
+            stats.trackSiteVisit();
+            expect(stats.get('sitesVisited')).toBe(1);
+        });
+
+        it('should track movement', () => {
+            stats.trackMovement(3);
+            expect(stats.get('hexesMoved')).toBe(1);
+            expect(stats.get('totalMovement')).toBe(3);
+        });
+
+        it('should track turn', () => {
+            stats.trackTurn();
+            expect(stats.get('turns')).toBe(1);
+        });
+
+        it('should track level up', () => {
+            stats.trackLevelUp(3);
+            expect(stats.get('level')).toBe(3);
+        });
+    });
+
+    describe('Additional Analysis', () => {
+        it('should calculate average turns', () => {
+            stats.set('gamesPlayed', 4);
+            stats.set('turns', 20);
+            expect(stats.getAverageTurns()).toBe(5);
+        });
+
+        it('should handle zero games for average turns', () => {
+            expect(stats.getAverageTurns()).toBe(0);
+        });
+
+        it('should calculate combat success rate', () => {
+            stats.set('combatsWon', 7);
+            stats.set('combatsLost', 3);
+            expect(stats.getCombatSuccessRate()).toBe(70);
+        });
+
+        it('should handle zero combats for success rate', () => {
+            expect(stats.getCombatSuccessRate()).toBe(0);
+        });
+
+        it('should handle zero games/losses for win rate', () => {
+            expect(stats.getWinRate()).toBe(0);
+        });
+
+        it('should return none for favorite color when no mana used', () => {
+            expect(stats.getFavoriteColor()).toBe('none');
+        });
+    });
+
+    describe('Edge Cases', () => {
+        it('should ignore invalid stat names for increment', () => {
+            stats.increment('invalidStat');
+            expect(stats.get('invalidStat')).toBeUndefined();
+        });
+
+        it('should ignore invalid stat names for set', () => {
+            stats.set('invalidStat', 10);
+            expect(stats.get('invalidStat')).toBeUndefined();
+        });
+
+        it('should track card without color', () => {
+            stats.trackCardPlayed({});
+            expect(stats.get('cardsPlayed')).toBe(1);
+        });
+
+        it('should handle invalid mana color', () => {
+            stats.trackManaUsed('invalid');
+            expect(stats.get('manaUsed')).toBe(1);
+            // Invalid color should not crash
+        });
+
+        it('should track combat with wounds taken (non-perfect)', () => {
+            stats.trackCombat(true, 2);
+            expect(stats.get('combatsWon')).toBe(1);
+            expect(stats.get('perfectCombats')).toBe(0);
+        });
     });
 });

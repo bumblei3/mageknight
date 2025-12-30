@@ -325,7 +325,6 @@ export class Hero {
         this.blockPoints = 0;
         this.influencePoints = 0;
         this.healingPoints = 0;
-        this.healingPoints = 0;
         this.wounds = [];
         this.units = [];
         this.initializeDeck();
@@ -356,7 +355,6 @@ export class Hero {
             reputation: this.reputation,
             wounds: this.wounds.length,
             deckSize: this.deck.length,
-            handSize: this.hand.length,
             handSize: this.hand.length,
             discardSize: this.discard.length,
             units: this.units.length,
@@ -437,6 +435,25 @@ export class Hero {
         // Maybe sort hand or trigger UI update? 
         // UI update happens in Game.render()
         return { success: true, message: `${card.name} erhalten!` };
+    }
+
+    // Crystal management (max 3 per color)
+    addCrystal(color) {
+        if (this.crystals[color] !== undefined) {
+            if (this.crystals[color] < 3) {
+                this.crystals[color]++;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    useCrystal(color) {
+        if (this.crystals[color] > 0) {
+            this.crystals[color]--;
+            return true;
+        }
+        return false;
     }
 
     // ===== MANA MANAGEMENT =====

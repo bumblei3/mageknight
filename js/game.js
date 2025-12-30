@@ -18,11 +18,11 @@ import { createUnit } from './unit.js';
 import { DebugManager } from './debug.js';
 import { getRandomSkills } from './skills.js';
 import { SAMPLE_ADVANCED_ACTIONS, createDeck, Card } from './card.js';
+import AchievementManager from './achievements.js';
+import { StatisticsManager } from './statistics.js';
 import SimpleTutorial from './simpleTutorial.js';
 import SoundManager from './soundManager.js';
 import TouchController from './touchController.js';
-import AchievementManager from './achievements.js';
-import StatisticsManager from './statistics.js';
 import { createEnemy } from './enemy.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS, TIME_OF_DAY, COMBAT_PHASES } from './constants.js';
@@ -223,7 +223,7 @@ export class MageKnightGame {
                 const enemy = this.enemyAI.generateEnemy(terrainName, level);
                 enemy.position = { q: hex.q, r: hex.r };
                 // Ensure unique ID
-                enemy.id = `enemy_${hex.q}_${hex.r}_${Date.now()} `;
+                enemy.id = `enemy_${hex.q}_${hex.r}_${Date.now()}`;
 
                 this.enemies.push(enemy);
             }
@@ -351,6 +351,13 @@ export class MageKnightGame {
                 this.rest();
                 e.preventDefault();
             }
+
+            // E for explore
+            if (e.key === 'e' || e.key === 'E') {
+                this.explore();
+                e.preventDefault();
+            }
+
 
             // Ctrl+S for save
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -482,74 +489,10 @@ export class MageKnightGame {
             }, { signal });
         });
 
-        // Show tutorial on first visit
-        const hasSeenTutorial = localStorage.getItem('mageKnightTutorialSeen');
-        if (!hasSeenTutorial) {
-            setTimeout(() => this.showTutorial(), 1000);
-        }
+
     }
 
-    showTutorial() {
-        const tutorialOverlay = document.getElementById('tutorial-overlay');
-        const tutorialTitle = document.getElementById('tutorial-title');
-        const tutorialText = document.getElementById('tutorial-text');
-        const tutorialNext = document.getElementById('tutorial-next');
-        const tutorialSkip = document.getElementById('tutorial-skip');
 
-        const tutorialSteps = [
-            {
-                title: '👋 Willkommen bei Mage Knight!',
-                text: 'Dies ist ein Tutorial, das dir die Grundlagen des Spiels zeigt. Du kannst es jederzeit überspringen oder später über den ❓-Button aufrufen.'
-            },
-            {
-                title: '🎴 Karten spielen',
-                text: 'Unten siehst du deine Handkarten. Klicke mit Links auf eine Karte, um sie zu spielen. Mit Rechtsklick kannst du sie seitlich für +1 Bewegung/Angriff/Block/Einfluss spielen.'
-            },
-            {
-                title: '👣 Bewegung',
-                text: 'Spiele grüne Karten für Bewegungspunkte. Erreichbare Felder werden violett hervorgehoben. Klicke auf ein Feld, um dich dorthin zu bewegen.'
-            },
-            {
-                title: '⚔️ Kampf',
-                text: 'Wenn du ein Feld mit einem Feind betrittst, beginnt automatisch ein Kampf. Nutze blaue Karten zum Blocken und rote Karten zum Angreifen!'
-            },
-            {
-                title: '🎯 Ziel',
-                text: 'Besiege alle 3 Feinde auf der Karte, um zu gewinnen! Viel Erfolg!'
-            }
-        ];
-
-        let currentStep = 0;
-
-        const showStep = () => {
-            if (currentStep >= tutorialSteps.length) {
-                tutorialOverlay.style.display = 'none';
-                localStorage.setItem('mageKnightTutorialSeen', 'true');
-                return;
-            }
-
-            const step = tutorialSteps[currentStep];
-            tutorialTitle.textContent = step.title;
-            tutorialText.textContent = step.text;
-
-            if (currentStep === tutorialSteps.length - 1) {
-                tutorialNext.textContent = 'Los geht\'s!';
-            }
-        };
-
-        tutorialNext.addEventListener('click', () => {
-            currentStep++;
-            showStep();
-        });
-
-        tutorialSkip.addEventListener('click', () => {
-            tutorialOverlay.style.display = 'none';
-            localStorage.setItem('mageKnightTutorialSeen', 'true');
-        });
-
-        tutorialOverlay.style.display = 'flex';
-        showStep();
-    }
 
     handleCanvasClick(e) {
         const rect = this.canvas.getBoundingClientRect();
@@ -580,53 +523,7 @@ export class MageKnightGame {
         }
     }
 
-    handleCanvasMouseMove(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
 
-        const hex = this.hexGrid.pixelToAxial(x, y);
-
-        // Check if hex exists
-        if (!this.hexGrid.hasHex(hex.q, hex.r)) {
-            this.ui.tooltipManager.hideTooltip();
-            return;
-        }
-
-        // Check for enemy (BUG FIX: add null check for position)
-        const enemy = this.enemies.find(e => e.position && e.position.q === hex.q && e.position.r === hex.r);
-        if (enemy) {
-            // Show enemy tooltip
-            const dummyEl = {
-                getBoundingClientRect: () => ({
-                    left: e.clientX,
-                    top: e.clientY,
-                    width: 0,
-                    height: 0,
-                    right: e.clientX,
-                    bottom: e.clientY
-                })
-            };
-            this.ui.tooltipManager.showEnemyTooltip(dummyEl, enemy);
-            return;
-        }
-
-        // Show terrain tooltip
-        const hexData = this.hexGrid.getHex(hex.q, hex.r);
-        if (hexData) {
-            const dummyEl = {
-                getBoundingClientRect: () => ({
-                    left: e.clientX,
-                    top: e.clientY,
-                    width: 0,
-                    height: 0,
-                    right: e.clientX,
-                    bottom: e.clientY
-                })
-            };
-            this.ui.tooltipManager.showTerrainTooltip(dummyEl, hexData.terrain, {});
-        }
-    }
 
     selectHex(q, r) {
         this.hexGrid.selectHex(q, r);
@@ -871,18 +768,7 @@ export class MageKnightGame {
         }
     }
 
-    visitSite() {
-        const q = this.hero.position.q;
-        const r = this.hero.position.r;
-        const hexData = this.hexGrid.getHex(q, r);
 
-        if (hexData && hexData.site) {
-            const interactionData = this.siteManager.visitSite(hexData, hexData.site);
-            this.ui.showSiteModal(interactionData);
-        } else {
-            this.addLog('Hier gibt es nichts zu besuchen.', 'info');
-        }
-    }
 
     initiateCombat(enemy) {
         this.combat = new Combat(this.hero, enemy);
@@ -894,7 +780,6 @@ export class MageKnightGame {
         this.combatRangedTotal = 0;
         this.combatSiegeTotal = 0;
 
-        this.addLog(result.message, 'combat');
         this.addLog(result.message, 'combat');
         this.ui.showCombatPanel(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
 
@@ -1354,6 +1239,7 @@ export class MageKnightGame {
 
         if (this.hero.movementPoints < 2) {
             this.addLog('Nicht genug Bewegungspunkte (Kosten: 2)', 'info');
+            this.ui.showToast('Nicht genug Bewegungspunkte!', 'warning');
             return;
         }
 
@@ -1444,10 +1330,12 @@ export class MageKnightGame {
     saveGame() {
         if (this.combat) {
             this.addLog('Kann nicht im Kampf speichern!', 'warning');
+            this.ui.showToast('Kann nicht im Kampf speichern!', 'warning');
             return;
         }
         this.saveManager.saveGame(0, this.getGameState()); // Slot 0 default
         this.addLog('Spiel gespeichert!', 'success');
+        this.ui.showToast('Spiel gespeichert (Slot 0)', 'success');
     }
 
     getGameState() {
@@ -1507,6 +1395,7 @@ export class MageKnightGame {
         this.renderMana();
         this.render();
         this.addLog('Spielstand geladen', 'info');
+        this.ui.showToast('Spielstand geladen', 'success');
     }
 
     openSaveDialog() {
@@ -1528,6 +1417,10 @@ export class MageKnightGame {
             const success = this.saveManager.saveGame(parseInt(slot) - 1, this.getGameState());
             if (success) {
                 this.addLog(`Spiel in Slot ${slot} gespeichert`, 'info');
+                this.ui.showToast(`Spiel in Slot ${slot} gespeichert`, 'success');
+            } else {
+                this.addLog('Fehler beim Speichern', 'error');
+                this.ui.showToast('Fehler beim Speichern', 'error');
             }
         }
     }
@@ -1553,6 +1446,7 @@ export class MageKnightGame {
                 this.loadGameState(state);
             } else {
                 this.addLog('Fehler beim Laden', 'info');
+                this.ui.showToast('Fehler beim Laden', 'error');
             }
         }
     }
@@ -1797,7 +1691,63 @@ export class MageKnightGame {
             createStatCard('Einheiten', this.hero.units.length);
         }
     }
+
+    handleCanvasMouseMove(e) {
+        if (!this.hexGrid || !this.ui.tooltipManager) return;
+
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Convert to axial coordinates
+        const axial = this.hexGrid.pixelToAxial(x, y);
+        const hex = this.hexGrid.getHex(axial.q, axial.r);
+
+        if (hex && hex.revealed) {
+            // Priority: Enemy > Site > Terrain
+            // Check for enemies at this position
+            const enemy = this.enemies.find(e =>
+                !e.isDefeated() &&
+                e.position &&
+                e.position.q === axial.q &&
+                e.position.r === axial.r
+            );
+
+            // Create fake element for positioning relative to the hex center
+            const hexCenter = this.hexGrid.axialToPixel(axial.q, axial.r);
+            // Adjust to screen coordinates
+            const screenX = rect.left + hexCenter.x;
+            const screenY = rect.top + hexCenter.y;
+
+            const fakeElement = {
+                getBoundingClientRect: () => ({
+                    left: screenX,
+                    top: screenY,
+                    right: screenX,
+                    bottom: screenY,
+                    width: 0,
+                    height: 0
+                })
+            };
+
+            if (enemy) {
+                const content = this.ui.tooltipManager.createEnemyTooltipHTML(enemy);
+                this.ui.tooltipManager.showTooltip(fakeElement, content);
+            } else if (hex.site) {
+                const content = this.ui.tooltipManager.createSiteTooltipHTML(hex.site);
+                this.ui.tooltipManager.showTooltip(fakeElement, content);
+            } else if (hex.terrain) {
+                const content = this.ui.tooltipManager.createTerrainTooltipHTML(hex.terrain);
+                this.ui.tooltipManager.showTooltip(fakeElement, content);
+            } else {
+                this.ui.tooltipManager.hideTooltip();
+            }
+        } else {
+            this.ui.tooltipManager.hideTooltip();
+        }
+    }
 }
+
 
 // Start the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

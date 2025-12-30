@@ -222,7 +222,9 @@ export class Combat {
         });
 
         // Calculate wounds (damage / hero armor, rounded up)
-        this.woundsReceived = Math.ceil(this.totalDamage / this.hero.armor);
+        const effectiveArmor = Math.max(1, this.hero.armor || 1);
+        this.woundsReceived = Math.ceil(this.totalDamage / effectiveArmor);
+        if (isNaN(this.woundsReceived)) this.woundsReceived = 0;
 
         // Apply wounds to hero
         for (let i = 0; i < this.woundsReceived; i++) {

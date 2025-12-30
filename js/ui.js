@@ -93,8 +93,8 @@ export class UI {
             siteModal: document.getElementById('site-modal'),
             siteClose: document.getElementById('site-close'),
             siteModalIcon: document.getElementById('site-modal-icon'),
-            siteModalTitle: document.querySelector('#site-modal .modal-title'),
-            siteModalDescription: document.querySelector('#site-modal .site-description'),
+            siteModalTitle: document.getElementById('site-modal-title'),
+            siteModalDescription: document.getElementById('site-modal-description'),
             siteOptions: document.getElementById('site-options'),
             siteCloseBtn: document.getElementById('site-close-btn'),
 

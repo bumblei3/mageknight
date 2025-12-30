@@ -25,7 +25,7 @@ describe('SimpleTutorial', () => {
                 addLog: () => { },
                 showNotification: () => { }
             },
-            playCard: (idx) => { },
+            handleCardClick: (idx, card) => { },
             moveHero: (q, r) => { }
         };
 
@@ -158,7 +158,7 @@ describe('SimpleTutorial', () => {
         it('should detect card play', async () => {
             tutorial.showStep(2); // Card Play Step
 
-            mockGame.playCard(0);
+            mockGame.handleCardClick(0, { color: 'green' });
 
             await new Promise(r => setTimeout(r, 600));
 

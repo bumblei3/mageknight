@@ -181,19 +181,19 @@ export class SimpleTutorial {
     // Wait for specific game action
     waitForAction(actionType) {
         // Store original action handlers
-        const originalPlayCard = this.game.playCard.bind(this.game);
-        const originalMovveHero = this.game.moveHero.bind(this.game);
+        const originalHandleCardClick = this.game.handleCardClick.bind(this.game);
+        const originalMoveHero = this.game.moveHero.bind(this.game);
 
         if (actionType === 'card_played') {
             // Temporary override to detect card play
-            this.game.playCard = (index, shouldUseStrong) => {
-                const card = this.game.hero.hand[index];
-                const result = originalPlayCard(index, shouldUseStrong);
+            this.game.handleCardClick = (index, card) => {
+                const result = originalHandleCardClick(index, card);
 
                 // Check if green card was played
                 if (card && card.color === 'green') {
+                    // We need to wait a bit because the card play logic itself might need time
                     setTimeout(() => {
-                        this.game.playCard = originalPlayCard; // Restore
+                        this.game.handleCardClick = originalHandleCardClick; // Restore
                         this.next();
                     }, 500);
                 }
@@ -203,9 +203,9 @@ export class SimpleTutorial {
         } else if (actionType === 'hero_moved') {
             // Temporary override to detect movement
             this.game.moveHero = (q, r) => {
-                originalMovveHero(q, r);
+                originalMoveHero(q, r);
                 setTimeout(() => {
-                    this.game.moveHero = originalMovveHero; // Restore
+                    this.game.moveHero = originalMoveHero; // Restore
                     this.next();
                 }, 500);
             };

@@ -49,17 +49,33 @@ export class ManaSource {
     // Ensure at least half of dice show basic colors
     ensureBasicColors() {
         const basicColors = [MANA_COLORS.RED, MANA_COLORS.BLUE, MANA_COLORS.WHITE, MANA_COLORS.GREEN];
-        const basicCount = this.dice.filter(color => basicColors.includes(color)).length;
-        const requiredBasic = Math.ceil(this.dice.length / 2);
+        const basicIndices = [];
+        const nonBasicIndices = [];
 
-        if (basicCount < requiredBasic) {
-            // Re-roll gold and black dice
-            this.dice = this.dice.map(color => {
-                if (color === MANA_COLORS.GOLD || color === MANA_COLORS.BLACK) {
-                    return basicColors[Math.floor(Math.random() * basicColors.length)];
-                }
-                return color;
-            });
+        this.dice.forEach((color, idx) => {
+            if (basicColors.includes(color)) {
+                basicIndices.push(idx);
+            } else {
+                nonBasicIndices.push(idx);
+            }
+        });
+
+        const requiredBasic = Math.ceil(this.dice.length / 2);
+        let currentBasicCount = basicIndices.length;
+
+        if (currentBasicCount < requiredBasic) {
+            // Shuffle non-basic indices to pick randomly
+            for (let i = nonBasicIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [nonBasicIndices[i], nonBasicIndices[j]] = [nonBasicIndices[j], nonBasicIndices[i]];
+            }
+
+            // Replace only as many as needed
+            while (currentBasicCount < requiredBasic && nonBasicIndices.length > 0) {
+                const idx = nonBasicIndices.pop();
+                this.dice[idx] = basicColors[Math.floor(Math.random() * basicColors.length)];
+                currentBasicCount++;
+            }
         }
     }
 

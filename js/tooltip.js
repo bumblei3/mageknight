@@ -316,6 +316,62 @@ export class TooltipManager {
             </div>
         `;
     }
+    /**
+     * Create HTML for site tooltip
+     * @param {object} site - Site object
+     * @returns {string} HTML string
+     */
+    createSiteTooltipHTML(site) {
+        const info = site.getInfo();
+        const status = site.conquered ? '<span class="status-conquered">👑 Erobert</span>' :
+            site.visited ? '<span class="status-visited">✓ Besucht</span>' : '';
+
+        let actionsHtml = '';
+        if (info.actions) {
+            actionsHtml = '<div class="tooltip-actions">';
+            info.actions.forEach(action => {
+                actionsHtml += `<span class="action-tag">${this.getActionIcon(action)} ${this.getActionName(action)}</span>`;
+            });
+            actionsHtml += '</div>';
+        }
+
+        return `
+            <div class="tooltip-site" style="border-left-color: ${info.color}">
+                <div class="tooltip-header">
+                    <span class="tooltip-icon">${info.icon}</span>
+                    <span class="tooltip-name">${info.name}</span>
+                </div>
+                ${status ? `<div class="tooltip-status">${status}</div>` : ''}
+                <div class="tooltip-divider"></div>
+                <div class="tooltip-description">${info.description}</div>
+                ${actionsHtml}
+            </div>
+        `;
+    }
+
+    getActionIcon(action) {
+        const icons = {
+            'heal': '❤️',
+            'recruit': '👥',
+            'attack': '⚔️',
+            'train': '📚',
+            'learn': '✨',
+            'explore': '🔍'
+        };
+        return icons[action] || '•';
+    }
+
+    getActionName(action) {
+        const names = {
+            'heal': 'Heilen',
+            'recruit': 'Rekrutieren',
+            'attack': 'Angreifen',
+            'train': 'Trainieren',
+            'learn': 'Lernen',
+            'explore': 'Erkunden'
+        };
+        return names[action] || action;
+    }
 }
 
 export default TooltipManager;

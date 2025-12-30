@@ -2,8 +2,8 @@
 
 [![Test Suite](https://github.com/bumblei3/mageknight/actions/workflows/test.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/bumblei3/mageknight/branch/master/graph/badge.svg)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 712 passing](https://img.shields.io/badge/tests-712%20passing-brightgreen)
-![Coverage: 92.14%](https://img.shields.io/badge/coverage-92.14%25-brightgreen)
+![Tests: 683 passing](https://img.shields.io/badge/tests-683%20passing-brightgreen)
+![Coverage: 91.18%](https://img.shields.io/badge/coverage-91.18%25-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -67,10 +67,10 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 ### Terraintypen
 
 - 🌾 **Ebenen**: 2 Bewegungspunkte
-- 🌲 **Wald**: 3 Bewegungspunkte (Tag), 2 (Nacht)
+- 🌲 **Wald**: 3 Bewegungspunkte (Tag), 5 (Nacht)
 - ⛰️ **Hügel**: 3 Bewegungspunkte
 - 🏔️ **Berge**: 5 Bewegungspunkte
-- 🏜️ **Wüste**: 3 Bewegungspunkte (Tag), 2 (Nacht)
+- 🏜️ **Wüste**: 5 Bewegungspunkte (Tag), 3 (Nacht)
 - ☠️ **Ödland**: 3 Bewegungspunkte
 - 💧 **Wasser**: Unpassierbar
 
@@ -83,8 +83,9 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 ### Mana-System
 
 - Klicke auf Mana-Würfel in der Quelle, um sie zu nehmen
-- Farben: 🔥 Rot, 💧 Blau, ✨ Weiß, 🌿 Grün
-- Mana wird für starke Kartenwirkungen benötigt (in Basis-Version vereinfacht)
+- Farben: 🔥 Rot, 💧 Blau, ✨ Weiß, 🌿 Grün, 💰 Gold, 🌑 Schwarz
+- **Tag/Nacht-Regel**: Gold-Mana ist ein Wildcard (beliebige Farbe), aber **nur am Tag**. In der Nacht kann Gold-Mana nicht verwendet werden, um andere Farben zu ersetzen.
+- Mana wird für starke Kartenwirkungen benötigt.
 
 ## 🎯 Tipps & Strategie
 
@@ -153,6 +154,8 @@ Das Spiel ist modular aufgebaut:
 - **Visuelles Feedback**: "Floating Text" für sofortiges Feedback bei Stat-Änderungen.
 - **Karten-UX**: Visuelle Hinweise für Rechtsklick-Aktionen (seitlich spielen).
 - **Polished UI**: Verbessertes Design für Modals und Interaktionen.
+- **Tag/Nacht-Visuals**: Dynamische Beleuchtung am Spielfeldrand und ein **Sichtweiten-System** (Vision Radius 2) bei Nacht, das Felder um den Helden herum beleuchtet.
+- **Smooth Transitions**: Weiche Farbübergänge beim Wechsel der Tageszeit.
 
 ## 🧪 Testing & Qualitätssicherung
 
@@ -160,9 +163,11 @@ Das Projekt verfügt über eine hochmoderne Test-Suite mit **712 Tests** und **9
 
 ### Test-Methodologien
 - **Unit & Integration Tests**: Vollständige Abdeckung aller Kernkomponenten.
+- **Deterministic Testing**: Implementierter seeded PRNG für 100% reproduzierbare Testläufe (`test-mocks.js`).
+- **UI Synchronization**: Verifikation der Bindung zwischen Spielstatus und UI-Elementen (`ui_sync.test.js`).
 - **Chaos Testing**: Überprüfung der Daten-Resilienz gegen korrupte Speicherstände (`chaos.test.js`).
 - **Property-Based Testing (PBT)**: Mathematische Verifikation der Kampfinvarianten unter zufälligen Szenarien (`pbt_combat.test.js`).
-- **Long Session Integration**: Stabilitätsprüfung über mehrere Spielrunden hinweg.
+- **Long Session & Resilience**: Stabilitätsprüfung über viele Züge hinweg und Resilienz gegen ungültige Daten.
 - **Visual Validation**: Überprüfung der Rendering-Integrität via Canvas-API-Snapshots.
 
 ### Tests ausführen

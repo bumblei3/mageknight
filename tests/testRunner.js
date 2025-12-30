@@ -44,7 +44,7 @@ export class TestRunner {
         const matchers = {
             toBe: (expected) => {
                 if (actual !== expected) {
-                    throw new Error(`Expected ${expected} but got ${actual}`);
+                    throw new Error(`Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`);
                 }
             },
             toEqual: (expected) => {
@@ -230,6 +230,22 @@ export class TestRunner {
             toBeFalsy: () => {
                 if (!actual) {
                     throw new Error(`Expected ${actual} not to be falsy`);
+                }
+            },
+            toThrow: (errorMessageOrType) => {
+                if (typeof actual !== 'function') {
+                    throw new Error('toThrow expects a function');
+                }
+                let thrown = false;
+                let error;
+                try {
+                    actual();
+                } catch (e) {
+                    thrown = true;
+                    error = e;
+                }
+                if (thrown) {
+                    throw new Error(`Expected function NOT to throw, but it threw: ${error.message}`);
                 }
             },
             // Custom Matchers

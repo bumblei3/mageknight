@@ -81,6 +81,9 @@ await import('./tests/architecture.test.js');
 await import('./tests/coverage_boost_v3.test.js');
 await import('./tests/coverage_boost_v4.test.js');
 await import('./tests/stability.test.js');
+await import('./tests/time_cycle.test.js');
+await import('./tests/ui_sync.test.js');
+await import('./tests/resilience.test.js');
 
 
 // Parse command line arguments

@@ -81,6 +81,7 @@ body {
     min-height: 100vh;
     overflow: hidden;
     /* Prevent scroll on body, handle in containers */
+    transition: background-color 2s ease, background-image 2s ease, filter 2s ease;
 }
 
 /* Dynamic Background Mesh */

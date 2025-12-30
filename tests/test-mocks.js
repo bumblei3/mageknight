@@ -40,6 +40,41 @@ export function createSpy(implementationOrName) {
     return spy;
 }
 
+/**
+ * Deterministic Pseudo-Random Number Generator
+ * @param {number} seed - Initial seed
+ * @returns {Function} Function that returns 0..1
+ */
+export function createPRNG(seed = 12345) {
+    let s = seed;
+    return function () {
+        let t = s += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+let originalRandom = Math.random;
+let currentPRNG = null;
+
+/**
+ * Sets a seed for Math.random() override
+ * @param {number} seed - Seed value
+ */
+export function setRandomSeed(seed) {
+    currentPRNG = createPRNG(seed);
+    Math.random = currentPRNG;
+}
+
+/**
+ * Restores original Math.random()
+ */
+export function restoreRandom() {
+    Math.random = originalRandom;
+    currentPRNG = null;
+}
+
 
 /**
  * Creates a mock 2D canvas context with all common methods
@@ -230,8 +265,10 @@ export class MockHTMLElement {
 
     set innerHTML(html) {
         this._innerHTML = html;
-        if (html === '') {
+        // Basic mock: if setting to empty string, clear children
+        if (html === '' || html === null) {
             this.children = [];
+            this._textContent = '';
         }
     }
 
@@ -247,7 +284,7 @@ export class MockHTMLElement {
     }
 
     set textContent(text) {
-        this._textContent = text;
+        this._textContent = text !== null && text !== undefined ? String(text) : '';
         this.children = []; // Setting textContent clears children in real DOM
     }
 
@@ -447,24 +484,41 @@ export function createMockDocument() {
             return elements.get(id);
         },
         querySelector: (selector) => {
-            if (selector.startsWith('.')) {
-                const className = selector.substring(1);
-                // Search in body children
-                const findIn = (parent) => {
-                    for (const child of parent.children) {
-                        if (child.classList && child.classList.contains(className)) return child;
-                        if (child.className && child.className.includes(className)) return child;
-                        const found = findIn(child);
-                        if (found) return found;
-                    }
-                    return null;
-                };
-                const found = findIn(doc.body);
-                if (found) return found;
-            }
-            return new MockHTMLElement();
+            const findIn = (parent) => {
+                if (selector.startsWith('#')) {
+                    if (parent.id === selector.substring(1)) return parent;
+                } else if (selector.startsWith('.')) {
+                    if (parent.classList && parent.classList.contains(selector.substring(1))) return parent;
+                } else if (parent.tagName === selector.toUpperCase()) {
+                    return parent;
+                }
+
+                for (const child of parent.children) {
+                    if (typeof child === 'string') continue;
+                    const found = findIn(child);
+                    if (found) return found;
+                }
+                return null;
+            };
+            return findIn(doc.body) || new MockHTMLElement();
         },
-        querySelectorAll: (selector) => [],
+        querySelectorAll: (selector) => {
+            const results = [];
+            const findIn = (parent) => {
+                if (selector.startsWith('.')) {
+                    if (parent.classList && parent.classList.contains(selector.substring(1))) results.push(parent);
+                } else if (parent.tagName === selector.toUpperCase()) {
+                    results.push(parent);
+                }
+
+                for (const child of parent.children) {
+                    if (typeof child === 'string') continue;
+                    findIn(child);
+                }
+            };
+            findIn(doc.body);
+            return results;
+        },
         createElement: (tag) => new MockHTMLElement(tag),
         createTextNode: (text) => ({ nodeValue: text, textContent: text }),
         addEventListener: () => { },
@@ -617,21 +671,17 @@ export function createMockWindow(width = 1024, height = 768) {
  * Call this in test setup to mock DOM/browser environment
  */
 export function setupGlobalMocks() {
-    if (typeof document === 'undefined') {
-        global.document = createMockDocument();
-    }
-    if (typeof window === 'undefined') {
-        global.window = createMockWindow();
-    }
-    if (typeof localStorage === 'undefined') {
-        global.localStorage = createMockLocalStorage();
-    }
-    if (typeof HTMLElement === 'undefined') {
-        global.HTMLElement = MockHTMLElement;
-    }
-    if (typeof prompt === 'undefined') {
+    global.document = createMockDocument();
+    global.window = createMockWindow();
+    global.localStorage = createMockLocalStorage();
+    global.HTMLElement = MockHTMLElement;
+
+    if (typeof prompt === 'undefined' || global.prompt.toString().includes('native')) {
         global.prompt = () => '1';
     }
+
+    // Default seed for deterministic tests
+    setRandomSeed(42);
 }
 
 /**

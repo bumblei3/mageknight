@@ -103,7 +103,7 @@ export class Hero {
     }
 
     // Play a card from hand
-    playCard(cardIndex, useStrong = false) {
+    playCard(cardIndex, useStrong = false, isNight = false) {
         if (cardIndex < 0 || cardIndex >= this.hand.length) {
             return null;
         }
@@ -112,7 +112,7 @@ export class Hero {
 
         // If using strong effect, check and spend mana
         if (useStrong && card.manaCost > 0) {
-            const success = this.spendMana(card.color);
+            const success = this.spendMana(card.color, isNight);
             if (!success) {
                 // Couldn't spend mana, fallback to basic
                 useStrong = false;
@@ -468,31 +468,31 @@ export class Hero {
     }
 
     // Check if hero has required mana color
-    hasMana(requiredColor) {
+    hasMana(requiredColor, isNight = false) {
         if (!requiredColor) return false;
-        // Gold can substitute any color
+        // Gold can substitute any color ONLY during the day
         return this.tempMana.some(m =>
-            m === requiredColor || m === MANA_COLORS.GOLD
+            m === requiredColor || (!isNight && m === MANA_COLORS.GOLD)
         );
     }
 
     // Check if hero can afford card's mana cost
-    canAffordMana(card) {
+    canAffordMana(card, isNight = false) {
         if (!card.manaCost || card.manaCost === 0) return true;
 
-        // For simplicity: need 1 mana matching card color (or gold)
-        return this.hasMana(card.color);
+        // For simplicity: need 1 mana matching card color (or gold if day)
+        return this.hasMana(card.color, isNight);
     }
 
-    // Spend mana for a card (prefer exact match, fallback to gold)
-    spendMana(requiredColor) {
+    // Spend mana for a card (prefer exact match, fallback to gold if day)
+    spendMana(requiredColor, isNight = false) {
         if (!requiredColor) return false;
 
         // Try exact match first
         let index = this.tempMana.indexOf(requiredColor);
 
-        // Fallback to gold wildcard
-        if (index === -1) {
+        // Fallback to gold wildcard (DAY ONLY)
+        if (index === -1 && !isNight) {
             index = this.tempMana.indexOf(MANA_COLORS.GOLD);
         }
 

@@ -45,7 +45,7 @@ describe('UI', () => {
         ui.updateHeroStats(mockHero);
 
         expect(ui.elements.heroName.textContent).toBe('TestHero');
-        expect(ui.elements.heroHandLimit.textContent).toBe(6);
+        expect(ui.elements.heroHandLimit.textContent).toBe('6');
         // Armor and fame use animation, so immediate textContent might not update or might be handled by animator mock?
         // In setup.js, requestAnimationFrame is setTimeout(cb, 0).
         // animateCounter uses requestAnimationFrame.
@@ -56,7 +56,7 @@ describe('UI', () => {
 
     it('should update movement points', () => {
         ui.updateMovementPoints(5);
-        expect(ui.elements.movementPoints.textContent).toBe(5);
+        expect(ui.elements.movementPoints.textContent).toBe('5');
     });
 
     it('should render hand cards', () => {

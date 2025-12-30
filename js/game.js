@@ -565,7 +565,7 @@ export class MageKnightGame {
         }
 
         // Play card for basic effect
-        const result = this.hero.playCard(index, false);
+        const result = this.hero.playCard(index, false, this.timeManager.isNight());
         if (result) {
             this.sound.cardPlay();
             this.addLog(`${result.card.name} gespielt: ${this.ui.formatEffect(result.effect)} `, 'info');
@@ -797,7 +797,7 @@ export class MageKnightGame {
         if (!this.combat || card.isWound()) return;
 
         const phase = this.combat.phase;
-        const result = this.hero.playCard(index, false);
+        const result = this.hero.playCard(index, false, this.timeManager.isNight());
 
         if (!result) return;
 
@@ -1476,7 +1476,7 @@ export class MageKnightGame {
                     const roundNum = document.getElementById('round-number');
                     if (timeIcon) {
                         timeIcon.textContent = isNight ? '🌙' : '☀️';
-                        timeIcon.className = `time - icon ${isNight ? 'night' : ''} `;
+                        timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
                     }
                     if (roundNum) roundNum.textContent = state.round;
 

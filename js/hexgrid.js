@@ -12,6 +12,8 @@ export class HexGrid {
         this.debugMode = false;
         this.animationFrame = 0; // For animated water/lava
         this.ambientLight = 1.0; // Global lighting (0.0-1.0)
+        this.heroPosition = null; // Track hero position for vision
+        this.visionRadius = 2; // Default vision radius
     }
 
     // Axial to Pixel conversion
@@ -109,9 +111,19 @@ export class HexGrid {
         this.ctx.fillStyle = fillColor;
         this.ctx.fill();
 
-        // Apply Day/Night lighting
-        if (this.ambientLight < 1.0) {
-            this.ctx.fillStyle = `rgba(0, 0, 20, ${1 - this.ambientLight})`;
+        // Apply Day/Night lighting with vision falloff
+        let effectiveLight = this.ambientLight;
+        if (this.ambientLight < 1.0 && this.heroPosition) {
+            const dist = this.distance(q, r, this.heroPosition.q, this.heroPosition.r);
+            if (dist <= this.visionRadius) {
+                // Smooth falloff from 1.0 down to ambientLight
+                const t = dist / (this.visionRadius + 1);
+                effectiveLight = 1.0 - t * (1.0 - this.ambientLight);
+            }
+        }
+
+        if (effectiveLight < 1.0) {
+            this.ctx.fillStyle = `rgba(0, 0, 20, ${1 - effectiveLight})`;
             this.ctx.fill();
         }
         this.ctx.closePath();
@@ -123,8 +135,8 @@ export class HexGrid {
         );
 
         // Apply ambient lighting to colors
-        const baseColor = this.applyLighting(fillColor, this.ambientLight);
-        gradient.addColorStop(0, this.lightenColor(baseColor, 20 * this.ambientLight));
+        const baseColor = this.applyLighting(fillColor, effectiveLight);
+        gradient.addColorStop(0, this.lightenColor(baseColor, 20 * effectiveLight));
         gradient.addColorStop(0.6, baseColor);
         gradient.addColorStop(1, this.darkenColor(baseColor, 20));
 
@@ -398,6 +410,10 @@ export class HexGrid {
     render(hero = null, enemies = []) {
         this.animationFrame++; // Increment for animations
         this.clear();
+
+        if (hero) {
+            this.heroPosition = hero.position;
+        }
 
         // Draw all hexes
         for (const [key, hexData] of this.hexes) {

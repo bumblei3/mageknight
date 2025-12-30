@@ -535,7 +535,7 @@ export class Combat {
 
     // Apply a status effect to hero
     applyEffectToHero(effectType, source = null) {
-        return this.statusEffects.applyToHero(effectType, source);
+        return this.statusEffects.applyToHero(this.hero, effectType, source);
     }
 
     // Apply a status effect to an enemy
@@ -562,7 +562,7 @@ export class Combat {
         };
 
         // Process hero effects
-        const heroResult = this.statusEffects.processHeroPhaseStart();
+        const heroResult = this.statusEffects.processHeroPhaseStart(this.hero);
         if (heroResult && heroResult.damage) {
             results.heroDamage = heroResult.damage;
             results.messages.push(`Held erleidet ${heroResult.damage} Schaden durch Statuseffekte!`);

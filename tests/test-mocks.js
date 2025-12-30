@@ -125,7 +125,10 @@ export function createMockCanvas(width = 800, height = 600) {
 export class MockHTMLElement {
     constructor(tagName = 'div') {
         this.tagName = tagName.toUpperCase();
-        this.style = {};
+        this.style = {
+            setProperty: (prop, val) => { this.style[prop] = val; },
+            getPropertyValue: (prop) => this.style[prop] || ''
+        };
         this._listeners = new Map();
         this.classList = {
             add: (...classes) => {
@@ -282,6 +285,25 @@ export class MockHTMLElement {
             }
         }
     }
+
+    closest(selector) {
+        if (!selector.startsWith('.')) return null;
+        const className = selector.substring(1);
+
+        let el = this;
+        while (el) {
+            if (el.classList.contains(className)) return el;
+            el = el.parentNode;
+        }
+        return null;
+    }
+
+    get width() { return this._width || 0; }
+    set width(v) { this._width = v; }
+    get height() { return this._height || 0; }
+    set height(v) { this._height = v; }
+
+    get parentElement() { return this.parentNode; }
 }
 
 /**

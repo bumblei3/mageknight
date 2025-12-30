@@ -20,7 +20,10 @@ import './tests/siteInteraction.test.js';
 import './tests/tutorialManager.test.js';
 import './tests/hexgrid.test.js';
 import './tests/game.test.js';
-import './tests/animator.test.js';
+await import('./tests/game_logic.test.js');
+await import('./tests/combatAnimations.test.js');
+await import('./tests/touchController.test.js');
+await import('./tests/animator.test.js');
 import './tests/particles.test.js';
 import './tests/tooltip.test.js';
 import './tests/debug.test.js';
@@ -48,6 +51,11 @@ await import('./tests/content_expansion.test.js');
 await import('./tests/level_up.test.js');
 await import('./tests/site_rewards.test.js');
 await import('./tests/combat_ranged.test.js');
+await import('./tests/statusEffects.test.js');
+await import('./tests/enemyAI.test.js');
+await import('./tests/combat_logic.test.js');
+await import('./tests/tutorial.test.js');
+await import('./tests/statistics.test.js');
 
 // Parse command line arguments
 const args = process.argv.slice(2);

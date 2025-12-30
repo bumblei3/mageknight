@@ -178,8 +178,8 @@ export class StatusEffectManager {
     }
 
     // Apply an effect to the hero
-    applyToHero(effectType, source = null) {
-        return this._applyEffect(this.heroEffects, effectType, 'hero', source);
+    applyToHero(hero, effectType, source = null) {
+        return this._applyEffect(this.heroEffects, effectType, hero, source);
     }
 
     // Apply an effect to an enemy
@@ -218,8 +218,8 @@ export class StatusEffectManager {
     }
 
     // Remove an effect from hero
-    removeFromHero(effectType) {
-        return this._removeEffect(this.heroEffects, effectType, 'hero');
+    removeFromHero(hero, effectType) {
+        return this._removeEffect(this.heroEffects, effectType, hero);
     }
 
     // Remove an effect from enemy
@@ -246,8 +246,8 @@ export class StatusEffectManager {
     }
 
     // Process phase start for hero
-    processHeroPhaseStart() {
-        return this._processPhaseStart(this.heroEffects, 'hero');
+    processHeroPhaseStart(hero) {
+        return this._processPhaseStart(this.heroEffects, hero);
     }
 
     // Process phase start for all enemies

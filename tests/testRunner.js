@@ -2,33 +2,38 @@
 export class TestRunner {
     constructor() {
         this.tests = [];
-        this.currentSuite = 'Global';
+        this.suiteStack = ['Global'];
         this.beforeEachCallbacks = [];
         this.afterEachCallbacks = [];
     }
 
     describe(name, callback) {
-        this.currentSuite = name;
+        this.suiteStack.push(name);
         callback();
+        this.suiteStack.pop();
+    }
+
+    get currentSuitePath() {
+        return [...this.suiteStack];
     }
 
     beforeEach(callback) {
         this.beforeEachCallbacks.push({
-            suite: this.currentSuite,
+            suitePath: this.currentSuitePath,
             callback: callback
         });
     }
 
     afterEach(callback) {
         this.afterEachCallbacks.push({
-            suite: this.currentSuite,
+            suitePath: this.currentSuitePath,
             callback: callback
         });
     }
 
     it(name, callback, options = {}) {
         this.tests.push({
-            suite: this.currentSuite,
+            suitePath: this.currentSuitePath,
             name: name,
             callback: callback,
             timeout: options.timeout || 5000 // Default 5s timeout
@@ -100,6 +105,12 @@ export class TestRunner {
                     : typeof actual === 'string' && actual.includes(expected);
                 if (!contains) {
                     throw new Error(`Expected ${JSON.stringify(actual)} to contain ${expected}`);
+                }
+            },
+            toMatch: (regex) => {
+                const re = new RegExp(regex);
+                if (!re.test(actual)) {
+                    throw new Error(`Expected ${actual} to match ${regex}`);
                 }
             },
             toHaveLength: (expected) => {
@@ -256,13 +267,10 @@ export class TestRunner {
 
     async run(options = {}) {
         const { grep } = options;
-        // Robust browser check: must have document AND not be in a mock environment (heuristic)
-        // Or simply check if we are in Node.js by checking process
         const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
         const isBrowser = !isNode && typeof document !== 'undefined';
 
         let resultsContainer;
-
         if (isBrowser) {
             resultsContainer = document.getElementById('test-results');
             if (resultsContainer) resultsContainer.innerHTML = '';
@@ -274,18 +282,20 @@ export class TestRunner {
         let failed = 0;
 
         for (const test of this.tests) {
+            const suiteName = test.suitePath.join(' ➔ ');
+            const fullTestName = `${suiteName}: ${test.name}`;
+
             // Filter tests if grep option is provided
-            if (grep) {
-                const fullTestName = `${test.suite} ${test.name}`;
-                if (!fullTestName.includes(grep)) {
-                    continue;
-                }
+            if (grep && !fullTestName.includes(grep)) {
+                continue;
             }
 
             try {
-                // Run beforeEach callbacks for this test's suite
-                const suiteBefore = this.beforeEachCallbacks.filter(b => b.suite === test.suite);
-                for (const before of suiteBefore) {
+                // Run all matching beforeEach hooks (hierarchy: global -> parent -> child)
+                const matchingBefore = this.beforeEachCallbacks.filter(b =>
+                    b.suitePath.every((name, i) => test.suitePath[i] === name)
+                );
+                for (const before of matchingBefore) {
                     await before.callback();
                 }
 
@@ -294,7 +304,6 @@ export class TestRunner {
                     new Promise(async (resolve, reject) => {
                         try {
                             if (test.callback.length > 0) {
-                                // Test expects 'done' callback
                                 await new Promise((doneResolve, doneReject) => {
                                     test.callback((err) => {
                                         if (err) doneReject(err);
@@ -302,7 +311,6 @@ export class TestRunner {
                                     });
                                 });
                             } else {
-                                // Standard async/sync test
                                 await test.callback();
                             }
                             resolve();
@@ -319,31 +327,33 @@ export class TestRunner {
                 if (isBrowser) {
                     const el = document.createElement('div');
                     el.className = 'test-result pass';
-                    el.innerHTML = `✅ <strong>${test.suite}</strong>: ${test.name}`;
+                    el.innerHTML = `✅ <strong>${suiteName}</strong>: ${test.name}`;
                     resultsContainer.appendChild(el);
                 } else {
-                    // console.log(`✅ ${test.suite}: ${test.name}`);
+                    // console.log(`✅ ${suiteName}: ${test.name}`);
                 }
             } catch (e) {
                 failed++;
                 if (isBrowser) {
                     const el = document.createElement('div');
                     el.className = 'test-result fail';
-                    el.innerHTML = `❌ <strong>${test.suite}</strong>: ${test.name}<br><span class="error">${e.message}</span>`;
+                    el.innerHTML = `❌ <strong>${suiteName}</strong>: ${test.name}<br><span class="error">${e.message}</span>`;
                     resultsContainer.appendChild(el);
                     console.error(e);
                 } else {
-                    console.error(`❌ ${test.suite}: ${test.name}`);
+                    console.error(`❌ ${suiteName}: ${test.name}`);
                     console.error(`   ${e.message}`);
                 }
             } finally {
-                // Run afterEach callbacks
-                const suiteAfter = this.afterEachCallbacks.filter(b => b.suite === test.suite);
-                for (const after of suiteAfter) {
+                // Run all matching afterEach hooks (hierarchy: child -> parent -> global)
+                const matchingAfter = this.afterEachCallbacks.filter(b =>
+                    b.suitePath.every((name, i) => test.suitePath[i] === name)
+                ).reverse();
+                for (const after of matchingAfter) {
                     try {
                         await after.callback();
                     } catch (e) {
-                        console.error(`Error in afterEach for ${test.suite}: ${e.message}`);
+                        console.error(`Error in afterEach for ${suiteName}: ${e.message}`);
                     }
                 }
             }

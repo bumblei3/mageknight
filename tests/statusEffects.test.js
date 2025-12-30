@@ -1,3 +1,4 @@
+
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { StatusEffectManager, StatusEffect, EFFECT_TYPES, EFFECT_DEFINITIONS } from '../js/statusEffects.js';
 
@@ -86,51 +87,53 @@ describe('Status Effects System', () => {
     });
 
     describe('StatusEffectManager', () => {
-        it('should apply effect to hero', () => {
-            const result = manager.applyToHero(EFFECT_TYPES.STUN);
-            expect(result.success).toBe(true);
-            expect(result.applied).toBe(true);
-            expect(manager.heroHasEffect(EFFECT_TYPES.STUN)).toBe(true);
-        });
+        describe('applyToHero', () => {
+            it('should apply effect to hero', () => {
+                const result = manager.applyToHero(mockHero, EFFECT_TYPES.STUN);
+                expect(result.success).toBe(true);
+                expect(result.applied).toBe(true);
+                expect(manager.heroHasEffect(EFFECT_TYPES.STUN)).toBe(true);
+            });
 
-        it('should apply effect to enemy', () => {
-            const result = manager.applyToEnemy(mockEnemy, EFFECT_TYPES.BURN);
-            expect(result.success).toBe(true);
-            expect(manager.enemyHasEffect(mockEnemy, EFFECT_TYPES.BURN)).toBe(true);
-        });
+            it('should apply effect to enemy', () => {
+                const result = manager.applyToEnemy(mockEnemy, EFFECT_TYPES.BURN);
+                expect(result.success).toBe(true);
+                expect(manager.enemyHasEffect(mockEnemy, EFFECT_TYPES.BURN)).toBe(true);
+            });
 
-        it('should stack existing effects', () => {
-            manager.applyToHero(EFFECT_TYPES.BURN);
-            const result = manager.applyToHero(EFFECT_TYPES.BURN);
-            expect(result.success).toBe(true);
-            expect(result.stacked).toBe(true);
-            expect(result.effect.stacks).toBe(2);
-        });
+            it('should stack existing effects', () => {
+                manager.applyToHero(mockHero, EFFECT_TYPES.BURN);
+                const result = manager.applyToHero(mockHero, EFFECT_TYPES.BURN);
+                expect(result.success).toBe(true);
+                expect(result.stacked).toBe(true);
+                expect(result.effect.stacks).toBe(2);
+            });
 
-        it('should remove effects from hero', () => {
-            manager.applyToHero(EFFECT_TYPES.FREEZE);
-            expect(manager.heroHasEffect(EFFECT_TYPES.FREEZE)).toBe(true);
-            manager.removeFromHero(EFFECT_TYPES.FREEZE);
-            expect(manager.heroHasEffect(EFFECT_TYPES.FREEZE)).toBe(false);
-        });
+            it('should remove effects from hero', () => {
+                manager.applyToHero(mockHero, EFFECT_TYPES.FREEZE);
+                expect(manager.heroHasEffect(EFFECT_TYPES.FREEZE)).toBe(true);
+                manager.removeFromHero(mockHero, EFFECT_TYPES.FREEZE);
+                expect(manager.heroHasEffect(EFFECT_TYPES.FREEZE)).toBe(false);
+            });
 
-        it('should process phase start effects and deal damage', () => {
-            manager.applyToHero(EFFECT_TYPES.BURN);
-            manager.applyToHero(EFFECT_TYPES.BURN); // 2 stacks
-            const result = manager.processHeroPhaseStart();
-            expect(result).toBeDefined();
-            expect(result.damage).toBe(2); // 2 stacks = 2 damage
-        });
+            it('should process phase start effects and deal damage', () => {
+                manager.applyToHero(mockHero, EFFECT_TYPES.BURN);
+                manager.applyToHero(mockHero, EFFECT_TYPES.BURN); // 2 stacks
+                const result = manager.processHeroPhaseStart(mockHero);
+                expect(result).toBeDefined();
+                expect(result.damage).toBe(2); // 2 stacks = 2 damage
+            });
 
-        it('should expire effects after duration', () => {
-            manager.applyToHero(EFFECT_TYPES.STUN); // Duration 1
-            expect(manager.heroHasEffect(EFFECT_TYPES.STUN)).toBe(true);
-            manager.processHeroPhaseStart(); // Tick
-            expect(manager.heroHasEffect(EFFECT_TYPES.STUN)).toBe(false);
+            it('should expire effects after duration', () => {
+                manager.applyToHero(mockHero, EFFECT_TYPES.STUN); // Duration 1
+                expect(manager.heroHasEffect(EFFECT_TYPES.STUN)).toBe(true);
+                manager.processHeroPhaseStart(mockHero); // Tick
+                expect(manager.heroHasEffect(EFFECT_TYPES.STUN)).toBe(false);
+            });
         });
 
         it('should clear all effects', () => {
-            manager.applyToHero(EFFECT_TYPES.BURN);
+            manager.applyToHero(mockHero, EFFECT_TYPES.BURN);
             manager.applyToEnemy(mockEnemy, EFFECT_TYPES.FREEZE);
             manager.clear();
             expect(manager.getHeroEffects().length).toBe(0);
@@ -138,8 +141,8 @@ describe('Status Effects System', () => {
         });
 
         it('should process combat end for poison', () => {
-            manager.applyToHero(EFFECT_TYPES.POISON);
-            manager.applyToHero(EFFECT_TYPES.POISON); // 2 stacks
+            manager.applyToHero(mockHero, EFFECT_TYPES.POISON);
+            manager.applyToHero(mockHero, EFFECT_TYPES.POISON); // 2 stacks
             const result = manager.processCombatEnd(mockHero);
             expect(result.wounds).toBe(2);
         });

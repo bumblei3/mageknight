@@ -1,76 +1,156 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+
+import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { StatisticsManager } from '../js/statistics.js';
 
 describe('StatisticsManager', () => {
-    let statsManager;
+    let stats;
+    let mockStorage;
 
     beforeEach(() => {
-        localStorage.clear();
-        statsManager = new StatisticsManager();
-        statsManager.reset();
+        // Mock localStorage
+        mockStorage = {};
+        global.localStorage = {
+            getItem: (key) => mockStorage[key] || null,
+            setItem: (key, val) => mockStorage[key] = val,
+            removeItem: (key) => delete mockStorage[key]
+        };
+
+        stats = new StatisticsManager();
     });
 
-    it('should initialize with default stats', () => {
-        const stats = statsManager.getAll();
-        expect(stats.gamesPlayed).toBe(0);
-        expect(stats.enemiesDefeated).toBe(0);
-        expect(stats.level).toBe(1);
+    afterEach(() => {
+        delete global.localStorage;
     });
 
-    it('should increment simple stats', () => {
-        statsManager.increment('enemiesDefeated');
-        expect(statsManager.get('enemiesDefeated')).toBe(1);
+    describe('Initialization', () => {
+        it('should initialize with default stats', () => {
+            expect(stats.get('gamesPlayed')).toBe(0);
+            expect(stats.get('totalDamageDealt')).toBe(0);
+            expect(stats.get('victory')).toBe(false);
+        });
 
-        statsManager.increment('enemiesDefeated', 5);
-        expect(statsManager.get('enemiesDefeated')).toBe(6);
+        it('should load stats from storage on init', () => {
+            const savedStats = { gamesPlayed: 5, gamesWon: 2 };
+            mockStorage['mageKnight_statistics'] = JSON.stringify({ stats: savedStats });
+
+            const newStats = new StatisticsManager();
+            expect(newStats.get('gamesPlayed')).toBe(5);
+            expect(newStats.get('gamesWon')).toBe(2);
+        });
     });
 
-    it('should track card plays by color', () => {
-        const redCard = { color: 'red', name: 'Attack' };
-        const blueCard = { color: 'blue', name: 'Block' };
+    describe('Tracking', () => {
+        it('should increment stats', () => {
+            stats.increment('gamesPlayed');
+            expect(stats.get('gamesPlayed')).toBe(1);
 
-        statsManager.trackCardPlayed(redCard);
-        statsManager.trackCardPlayed(blueCard);
-        statsManager.trackCardPlayed(redCard);
+            stats.increment('gamesPlayed', 2);
+            expect(stats.get('gamesPlayed')).toBe(3);
+        });
 
-        const stats = statsManager.getAll();
-        expect(stats.cardsPlayed).toBe(3);
-        expect(stats.attackCardsPlayed).toBe(2);
-        expect(stats.blockCardsPlayed).toBe(1);
+        it('should set stats explicitly', () => {
+            stats.set('level', 5);
+            expect(stats.get('level')).toBe(5);
+        });
+
+        it('should track card played', () => {
+            stats.trackCardPlayed({ color: 'red' });
+
+            expect(stats.get('cardsPlayed')).toBe(1);
+            expect(stats.get('attackCardsPlayed')).toBe(1);
+            expect(stats.get('blockCardsPlayed')).toBe(0);
+        });
+
+        it('should track enemy defeated', () => {
+            stats.trackEnemyDefeated({ type: 'orc' });
+            expect(stats.get('enemiesDefeated')).toBe(1);
+            expect(stats.get('dragonsDefeated')).toBe(0);
+
+            stats.trackEnemyDefeated({ type: 'dragon' });
+            expect(stats.get('enemiesDefeated')).toBe(2);
+            expect(stats.get('dragonsDefeated')).toBe(1);
+        });
+
+        it('should track combat results', () => {
+            stats.trackCombat(true, 0); // Won, perfect
+            expect(stats.get('combatsWon')).toBe(1);
+            expect(stats.get('perfectCombats')).toBe(1);
+
+            stats.trackCombat(false, 3); // Lost
+            expect(stats.get('combatsLost')).toBe(1);
+        });
+
+        it('should track mana usage', () => {
+            stats.trackManaUsed('blue');
+            expect(stats.get('manaUsed')).toBe(1);
+            expect(stats.getAll().manaByColor.blue).toBe(1);
+            expect(stats.getAll().manaByColor.red).toBe(0);
+        });
     });
 
-    it('should track combat results', () => {
-        // Win with 0 wounds
-        statsManager.trackCombat(true, 0);
-        expect(statsManager.get('combatsWon')).toBe(1);
-        expect(statsManager.get('perfectCombats')).toBe(1);
+    describe('Game Flow', () => {
+        it('should handle game start', () => {
+            stats.set('gamesPlayed', 10);
+            stats.set('turns', 50); // Current game stat
 
-        // Win with 2 wounds
-        statsManager.trackCombat(true, 2);
-        expect(statsManager.get('combatsWon')).toBe(2);
-        expect(statsManager.get('perfectCombats')).toBe(1);
+            stats.startGame();
 
-        // Loss
-        statsManager.trackCombat(false, 0);
-        expect(statsManager.get('combatsLost')).toBe(1);
+            expect(stats.get('gamesPlayed')).toBe(11); // incremented
+            expect(stats.get('turns')).toBe(0); // reset
+        });
+
+        it('should handle game end victory', () => {
+            stats.endGame(true);
+
+            expect(stats.get('victory')).toBe(true);
+            expect(stats.get('gamesWon')).toBe(1);
+        });
+
+        it('should handle game end loss', () => {
+            stats.endGame(false);
+
+            expect(stats.get('victory')).toBe(false);
+            expect(stats.get('gamesLost')).toBe(1);
+        });
     });
 
-    it('should persist to localStorage', () => {
-        statsManager.increment('gamesPlayed');
+    describe('Analysis', () => {
+        it('should calculate win rate', () => {
+            stats.set('gamesWon', 6);
+            stats.set('gamesLost', 4);
+            // Total 10, won 6 => 60%
+            expect(stats.getWinRate()).toBe(60);
+        });
 
-        // Create new instance to simulate reload
-        const newManager = new StatisticsManager();
-        expect(newManager.get('gamesPlayed')).toBe(1);
+        it('should determine favorite color', () => {
+            stats.trackManaUsed('red');
+            stats.trackManaUsed('red');
+            stats.trackManaUsed('blue');
+
+            expect(stats.getFavoriteColor()).toBe('red');
+        });
+
+        it('should return summary', () => {
+            const summary = stats.getSummary();
+            expect(summary).toBeDefined();
+            expect(summary.winRate).toBeDefined();
+            expect(summary.favoriteColor).toBeDefined();
+        });
     });
 
-    it('should calculate summary stats', () => {
-        statsManager.increment('gamesWon');
-        statsManager.increment('gamesLost');
-        statsManager.set('turns', 20);
-        statsManager.increment('gamesPlayed', 2); // Total 2 games
+    describe('Persistence', () => {
+        it('should save to storage', () => {
+            stats.increment('gamesPlayed');
+            // stats.save() is called automatically by increment/set
 
-        const summary = statsManager.getSummary();
-        expect(summary.winRate).toBe(50); // 1 win, 1 loss
-        expect(summary.averageTurns).toBe(10); // 20 turns / 2 games
+            const stored = JSON.parse(mockStorage['mageKnight_statistics']);
+            expect(stored.stats.gamesPlayed).toBe(1);
+        });
+
+        it('should reset stats', () => {
+            stats.increment('gamesPlayed');
+            stats.reset();
+            expect(stats.get('gamesPlayed')).toBe(0);
+        });
     });
 });

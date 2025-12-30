@@ -24,6 +24,14 @@ if (typeof document === 'undefined') {
     };
     global.alert = () => { };
     global.confirm = () => true; // Mock confirm
+    global.performance = { now: () => Date.now() };
+    global.CustomEvent = class CustomEvent {
+        constructor(type, options = {}) {
+            this.type = type;
+            Object.assign(this, options);
+            if (!this.preventDefault) this.preventDefault = () => { };
+        }
+    };
 
     // Expose AudioContext globally for SoundManager
     global.AudioContext = mockWindow.AudioContext;

@@ -61,6 +61,9 @@ export class TouchController {
         const touch = e.changedTouches[0];
         const touchDuration = Date.now() - this.touchStartTime;
 
+        // Safety check
+        if (!this.touchStartPos) return;
+
         // If it was a long press, don't process as normal click
         if (this.isLongPress) {
             this.isLongPress = false;
@@ -335,6 +338,8 @@ export class TouchController {
     }
 
     resizeCanvas() {
+        if (!this.game.canvas || !this.game.canvas.parentElement) return;
+
         const container = this.game.canvas.parentElement;
         const rect = container.getBoundingClientRect();
 
@@ -353,7 +358,9 @@ export class TouchController {
             }
 
             // Re-render
-            this.game.render();
+            if (this.game.hero && typeof this.game.hero.getStats === 'function') {
+                this.game.render();
+            }
 
             console.log(`Canvas resized to ${width}x${height}`);
         }

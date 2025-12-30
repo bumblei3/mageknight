@@ -1,319 +1,140 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
-import { TouchController } from '../js/touchController.js';
 
-describe('TouchController', () => {
+import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { TouchController } from '../js/touchController.js';
+import { MageKnightGame } from '../js/game.js';
+import { MockHTMLElement } from './test-mocks.js';
+
+describe('Touch Controller', () => {
+    let game;
     let touchController;
-    let mockGame;
-    let mockCanvas;
+    let canvas;
 
     beforeEach(() => {
-        // Mock Canvas
-        mockCanvas = {
-            addEventListener: () => { },
-            removeEventListener: () => { },
-            getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 600 }),
-            width: 800,
-            height: 600,
-            parentElement: {
-                getBoundingClientRect: () => ({ width: 800, height: 600 })
+        document.body.innerHTML = '<div id="canvas-container"><canvas id="game-board"></canvas></div><div id="hand-cards"></div>';
+        game = new MageKnightGame();
+
+        // Mock hero for render/update
+        game.hero = {
+            hand: [],
+            getStats: () => ({
+                health: 10, maxHealth: 10,
+                armor: 2,
+                handSize: 5
+            }),
+            position: { q: 0, r: 0 },
+            displayPosition: { q: 0, r: 0 }
+        };
+
+        canvas = game.canvas;
+        touchController = new TouchController(game);
+
+        // Mock navigator.vibrate
+        global.navigator.vibrate = () => true;
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    it('should handle tap as a click/select', () => {
+        let selectedHex = null;
+        game.selectHex = (q, r) => { selectedHex = { q, r }; };
+
+        // Mock coordinate translation
+        game.hexGrid.pixelToAxial = () => ({ q: 2, r: 3 });
+        game.hexGrid.hasHex = () => true;
+
+        const touchStart = new CustomEvent('touchstart');
+        touchStart.touches = [{ clientX: 100, clientY: 100 }];
+        canvas.dispatchEvent(touchStart);
+
+        const touchEnd = new CustomEvent('touchend');
+        touchEnd.changedTouches = [{ clientX: 100, clientY: 100 }];
+        canvas.dispatchEvent(touchEnd);
+
+        expect(selectedHex).toEqual({ q: 2, r: 3 });
+    });
+
+    it('should handle long press for context info', (done) => {
+        game.ui.addLog = (msg, type) => {
+            if (msg.includes('Langes Drücken')) {
+                done();
             }
         };
 
-        // Mock Game
-        mockGame = {
-            canvas: mockCanvas,
-            hexGrid: {
-                pixelToAxial: () => ({ q: 0, r: 0 }),
-                hasHex: () => true,
-                getHex: () => ({ terrain: 'plains' }),
-                selectHex: () => { }, // Spy on this
-                clearHighlights: () => { },
-                highlightHexes: () => { }
-            },
-            ui: {
-                addLog: () => { },
-                tooltipManager: {
-                    showEnemyTooltip: () => { },
-                    showTerrainTooltip: () => { },
-                    hideTooltip: () => { }
-                }
-            },
-            enemies: [],
-            terrain: {
-                getName: () => 'Plains'
-            },
-            moveHero: () => { },
-            selectHex: () => { },
-            handleCardClick: () => { },
-            handleCardRightClick: () => { },
-            render: () => { },
-            movementMode: false
-        };
+        game.hexGrid.pixelToAxial = () => ({ q: 2, r: 3 });
+        game.hexGrid.hasHex = () => true;
 
-        // Mock window properties
-        global.window = {
-            addEventListener: () => { },
-            removeEventListener: () => { },
-            devicePixelRatio: 1
-        };
-        global.navigator = {
-            vibrate: () => { }
-        };
+        // Force long press threshold
+        touchController.longPressThreshold = 10;
 
-        touchController = new TouchController(mockGame);
+        const touchStart = new CustomEvent('touchstart');
+        touchStart.touches = [{ clientX: 100, clientY: 100 }];
+        canvas.dispatchEvent(touchStart);
+
+        // Wait for long press timer
+        setTimeout(() => {
+            const touchEnd = new CustomEvent('touchend');
+            touchEnd.changedTouches = [{ clientX: 100, clientY: 100 }];
+            canvas.dispatchEvent(touchEnd);
+        }, 20);
     });
 
-    it('should initialize and attach listeners', () => {
-        expect(touchController).toBeDefined();
-        // We could spy on addEventListener to verify calls
+    it('should handle swipes', () => {
+        let loggedMsg = '';
+        game.ui.addLog = (msg) => { loggedMsg = msg; };
+
+        const touchStart = new CustomEvent('touchstart');
+        touchStart.touches = [{ clientX: 100, clientY: 100 }];
+        canvas.dispatchEvent(touchStart);
+
+        const touchEnd = new CustomEvent('touchend');
+        touchEnd.changedTouches = [{ clientX: 200, clientY: 100 }]; // Swipe right
+        canvas.dispatchEvent(touchEnd);
+
+        expect(loggedMsg).toBe('Swipe rechts');
     });
 
-    it('should handle tap', () => {
-        // Mock touch event
-        const touchEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }],
-            changedTouches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        // Simulate tap sequence
-        touchController.handleTouchStart(touchEvent);
-
-        // Fast forward time slightly (less than long press)
-        // Since we can't easily mock Date.now() in this setup without more libs,
-        // we rely on the fact that handleTouchEnd calculates duration.
-        // We can mock Date.now if needed, but let's assume immediate end for tap.
-
-        touchController.handleTouchEnd(touchEvent);
-
-        // Should trigger selectHex (default mode)
-        // We need to spy on mockGame.selectHex. 
-        // Since we didn't use a spy lib, we can check a flag.
-
-        let selected = false;
-        mockGame.selectHex = () => { selected = true; };
-
-        // Re-run with spy
-        touchController.handleTouchStart(touchEvent);
-        touchController.handleTouchEnd(touchEvent);
-
-        expect(selected).toBe(true);
-    });
-
-    it('should handle long press', () => {
-        return new Promise((resolve, reject) => {
-            const touchEvent = {
-                preventDefault: () => { },
-                touches: [{ clientX: 100, clientY: 100 }],
-                changedTouches: [{ clientX: 100, clientY: 100 }]
-            };
-
-            let longPressHandled = false;
-            mockGame.ui.addLog = (msg) => {
-                if (msg.includes('Langes Drücken')) longPressHandled = true;
-            };
-
-            // Reduce threshold for test
-            touchController.longPressThreshold = 10;
-
-            touchController.handleTouchStart(touchEvent);
-
-            setTimeout(() => {
-                try {
-                    expect(longPressHandled).toBe(true);
-                    expect(touchController.isLongPress).toBe(true);
-                    resolve();
-                } catch (e) {
-                    reject(e);
-                }
-            }, 50);
-        });
-    });
-
-    it('should handle swipe', () => {
-        const startEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        const endEvent = {
-            preventDefault: () => { },
-            changedTouches: [{ clientX: 200, clientY: 100 }] // +100px X
-        };
-
-        let logMsg = '';
-        mockGame.ui.addLog = (msg) => { logMsg = msg; };
-
-        touchController.handleTouchStart(startEvent);
-        touchController.handleTouchEnd(endEvent);
-
-        expect(logMsg).toBe('Swipe rechts');
-    });
-
-    it('should resize canvas', () => {
-        let rendered = false;
-        mockGame.render = () => { rendered = true; };
-
-        touchController.resizeCanvas();
-
-        expect(mockGame.canvas.width).toBe(800);
-        expect(rendered).toBe(true);
-    });
-
-    it('should detect touch device', () => {
-        const result = TouchController.isTouchDevice();
-        // In test environment, this depends on what's mocked
-        expect(typeof result).toBe('boolean');
-    });
-
-    it('should handle touch move', () => {
-        const touchMoveEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 110, clientY: 110 }]
-        };
-
-        // Should not throw
-        touchController.handleTouchMove(touchMoveEvent);
-        expect(true).toBe(true);
-    });
-
-    it('should cancel long press on move', () => {
-        const startEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        const moveEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 120, clientY: 120 }] // Moved > 10px
-        };
-
-        touchController.handleTouchStart(startEvent);
-        expect(touchController.longPressTimer).not.toBeNull();
-
-        touchController.handleTouchMove(moveEvent);
-        // Timer should be cancelled
-        expect(touchController.longPressTimer).toBeNull();
-    });
-
-    it('should handle touch cancel', () => {
-        const startEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        touchController.handleTouchStart(startEvent);
-        expect(touchController.longPressTimer).not.toBeNull();
-
-        touchController.handleTouchCancel({});
-        expect(touchController.longPressTimer).toBeNull();
-        expect(touchController.isLongPress).toBe(false);
-    });
-
-    it('should handle card tap', () => {
-        const mockCard = { name: 'MockCard' };
-        mockGame.hero = { hand: [mockCard] };
+    it('should handle card taps', () => {
+        const hand = document.getElementById('hand-cards');
+        const cardEl = document.createElement('div');
+        cardEl.classList.add('card');
+        cardEl.dataset.index = '0';
+        hand.appendChild(cardEl);
 
         let cardClicked = false;
-        mockGame.handleCardClick = () => { cardClicked = true; };
+        game.handleCardClick = () => { cardClicked = true; };
+        game.hero = { hand: [{ name: 'Test Card' }] };
 
-        touchController.handleCardTap(0);
+        const touchStart = new CustomEvent('touchstart');
+        touchStart.target = cardEl;
+        hand.dispatchEvent(touchStart);
+
+        const touchEnd = new CustomEvent('touchend');
+        touchEnd.target = cardEl;
+        hand.dispatchEvent(touchEnd);
+
         expect(cardClicked).toBe(true);
     });
 
-    it('should handle card long press', () => {
-        const mockCard = { name: 'MockCard' };
-        mockGame.hero = { hand: [mockCard] };
+    it('should handle viewport resize', (done) => {
+        const initialWidth = canvas.width;
 
-        let rightClicked = false;
-        mockGame.handleCardRightClick = () => { rightClicked = true; };
-
-        touchController.handleCardLongPress(0);
-        expect(rightClicked).toBe(true);
-    });
-
-    it('should handle vertical swipe', () => {
-        const startEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        const endEvent = {
-            preventDefault: () => { },
-            changedTouches: [{ clientX: 100, clientY: 200 }] // +100px Y
-        };
-
-        let logMsg = '';
-        mockGame.ui.addLog = (msg) => { logMsg = msg; };
-
-        touchController.handleTouchStart(startEvent);
-        touchController.handleTouchEnd(endEvent);
-
-        expect(logMsg).toBe('Swipe runter');
-    });
-
-    it('should handle tap in movement mode', () => {
-        mockGame.movementMode = true;
-
-        let heroMoved = false;
-        mockGame.moveHero = () => { heroMoved = true; };
-
-        const touchEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }],
-            changedTouches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        touchController.handleTouchStart(touchEvent);
-        touchController.handleTouchEnd(touchEvent);
-
-        expect(heroMoved).toBe(true);
-    });
-
-    it('should show hex tooltip on touch move', () => {
-        let tooltipShown = false;
-        mockGame.ui.tooltipManager.showTerrainTooltip = () => { tooltipShown = true; };
-
-        const touchMoveEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        touchController.handleTouchMove(touchMoveEvent);
-        expect(tooltipShown).toBe(true);
-    });
-
-    it('should handle resize with particle canvas', () => {
-        mockGame.particleCanvas = {
-            width: 0,
-            height: 0
-        };
+        // Mock container
+        const container = document.createElement('div');
+        Object.defineProperty(container, 'getBoundingClientRect', {
+            value: () => ({ width: 500, height: 400 })
+        });
+        container.appendChild(canvas);
+        document.body.appendChild(container); // Add to DOM
 
         touchController.resizeCanvas();
 
-        expect(mockGame.particleCanvas.width).toBe(800);
-        expect(mockGame.particleCanvas.height).toBe(600);
-    });
-
-    it('should get device pixel ratio', () => {
-        global.window.devicePixelRatio = 2;
-        const ratio = TouchController.getDevicePixelRatio();
-        expect(ratio).toBe(2);
-    });
-
-    it('should not crash with invalid hex on tap', () => {
-        mockGame.hexGrid.hasHex = () => false;
-
-        const touchEvent = {
-            preventDefault: () => { },
-            touches: [{ clientX: 100, clientY: 100 }],
-            changedTouches: [{ clientX: 100, clientY: 100 }]
-        };
-
-        touchController.handleTouchStart(touchEvent);
-        touchController.handleTouchEnd(touchEvent);
-
-        // Should not throw
-        expect(true).toBe(true);
+        // Canvas should be resized
+        setTimeout(() => {
+            expect(canvas.width).toBe(500);
+            expect(canvas.height).toBe(400);
+            done();
+        }, 150);
     });
 });

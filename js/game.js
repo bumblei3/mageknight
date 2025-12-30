@@ -163,6 +163,24 @@ export class MageKnightGame {
         eventBus.emit(GAME_EVENTS.LOG_ADDED, { message, type });
     }
 
+    /**
+     * Helper to show a toast notification via event bus
+     * @param {string} message 
+     * @param {string} type 
+     */
+    showToast(message, type = 'info') {
+        eventBus.emit(GAME_EVENTS.TOAST_SHOW, { message, type });
+    }
+
+    /**
+     * Helper to show a notification via event bus
+     * @param {string} message 
+     * @param {string} type 
+     */
+    showNotification(message, type = 'info') {
+        eventBus.emit(GAME_EVENTS.NOTIFICATION_SHOW, { message, type });
+    }
+
     reset() {
         // Use custom modal instead of confirm
         const modal = document.getElementById('reset-modal');
@@ -716,7 +734,7 @@ export class MageKnightGame {
 
                         // Check for exploration opportunity (if at edge)
                         if (this.mapManager.canExplore(q, r)) {
-                            this.ui.showNotification('Neues Gebiet kann erkundet werden! (Klicke auf leeres Feld)', 'info');
+                            this.showNotification('Neues Gebiet kann erkundet werden! (Klicke auf leeres Feld)', 'info');
                             // For now, auto-explore if very close to edge? 
                             // Or better: let user click. But we don't have a specific "Explore" button yet.
                             // Let's auto-explore for smooth gameplay in this version.
@@ -1078,7 +1096,7 @@ export class MageKnightGame {
         if (result.leveledUp) {
             this.statisticsManager.trackLevelUp(result.newLevel);
             this.addLog(`🎉 STUFENAUFSTIEG! Stufe ${result.newLevel} erreicht!`, 'success');
-            this.ui.showNotification(`Stufe ${result.newLevel} erreicht!`, 'success');
+            this.showNotification(`Stufe ${result.newLevel} erreicht!`, 'success');
             this.triggerLevelUp(result.newLevel);
         }
     }
@@ -1239,7 +1257,7 @@ export class MageKnightGame {
 
         if (this.hero.movementPoints < 2) {
             this.addLog('Nicht genug Bewegungspunkte (Kosten: 2)', 'info');
-            this.ui.showToast('Nicht genug Bewegungspunkte!', 'warning');
+            this.showToast('Nicht genug Bewegungspunkte!', 'warning');
             return;
         }
 
@@ -1330,12 +1348,12 @@ export class MageKnightGame {
     saveGame() {
         if (this.combat) {
             this.addLog('Kann nicht im Kampf speichern!', 'warning');
-            this.ui.showToast('Kann nicht im Kampf speichern!', 'warning');
+            this.showToast('Kann nicht im Kampf speichern!', 'warning');
             return;
         }
         this.saveManager.saveGame(0, this.getGameState()); // Slot 0 default
         this.addLog('Spiel gespeichert!', 'success');
-        this.ui.showToast('Spiel gespeichert (Slot 0)', 'success');
+        this.showToast('Spiel gespeichert (Slot 0)', 'success');
     }
 
     getGameState() {
@@ -1395,7 +1413,7 @@ export class MageKnightGame {
         this.renderMana();
         this.render();
         this.addLog('Spielstand geladen', 'info');
-        this.ui.showToast('Spielstand geladen', 'success');
+        this.showToast('Spielstand geladen', 'success');
     }
 
     openSaveDialog() {
@@ -1417,10 +1435,10 @@ export class MageKnightGame {
             const success = this.saveManager.saveGame(parseInt(slot) - 1, this.getGameState());
             if (success) {
                 this.addLog(`Spiel in Slot ${slot} gespeichert`, 'info');
-                this.ui.showToast(`Spiel in Slot ${slot} gespeichert`, 'success');
+                this.showToast(`Spiel in Slot ${slot} gespeichert`, 'success');
             } else {
                 this.addLog('Fehler beim Speichern', 'error');
-                this.ui.showToast('Fehler beim Speichern', 'error');
+                this.showToast('Fehler beim Speichern', 'error');
             }
         }
     }
@@ -1446,7 +1464,7 @@ export class MageKnightGame {
                 this.loadGameState(state);
             } else {
                 this.addLog('Fehler beim Laden', 'info');
-                this.ui.showToast('Fehler beim Laden', 'error');
+                this.showToast('Fehler beim Laden', 'error');
             }
         }
     }
@@ -1506,7 +1524,7 @@ export class MageKnightGame {
         // Show notifications for new achievements
         newAchievements.forEach(achievement => {
             if (this.sound.success) this.sound.success();
-            this.ui.showNotification(
+            this.showNotification(
                 `🏆 ${achievement.name} freigeschaltet!`,
                 'success'
             );

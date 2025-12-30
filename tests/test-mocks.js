@@ -523,15 +523,18 @@ export function createMockDocument() {
         querySelectorAll: (selector) => {
             const results = [];
             const findIn = (parent) => {
+                if (!parent) return;
                 if (selector.startsWith('.')) {
                     if (parent.classList && parent.classList.contains(selector.substring(1))) results.push(parent);
                 } else if (parent.tagName === selector.toUpperCase()) {
                     results.push(parent);
                 }
 
-                for (const child of parent.children) {
-                    if (typeof child === 'string') continue;
-                    findIn(child);
+                if (parent.children && Array.isArray(parent.children)) {
+                    for (const child of parent.children) {
+                        if (typeof child === 'string') continue;
+                        findIn(child);
+                    }
                 }
             };
             findIn(doc.body);

@@ -1,5 +1,6 @@
 import { describe, it, expect } from './testRunner.js';
-import { Terrain, TERRAIN_TYPES } from '../js/terrain.js';
+import { Terrain } from '../js/terrain.js';
+import { TERRAIN_TYPES } from '../js/constants.js';
 
 describe('Terrain', () => {
     it('should return correct day movement costs', () => {

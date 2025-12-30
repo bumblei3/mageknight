@@ -24,6 +24,7 @@ describe('Touch Controller', () => {
         game = {
             canvas: canvas,
             movementMode: false,
+            addLog: createSpy('addLog'),
             hexGrid: {
                 hasHex: () => true,
                 pixelToAxial: (x, y) => ({ q: Math.floor(x / 50), r: Math.floor(y / 50) }),
@@ -84,22 +85,22 @@ describe('Touch Controller', () => {
         // Swipe Right
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 200, clientY: 100 }], preventDefault: () => { } });
-        expect(game.ui.addLog.calledWith('Swipe rechts', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe rechts', 'info')).toBe(true);
 
         // Swipe Left
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 0, clientY: 100 }], preventDefault: () => { } });
-        expect(game.ui.addLog.calledWith('Swipe links', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe links', 'info')).toBe(true);
 
         // Swipe Down
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 100, clientY: 200 }], preventDefault: () => { } });
-        expect(game.ui.addLog.calledWith('Swipe runter', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe runter', 'info')).toBe(true);
 
         // Swipe Up
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 100, clientY: 0 }], preventDefault: () => { } });
-        expect(game.ui.addLog.calledWith('Swipe hoch', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe hoch', 'info')).toBe(true);
     });
 
     it('should show tooltips for enemies and terrain', () => {
@@ -125,7 +126,7 @@ describe('Touch Controller', () => {
         // Wait for long press threshold
         await new Promise(resolve => setTimeout(resolve, 600));
 
-        expect(game.ui.addLog.called).toBe(true);
+        expect(game.addLog.called).toBe(true);
     });
 
     it('should handle resize', () => {

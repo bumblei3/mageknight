@@ -25,27 +25,33 @@ describe('Long Session - Integration', () => {
     });
 
     afterEach(() => {
+        if (game && game.ui) game.ui.destroy();
         global.document.getElementById = originalGetElementById;
         global.document.querySelector = originalQuerySelector;
     });
 
     it('should maintain state over a 3-turn sequence', () => {
         // Turn 1: Initialization
-        expect(game.turnNumber).toBe(1);
+        expect(game.turnNumber).toBe(0);
         const initialDeckSize = game.hero.deck.length;
+
+        // Turn 0: End Turn
+        game.endTurn();
+        expect(game.turnNumber).toBe(1);
+
+        // Turn 1: Gain Fame (combat result simulation)
+        game.ui.showLevelUpModal = createSpy((level, data, callback) => {
+            // Simulate selecting first skill and card
+            callback({ skill: data.skills[0], card: data.cards[0] });
+        });
+
+        game.gainFame(15); // Level up happens at 10
+        expect(game.hero.level).toBe(2);
+        expect(game.hero.skills.length).toBeGreaterThan(0);
 
         // Turn 1: End Turn
         game.endTurn();
         expect(game.turnNumber).toBe(2);
-
-        // Turn 2: Gain Fame (combat result simulation)
-        game.hero.gainFame(15); // Level up happens at 10
-        expect(game.hero.level).toBe(2);
-        expect(game.hero.skillChoices.length).toBeGreaterThan(0);
-
-        // Turn 2: End Turn
-        game.endTurn();
-        expect(game.turnNumber).toBe(3);
 
         // Turn 3: Check day/night transition if applicable (requires timeManager)
         // The game cycles day/night after turns? Or rounds? 

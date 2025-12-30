@@ -9,6 +9,7 @@ describe('Site Interaction Boost', () => {
 
     beforeEach(() => {
         game = {
+            addLog: createSpy('addLog'),
             hero: {
                 addItem: createSpy(),
                 addExperience: createSpy(),
@@ -52,8 +53,6 @@ describe('Site Interaction Boost', () => {
         const hex = { q: 0, r: 0 };
 
         manager.visitSite(hex, site);
-        // showSiteInteraction isn't called anymore, it returns data now (Wait, I checked the code)
-        // visitSite returns interactionData
         const data = manager.visitSite(hex, site);
         expect(data.name).toBe('Test Village');
     });
@@ -69,7 +68,7 @@ describe('Site Interaction Boost', () => {
         manager.recruitUnit(unitInfo);
         expect(game.hero.units.length).toBe(1);
         expect(game.hero.influencePoints).toBe(7);
-        expect(game.ui.addLog.calledWith('Einheit Test Unit Instance rekrutiert!', 'success')).toBe(true);
+        expect(game.addLog.calledWith('Einheit Test Unit Instance rekrutiert!', 'success')).toBe(true);
     });
 
     it('should handle unit damage and healing', () => {
@@ -101,7 +100,7 @@ describe('Site Interaction Boost', () => {
 
         manager.buyCard(cardData, 1);
         expect(game.hero.deck.length).toBe(1);
-        expect(game.ui.addLog.calledWith('Karte Fireball gekauft!', 'success')).toBe(true);
+        expect(game.addLog.calledWith('Karte Fireball gekauft!', 'success')).toBe(true);
     });
 
     it('should handle healing at Monastery', () => {
@@ -116,6 +115,6 @@ describe('Site Interaction Boost', () => {
     it('should handle attacking sites', () => {
         manager.currentSite = { type: SITE_TYPES.KEEP, name: 'Keep' };
         manager.attackSite();
-        expect(game.ui.addLog.calledWith('Kampf gegen Keep gestartet!', 'warning')).toBe(true);
+        expect(game.addLog.calledWith('Kampf gegen Keep gestartet!', 'warning')).toBe(true);
     });
 });

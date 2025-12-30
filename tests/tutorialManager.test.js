@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { TutorialManager } from '../js/tutorialManager.js';
+import { createSpy } from './test-mocks.js';
 
 // Mock DOM
 const mockElement = {
@@ -25,11 +26,12 @@ if (typeof document === 'undefined') {
 
 describe('TutorialManager', () => {
     let tutorial;
-    let game = {};
+    let game = {
+        addLog: createSpy('addLog')
+    };
 
     beforeEach(() => {
         tutorial = new TutorialManager(game);
-        // Reset localStorage mock if needed (handled by global mock usually)
         if (typeof localStorage !== 'undefined') localStorage.clear();
     });
 
@@ -41,7 +43,6 @@ describe('TutorialManager', () => {
 
     it('should start tutorial', () => {
         tutorial.start();
-
         expect(tutorial.isActive).toBe(true);
         expect(tutorial.currentStep).toBe(0);
     });
@@ -49,7 +50,6 @@ describe('TutorialManager', () => {
     it('should advance steps', () => {
         tutorial.start();
         tutorial.nextStep();
-
         expect(tutorial.currentStep).toBe(1);
     });
 
@@ -57,14 +57,12 @@ describe('TutorialManager', () => {
         tutorial.start();
         tutorial.nextStep();
         tutorial.prevStep();
-
         expect(tutorial.currentStep).toBe(0);
     });
 
     it('should complete tutorial', () => {
         tutorial.start();
         tutorial.complete();
-
         expect(tutorial.isActive).toBe(false);
         expect(TutorialManager.hasCompleted()).toBe(true);
     });
@@ -72,19 +70,13 @@ describe('TutorialManager', () => {
     it('should skip tutorial', () => {
         tutorial.start();
         tutorial.skip();
-
         expect(tutorial.isActive).toBe(false);
         expect(TutorialManager.hasCompleted()).toBe(true);
     });
 
     it('should handle step bounds', () => {
         tutorial.start();
-        tutorial.prevStep(); // Should stay at 0 or handle gracefully (implementation allows < 0 check in showStep)
-
-        // If prevStep calls showStep(-1), showStep calls complete()
-        // Let's verify behavior based on implementation:
-        // showStep checks index < 0 -> complete()
-
+        tutorial.prevStep();
         expect(tutorial.isActive).toBe(false);
     });
 });

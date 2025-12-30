@@ -4,12 +4,12 @@ import { HexGrid } from './hexgrid.js';
 import Hero from './hero.js';
 import { ManaSource } from './mana.js';
 import { EnemyAI } from './enemyAI.js';
-import { Combat, COMBAT_PHASE } from './combat.js';
-import UI from './ui.js';
-import Terrain, { TERRAIN_TYPES } from './terrain.js';
+import { Combat } from './combat.js';
+import { UI } from './ui.js';
+import Terrain from './terrain.js';
 import SaveManager from './saveManager.js';
 import TutorialManager from './tutorialManager.js';
-import { TimeManager, TIME_OF_DAY } from './timeManager.js';
+import { TimeManager } from './timeManager.js';
 import { MapManager } from './mapManager.js';
 import ParticleSystem from './particles.js';
 import { animator } from './animator.js';
@@ -24,6 +24,8 @@ import TouchController from './touchController.js';
 import AchievementManager from './achievements.js';
 import StatisticsManager from './statistics.js';
 import { createEnemy } from './enemy.js';
+import { eventBus } from './eventBus.js';
+import { GAME_EVENTS, TIME_OF_DAY } from './constants.js';
 
 export class MageKnightGame {
     constructor() {
@@ -89,7 +91,7 @@ export class MageKnightGame {
         // Initialize touch controls if on mobile device
         if (TouchController.isTouchDevice()) {
             this.touchController = new TouchController(this);
-            this.ui.addLog('Touch-Steuerung aktiviert', 'info');
+            this.addLog('Touch-Steuerung aktiviert', 'info');
         }
 
         this.setupParticleSystem();
@@ -135,12 +137,21 @@ export class MageKnightGame {
             setTimeout(() => this.simpleTutorial.start(), 1500);
         }
 
-        this.ui.addLog('Willkommen bei Mage Knight!', 'info');
-        this.ui.addLog('Spiel gestartet. Viel Erfolg!', 'info');
+        this.addLog('Willkommen bei Mage Knight!', 'info');
+        this.addLog('Spiel gestartet. Viel Erfolg!', 'info');
         this.updatePhaseIndicator();
         this.renderHand();
         this.renderMana();
         this.ui.updateHeroStats(this.hero);
+    }
+
+    /**
+     * Helper to add a log entry via event bus
+     * @param {string} message 
+     * @param {string} type 
+     */
+    addLog(message, type = 'info') {
+        eventBus.emit(GAME_EVENTS.LOG_ADDED, { message, type });
     }
 
     reset() {
@@ -203,7 +214,7 @@ export class MageKnightGame {
                 const enemy = this.enemyAI.generateEnemy(terrainName, level);
                 enemy.position = { q: hex.q, r: hex.r };
                 // Ensure unique ID
-                enemy.id = `enemy_${hex.q}_${hex.r}_${Date.now()}`;
+                enemy.id = `enemy_${hex.q}_${hex.r}_${Date.now()} `;
 
                 this.enemies.push(enemy);
             }
@@ -307,7 +318,7 @@ export class MageKnightGame {
                 const index = parseInt(e.key) - 1;
                 if (index < this.hero.hand.length) {
                     this.handleCardClick(index, this.hero.hand[index]);
-                    this.ui.addLog(`Karte ${e.key} gespielt (Tastatur)`, 'info');
+                    this.addLog(`Karte ${e.key} gespielt(Tastatur)`, 'info');
                 }
                 e.preventDefault();
             }
@@ -352,7 +363,7 @@ export class MageKnightGame {
             if (e.key === 'Escape') {
                 if (this.movementMode) {
                     this.exitMovementMode();
-                    this.ui.addLog('Bewegungsmodus abgebrochen', 'info');
+                    this.addLog('Bewegungsmodus abgebrochen', 'info');
                 }
             }
 
@@ -361,7 +372,7 @@ export class MageKnightGame {
                 e.preventDefault();
                 // Logic to cycle selection could go here
                 // For now just log
-                // this.ui.addLog('Tab: Karte wählen (WIP)', 'info');
+                // this.addLog('Tab: Karte wählen (WIP)', 'info');
             }
 
             // M for Mana Panel highlight
@@ -406,7 +417,7 @@ export class MageKnightGame {
             phaseHint.textContent = `👣 ${this.hero.movementPoints} Punkte - Klicke auf ein Feld`;
         } else {
             const timeIcon = this.timeManager.isDay() ? '☀️' : '🌙';
-            phaseText.textContent = `Erkundung (${timeIcon})`;
+            phaseText.textContent = `Erkundung(${timeIcon})`;
             phaseHint.textContent = '🎴 Spiele Karten oder bewege dich (1-5)';
         }
     }
@@ -452,7 +463,7 @@ export class MageKnightGame {
 
                 // Add active to clicked tab and corresponding content
                 tab.classList.add('active');
-                document.getElementById(`help-${targetTab}`).classList.add('active');
+                document.getElementById(`help - ${targetTab} `).classList.add('active');
             });
         });
 
@@ -542,7 +553,7 @@ export class MageKnightGame {
             this.hero.position = { q: hex.q, r: hex.r };
             this.hero.displayPosition = { q: hex.q, r: hex.r };
             this.render();
-            this.ui.addLog(`Debug: Teleported to ${hex.q},${hex.r}`, 'info');
+            this.addLog(`Debug: Teleported to ${hex.q},${hex.r} `, 'info');
             this.debugTeleport = false;
             return;
         }
@@ -609,7 +620,7 @@ export class MageKnightGame {
         const enemy = this.enemies.find(e => e.position && e.position.q === q && e.position.r === r);
 
         if (enemy) {
-            this.ui.addLog(`Feind gefunden: ${enemy.name} (Rüstung: ${enemy.armor}, Angriff: ${enemy.attack})`, 'combat');
+            this.addLog(`Feind gefunden: ${enemy.name} (Rüstung: ${enemy.armor}, Angriff: ${enemy.attack})`, 'combat');
 
             // Check if hero is adjacent
             const distance = this.hexGrid.distance(this.hero.position.q, this.hero.position.r, q, r);
@@ -622,7 +633,7 @@ export class MageKnightGame {
         const hexData = this.hexGrid.getHex(q, r);
         if (hexData) {
             const terrainName = this.terrain.getName(hexData.terrain);
-            this.ui.addLog(`Hex ausgewählt: ${q},${r} - ${terrainName}`, 'info');
+            this.addLog(`Hex ausgewählt: ${q},${r} - ${terrainName} `, 'info');
         }
 
         this.render();
@@ -637,7 +648,7 @@ export class MageKnightGame {
 
         if (card.isWound()) {
             this.sound.error();
-            this.ui.addLog('Verletzungen können nicht gespielt werden.', 'info');
+            this.addLog('Verletzungen können nicht gespielt werden.', 'info');
             return;
         }
 
@@ -645,7 +656,7 @@ export class MageKnightGame {
         const result = this.hero.playCard(index, false);
         if (result) {
             this.sound.cardPlay();
-            this.ui.addLog(`${result.card.name} gespielt: ${this.ui.formatEffect(result.effect)}`, 'info');
+            this.addLog(`${result.card.name} gespielt: ${this.ui.formatEffect(result.effect)} `, 'info');
             this.ui.addPlayedCard(result.card, result.effect);
             this.ui.showPlayArea();
 
@@ -676,7 +687,7 @@ export class MageKnightGame {
 
         // Show menu for sideways options
         const options = ['movement', 'attack', 'block', 'influence'];
-        const chosen = prompt(`${card.name} seitlich spielen für:\n1: +1 Bewegung\n2: +1 Angriff\n3: +1 Block\n4: +1 Einfluss\n\nWähle Option (1-4):`);
+        const chosen = prompt(`${card.name} seitlich spielen für: \n1: +1 Bewegung\n2: +1 Angriff\n3: +1 Block\n4: +1 Einfluss\n\nWähle Option(1 - 4): `);
 
         // BUG FIX: prompt() returns string, convert to number
         const chosenNum = parseInt(chosen, 10);
@@ -694,7 +705,7 @@ export class MageKnightGame {
                     this.particleSystem.playCardEffect(x, y, result.card.color);
                 }
 
-                this.ui.addLog(`${result.card.name} seitlich gespielt: ${this.ui.formatEffect(result.effect)}`, 'info');
+                this.addLog(`${result.card.name} seitlich gespielt: ${this.ui.formatEffect(result.effect)} `, 'info');
                 this.renderHand();
                 this.updateStats();
             }
@@ -704,7 +715,7 @@ export class MageKnightGame {
     enterMovementMode() {
         this.movementMode = true;
         this.calculateReachableHexes();
-        this.ui.addLog(`Bewegungsmodus: ${this.hero.movementPoints} Punkte verfügbar`, 'movement');
+        this.addLog(`Bewegungsmodus: ${this.hero.movementPoints} Punkte verfügbar`, 'movement');
         this.updatePhaseIndicator();
         this.render();
     }
@@ -725,7 +736,7 @@ export class MageKnightGame {
 
         while (queue.length > 0) {
             const { pos, cost } = queue.shift();
-            const key = `${pos.q},${pos.r}`;
+            const key = `${pos.q},${pos.r} `;
 
             if (visited.has(key)) continue;
             visited.add(key);
@@ -756,7 +767,7 @@ export class MageKnightGame {
         const isReachable = this.reachableHexes.some(hex => hex.q === q && hex.r === r);
 
         if (!isReachable) {
-            this.ui.addLog('Hex nicht erreichbar!', 'info');
+            this.addLog('Hex nicht erreichbar!', 'info');
             return;
         }
 
@@ -769,7 +780,7 @@ export class MageKnightGame {
         if (this.hero.moveTo(q, r, moveCost)) {
             this.sound.move();
             const terrainName = this.terrain.getName(hexData.terrain);
-            this.ui.addLog(`Bewegt nach ${q},${r} (${terrainName}) - ${moveCost} Kosten`, 'movement');
+            this.addLog(`Bewegt nach ${q},${r} (${terrainName}) - ${moveCost} Kosten`, 'movement');
 
             // Animate movement
             animator.animateProperties(
@@ -799,7 +810,7 @@ export class MageKnightGame {
                             // Let's auto-explore for smooth gameplay in this version.
                             const exploreResult = this.mapManager.explore(q, r);
                             if (exploreResult.success) {
-                                this.ui.addLog(exploreResult.message, 'success');
+                                this.addLog(exploreResult.message, 'success');
                                 // Reveal the new tile immediately
                                 this.mapManager.revealMap(exploreResult.center.q, exploreResult.center.r, 2);
                             }
@@ -811,7 +822,7 @@ export class MageKnightGame {
             // Check if there's an enemy on this hex (BUG FIX: add null check for position)
             const enemy = this.enemies.find(e => e.position && e.position.q === q && e.position.r === r);
             if (enemy) {
-                this.ui.addLog(`Feind entdeckt: ${enemy.name}!`, 'combat');
+                this.addLog(`Feind entdeckt: ${enemy.name} !`, 'combat');
                 this.exitMovementMode();
                 this.initiateCombat(enemy);
                 return;
@@ -819,7 +830,7 @@ export class MageKnightGame {
 
             // Check for site
             if (hexData.site) {
-                this.ui.addLog(`Ort entdeckt: ${hexData.site.getName()}`, 'info');
+                this.addLog(`Ort entdeckt: ${hexData.site.getName()} `, 'info');
                 // Show visit button
                 const visitBtn = document.getElementById('visit-btn');
                 if (visitBtn) {
@@ -854,7 +865,7 @@ export class MageKnightGame {
             const interactionData = this.siteManager.visitSite(hexData, hexData.site);
             this.ui.showSiteModal(interactionData);
         } else {
-            this.ui.addLog('Hier gibt es nichts zu besuchen.', 'info');
+            this.addLog('Hier gibt es nichts zu besuchen.', 'info');
         }
     }
 
@@ -868,8 +879,8 @@ export class MageKnightGame {
         this.combatRangedTotal = 0;
         this.combatSiegeTotal = 0;
 
-        this.ui.addLog(result.message, 'combat');
-        this.ui.addLog(result.message, 'combat');
+        this.addLog(result.message, 'combat');
+        this.addLog(result.message, 'combat');
         this.ui.showCombatPanel(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
 
         // Show units in combat
@@ -902,7 +913,7 @@ export class MageKnightGame {
         // Accumulate attack and block values
         if (phase === 'block' && result.effect.block) {
             this.combatBlockTotal += result.effect.block;
-            effectParts.push(`+${result.effect.block} Block`);
+            effectParts.push(`+ ${result.effect.block} Block`);
         } else if (phase === 'ranged') {
             if (result.effect.ranged || result.effect.attack) { // Allow normal attack as Ranged? No. Ranged Only.
                 // Actually, some cards give "Ranged Attack". Normal Attack cards usually don't work in Ranged phase.
@@ -919,33 +930,33 @@ export class MageKnightGame {
 
                 if (result.effect.attack && (result.effect.ranged || result.card.type === 'spell')) {
                     this.combatRangedTotal += result.effect.attack;
-                    effectParts.push(`+${result.effect.attack} Fernkampf`);
+                    effectParts.push(`+ ${result.effect.attack} Fernkampf`);
                 }
                 if (result.effect.siege) {
                     this.combatSiegeTotal += result.effect.attack; // Siege is also attack value
-                    effectParts.push(`+${result.effect.attack} Belagerung`);
+                    effectParts.push(`+ ${result.effect.attack} Belagerung`);
                 }
             }
         }
 
-        if (phase === COMBAT_PHASE.ATTACK && result.effect.attack) {
+        if (phase === COMBAT_PHASES.ATTACK && result.effect.attack) {
             this.combatAttackTotal += result.effect.attack;
-            effectParts.push(`+${result.effect.attack} Angriff`);
+            effectParts.push(`+ ${result.effect.attack} Angriff`);
         }
 
         // Other effects (movement, influence, etc.) are also applied
         if (result.effect.movement) {
-            effectParts.push(`+${result.effect.movement} Bewegung`);
+            effectParts.push(`+ ${result.effect.movement} Bewegung`);
         }
         if (result.effect.influence) {
-            effectParts.push(`+${result.effect.influence} Einfluss`);
+            effectParts.push(`+ ${result.effect.influence} Einfluss`);
         }
         if (result.effect.healing) {
-            effectParts.push(`+${result.effect.healing} Heilung`);
+            effectParts.push(`+ ${result.effect.healing} Heilung`);
         }
 
         const effectDesc = effectParts.length > 0 ? effectParts.join(', ') : 'Effekt';
-        this.ui.addLog(`${result.card.name}: ${effectDesc}`, 'combat');
+        this.addLog(`${result.card.name}: ${effectDesc} `, 'combat');
         this.ui.addPlayedCard(result.card, result.effect);
         this.ui.showPlayArea();
 
@@ -975,7 +986,7 @@ export class MageKnightGame {
         const result = this.combat.activateUnit(unit);
 
         if (result.success) {
-            this.ui.addLog(result.message, 'combat');
+            this.addLog(result.message, 'combat');
 
             // Visual feedback
             const heroPixel = this.hexGrid.axialToPixel(this.hero.position.q, this.hero.position.r);
@@ -985,7 +996,7 @@ export class MageKnightGame {
             this.renderUnitsInCombat();
             this.updateStats();
         } else {
-            this.ui.addLog(result.message, 'info');
+            this.addLog(result.message, 'info');
         }
     }
 
@@ -998,7 +1009,7 @@ export class MageKnightGame {
             this.combat.enemies.forEach(enemy => {
                 const blockResult = this.combat.blockEnemy(enemy, this.combatBlockTotal);
                 if (blockResult.blocked) {
-                    this.ui.addLog(`${enemy.name} geblockt mit ${this.combatBlockTotal} Block`, 'combat');
+                    this.addLog(`${enemy.name} geblockt mit ${this.combatBlockTotal} Block`, 'combat');
                 }
             });
         }
@@ -1010,7 +1021,7 @@ export class MageKnightGame {
             const heroPixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
             this.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
         }
-        this.ui.addLog(result.message, 'combat');
+        this.addLog(result.message, 'combat');
         this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
 
         // Reset block total, prepare for attack phase
@@ -1028,7 +1039,7 @@ export class MageKnightGame {
         if (!this.combat) return;
 
         const result = this.combat.endCombat();
-        this.ui.addLog(result.message, result.victory ? 'info' : 'combat');
+        this.addLog(result.message, result.victory ? 'info' : 'combat');
 
         // Reset combat accumulation
         this.combatAttackTotal = 0;
@@ -1059,7 +1070,7 @@ export class MageKnightGame {
         if (this.combat.phase !== 'attack') return;
 
         if (this.combatAttackTotal === 0) {
-            this.ui.addLog('Keine Angriffspunkte verfügbar!', 'info');
+            this.addLog('Keine Angriffspunkte verfügbar!', 'info');
             return;
         }
 
@@ -1073,7 +1084,7 @@ export class MageKnightGame {
         const attackResult = this.combat.attackEnemies(this.combatAttackTotal, 'physical');
 
         if (attackResult.success) {
-            this.ui.addLog(attackResult.message, 'success');
+            this.addLog(attackResult.message, 'success');
 
             // Track stats
             attackResult.defeated.forEach(enemy => {
@@ -1093,7 +1104,7 @@ export class MageKnightGame {
                 this.updateCombatTotals();
             }
         } else {
-            this.ui.addLog(attackResult.message, 'warning');
+            this.addLog(attackResult.message, 'warning');
         }
     }
 
@@ -1116,7 +1127,7 @@ export class MageKnightGame {
 
         const attackResult = this.combat.rangedAttackEnemy(enemy, attackValue, isSiege);
 
-        this.ui.addLog(attackResult.message, 'combat');
+        this.addLog(attackResult.message, 'combat');
 
         if (attackResult.success) {
             // Track defeated enemies
@@ -1149,7 +1160,7 @@ export class MageKnightGame {
         if (!this.combat) return;
 
         const result = this.combat.endRangedPhase();
-        this.ui.addLog(result.message, 'combat');
+        this.addLog(result.message, 'combat');
 
         if (result.phase === 'block') {
             this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
@@ -1166,7 +1177,7 @@ export class MageKnightGame {
         const result = this.hero.gainFame(amount);
         if (result.leveledUp) {
             this.statisticsManager.trackLevelUp(result.newLevel);
-            this.ui.addLog(`🎉 STUFENAUFSTIEG! Stufe ${result.newLevel} erreicht!`, 'success');
+            this.addLog(`🎉 STUFENAUFSTIEG! Stufe ${result.newLevel} erreicht!`, 'success');
             this.ui.showNotification(`Stufe ${result.newLevel} erreicht!`, 'success');
             this.triggerLevelUp(result.newLevel);
         }
@@ -1190,14 +1201,14 @@ export class MageKnightGame {
         // Apply Skill
         if (selection.skill) {
             this.hero.addSkill(selection.skill);
-            this.ui.addLog(`Fertigkeit gelernt: ${selection.skill.name}`, 'success');
+            this.addLog(`Fertigkeit gelernt: ${selection.skill.name} `, 'success');
         }
 
         // Apply Card
         // Apply Card
         if (selection.card) {
             this.hero.gainCardToHand(selection.card);
-            this.ui.addLog(`Karte erhalten (auf die Hand): ${selection.card.name}`, 'success');
+            this.addLog(`Karte erhalten(auf die Hand): ${selection.card.name} `, 'success');
         }
 
         // Apply Level Up stats
@@ -1217,7 +1228,7 @@ export class MageKnightGame {
             // Add to hero's mana inventory
             this.hero.takeManaFromSource(mana);
 
-            this.ui.addLog(`Mana genommen: ${this.getManaEmoji(color)} ${color}`, 'info');
+            this.addLog(`Mana genommen: ${this.getManaEmoji(color)} ${color} `, 'info');
 
             // Particle Effect
             const heroPixel = this.hexGrid.axialToPixel(this.hero.position.q, this.hero.position.r);
@@ -1248,11 +1259,11 @@ export class MageKnightGame {
     endTurn() {
         if (this.combat) {
             // End combat phase or combat
-            if (this.combat.phase === COMBAT_PHASE.RANGED) {
+            if (this.combat.phase === COMBAT_PHASES.RANGED) {
                 this.endRangedPhase();
-            } else if (this.combat.phase === COMBAT_PHASE.BLOCK) {
+            } else if (this.combat.phase === COMBAT_PHASES.BLOCK) {
                 this.endBlockPhase();
-            } else if (this.combat.phase === COMBAT_PHASE.ATTACK) {
+            } else if (this.combat.phase === COMBAT_PHASES.ATTACK) {
                 this.endCombat();
             }
             return;
@@ -1272,7 +1283,7 @@ export class MageKnightGame {
 
         if (this.hero.deck.length === 0) {
             const roundInfo = this.timeManager.endRound();
-            this.ui.addLog(`🌙 Runde beendet! Es ist jetzt ${roundInfo.timeOfDay === TIME_OF_DAY.DAY ? 'Tag' : 'Nacht'}.`, 'info');
+            this.addLog(`🌙 Runde beendet! Es ist jetzt ${roundInfo.timeOfDay === TIME_OF_DAY.DAY ? 'Tag' : 'Nacht'}.`, 'info');
 
             // Re-roll mana source completely for new round
             this.manaSource.initialize();
@@ -1281,8 +1292,8 @@ export class MageKnightGame {
             this.hero.prepareNewRound();
         }
 
-        this.ui.addLog(`--- Zug ${this.turnNumber} beendet ---`, 'info');
-        this.ui.addLog('Neue Karten gezogen', 'info');
+        this.addLog(`-- - Zug ${this.turnNumber} beendet-- - `, 'info');
+        this.addLog('Neue Karten gezogen', 'info');
         this.ui.hidePlayArea();
 
         this.renderHand();
@@ -1298,14 +1309,14 @@ export class MageKnightGame {
             this.statisticsManager.endGame(true);
             this.statisticsManager.set('turns', this.turnNumber);
             this.checkAndShowAchievements();
-            this.ui.addLog('🎉 SIEG! Alle Feinde wurden besiegt!', 'info');
+            this.addLog('🎉 SIEG! Alle Feinde wurden besiegt!', 'info');
             this.ui.setButtonEnabled(this.ui.elements.endTurnBtn, false);
         }
     }
 
     rest() {
         if (this.combat) {
-            this.ui.addLog('Kann nicht im Kampf rasten!', 'info');
+            this.addLog('Kann nicht im Kampf rasten!', 'info');
             return;
         }
         // Particle Effect
@@ -1317,7 +1328,7 @@ export class MageKnightGame {
             const nonWoundIndex = this.hero.hand.findIndex(c => !c.isWound());
             if (nonWoundIndex >= 0) {
                 this.hero.discardCard(nonWoundIndex);
-                this.ui.addLog('Rast: 1 Karte abgelegt', 'info');
+                this.addLog('Rast: 1 Karte abgelegt', 'info');
                 this.renderHand();
             }
         }
@@ -1327,18 +1338,18 @@ export class MageKnightGame {
         if (this.combat) return;
 
         if (this.hero.movementPoints < 2) {
-            this.ui.addLog('Nicht genug Bewegungspunkte (Kosten: 2)', 'info');
+            this.addLog('Nicht genug Bewegungspunkte (Kosten: 2)', 'info');
             return;
         }
 
         const result = this.mapManager.explore(this.hero.position.q, this.hero.position.r);
         if (result.success) {
             this.hero.movementPoints -= 2;
-            this.ui.addLog(result.message, 'info');
+            this.addLog(result.message, 'info');
             this.updateStats();
             this.render();
         } else {
-            this.ui.addLog(result.message, 'info');
+            this.addLog(result.message, 'info');
         }
     }
 
@@ -1385,7 +1396,7 @@ export class MageKnightGame {
             const hasSite = currentHex && currentHex.site;
             this.ui.setButtonEnabled(visitBtn, hasSite && !this.combat);
             if (hasSite) {
-                visitBtn.textContent = `Besuche ${currentHex.site.getName()}`;
+                visitBtn.textContent = `Besuche ${currentHex.site.getName()} `;
                 visitBtn.style.display = 'inline-block';
             } else {
                 visitBtn.style.display = 'none';
@@ -1400,7 +1411,7 @@ export class MageKnightGame {
         if (!currentHex || !currentHex.site) return;
 
         const site = currentHex.site;
-        this.ui.addLog(`Besuche ${site.getName()}...`, 'info');
+        this.addLog(`Besuche ${site.getName()}...`, 'info');
 
         // Get interaction data from manager
         const interactionData = this.siteManager.visitSite(currentHex, site);
@@ -1417,11 +1428,11 @@ export class MageKnightGame {
     // Save/Load functionality
     saveGame() {
         if (this.combat) {
-            this.ui.addLog('Kann nicht im Kampf speichern!', 'warning');
+            this.addLog('Kann nicht im Kampf speichern!', 'warning');
             return;
         }
         this.saveManager.saveGame(0, this.getGameState()); // Slot 0 default
-        this.ui.addLog('Spiel gespeichert!', 'success');
+        this.addLog('Spiel gespeichert!', 'success');
     }
 
     getGameState() {
@@ -1470,7 +1481,7 @@ export class MageKnightGame {
             const enemy = createEnemy(e.type);
             if (enemy) {
                 enemy.position = e.position;
-                enemy.id = e.id || `enemy_${e.position.q}_${e.position.r}_${Date.now()}`;
+                enemy.id = e.id || `enemy_${e.position.q}_${e.position.r}_${Date.now()} `;
                 if (e.currentHealth) enemy.currentHealth = e.currentHealth;
             }
             return enemy;
@@ -1480,7 +1491,7 @@ export class MageKnightGame {
         this.renderHand();
         this.renderMana();
         this.render();
-        this.ui.addLog('Spielstand geladen', 'info');
+        this.addLog('Spielstand geladen', 'info');
     }
 
     openSaveDialog() {
@@ -1491,7 +1502,7 @@ export class MageKnightGame {
             if (save.empty) {
                 message += `Slot ${save.slotId + 1}: [Leer]\n`;
             } else {
-                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date}\n`;
+                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date} \n`;
             }
         });
 
@@ -1501,7 +1512,7 @@ export class MageKnightGame {
         if (slot && slot >= 1 && slot <= 5) {
             const success = this.saveManager.saveGame(parseInt(slot) - 1, this.getGameState());
             if (success) {
-                this.ui.addLog(`Spiel in Slot ${slot} gespeichert`, 'info');
+                this.addLog(`Spiel in Slot ${slot} gespeichert`, 'info');
             }
         }
     }
@@ -1514,7 +1525,7 @@ export class MageKnightGame {
             if (save.empty) {
                 message += `Slot ${save.slotId + 1}: [Leer]\n`;
             } else {
-                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date}\n`;
+                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date} \n`;
             }
         });
 
@@ -1526,7 +1537,7 @@ export class MageKnightGame {
             if (state) {
                 this.loadGameState(state);
             } else {
-                this.ui.addLog('Fehler beim Laden', 'info');
+                this.addLog('Fehler beim Laden', 'info');
             }
         }
     }
@@ -1556,7 +1567,7 @@ export class MageKnightGame {
                     const roundNum = document.getElementById('round-number');
                     if (timeIcon) {
                         timeIcon.textContent = isNight ? '🌙' : '☀️';
-                        timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
+                        timeIcon.className = `time - icon ${isNight ? 'night' : ''} `;
                     }
                     if (roundNum) roundNum.textContent = state.round;
 
@@ -1572,7 +1583,7 @@ export class MageKnightGame {
                 this.render();
             }
 
-            this.ui.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
+            this.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'} `, 'info');
         });
     }
 
@@ -1590,12 +1601,12 @@ export class MageKnightGame {
                 `🏆 ${achievement.name} freigeschaltet!`,
                 'success'
             );
-            this.ui.addLog(`🏆 Achievement: ${achievement.name} - ${achievement.description}`, 'success');
+            this.addLog(`🏆 Achievement: ${achievement.name} - ${achievement.description} `, 'success');
 
             // Apply rewards
             if (achievement.reward && achievement.reward.fame) {
                 this.hero.gainFame(achievement.reward.fame);
-                this.ui.addLog(`Belohnung: +${achievement.reward.fame} Ruhm`, 'info');
+                this.addLog(`Belohnung: +${achievement.reward.fame} Ruhm`, 'info');
             }
         });
 
@@ -1623,7 +1634,7 @@ export class MageKnightGame {
         soundBtn.addEventListener('click', () => {
             const enabled = this.sound.toggle();
             soundBtn.innerHTML = enabled ? '🔊' : '🔇';
-            this.ui.addLog(enabled ? 'Sound aktiviert' : 'Sound deaktiviert', 'info');
+            this.addLog(enabled ? 'Sound aktiviert' : 'Sound deaktiviert', 'info');
         });
 
         this.setupUIListeners();
@@ -1700,7 +1711,7 @@ export class MageKnightGame {
 
         // Update Progress
         const progress = this.achievementManager.getProgress();
-        progressBar.style.width = `${progress.percentage}%`;
+        progressBar.style.width = `${progress.percentage}% `;
         progressText.textContent = `${progress.unlocked}/${progress.total} Freigeschaltet (${progress.percentage}%)`;
 
         // Filter and Render

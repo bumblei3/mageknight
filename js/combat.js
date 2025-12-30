@@ -1,22 +1,15 @@
-// Combat system for Mage Knight (simplified)
-
 import { StatusEffectManager, EFFECT_TYPES } from './statusEffects.js';
 import { BossEnemy } from './enemy.js';
+import { COMBAT_PHASES } from './constants.js';
 
-export const COMBAT_PHASE = {
-    NOT_IN_COMBAT: 'not_in_combat',
-    RANGED: 'ranged',
-    BLOCK: 'block',
-    DAMAGE: 'damage',
-    ATTACK: 'attack',
-    COMPLETE: 'complete'
-};
+// For backward compatibility
+export const COMBAT_PHASE = COMBAT_PHASES;
 
 export class Combat {
     constructor(hero, enemies) {
         this.hero = hero;
         this.enemies = Array.isArray(enemies) ? enemies : [enemies];
-        this.phase = COMBAT_PHASE.NOT_IN_COMBAT;
+        this.phase = COMBAT_PHASES.NOT_IN_COMBAT;
         this.defeatedEnemies = [];
         this.blockedEnemies = new Set();
         this.totalDamage = 0;
@@ -35,7 +28,7 @@ export class Combat {
 
     // Start combat
     start() {
-        this.phase = COMBAT_PHASE.RANGED;
+        this.phase = COMBAT_PHASES.RANGED;
         return {
             phase: this.phase,
             enemies: this.enemies,
@@ -45,7 +38,7 @@ export class Combat {
 
     // Ranged phase - player uses ranged/siege attacks
     rangedPhase() {
-        if (this.phase !== COMBAT_PHASE.RANGED) {
+        if (this.phase !== COMBAT_PHASES.RANGED) {
             return { error: 'Nicht in der Fernkampf-Phase' };
         }
 
@@ -57,7 +50,7 @@ export class Combat {
 
     // Attempt to defeat enemies with Ranged/Siege Attack
     rangedAttackEnemy(enemy, attackValue, isSiege = false, element = 'physical') {
-        if (this.phase !== COMBAT_PHASE.RANGED) {
+        if (this.phase !== COMBAT_PHASES.RANGED) {
             return { success: false, error: 'Nicht in der Fernkampf-Phase' };
         }
 
@@ -135,7 +128,7 @@ export class Combat {
 
     // End ranged phase and proceed to block
     endRangedPhase() {
-        if (this.phase !== COMBAT_PHASE.RANGED) {
+        if (this.phase !== COMBAT_PHASES.RANGED) {
             return { error: 'Nicht in der Fernkampf-Phase' };
         }
 
@@ -144,7 +137,7 @@ export class Combat {
             return this.endCombat();
         }
 
-        this.phase = COMBAT_PHASE.BLOCK;
+        this.phase = COMBAT_PHASES.BLOCK;
         return {
             phase: this.phase,
             message: 'Block-Phase begonnen.'
@@ -153,7 +146,7 @@ export class Combat {
 
     // Block phase - player plays blocks against enemy attacks
     blockPhase() {
-        if (this.phase !== COMBAT_PHASE.BLOCK) {
+        if (this.phase !== COMBAT_PHASES.BLOCK) {
             return { error: 'Nicht in der Block-Phase' };
         }
 
@@ -175,7 +168,7 @@ export class Combat {
 
     // Attempt to block an enemy (includes unit contributions)
     blockEnemy(enemy, blockValue) {
-        if (this.phase !== COMBAT_PHASE.BLOCK) {
+        if (this.phase !== COMBAT_PHASES.BLOCK) {
             return { success: false, error: 'Nicht in der Block-Phase' };
         }
 
@@ -203,17 +196,17 @@ export class Combat {
 
     // End block phase and move to damage phase
     endBlockPhase() {
-        if (this.phase !== COMBAT_PHASE.BLOCK) {
+        if (this.phase !== COMBAT_PHASES.BLOCK) {
             return { error: 'Nicht in der Block-Phase' };
         }
 
-        this.phase = COMBAT_PHASE.DAMAGE;
+        this.phase = COMBAT_PHASES.DAMAGE;
         return this.damagePhase();
     }
 
     // Damage phase - calculate and assign damage
     damagePhase() {
-        if (this.phase !== COMBAT_PHASE.DAMAGE) {
+        if (this.phase !== COMBAT_PHASES.DAMAGE) {
             return { error: 'Nicht in der Schadens-Phase' };
         }
 
@@ -261,20 +254,20 @@ export class Combat {
             }
         });
 
-        this.phase = COMBAT_PHASE.ATTACK;
+        this.phase = COMBAT_PHASES.ATTACK;
 
         return {
             totalDamage: this.totalDamage,
             woundsReceived: this.woundsReceived,
             unblockedEnemies,
             message: `${this.woundsReceived} Verletzungen erhalten!`,
-            nextPhase: COMBAT_PHASE.ATTACK
+            nextPhase: COMBAT_PHASES.ATTACK
         };
     }
 
     // Attack phase - player attacks enemies
     attackPhase() {
-        if (this.phase !== COMBAT_PHASE.ATTACK) {
+        if (this.phase !== COMBAT_PHASES.ATTACK) {
             return { error: 'Nicht in der Angriffs-Phase' };
         }
 
@@ -304,13 +297,13 @@ export class Combat {
         let applied = [];
 
         abilities.forEach(ability => {
-            if (this.phase === COMBAT_PHASE.BLOCK && ability.type === 'block') {
+            if (this.phase === COMBAT_PHASES.BLOCK && ability.type === 'block') {
                 this.unitBlockPoints += ability.value;
                 applied.push(`+${ability.value} Block`);
-            } else if (this.phase === COMBAT_PHASE.ATTACK && ability.type === 'attack') {
+            } else if (this.phase === COMBAT_PHASES.ATTACK && ability.type === 'attack') {
                 this.unitAttackPoints += ability.value;
                 applied.push(`+${ability.value} Angriff`);
-            } else if (this.phase === COMBAT_PHASE.RANGED) {
+            } else if (this.phase === COMBAT_PHASES.RANGED) {
                 if (ability.type === 'ranged') {
                     this.unitRangedPoints += ability.value;
                     applied.push(`+${ability.value} Fernkampf`);
@@ -331,7 +324,7 @@ export class Combat {
 
     // Attempt to defeat enemies with attack (includes unit contributions)
     attackEnemies(attackValue, attackElement = 'physical', targetEnemies = null) {
-        if (this.phase !== COMBAT_PHASE.ATTACK) {
+        if (this.phase !== COMBAT_PHASES.ATTACK) {
             return { error: 'Nicht in der Angriffs-Phase' };
         }
 
@@ -594,7 +587,7 @@ export class Combat {
         // Clear all status effects
         this.statusEffects.clear();
 
-        this.phase = COMBAT_PHASE.COMPLETE;
+        this.phase = COMBAT_PHASES.COMPLETE;
 
         const allDefeated = this.enemies.length === 0;
         const result = {
@@ -612,7 +605,7 @@ export class Combat {
 
     // Check if combat is complete
     isComplete() {
-        return this.phase === COMBAT_PHASE.COMPLETE;
+        return this.phase === COMBAT_PHASES.COMPLETE;
     }
 
     // Get current combat state

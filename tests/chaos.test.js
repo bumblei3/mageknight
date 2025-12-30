@@ -57,9 +57,13 @@ describe('Chaos Testing - Resilience', () => {
         const originalVibrate = global.navigator.vibrate;
         global.navigator.vibrate = undefined;
 
-        expect(() => {
+        try {
             if (global.navigator.vibrate) global.navigator.vibrate(10);
-        }).not.toThrow();
+        } catch (e) {
+            // Should not reach here if handled correctly, but expect() doesn't have toThrow
+            throw e;
+        }
+        expect(true).toBe(true); // Placeholder for pass
 
         global.navigator = originalNav;
     });

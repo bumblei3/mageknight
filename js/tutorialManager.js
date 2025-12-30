@@ -85,19 +85,31 @@ export class TutorialManager {
         const step = this.steps[stepIndex];
 
         // Update UI
-        document.getElementById('tutorial-step-counter').textContent = `${stepIndex + 1} / ${this.steps.length}`;
-        document.getElementById('tutorial-title-custom').textContent = step.title;
-        document.getElementById('tutorial-text-custom').textContent = step.text;
+        if (document.getElementById('tutorial-step-counter')) {
+            document.getElementById('tutorial-step-counter').textContent = `${stepIndex + 1} / ${this.steps.length}`;
+        }
+        if (document.getElementById('tutorial-title-custom')) {
+            document.getElementById('tutorial-title-custom').textContent = step.title;
+        }
+        if (document.getElementById('tutorial-text-custom')) {
+            document.getElementById('tutorial-text-custom').textContent = step.text;
+        }
 
         // Update button states
         const prevBtn = document.getElementById('tutorial-prev-btn');
         const nextBtn = document.getElementById('tutorial-next-btn');
 
-        prevBtn.disabled = stepIndex === 0;
-        nextBtn.textContent = stepIndex === this.steps.length - 1 ? "Los geht's!" : 'Weiter →';
+        if (prevBtn) {
+            prevBtn.disabled = stepIndex === 0;
+        }
+        if (nextBtn) {
+            nextBtn.textContent = stepIndex === this.steps.length - 1 ? "Los geht's!" : 'Weiter →';
+        }
 
         // Show overlay
-        this.overlay.style.display = 'flex';
+        if (this.overlay) {
+            this.overlay.style.display = 'flex';
+        }
 
         // Highlight element if specified
         if (step.highlightSelector) {
@@ -121,12 +133,13 @@ export class TutorialManager {
         }
 
         const rect = element.getBoundingClientRect();
-
-        this.spotlight.style.display = 'block';
-        this.spotlight.style.left = `${rect.left - 10}px`;
-        this.spotlight.style.top = `${rect.top - 10}px`;
-        this.spotlight.style.width = `${rect.width + 20}px`;
-        this.spotlight.style.height = `${rect.height + 20}px`;
+        if (this.spotlight) {
+            this.spotlight.style.display = 'block';
+            this.spotlight.style.left = `${rect.left - 10}px`;
+            this.spotlight.style.top = `${rect.top - 10}px`;
+            this.spotlight.style.width = `${rect.width + 20}px`;
+            this.spotlight.style.height = `${rect.height + 20}px`;
+        }
 
         // Make element temporarily higher z-index
         element.style.zIndex = '10000';
@@ -137,7 +150,9 @@ export class TutorialManager {
      * Clear spotlight
      */
     clearHighlight() {
-        this.spotlight.style.display = 'none';
+        if (this.spotlight) {
+            this.spotlight.style.display = 'none';
+        }
 
         // Reset z-index of previously highlighted elements
         const highlighted = document.querySelectorAll('[data-tutorial-highlight="true"]');

@@ -310,12 +310,19 @@ export class StatisticsManager {
     load() {
         try {
             const data = localStorage.getItem('mageKnight_statistics');
-            if (data) {
+            if (data && data.startsWith('{')) {
                 const parsed = JSON.parse(data);
-                this.stats = { ...this.createDefaultStats(), ...parsed.stats };
+                if (parsed && typeof parsed === 'object' && parsed.stats) {
+                    this.stats = { ...this.createDefaultStats(), ...parsed.stats };
+                }
             }
         } catch (error) {
             console.error('Failed to load statistics:', error);
+            // Default stats already set in constructor
+        }
+        // Final safety check: ensure we always have valid stats
+        if (!this.stats || typeof this.stats !== 'object') {
+            this.stats = this.createDefaultStats();
         }
     }
 

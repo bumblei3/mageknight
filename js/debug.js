@@ -77,32 +77,32 @@ export class DebugManager {
         this.game.hero.crystals.blue += 5;
         this.game.hero.crystals.green += 5;
         this.game.hero.crystals.white += 5;
-        this.game.ui.addLog('Debug: Added 5 of each crystal', 'info');
+        this.game.addLog('Debug: Added 5 of each crystal', 'info');
         this.game.updateStats();
     }
 
     addFame() {
         this.game.hero.gainFame(10);
-        this.game.ui.addLog('Debug: Added 10 Fame', 'info');
+        this.game.addLog('Debug: Added 10 Fame', 'info');
         this.game.updateStats();
     }
 
     addReputation() {
         this.game.hero.changeReputation(1);
-        this.game.ui.addLog('Debug: +1 Reputation', 'info');
+        this.game.addLog('Debug: +1 Reputation', 'info');
         this.game.updateStats();
     }
 
     addInfluence() {
         this.game.hero.influencePoints += 10;
-        this.game.ui.addLog('Debug: +10 Influence', 'info');
+        this.game.addLog('Debug: +10 Influence', 'info');
         this.game.updateStats();
     }
 
     healAll() {
         this.game.hero.wounds = [];
         this.game.hero.units.forEach(u => u.heal());
-        this.game.ui.addLog('Debug: Healed hero and units', 'info');
+        this.game.addLog('Debug: Healed hero and units', 'info');
         this.game.updateStats();
         this.game.renderHand();
     }
@@ -110,11 +110,11 @@ export class DebugManager {
     drawCard() {
         const card = this.game.hero.drawCard();
         if (card) {
-            this.game.ui.addLog(`Debug: Drew ${card.name}`, 'info');
+            this.game.addLog(`Debug: Drew ${card.name}`, 'info');
             this.game.renderHand();
             this.game.updateStats();
         } else {
-            this.game.ui.addLog('Debug: Deck empty', 'warning');
+            this.game.addLog('Debug: Deck empty', 'warning');
         }
     }
 
@@ -122,7 +122,7 @@ export class DebugManager {
         this.game.hero.discard.push(...this.game.hero.hand);
         this.game.hero.hand = [];
         this.game.hero.drawCards();
-        this.game.ui.addLog('Debug: Reset hand', 'info');
+        this.game.addLog('Debug: Reset hand', 'info');
         this.game.renderHand();
         this.game.updateStats();
     }
@@ -137,10 +137,10 @@ export class DebugManager {
         import('./unit.js').then(module => {
             const unit = module.createUnit(type);
             if (this.game.hero.addUnit(unit)) {
-                this.game.ui.addLog(`Debug: Added ${unit.getName()}`, 'info');
+                this.game.addLog(`Debug: Added ${unit.getName()}`, 'info');
                 this.game.updateStats();
             } else {
-                this.game.ui.addLog('Debug: Command limit reached', 'warning');
+                this.game.addLog('Debug: Command limit reached', 'warning');
             }
         });
     }
@@ -149,18 +149,18 @@ export class DebugManager {
         this.showCoordinates = !this.showCoordinates;
         this.game.hexGrid.debugMode = this.showCoordinates;
         this.game.render();
-        this.game.ui.addLog(`Debug: Coordinates ${this.showCoordinates ? 'ON' : 'OFF'}`, 'info');
+        this.game.addLog(`Debug: Coordinates ${this.showCoordinates ? 'ON' : 'OFF'}`, 'info');
     }
 
     revealMap() {
         // Reveal all tiles
         // This requires mapManager support or direct grid manipulation
         // For now, just log
-        this.game.ui.addLog('Debug: Reveal Map not implemented yet', 'warning');
+        this.game.addLog('Debug: Reveal Map not implemented yet', 'warning');
     }
 
     teleportMode() {
-        this.game.ui.addLog('Debug: Click any hex to teleport', 'info');
+        this.game.addLog('Debug: Click any hex to teleport', 'info');
         // Override click handler temporarily?
         // Or add a flag to game
         this.game.debugTeleport = true;
@@ -178,12 +178,12 @@ export class DebugManager {
         };
         this.game.enemies.push(enemy);
         this.game.render();
-        this.game.ui.addLog('Debug: Spawned enemy at hero location', 'info');
+        this.game.addLog('Debug: Spawned enemy at hero location', 'info');
     }
 
     killEnemies() {
         this.game.enemies = [];
         this.game.render();
-        this.game.ui.addLog('Debug: Killed all enemies', 'info');
+        this.game.addLog('Debug: Killed all enemies', 'info');
     }
 }

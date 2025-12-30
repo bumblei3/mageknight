@@ -44,6 +44,7 @@ describe('Combat Ranged Phase Integration', () => {
                 visitBtn: { style: {} }
             }
         };
+        game.addLog = createSpy();
         game.particleSystem = { impactEffect: createSpy() };
 
         game.initiateCombat(enemy);
@@ -58,7 +59,7 @@ describe('Combat Ranged Phase Integration', () => {
         game.executeAttackAction(); // In Ranged phase, this is "End Phase"
 
         expect(game.combat.phase).toBe(COMBAT_PHASE.BLOCK);
-        expect(game.ui.addLog.calls.some(c => c[0].includes('Block-Phase'))).toBe(true);
+        expect(game.addLog.calls.some(c => c[0].includes('Block-Phase'))).toBe(true);
     });
 
     it('should handle Ranged Attack properly', () => {
@@ -70,7 +71,7 @@ describe('Combat Ranged Phase Integration', () => {
 
         // Since it was the only enemy, combat should end
         expect(game.combat).toBeNull();
-        expect(game.ui.addLog.calls.some(c => c[0].includes('besiegt'))).toBe(true);
+        expect(game.addLog.calls.some(c => c[0].includes('besiegt'))).toBe(true);
         expect(game.combatRangedTotal).toBe(0); // Should reset after hit (simplified logic)
     });
 
@@ -80,6 +81,6 @@ describe('Combat Ranged Phase Integration', () => {
         game.handleEnemyClick(game.combat.enemies[0]);
 
         expect(game.combat.enemies.length).toBe(1); // Enemy still alive
-        expect(game.ui.addLog.calls.some(c => c[0].includes('zu schwach'))).toBe(true);
+        expect(game.addLog.calls.some(c => c[0].includes('zu schwach'))).toBe(true);
     });
 });

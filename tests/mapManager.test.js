@@ -1,7 +1,7 @@
 import { describe, it, expect } from './testRunner.js';
 import { MapManager } from '../js/mapManager.js';
 import { HexGrid } from '../js/hexgrid.js';
-import { TERRAIN_TYPES } from '../js/terrain.js';
+import { TERRAIN_TYPES } from '../js/constants.js';
 import { SITE_TYPES } from '../js/sites.js';
 import { createMockCanvas } from './test-mocks.js';
 

@@ -77,6 +77,7 @@ await import('./tests/long_session.test.js');
 await import('./tests/save_logic_boost.test.js');
 await import('./tests/pbt_combat.test.js');
 await import('./tests/visual_snapshots.test.js');
+await import('./tests/architecture.test.js');
 
 // Parse command line arguments
 const args = process.argv.slice(2);

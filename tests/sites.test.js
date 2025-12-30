@@ -7,7 +7,9 @@ import { UNIT_TYPES } from '../js/unit.js';
 describe('Site Interactions', () => {
     // Mock Game object
     const mockGame = {
-        hero: new Hero('TestHero')
+        hero: new Hero('TestHero'),
+        addLog: () => { },
+        initiateCombat: () => { }
     };
     const manager = new SiteInteractionManager(mockGame);
 

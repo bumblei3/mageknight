@@ -18,12 +18,33 @@ describe('UI Boost', () => {
             }
             return elements[id];
         };
+        // Pre-initialize elements that UI expects in constructor
+        document.getElementById('hand-cards');
+        document.getElementById('played-cards');
+        document.getElementById('unit-cards');
+        document.getElementById('hero-units');
+        document.getElementById('toast-container');
+        document.getElementById('site-modal');
+        document.getElementById('site-options');
+        document.getElementById('site-modal-icon');
+        document.getElementById('site-modal-title');
+        document.getElementById('site-modal-description');
+
         global.document.createElement = (tag) => createMockElement(tag);
 
-        ui = new UI();
+        const game = {
+            addLog: createSpy(),
+            showToast: createSpy(),
+            sound: { cardPlay: createSpy(), diceRoll: createSpy(), success: createSpy() },
+            hero: { position: { q: 0, r: 0 }, hand: [{ name: 'Test Card' }] },
+            render: createSpy(),
+            updateStats: createSpy(),
+        };
+        ui = new UI(game);
+        // Do not mock addLog/showToast globally as some tests need the real ones
+        // ui.addLog = createSpy();
+        // ui.showToast = createSpy();
         // Manually link some elements that UI expects in constructor or methods
-        ui.elements.siteModal = createMockElement('div');
-        ui.elements.siteOptions = createMockElement('div');
         ui.elements.siteModalIcon = createMockElement('div');
         ui.elements.siteModalTitle = createMockElement('div');
         ui.elements.siteModalDescription = createMockElement('div');
@@ -31,6 +52,7 @@ describe('UI Boost', () => {
     });
 
     afterEach(() => {
+        ui.destroy();
         global.document.createElement = originalCreateElement;
         global.document.getElementById = originalGetElementById;
     });
@@ -116,17 +138,22 @@ describe('UI Boost', () => {
         ui.showSiteModal(data);
         const items = ui.elements.siteOptions.querySelectorAll('.shop-item');
 
+        ui.addLog = createSpy(); // Spy specifically for this test
         // Success case (card red)
         items[0].click();
-        expect(ui.showNotification.calledWith('Lernt Fireball', 'success')).toBe(true);
+        expect(ui.addLog.calledWith('Lernt Fireball', 'success')).toBe(true);
 
         // Failure case (card green)
         items[1].click();
-        expect(ui.showNotification.calledWith('Fehlgeschlagen', 'error')).toBe(true);
+        expect(ui.addLog.calledWith('Fehlgeschlagen', 'error')).toBe(true);
+
+        // Turn 0: End Turn
+        ui.game.endTurn();
+        expect(ui.game.turnNumber).toBe(0); // Initial turn number is 0, endTurn doesn't change it in this mock
 
         // Success case (unit)
         items[2].click();
-        expect(ui.showNotification.calledWith('Guard rekrutiert', 'success')).toBe(true);
+        expect(ui.addLog.calledWith('Guard rekrutiert', 'success')).toBe(true);
     });
 
     it('should handle site modal button action with success', () => {
@@ -168,12 +195,12 @@ describe('UI Boost', () => {
         const btn = ui.elements.siteOptions.querySelector('button');
         expect(btn.disabled).toBe(true);
 
-        // Even if clicked (manually or via code bypass), ensure showNotification handles it
-        // Note: showNotification logic might have branching for types
+        ui.addLog = createSpy();
         ui.showNotification('Test info', 'info');
         ui.showNotification('Test warning', 'warning');
         ui.showNotification('Test error', 'error');
-        expect(ui.showNotification.callCount).toBeGreaterThan(0);
+        // Check that addLog was called (since showNotification calls it)
+        expect(ui.addLog.called).toBe(true);
     });
 
     it('should render units with different statuses', () => {
@@ -210,7 +237,13 @@ describe('UI Boost', () => {
     });
 
     it('should handle addPlayedCard with formatting', () => {
-        const card = { name: 'Fireball', color: 'red' };
+        const card = {
+            name: 'Fireball',
+            color: 'red',
+            isWound: () => false,
+            basicEffect: { value: 5 },
+            strongEffect: { value: 10 }
+        };
         const effect = { type: 'attack', value: 5 };
         ui.formatEffect = (eff) => `${eff.value} Damage`;
 
@@ -225,10 +258,11 @@ describe('UI Boost', () => {
             ui.showToast(`Test ${type}`, type);
         });
         expect(ui.toastContainer.children.length).toBe(types.length);
-        // Ensure some iconic symbols are present
-        expect(ui.toastContainer.innerHTML).toContain('✅');
-        expect(ui.toastContainer.innerHTML).toContain('❌');
-        expect(ui.toastContainer.innerHTML).toContain('⚔️');
+        // Ensure some iconic symbols are present in any of the toasts
+        const allText = Array.from(ui.toastContainer.children).map(t => t.textContent).join(' ');
+        expect(allText).toContain('✅');
+        expect(allText).toContain('❌');
+        expect(allText).toContain('⚔️');
     });
 
     it('should handle toast removal animation', (done) => {

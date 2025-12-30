@@ -162,7 +162,7 @@ export class TouchController {
         }
 
         // Show context menu or info
-        this.game.ui.addLog(`Langes Drücken auf Hex ${hex.q},${hex.r}`, 'info');
+        this.game.addLog(`Langes Drücken auf Hex ${hex.q},${hex.r}`, 'info');
 
         // Haptic feedback
         if (navigator.vibrate) {
@@ -182,19 +182,19 @@ export class TouchController {
             // Horizontal swipe
             if (deltaX > 0) {
                 // Swipe right - maybe cycle cards?
-                this.game.ui.addLog('Swipe rechts', 'info');
+                this.game.addLog('Swipe rechts', 'info');
             } else {
                 // Swipe left
-                this.game.ui.addLog('Swipe links', 'info');
+                this.game.addLog('Swipe links', 'info');
             }
         } else {
             // Vertical swipe
             if (deltaY > 0) {
                 // Swipe down - could show/hide panels
-                this.game.ui.addLog('Swipe runter', 'info');
+                this.game.addLog('Swipe runter', 'info');
             } else {
                 // Swipe up
-                this.game.ui.addLog('Swipe hoch', 'info');
+                this.game.addLog('Swipe hoch', 'info');
             }
         }
     }

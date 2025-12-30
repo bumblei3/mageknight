@@ -184,7 +184,7 @@ export class SaveManager {
                 influencePoints: gameState.hero.influencePoints,
                 healingPoints: gameState.hero.healingPoints
             },
-            enemies: gameState.enemies.map(enemy => ({
+            enemies: (gameState.enemies || []).map(enemy => ({
                 type: enemy.type,
                 position: enemy.position,
                 armor: enemy.armor,
@@ -194,7 +194,7 @@ export class SaveManager {
                 isAlive: enemy.isAlive
             })),
             manaSource: {
-                dice: gameState.manaSource.dice
+                dice: (gameState.manaSource && gameState.manaSource.dice) || []
             },
             terrain: gameState.terrain || {},
             selectedHex: gameState.selectedHex || null,

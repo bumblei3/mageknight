@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
 import { createMockElement, createMockCanvas, createMockContext } from './test-mocks.js';
 
@@ -22,13 +22,19 @@ describe('Visual Rendering Snapshots', () => {
         game = new MageKnightGame();
     });
 
+    afterEach(() => {
+        if (game && game.ui) game.ui.destroy();
+    });
+
     it('should call fillRect and stroke during hex rendering', () => {
         // Mock data
         game.hexGrid = {
             hexagons: new Map([
                 ['0,0', { q: 0, r: 0, terrain: 'plains' }]
             ]),
-            hexToPixel: () => ({ x: 100, y: 100 })
+            hexToPixel: () => ({ x: 100, y: 100 }),
+            render: () => { },
+            getHex: () => ({})
         };
         game.enemies = [];
 
@@ -41,9 +47,11 @@ describe('Visual Rendering Snapshots', () => {
     });
 
     it('should render game logs to the UI', () => {
-        const logContainer = document.getElementById('log-container');
+        const logContainer = game.ui.elements.gameLog;
         game.ui.addLog('Test Log', 'info');
         expect(logContainer.children.length).toBeGreaterThan(0);
-        expect(logContainer.innerHTML).toContain('Test Log');
+        // Use textContent of the first child or search children
+        const entry = logContainer.children[0];
+        expect(entry.textContent).toBe('Test Log');
     });
 });

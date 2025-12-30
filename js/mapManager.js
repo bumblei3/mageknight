@@ -1,4 +1,4 @@
-import { TERRAIN_TYPES } from './terrain.js';
+import { TERRAIN_TYPES } from './constants.js';
 import { SITE_TYPES, Site } from './sites.js';
 
 export class MapManager {

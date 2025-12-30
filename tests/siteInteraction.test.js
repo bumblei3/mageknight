@@ -15,6 +15,7 @@ const mockHero = {
 
 const mockGame = {
     hero: mockHero,
+    addLog: () => { },
     initiateCombat: () => { }
 };
 

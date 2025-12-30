@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { DebugManager } from '../js/debug.js';
+import { createSpy } from './test-mocks.js';
 
 describe('DebugManager', () => {
     let debugManager;
@@ -10,8 +11,8 @@ describe('DebugManager', () => {
     beforeEach(() => {
         // Mock Game and its dependencies
         mockUI = {
-            addLog: () => { },
-            renderHand: () => { } // Add renderHand mock
+            addLog: createSpy('addLog'),
+            renderHand: () => { }
         };
 
         mockHero = {
@@ -32,15 +33,13 @@ describe('DebugManager', () => {
         mockGame = {
             hero: mockHero,
             ui: mockUI,
+            addLog: createSpy('addLog'),
             updateStats: () => { },
             renderHand: () => { },
             render: () => { },
             hexGrid: { debugMode: false },
             enemies: []
         };
-
-        // Mock global window/document if needed (handled by setup.js mostly)
-        // DebugManager accesses document.body.appendChild
 
         debugManager = new DebugManager(mockGame);
     });
@@ -52,32 +51,16 @@ describe('DebugManager', () => {
     });
 
     it('should setup console access', () => {
-        // setupConsoleAccess is called in constructor
         expect(window.game).toBe(mockGame);
         expect(window.debug).toBe(debugManager);
     });
 
     it('should toggle panel', () => {
-        // Initial state hidden (class 'hidden' added in createDebugUI)
-        // But MockHTMLElement classList is simple.
-        // Let's check the toggle method logic if possible or just state
-
-        // The panel is created in constructor.
-        // debugManager.panel should be a MockHTMLElement
-
-        // Manually check toggle
         debugManager.togglePanel();
-        // In mock setup, classList.toggle might not be fully implemented to track state without a real DOM
-        // But let's assume we can just call it without error.
-        // To verify, we might need to spy or check if we can inspect classList on MockHTMLElement.
-        // The MockHTMLElement in setup.js has a dummy classList.
-        // So we can't easily verify the class changed unless we improve the mock or just verify no error.
-        // For now, verify no error.
     });
 
     it('should add crystals (cheat)', () => {
         debugManager.addCrystals();
-
         expect(mockHero.crystals.red).toBe(5);
         expect(mockHero.crystals.blue).toBe(5);
         expect(mockHero.crystals.green).toBe(5);
@@ -87,7 +70,6 @@ describe('DebugManager', () => {
     it('should add fame (cheat)', () => {
         let fameAdded = 0;
         mockHero.gainFame = (amount) => { fameAdded += amount; };
-
         debugManager.addFame();
         expect(fameAdded).toBe(10);
     });
@@ -95,7 +77,6 @@ describe('DebugManager', () => {
     it('should add reputation (cheat)', () => {
         let repChange = 0;
         mockHero.changeReputation = (amount) => { repChange += amount; };
-
         debugManager.addReputation();
         expect(repChange).toBe(1);
     });
@@ -109,36 +90,27 @@ describe('DebugManager', () => {
         mockHero.wounds = ['Wound1', 'Wound2'];
         let unitHealed = false;
         mockHero.units = [{ heal: () => { unitHealed = true; } }];
-
         debugManager.healAll();
-
         expect(mockHero.wounds.length).toBe(0);
         expect(unitHealed).toBe(true);
     });
 
     it('should draw card (cheat)', () => {
-        // Mock drawCard returns a card
         debugManager.drawCard();
-        // Should log success. We can't easily check log without spying on ui.addLog
-        // But we can check if it runs without error.
     });
 
     it('should reset hand (cheat)', () => {
         mockHero.hand = ['Card1'];
         mockHero.discard = [];
-
         debugManager.resetHand();
-
         expect(mockHero.hand.length).toBe(0);
         expect(mockHero.discard).toContain('Card1');
-        // drawCards called
     });
 
     it('should toggle coordinates', () => {
         debugManager.toggleCoordinates();
         expect(debugManager.showCoordinates).toBe(true);
         expect(mockGame.hexGrid.debugMode).toBe(true);
-
         debugManager.toggleCoordinates();
         expect(debugManager.showCoordinates).toBe(false);
         expect(mockGame.hexGrid.debugMode).toBe(false);

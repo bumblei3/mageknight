@@ -124,19 +124,17 @@ export function createMockCanvas(width = 800, height = 600) {
     };
 }
 
-/**
- * Creates a comprehensive mock UI object
- */
 export function createMockUI() {
     return {
-        addLog: createSpy(),
+        addLog: createSpy('addLog'),
+        showToast: createSpy('showToast'),
         updateHeroStats: createSpy(),
         formatEffect: createSpy(() => ''),
         addPlayedCard: createSpy(),
         showPlayArea: createSpy(),
         reset: createSpy(),
-        showSiteModal: createSpy(), // Added
-        showSiteInteraction: createSpy(), // Added for safety as per previous test
+        showSiteModal: createSpy(),
+        showSiteInteraction: createSpy(),
         updateMovementPoints: createSpy(),
         renderUnits: createSpy(),
         renderHandCards: createSpy(),
@@ -176,39 +174,58 @@ export class MockHTMLElement {
             getPropertyValue: (prop) => this.style[prop] || ''
         };
         this._listeners = new Map();
+        const self = this;
         this.classList = {
             add: (...classes) => {
-                this._classes = this._classes || new Set();
-                classes.forEach(c => this._classes.add(c));
+                self._classes = self._classes || new Set();
+                classes.forEach(c => self._classes.add(c));
+                self._className = Array.from(self._classes).join(' ');
             },
             remove: (...classes) => {
-                this._classes = this._classes || new Set();
-                classes.forEach(c => this._classes.delete(c));
+                self._classes = self._classes || new Set();
+                classes.forEach(c => self._classes.delete(c));
+                self._className = Array.from(self._classes).join(' ');
             },
             contains: (className) => {
-                this._classes = this._classes || new Set();
-                return this._classes.has(className);
+                self._classes = self._classes || new Set();
+                return self._classes.has(className);
             },
             toggle: (className) => {
-                this._classes = this._classes || new Set();
-                if (this._classes.has(className)) {
-                    this._classes.delete(className);
+                self._classes = self._classes || new Set();
+                if (self._classes.has(className)) {
+                    self._classes.delete(className);
                 } else {
-                    this._classes.add(className);
+                    self._classes.add(className);
                 }
+                self._className = Array.from(self._classes).join(' ');
             }
         };
         this.dataset = {};
+        this.parentId = null;
         this.children = [];
         this.value = '';
         this.id = '';
-        this.className = '';
+        this._className = '';
+        this._classes = new Set();
         this.parentNode = null;
         this._innerHTML = '';
     }
 
+    get className() {
+        return this._className;
+    }
+
+    set className(val) {
+        this._className = val;
+        this._classes = new Set(val.split(' ').filter(c => c));
+    }
+
     get innerHTML() {
-        return this._innerHTML;
+        if (this._innerHTML) return this._innerHTML;
+        return this.children.map(child => {
+            if (typeof child === 'string') return child;
+            return child.outerHTML || child.innerHTML || '';
+        }).join('');
     }
 
     set innerHTML(html) {
@@ -216,6 +233,22 @@ export class MockHTMLElement {
         if (html === '') {
             this.children = [];
         }
+    }
+
+    get textContent() {
+        if (this._textContent) return this._textContent;
+        if (this.children.length > 0) {
+            return this.children.map(child => {
+                if (typeof child === 'string') return child;
+                return child.textContent || '';
+            }).join('');
+        }
+        return (this._innerHTML || '').replace(/<[^>]*>/g, '');
+    }
+
+    set textContent(text) {
+        this._textContent = text;
+        this.children = []; // Setting textContent clears children in real DOM
     }
 
     addEventListener(event, callback) {
@@ -297,7 +330,14 @@ export class MockHTMLElement {
             }
             return null;
         };
-        return findIn(this) || new MockHTMLElement();
+        const found = findIn(this);
+        if (found) return found;
+
+        // Return a dummy element to avoid null pointer errors in code that assumes elements exist
+        const dummy = new MockHTMLElement();
+        if (selector.startsWith('#')) dummy.id = selector.substring(1);
+        else if (selector.startsWith('.')) dummy.className = selector.substring(1);
+        return dummy;
     }
 
     querySelectorAll(selector) {
@@ -313,8 +353,6 @@ export class MockHTMLElement {
             }
         };
         findAllIn(this);
-        // Fallback: if nothing found but we expect something, return at least one mock to avoid breakage in loops
-        if (results.length === 0) return [new MockHTMLElement()];
         return results;
     }
 

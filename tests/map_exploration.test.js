@@ -1,7 +1,7 @@
 import { TestRunner } from './testRunner.js';
 import { MapManager } from '../js/mapManager.js';
 import { HexGrid } from '../js/hexgrid.js';
-import { TERRAIN_TYPES } from '../js/terrain.js';
+import { TERRAIN_TYPES } from '../js/constants.js';
 
 const runner = new TestRunner();
 const describe = runner.describe.bind(runner);

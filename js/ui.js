@@ -1,8 +1,8 @@
-// UI management for Mage Knight
-
 import TooltipManager from './tooltip.js';
 import { animator, animateCounter } from './animator.js';
 import * as CardAnimations from './cardAnimations.js';
+import { eventBus } from './eventBus.js';
+import { GAME_EVENTS } from './constants.js';
 
 export class UI {
     constructor() {
@@ -11,6 +11,20 @@ export class UI {
         this.setupEventListeners();
         this.setupTooltips();
         this.setupToastContainer();
+        this.setupGlobalListeners();
+    }
+
+    setupGlobalListeners() {
+        this._logAddedHandler = ({ message, type }) => this.addLog(message, type);
+        this._toastShowHandler = ({ message, type }) => this.showToast(message, type);
+
+        eventBus.on(GAME_EVENTS.LOG_ADDED, this._logAddedHandler);
+        eventBus.on(GAME_EVENTS.TOAST_SHOW, this._toastShowHandler);
+    }
+
+    destroy() {
+        if (this._logAddedHandler) eventBus.off(GAME_EVENTS.LOG_ADDED, this._logAddedHandler);
+        if (this._toastShowHandler) eventBus.off(GAME_EVENTS.TOAST_SHOW, this._toastShowHandler);
     }
 
     setupTooltips() {

@@ -1,8 +1,6 @@
+import { TIME_OF_DAY } from './constants.js';
 
-export const TIME_OF_DAY = {
-    DAY: 'day',
-    NIGHT: 'night'
-};
+export { TIME_OF_DAY };
 
 export class TimeManager {
     constructor() {

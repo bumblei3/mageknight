@@ -16,7 +16,18 @@ describe('Final Touch and Particles', () => {
             handleCardClick: createSpy(),
             handleCardRightClick: createSpy(),
             render: createSpy(),
-            hexGrid: { pixelToHex: () => ({ q: 0, r: 0 }), hexagons: new Map() }
+            hexGrid: { pixelToHex: () => ({ q: 0, r: 0 }), hexagons: new Map() },
+            ui: {
+                addLog: createSpy(),
+                tooltipManager: {
+                    showEnemyTooltip: createSpy(),
+                    showTerrainTooltip: createSpy(),
+                    hideTooltip: createSpy()
+                },
+                setButtonEnabled: createSpy()
+            },
+            addLog: createSpy(),
+            sound: { cardPlay: createSpy() }
         };
         game.canvas.parentElement = createMockElement('div');
 
@@ -26,6 +37,7 @@ describe('Final Touch and Particles', () => {
         originalNavigator = global.navigator;
         global.navigator = { vibrate: createSpy(), maxTouchPoints: 5 };
     });
+
 
     afterEach(() => {
         global.navigator = originalNavigator;
@@ -65,29 +77,26 @@ describe('Final Touch and Particles', () => {
 
         // Swipe right
         controller.handleSwipe(100, 0);
-        expect(game.ui.addLog.calledWith('Swipe rechts', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe rechts', 'info')).toBe(true);
 
         // Swipe left
         controller.handleSwipe(-100, 0);
-        expect(game.ui.addLog.calledWith('Swipe links', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe links', 'info')).toBe(true);
 
         // Swipe up
         controller.handleSwipe(0, -100);
-        expect(game.ui.addLog.calledWith('Swipe hoch', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe hoch', 'info')).toBe(true);
 
         // Swipe down
         controller.handleSwipe(0, 100);
-        expect(game.ui.addLog.calledWith('Swipe runter', 'info')).toBe(true);
+        expect(game.addLog.calledWith('Swipe runter', 'info')).toBe(true);
     });
 
     it('should show hex tooltip for enemy and terrain', () => {
         const hex = { q: 0, r: 0 };
         const touch = { clientX: 10, clientY: 20 };
         game.enemies = [{ name: 'Orc', position: { q: 0, r: 0 } }];
-        game.ui.tooltipManager = {
-            showEnemyTooltip: createSpy(),
-            showTerrainTooltip: createSpy()
-        };
+        // Already setup in beforeEach
         game.hexGrid.getHex = () => ({ terrain: 'plains' });
 
         controller.showHexTooltip(touch, hex);

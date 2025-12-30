@@ -221,6 +221,13 @@ export class Hero {
         this.wounds.push(wound);
     }
 
+    // Take a wound to discard pile (Poison effect)
+    takeWoundToDiscard() {
+        const wound = createWoundCard();
+        this.discard.push(wound);
+        this.wounds.push(wound);
+    }
+
     // Heal a wound
     healWound(useHealingPoints = true) {
         if (this.wounds.length === 0) {
@@ -422,6 +429,14 @@ export class Hero {
         this.influencePoints -= influenceCost;
         this.discard.push(actionCard);
         return { success: true, message: `${actionCard.name} gelernt!` };
+    }
+
+    // Gain card directly to hand (e.g. from Level Up)
+    gainCardToHand(card) {
+        this.hand.push(card);
+        // Maybe sort hand or trigger UI update? 
+        // UI update happens in Game.render()
+        return { success: true, message: `${card.name} erhalten!` };
     }
 
     // ===== MANA MANAGEMENT =====

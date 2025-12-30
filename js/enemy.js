@@ -87,6 +87,155 @@ export class Enemy {
     }
 }
 
+// ============ BOSS ENEMY ============
+// Bosses have multi-phase health and special abilities
+
+export const BOSS_PHASES = {
+    PHASE_1: 1,
+    PHASE_2: 2,
+    PHASE_3: 3,
+    ENRAGED: 'enraged'
+};
+
+export class BossEnemy extends Enemy {
+    constructor(data) {
+        super(data);
+
+        this.isBoss = true;
+
+        // Multi-phase health system
+        this.maxHealth = data.maxHealth || 30;
+        this.currentHealth = data.currentHealth || this.maxHealth;
+        this.phases = data.phases || [
+            { threshold: 0.66, name: 'Phase 1', triggered: false },
+            { threshold: 0.33, name: 'Phase 2', triggered: false },
+            { threshold: 0, name: 'Enraged', triggered: false }
+        ];
+        this.currentPhase = BOSS_PHASES.PHASE_1;
+
+        // Enrage mechanics
+        this.enraged = false;
+        this.enrageThreshold = data.enrageThreshold || 0.25;
+        this.enrageMultiplier = data.enrageMultiplier || 1.5;
+
+        // Special abilities per phase
+        this.phaseAbilities = data.phaseAbilities || {
+            [BOSS_PHASES.PHASE_1]: null,
+            [BOSS_PHASES.PHASE_2]: 'summon',
+            [BOSS_PHASES.PHASE_3]: 'heal',
+            [BOSS_PHASES.ENRAGED]: 'double_attack'
+        };
+
+        // Summon data
+        this.summonType = data.summonType || 'weakling';
+        this.summonCount = data.summonCount || 2;
+    }
+
+    // Take damage and check phase transitions
+    takeDamage(amount) {
+        const previousHealth = this.currentHealth;
+        this.currentHealth = Math.max(0, this.currentHealth - amount);
+
+        const healthPercent = this.currentHealth / this.maxHealth;
+        const transitions = [];
+
+        // Check phase transitions
+        for (const phase of this.phases) {
+            if (!phase.triggered && healthPercent <= phase.threshold) {
+                phase.triggered = true;
+                transitions.push({
+                    phase: phase.name,
+                    ability: this.getPhaseAbility(phase.name)
+                });
+            }
+        }
+
+        // Check enrage
+        if (!this.enraged && healthPercent <= this.enrageThreshold) {
+            this.enraged = true;
+            this.currentPhase = BOSS_PHASES.ENRAGED;
+            transitions.push({
+                phase: 'Enraged',
+                ability: 'enrage',
+                message: `${this.name} wird wütend! Angriff erhöht!`
+            });
+        }
+
+        return {
+            damage: amount,
+            previousHealth,
+            currentHealth: this.currentHealth,
+            healthPercent,
+            transitions,
+            defeated: this.currentHealth <= 0
+        };
+    }
+
+    // Get ability for phase
+    getPhaseAbility(phaseName) {
+        if (phaseName === 'Phase 2') return this.phaseAbilities[BOSS_PHASES.PHASE_2];
+        if (phaseName === 'Enraged') return this.phaseAbilities[BOSS_PHASES.ENRAGED];
+        return null;
+    }
+
+    // Get effective attack (with enrage modifier)
+    getEffectiveAttack() {
+        let attack = super.getEffectiveAttack();
+        if (this.enraged) {
+            attack = Math.floor(attack * this.enrageMultiplier);
+        }
+        return attack;
+    }
+
+    // Check if boss is defeated (health-based, not armor)
+    isDefeated(attackValue = null) {
+        return this.currentHealth <= 0;
+    }
+
+    // Get current health percentage
+    getHealthPercent() {
+        return this.currentHealth / this.maxHealth;
+    }
+
+    // Get phase name
+    getPhaseName() {
+        if (this.enraged) return 'Wütend';
+        const healthPercent = this.getHealthPercent();
+        if (healthPercent > 0.66) return 'Phase 1';
+        if (healthPercent > 0.33) return 'Phase 2';
+        return 'Phase 3';
+    }
+
+    // Execute phase ability (returns what should happen)
+    executePhaseAbility(abilityName) {
+        switch (abilityName) {
+            case 'summon':
+                return {
+                    type: 'summon',
+                    enemyType: this.summonType,
+                    count: this.summonCount,
+                    message: `${this.name} beschwört ${this.summonCount} ${this.summonType}!`
+                };
+            case 'heal':
+                const healAmount = Math.floor(this.maxHealth * 0.1);
+                this.currentHealth = Math.min(this.maxHealth, this.currentHealth + healAmount);
+                return {
+                    type: 'heal',
+                    amount: healAmount,
+                    message: `${this.name} heilt sich um ${healAmount}!`
+                };
+            case 'enrage':
+            case 'double_attack':
+                return {
+                    type: 'buff',
+                    message: `${this.name} greift nun doppelt an!`
+                };
+            default:
+                return null;
+        }
+    }
+}
+
 // Enemy definitions
 export const ENEMY_DEFINITIONS = {
     [ENEMY_TYPES.ORC]: {
@@ -134,13 +283,12 @@ export const ENEMY_DEFINITIONS = {
         icon: '🏹',
         color: '#78716c'
     },
-    // New enemy types
     mage: {
         name: 'Magier',
         armor: 3,
         attack: 4,
         fame: 4,
-        swift: true, // Can teleport after attack
+        swift: true,
         physicalResist: true,
         attackType: 'ice',
         icon: '🧙',
@@ -151,7 +299,7 @@ export const ENEMY_DEFINITIONS = {
         armor: 6,
         attack: 5,
         fame: 6,
-        brutal: true, // Fire breath - double damage
+        brutal: true,
         fireResist: true,
         attackType: 'fire',
         icon: '🐉',
@@ -163,7 +311,7 @@ export const ENEMY_DEFINITIONS = {
         attack: 3,
         fame: 4,
         swift: true,
-        physicalResist: true, // Intangible - physical attacks less effective
+        physicalResist: true,
         attackType: 'physical',
         icon: '👻',
         color: '#a78bfa'
@@ -173,7 +321,7 @@ export const ENEMY_DEFINITIONS = {
         armor: 8,
         attack: 2,
         fame: 5,
-        fortified: true, // Very slow but tough
+        fortified: true,
         iceResist: true,
         physicalResist: true,
         attackType: 'physical',
@@ -185,8 +333,8 @@ export const ENEMY_DEFINITIONS = {
         armor: 4,
         attack: 4,
         fame: 5,
-        brutal: true, // Life steal - deals more damage
-        poison: true, // Drains life
+        brutal: true,
+        poison: true,
         attackType: 'physical',
         icon: '🦇',
         color: '#7c2d12'
@@ -225,6 +373,72 @@ export const ENEMY_DEFINITIONS = {
     }
 };
 
+// ============ BOSS DEFINITIONS ============
+export const BOSS_DEFINITIONS = {
+    dark_lord: {
+        name: 'Dunkler Lord',
+        armor: 10,
+        attack: 6,
+        fame: 50,
+        maxHealth: 30,
+        fortified: true,
+        brutal: true,
+        fireResist: true,
+        iceResist: true,
+        physicalResist: true,
+        icon: '👿',
+        color: '#000000',
+        summonType: 'phantom',
+        summonCount: 2,
+        phaseAbilities: {
+            1: null,
+            2: 'summon',
+            3: 'heal',
+            enraged: 'double_attack'
+        }
+    },
+    dragon_lord: {
+        name: 'Drachen-König',
+        armor: 12,
+        attack: 8,
+        fame: 60,
+        maxHealth: 40,
+        brutal: true,
+        fireResist: true,
+        attackType: 'fire',
+        icon: '🐲',
+        color: '#dc2626',
+        summonType: 'draconum',
+        summonCount: 1,
+        phaseAbilities: {
+            1: null,
+            2: 'summon',
+            3: null,
+            enraged: 'double_attack'
+        }
+    },
+    lich_king: {
+        name: 'Lich-König',
+        armor: 8,
+        attack: 5,
+        fame: 55,
+        maxHealth: 35,
+        poison: true,
+        iceResist: true,
+        physicalResist: true,
+        icon: '💀',
+        color: '#7c3aed',
+        summonType: 'phantom',
+        summonCount: 3,
+        phaseAbilities: {
+            1: 'summon',
+            2: 'heal',
+            3: 'summon',
+            enraged: 'double_attack'
+        }
+    }
+};
+
 // Create an enemy from a definition
 export function createEnemy(enemyKey, position = null) {
     const def = ENEMY_DEFINITIONS[enemyKey];
@@ -243,6 +457,21 @@ export function createEnemy(enemyKey, position = null) {
 // Create a list of enemies
 export function createEnemies(enemyList) {
     return enemyList.map(({ type, position }) => createEnemy(type, position));
+}
+
+// Create a boss from a definition
+export function createBoss(bossKey, position = null) {
+    const def = BOSS_DEFINITIONS[bossKey];
+    if (!def) {
+        console.error(`Unknown boss type: ${bossKey}`);
+        return null;
+    }
+
+    return new BossEnemy({
+        ...def,
+        type: bossKey,
+        position
+    });
 }
 
 export default Enemy;

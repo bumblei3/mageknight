@@ -262,6 +262,99 @@ export const SAMPLE_SPELLS = [
         strongEffect: { healing: 4 },
         manaCost: 1,
         description: 'Basic: 2 Heilung | Strong: 4 Heilung'
+    },
+    {
+        id: 'spell_ice_bolt',
+        name: 'Eis-Pfeil',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.BLUE,
+        basicEffect: { attack: 3, element: 'ice', block: 2 },
+        strongEffect: { attack: 6, element: 'ice', block: 5, freeze: true },
+        manaCost: 1,
+        description: 'Basic: 3 Eis-Angriff + 2 Block | Strong: 6 Eis-Angriff + Freeze'
+    },
+    {
+        id: 'spell_tremor',
+        name: 'Erdbeben',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.GREEN,
+        basicEffect: { attack: 4, siege: true },
+        strongEffect: { attack: 8, siege: true, destroyArmor: true },
+        manaCost: 1,
+        description: 'Basic: 4 Belagerungs-Angriff | Strong: 8 Belagerung + Rüstung zerstören'
+    },
+    {
+        id: 'spell_wind_walk',
+        name: 'Windlauf',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.WHITE,
+        basicEffect: { movement: 4 },
+        strongEffect: { movement: 8, flying: true },
+        manaCost: 1,
+        description: 'Basic: 4 Bewegung | Strong: 8 Bewegung (Fliegend)'
+    },
+    {
+        id: 'spell_demolish',
+        name: 'Zertrümmern',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.RED,
+        basicEffect: { attack: 5, siege: true },
+        strongEffect: { attack: 10, siege: true },
+        manaCost: 1,
+        description: 'Basic: 5 Belagerungs-Angriff | Strong: 10 Belagerungs-Angriff'
+    }
+];
+
+export const SAMPLE_ARTIFACTS = [
+    {
+        id: 'art_horn_of_wrath',
+        name: 'Horn des Zorns',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.RED,
+        basicEffect: { attack: 4, interaction: true },
+        strongEffect: { attack: 8, interaction: true, brutal: true },
+        manaCost: 0, // Artifacts usually don't cost mana to use, or generate it
+        description: 'Basic: 4 Angriff | Strong: 8 Brutaler Angriff'
+    },
+    {
+        id: 'art_shield_of_truth',
+        name: 'Schild der Wahrheit',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.BLUE,
+        basicEffect: { block: 5 },
+        strongEffect: { block: 10, resistance: 'all' },
+        manaCost: 0,
+        description: 'Basic: 5 Block | Strong: 10 Block + Widerstand'
+    },
+    {
+        id: 'art_banner_of_glory',
+        name: 'Banner des Ruhms',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.WHITE,
+        basicEffect: { influence: 5, fame: 1 },
+        strongEffect: { influence: 10, fame: 2 },
+        manaCost: 0,
+        description: 'Basic: 5 Einfluss + 1 Ruhm | Strong: 10 Einfluss + 2 Ruhm'
+    },
+    {
+        id: 'art_gem_of_flight',
+        name: 'Juwel des Fluges',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GREEN,
+        basicEffect: { movement: 5 },
+        strongEffect: { movement: 10, flying: true },
+        manaCost: 0,
+        description: 'Basic: 5 Bewegung | Strong: 10 Bewegung (Fliegend)'
+    },
+    {
+        id: 'art_ring_of_power',
+        name: 'Ring der Macht',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        basicEffect: { drawMana: 2, crystal: 1 },
+        strongEffect: { drawMana: 3, crystal: 2 },
+        manaCost: 0,
+        description: 'Basic: 2 Mana + 1 Kristall | Strong: 3 Mana + 2 Kristalle'
     }
 ];
 

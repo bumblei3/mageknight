@@ -47,6 +47,11 @@ describe('Game Integration', () => {
         expect(game.combat).not.toBeNull();
 
         // 2. Block Phase
+        // Skip Ranged
+        if (game.combat.phase === 'ranged') {
+            game.combat.endRangedPhase();
+        }
+
         // Skip block (take wound)
         game.combat.endBlockPhase();
         expect(game.combat.phase).toBe('attack');
@@ -111,7 +116,7 @@ describe('Game Integration', () => {
 
         // 3. Check for rewards
         expect(game.hero.skills.length).toBeGreaterThan(0);
-        // Check if card was added to discard (standard reward behavior)
-        expect(game.hero.discard.length).toBeGreaterThan(0);
+        // Check if card was added to hand (Level Up reward goes to hand)
+        expect(game.hero.hand.length).toBeGreaterThan(5); // Default hand is 5, +1 reward
     });
 });

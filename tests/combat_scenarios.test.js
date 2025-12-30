@@ -16,6 +16,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, enemies);
         combat.start();
+        combat.endRangedPhase(); // Skip ranged
 
         // Strategy: Block all (needs 6 block total)
         // Hero has 0 block initially.
@@ -53,6 +54,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, tank);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase(); // Take the hit (3 damage -> 2 wounds if armor 2)
 
         // Attack: Fortified means ranged/siege attacks are halved? 
@@ -80,6 +82,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, assassin);
         combat.start();
+        combat.endRangedPhase();
 
         // Try blocking with 4 (fail due to Swift)
         const blockResult = combat.blockEnemy(assassin, 4);
@@ -118,6 +121,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, [fireElemental, iceElemental]);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         // Attack Fire Elemental with Fire (Resistant)
@@ -140,6 +144,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         // Attack with 0 damage
@@ -154,6 +159,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         // Attack with excessive damage
@@ -175,6 +181,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
 
         // Try to block (should fail due to swift)
         const blockResult = combat.blockEnemy(enemy, 5);
@@ -190,6 +197,10 @@ describe('Combat Scenarios', () => {
         const hero = new Hero('TestHero');
         const combat = new Combat(hero, []);
         combat.start();
+        // Even with no enemies, we might start in ranged -> end ranged -> end block -> end combat?
+        // Or if no enemies, endCombat might be called immediately?
+        // Let's check combat.start logic for empty array. It sets phase to RANGED.
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         const result = combat.endCombat();
@@ -203,6 +214,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         // Attack with exactly the armor value
@@ -217,6 +229,7 @@ describe('Combat Scenarios', () => {
 
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         // Attack with armor - 1

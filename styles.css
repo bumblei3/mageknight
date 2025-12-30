@@ -3290,3 +3290,110 @@ kbd {
     gap: 1rem;
     margin-top: 1.5rem;
 }
+
+/* ===================================
+   LEVEL UP MODAL
+   =================================== */
+.level-up-content {
+    max-width: 900px;
+    /* Wider modal */
+    background: linear-gradient(135deg, rgba(20, 20, 40, 0.98), rgba(10, 10, 20, 0.98));
+    border: 1px solid var(--color-accent-gold);
+    box-shadow: 0 0 50px rgba(251, 191, 36, 0.2);
+}
+
+.level-up-message {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-accent-gold);
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+.level-up-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.level-up-section h3 {
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.choices-grid {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+/* Skill Selection */
+.skill-choice {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    width: 200px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.skill-choice:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+}
+
+.skill-choice.selected {
+    border-color: var(--color-accent-gold);
+    background: rgba(251, 191, 36, 0.15);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+    transform: scale(1.05);
+}
+
+.skill-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.skill-name {
+    font-weight: bold;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.skill-description {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+/* Card Choice uses .card styles but adds selection */
+.card-choice {
+    transform: scale(0.9);
+    /* Slightly smaller to fit */
+}
+
+.card-choice.selected {
+    border-color: var(--color-accent-gold);
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+    transform: scale(1) translateY(-10px);
+    z-index: 10;
+}
+
+#confirm-level-up {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 2rem auto 0;
+    font-size: 1.2rem;
+    padding: 1rem;
+}

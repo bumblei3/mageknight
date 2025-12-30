@@ -22,12 +22,12 @@ class MockEnemy {
 }
 
 describe('Combat', () => {
-    it('should start in BLOCK phase', () => {
+    it('should start in RANGED phase', () => {
         const hero = new Hero('TestHero');
         const enemy = new MockEnemy(3, 4);
         const combat = new Combat(hero, enemy);
         combat.start();
-        expect(combat.phase).toBe(COMBAT_PHASE.BLOCK);
+        expect(combat.phase).toBe(COMBAT_PHASE.RANGED);
     });
 
     it('should successfully block an enemy', () => {
@@ -35,7 +35,7 @@ describe('Combat', () => {
         const enemy = new MockEnemy(3, 4);
         const combat = new Combat(hero, enemy);
         combat.start();
-
+        combat.endRangedPhase(); // Skip ranged for block test
         const result = combat.blockEnemy(enemy, 4); // Block 4 vs Attack 4
         expect(result.success).toBe(true);
         expect(result.blocked).toBe(true);
@@ -47,6 +47,7 @@ describe('Combat', () => {
         const enemy = new MockEnemy(3, 4);
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase(); // Skip ranged
 
         const result = combat.blockEnemy(enemy, 3); // Block 3 vs Attack 4
         expect(result.success).toBe(true);
@@ -59,6 +60,7 @@ describe('Combat', () => {
         const enemy = new MockEnemy(3, 5); // 5 Attack
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase(); // Skip ranged
 
         // Skip block
         combat.endBlockPhase();
@@ -76,6 +78,7 @@ describe('Combat', () => {
         const enemy2 = new MockEnemy(3, 4);
         const combat = new Combat(hero, [enemy1, enemy2]);
         combat.start();
+        combat.endRangedPhase();
 
         expect(combat.enemies.length).toBe(2);
 
@@ -97,6 +100,7 @@ describe('Combat', () => {
 
         const combat = new Combat(hero, swiftEnemy);
         combat.start();
+        combat.endRangedPhase();
 
         // Block 4 should fail against swift (needs 8)
         const result1 = combat.blockEnemy(swiftEnemy, 4);
@@ -113,11 +117,12 @@ describe('Combat', () => {
         const combat = new Combat(hero, poisonEnemy);
 
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase(); // No block
 
-        // Base wounds + 1 poison wound
+        // Base wounds + Poison wounds (equal to base wounds) = 2 * base wounds
         const baseWounds = Math.ceil(3 / hero.armor); // 2
-        expect(combat.woundsReceived).toBe(baseWounds + 1);
+        expect(combat.woundsReceived).toBe(baseWounds * 2);
     });
 
     it('should handle vampiric ability', () => {
@@ -127,6 +132,7 @@ describe('Combat', () => {
 
         const combat = new Combat(hero, vampireEnemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase(); // Deals damage, should heal
 
         expect(vampireEnemy.currentHealth).toBe(4); // Healed by 1
@@ -137,6 +143,7 @@ describe('Combat', () => {
         const enemy = new MockEnemy(3, 6);
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
 
         combat.unitBlockPoints = 2; // Unit adds 2 block
 
@@ -150,6 +157,7 @@ describe('Combat', () => {
         const enemy = new MockEnemy(8, 3);
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         combat.unitAttackPoints = 3;
@@ -174,7 +182,8 @@ describe('Combat', () => {
         const hero = new Hero('TestHero');
         const enemy = new MockEnemy(3, 4);
         const combat = new Combat(hero, enemy);
-        combat.start(); // BLOCK phase
+        combat.start(); // RANGED phase
+        combat.endRangedPhase(); // BLOCK phase
 
         const result = combat.attackEnemies(5);
         expect(result.error).toBeDefined();
@@ -187,6 +196,7 @@ describe('Combat', () => {
         const combat = new Combat(hero, [enemy1, enemy2]);
 
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
         combat.attackEnemies(5); // Defeats both (3+2=5)
 
@@ -202,6 +212,7 @@ describe('Combat', () => {
         const combat = new Combat(hero, [enemy1, enemy2]);
 
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
         // Attack only enemy1 by targeting it specifically
         combat.attackEnemies(2, 'physical', [enemy1]); // Only target enemy1
@@ -220,6 +231,7 @@ describe('Combat', () => {
 
         const combat = new Combat(hero, [enemy1, enemy2]);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
         combat.attackEnemies(5); // Defeats both
 
@@ -235,6 +247,7 @@ describe('Combat', () => {
 
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         // Fire attack needs double (8) due to resistance
@@ -315,6 +328,7 @@ describe('Combat', () => {
 
         const combat = new Combat(hero, enemy);
         combat.start();
+        combat.endRangedPhase();
         combat.endBlockPhase();
 
         // 3 / 10 = 0.3 -> rounds up to 1 wound minimum
@@ -330,6 +344,9 @@ describe('Combat', () => {
         expect(combat.phase).toBe(COMBAT_PHASE.NOT_IN_COMBAT);
 
         combat.start();
+        expect(combat.phase).toBe(COMBAT_PHASE.RANGED);
+
+        combat.endRangedPhase();
         expect(combat.phase).toBe(COMBAT_PHASE.BLOCK);
 
         combat.endBlockPhase();

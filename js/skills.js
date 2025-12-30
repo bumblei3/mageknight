@@ -49,6 +49,41 @@ export const SKILLS = {
             description: 'Einmal pro Runde: Ein Feind erhält -3 Rüstung und verliert alle Angriffe.',
             type: SKILL_TYPES.ACTIVE,
             icon: '❄️'
+        },
+        {
+            id: 'siege_mastery',
+            name: 'Belagerungs-Meister',
+            description: 'Alle Belagerungs-Angriffe erhalten +2.',
+            type: SKILL_TYPES.PASSIVE,
+            icon: '🏰'
+        },
+        {
+            id: 'essence_flow',
+            name: 'Essenz-Fluss',
+            description: 'Einmal pro Runde: Ziehe 1 Karte und erhalte 1 Mana einer beliebigen Farbe.',
+            type: SKILL_TYPES.ACTIVE,
+            icon: '🌀'
+        },
+        {
+            id: 'natural_healing',
+            name: 'Natürliche Heilung',
+            description: 'Heile am Ende deines Zuges 1 Wunde, wenn du keine Karten abgeworfen hast.',
+            type: SKILL_TYPES.PASSIVE,
+            icon: '🌿'
+        },
+        {
+            id: 'noble_manners',
+            name: 'Edle Manieren',
+            description: '+2 Einfluss in Interaktionen.',
+            type: SKILL_TYPES.PASSIVE,
+            icon: '👑'
+        },
+        {
+            id: 'avenging_spirit',
+            name: 'Rächender Geist',
+            description: 'Wenn du eine Wunde nimmst, erhalte +2 Angriff für den nächsten Kampf.',
+            type: SKILL_TYPES.PASSIVE,
+            icon: '👻'
         }
     ]
 };

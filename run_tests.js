@@ -44,6 +44,10 @@ await import('./tests/soundManager.test.js');
 await import('./tests/ui_hand.test.js');
 await import('./tests/ui_interactions.test.js');
 await import('./tests/ui_tooltips.test.js');
+await import('./tests/content_expansion.test.js');
+await import('./tests/level_up.test.js');
+await import('./tests/site_rewards.test.js');
+await import('./tests/combat_ranged.test.js');
 
 // Parse command line arguments
 const args = process.argv.slice(2);

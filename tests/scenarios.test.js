@@ -61,6 +61,11 @@ describe('Scenario - Conquest and Progression', () => {
         game.initiateCombat(enemy);
         expect(game.combat).toBeDefined();
 
+        // Ranged Phase (Skip)
+        if (game.combat.phase === 'ranged') {
+            game.combat.endRangedPhase();
+        }
+
         // Block
         game.combat.blockEnemy(enemy, 3);
         game.combat.endBlockPhase();
@@ -102,6 +107,11 @@ describe('Scenario - Recovery and Persistence', () => {
         });
 
         game.initiateCombat(boss);
+
+        // Ranged Phase (Skip)
+        if (game.combat.phase === 'ranged') {
+            game.combat.endRangedPhase();
+        }
 
         // Partial Block (only 3 block)
         game.combat.blockEnemy(boss, 3);

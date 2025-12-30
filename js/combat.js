@@ -1,7 +1,11 @@
 // Combat system for Mage Knight (simplified)
 
+import { StatusEffectManager, EFFECT_TYPES } from './statusEffects.js';
+import { BossEnemy } from './enemy.js';
+
 export const COMBAT_PHASE = {
     NOT_IN_COMBAT: 'not_in_combat',
+    RANGED: 'ranged',
     BLOCK: 'block',
     DAMAGE: 'damage',
     ATTACK: 'attack',
@@ -18,19 +22,132 @@ export class Combat {
         this.totalDamage = 0;
         this.woundsReceived = 0;
 
+        // Status Effects
+        this.statusEffects = new StatusEffectManager();
+
         // Unit contribution tracking
         this.unitAttackPoints = 0;
         this.unitBlockPoints = 0;
+        this.unitRangedPoints = 0;
+        this.unitSiegePoints = 0;
         this.activatedUnits = new Set();
     }
 
     // Start combat
     start() {
-        this.phase = COMBAT_PHASE.BLOCK;
+        this.phase = COMBAT_PHASE.RANGED;
         return {
             phase: this.phase,
             enemies: this.enemies,
-            message: `Kampf begonnen gegen ${this.enemies.length} Feinde!`
+            message: `Kampf begonnen gegen ${this.enemies.length} Feinde! Fernkampf-Phase.`
+        };
+    }
+
+    // Ranged phase - player uses ranged/siege attacks
+    rangedPhase() {
+        if (this.phase !== COMBAT_PHASE.RANGED) {
+            return { error: 'Nicht in der Fernkampf-Phase' };
+        }
+
+        return {
+            enemies: this.enemies,
+            message: 'Nutze Fernkampf- oder Belagerungsangriffe!'
+        };
+    }
+
+    // Attempt to defeat enemies with Ranged/Siege Attack
+    rangedAttackEnemy(enemy, attackValue, isSiege = false, element = 'physical') {
+        if (this.phase !== COMBAT_PHASE.RANGED) {
+            return { success: false, error: 'Nicht in der Fernkampf-Phase' };
+        }
+
+        // Check immunities
+        if (enemy.fortified && !isSiege) {
+            return {
+                success: false,
+                message: `${enemy.name} ist befestigt! Nur Belagerungsangriffe wirken.`
+            };
+        }
+
+        const multiplier = enemy.getResistanceMultiplier(element);
+        const totalAttack = attackValue + (isSiege ? this.unitSiegePoints : this.unitRangedPoints);
+
+        // Handle boss enemies (health-based damage)
+        if (enemy.isBoss) {
+            const effectiveDamage = Math.floor(totalAttack * multiplier);
+            const damageResult = enemy.takeDamage(effectiveDamage);
+
+            const result = {
+                success: true,
+                isBoss: true,
+                damage: effectiveDamage,
+                healthPercent: damageResult.healthPercent,
+                bossTransitions: [],
+                message: `${enemy.name} erleidet ${effectiveDamage} Fernkampf-Schaden! (${enemy.currentHealth}/${enemy.maxHealth} HP)`
+            };
+
+            // Handle phase transitions
+            if (damageResult.transitions.length > 0) {
+                damageResult.transitions.forEach(transition => {
+                    result.bossTransitions.push({
+                        boss: enemy,
+                        phase: transition.phase,
+                        ability: transition.ability,
+                        message: transition.message || `${enemy.name} erreicht ${transition.phase}!`
+                    });
+                });
+            }
+
+            // Check if boss is defeated
+            if (damageResult.defeated) {
+                this.defeatedEnemies.push(enemy);
+                this.hero.gainFame(enemy.fame);
+                this.enemies = this.enemies.filter(e => e.id !== enemy.id);
+                result.defeated = [enemy];
+                result.fameGained = enemy.fame;
+                result.message = `🏆 ${enemy.name} im Fernkampf besiegt! +${enemy.fame} Ruhm!`;
+            }
+
+            return result;
+        }
+
+        // Handle regular enemies (armor-based defeat)
+        const effectiveArmor = enemy.armor / multiplier;
+
+        if (totalAttack >= effectiveArmor) {
+            this.defeatedEnemies.push(enemy);
+            this.hero.gainFame(enemy.fame);
+            this.enemies = this.enemies.filter(e => e.id !== enemy.id);
+
+            return {
+                success: true,
+                defeated: [enemy],
+                fameGained: enemy.fame,
+                message: `${enemy.name} im Fernkampf besiegt!`
+            };
+        }
+
+        return {
+            success: false,
+            message: `Fernkampf zu schwach (${totalAttack} vs ${effectiveArmor})`
+        };
+    }
+
+    // End ranged phase and proceed to block
+    endRangedPhase() {
+        if (this.phase !== COMBAT_PHASE.RANGED) {
+            return { error: 'Nicht in der Fernkampf-Phase' };
+        }
+
+        // Check if all enemies dead
+        if (this.enemies.length === 0) {
+            return this.endCombat();
+        }
+
+        this.phase = COMBAT_PHASE.BLOCK;
+        return {
+            phase: this.phase,
+            message: 'Block-Phase begonnen.'
         };
     }
 
@@ -120,15 +237,23 @@ export class Combat {
         }
 
         // Apply Special Abilities
-        unblockedEnemies.forEach(enemy => {
-            // Poison: Deals 1 extra wound
-            if (enemy.poison || (enemy.abilities && enemy.abilities.includes('poison'))) {
-                this.hero.takeWound();
-                this.woundsReceived++; // Track for reporting
-                // We might want to log this specifically
-            }
+        // Apply Special Abilities Logic
 
+        // Check for Poison (if any unblocked enemy has poison, the whole attack is poisonous)
+        const isPoison = unblockedEnemies.some(e => e.poison || (e.abilities && e.abilities.includes('poison')));
+
+        if (isPoison) {
+            // Poison deals equal amount of wounds to Discard
+            const poisonWounds = this.woundsReceived;
+            for (let i = 0; i < poisonWounds; i++) {
+                this.hero.takeWoundToDiscard();
+            }
+            this.woundsReceived += poisonWounds; // Track total wounds received
+        }
+
+        unblockedEnemies.forEach(enemy => {
             // Vampiric: Heals enemy if they deal damage
+            // Note: Vampiric usually heals if attack is unblocked (damage dealt)
             if (enemy.abilities && enemy.abilities.includes('vampiric')) {
                 if (enemy.currentHealth < enemy.maxHealth) {
                     enemy.currentHealth = Math.min(enemy.maxHealth, enemy.currentHealth + 1);
@@ -185,6 +310,14 @@ export class Combat {
             } else if (this.phase === COMBAT_PHASE.ATTACK && ability.type === 'attack') {
                 this.unitAttackPoints += ability.value;
                 applied.push(`+${ability.value} Angriff`);
+            } else if (this.phase === COMBAT_PHASE.RANGED) {
+                if (ability.type === 'ranged') {
+                    this.unitRangedPoints += ability.value;
+                    applied.push(`+${ability.value} Fernkampf`);
+                } else if (ability.type === 'siege') {
+                    this.unitSiegePoints += ability.value;
+                    applied.push(`+${ability.value} Belagerung`);
+                }
             }
         });
 
@@ -203,46 +336,99 @@ export class Combat {
         }
 
         const targets = targetEnemies || this.enemies;
-
-        // Calculate effective armor based on resistances
-        const totalArmor = targets.reduce((sum, enemy) => {
-            const multiplier = enemy.getResistanceMultiplier(attackElement);
-            // If resistant, armor is effectively doubled (or damage halved, same result for threshold)
-            // Mage Knight rules: Resistance halves damage. 
-            // Here we compare Total Attack vs Armor. 
-            // So if resistant, we need 2x Attack to kill.
-            // Let's implement it as: Effective Armor = Armor / Multiplier
-            // e.g. Multiplier 0.5 -> Effective Armor = Armor * 2
-            return sum + (enemy.armor / multiplier);
-        }, 0);
-
         const totalAttack = attackValue + this.unitAttackPoints;
 
-        if (totalAttack >= totalArmor) {
-            // Defeat all targeted enemies
-            targets.forEach(enemy => {
-                this.defeatedEnemies.push(enemy);
-                this.hero.gainFame(enemy.fame);
-            });
+        // Split targets into bosses and regular enemies
+        const bosses = targets.filter(e => e.isBoss);
+        const regularEnemies = targets.filter(e => !e.isBoss);
 
-            // Remove defeated enemies from active list
-            this.enemies = this.enemies.filter(e => !targets.includes(e));
+        const result = {
+            success: false,
+            defeated: [],
+            damaged: [],
+            bossTransitions: [],
+            fameGained: 0,
+            totalAttack: totalAttack,
+            unitContribution: this.unitAttackPoints,
+            messages: []
+        };
 
-            return {
-                success: true,
-                defeated: targets,
-                fameGained: targets.reduce((sum, e) => sum + e.fame, 0),
-                totalAttack: totalAttack,
-                unitContribution: this.unitAttackPoints,
-                message: `${targets.length} Feinde besiegt! (Angriff: ${totalAttack})`
-            };
+        // Handle regular enemies (armor-based defeat)
+        if (regularEnemies.length > 0) {
+            const totalArmor = regularEnemies.reduce((sum, enemy) => {
+                const multiplier = enemy.getResistanceMultiplier(attackElement);
+                return sum + (enemy.armor / multiplier);
+            }, 0);
+
+            if (totalAttack >= totalArmor) {
+                regularEnemies.forEach(enemy => {
+                    this.defeatedEnemies.push(enemy);
+                    this.hero.gainFame(enemy.fame);
+                    result.defeated.push(enemy);
+                    result.fameGained += enemy.fame;
+                });
+                this.enemies = this.enemies.filter(e => !regularEnemies.includes(e));
+                result.messages.push(`${regularEnemies.length} Feinde besiegt!`);
+                result.success = true;
+            } else {
+                result.messages.push(`Angriff zu schwach für normale Feinde (${totalAttack} vs ${totalArmor})`);
+            }
         }
 
-        return {
-            success: false,
-            totalAttack: totalAttack,
-            message: `Angriff zu schwach (${totalAttack} vs ${totalArmor} Effektive Rüstung)`
-        };
+        // Handle bosses (health-based damage)
+        bosses.forEach(boss => {
+            const multiplier = boss.getResistanceMultiplier(attackElement);
+            const effectiveDamage = Math.floor(totalAttack * multiplier);
+
+            const damageResult = boss.takeDamage(effectiveDamage);
+            result.damaged.push({
+                boss: boss,
+                damage: effectiveDamage,
+                healthPercent: damageResult.healthPercent
+            });
+
+            // Handle phase transitions
+            if (damageResult.transitions.length > 0) {
+                damageResult.transitions.forEach(transition => {
+                    result.bossTransitions.push({
+                        boss: boss,
+                        phase: transition.phase,
+                        ability: transition.ability,
+                        message: transition.message || `${boss.name} erreicht ${transition.phase}!`
+                    });
+
+                    // Execute phase ability if exists
+                    if (transition.ability && transition.ability !== 'enrage') {
+                        const abilityResult = boss.executePhaseAbility(transition.ability);
+                        if (abilityResult) {
+                            result.bossTransitions.push({
+                                boss: boss,
+                                abilityResult: abilityResult
+                            });
+                        }
+                    }
+                });
+            }
+
+            result.messages.push(`${boss.name} erleidet ${effectiveDamage} Schaden! (${boss.currentHealth}/${boss.maxHealth} HP)`);
+
+            // Check if boss is defeated
+            if (damageResult.defeated) {
+                this.defeatedEnemies.push(boss);
+                this.hero.gainFame(boss.fame);
+                result.defeated.push(boss);
+                result.fameGained += boss.fame;
+                this.enemies = this.enemies.filter(e => e.id !== boss.id);
+                result.messages.push(`🏆 ${boss.name} wurde besiegt! +${boss.fame} Ruhm!`);
+            }
+
+            result.success = true;
+        });
+
+        // Create combined message
+        result.message = result.messages.join(' ');
+
+        return result;
     }
 
     // Combo System - detects and applies bonuses for card combinations
@@ -345,8 +531,68 @@ export class Combat {
         return Math.floor(baseValue * combo.multiplier);
     }
 
+    // ============ STATUS EFFECTS ============
+
+    // Apply a status effect to hero
+    applyEffectToHero(effectType, source = null) {
+        return this.statusEffects.applyToHero(effectType, source);
+    }
+
+    // Apply a status effect to an enemy
+    applyEffectToEnemy(enemy, effectType, source = null) {
+        return this.statusEffects.applyToEnemy(enemy, effectType, source);
+    }
+
+    // Get all effects on hero
+    getHeroEffects() {
+        return this.statusEffects.getHeroEffects();
+    }
+
+    // Get all effects on an enemy
+    getEnemyEffects(enemy) {
+        return this.statusEffects.getEnemyEffects(enemy);
+    }
+
+    // Process effects at phase start (called by game.js)
+    processPhaseEffects() {
+        const results = {
+            heroDamage: 0,
+            enemyDamage: [],
+            messages: []
+        };
+
+        // Process hero effects
+        const heroResult = this.statusEffects.processHeroPhaseStart();
+        if (heroResult && heroResult.damage) {
+            results.heroDamage = heroResult.damage;
+            results.messages.push(`Held erleidet ${heroResult.damage} Schaden durch Statuseffekte!`);
+        }
+
+        // Process enemy effects
+        const enemyResults = this.statusEffects.processEnemyPhaseStart(this.enemies);
+        for (const result of enemyResults) {
+            if (result.damage) {
+                results.enemyDamage.push({ enemy: result.enemy, damage: result.damage });
+                results.messages.push(`${result.enemy.name} erleidet ${result.damage} Schaden!`);
+            }
+        }
+
+        return results;
+    }
+
     // End combat
     endCombat() {
+        // Process end-of-combat effects (like Poison)
+        const endResult = this.statusEffects.processCombatEnd(this.hero);
+        if (endResult.wounds > 0) {
+            for (let i = 0; i < endResult.wounds; i++) {
+                this.hero.takeWound();
+            }
+            this.woundsReceived += endResult.wounds;
+        }
+
+        // Clear all status effects
+        this.statusEffects.clear();
 
         this.phase = COMBAT_PHASE.COMPLETE;
 
@@ -357,6 +603,7 @@ export class Combat {
             remainingEnemies: this.enemies,
             woundsReceived: this.woundsReceived,
             fameGained: this.defeatedEnemies.reduce((sum, e) => sum + e.fame, 0),
+            poisonWounds: endResult.wounds,
             message: allDefeated ? 'Sieg!' : 'Kampf beendet.'
         };
 

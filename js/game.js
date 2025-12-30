@@ -384,6 +384,7 @@ export class MageKnightGame {
 
         if (this.combat) {
             const phaseNames = {
+                'ranged': 'Fernkampf-Phase',
                 'block': 'Block-Phase',
                 'damage': 'Schadens-Phase',
                 'attack': 'Angriffs-Phase',
@@ -391,6 +392,7 @@ export class MageKnightGame {
             };
 
             const hints = {
+                'ranged': '🏹 Nutze Fernkampf- oder Belagerungsangriffe (Töten sofort!)',
                 'block': '🛡️ Spiele blaue Karten zum Blocken',
                 'damage': '💔 Schaden wird verrechnet...',
                 'attack': '⚔️ Spiele rote Karten zum Angreifen',
@@ -863,9 +865,14 @@ export class MageKnightGame {
         // Initialize combat accumulation
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
+        this.combatRangedTotal = 0;
+        this.combatSiegeTotal = 0;
 
         this.ui.addLog(result.message, 'combat');
-        this.ui.showCombatPanel(this.combat.enemies, this.combat.phase);
+        this.ui.addLog(result.message, 'combat');
+        this.ui.showCombatPanel(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
+
+        // Show units in combat
 
         // Show units in combat
         this.renderUnitsInCombat();
@@ -893,9 +900,32 @@ export class MageKnightGame {
         const effectParts = [];
 
         // Accumulate attack and block values
-        if (phase === COMBAT_PHASE.BLOCK && result.effect.block) {
+        if (phase === 'block' && result.effect.block) {
             this.combatBlockTotal += result.effect.block;
             effectParts.push(`+${result.effect.block} Block`);
+        } else if (phase === 'ranged') {
+            if (result.effect.ranged || result.effect.attack) { // Allow normal attack as Ranged? No. Ranged Only.
+                // Actually, some cards give "Ranged Attack". Normal Attack cards usually don't work in Ranged phase.
+                // But for simplicity/fun, maybe we allow "Attack" as "Ranged" with penalty? No, stick to rules.
+                // We need to check if card allows Ranged. 
+                // If default attack card is played, it does nothing?
+                // Let's assume we have specific Ranged cards or we treat Attack as Ranged / 2?
+                // MK Rule: Only Ranged attacks work.
+
+                // However, we don't have many Ranged cards defined yet.
+                // Let's check result.card for 'ranged' property or effect.
+                const isRanged = result.card.type === 'spell' || result.effect.ranged;
+                // Spells like Fireball are Ranged.
+
+                if (result.effect.attack && (result.effect.ranged || result.card.type === 'spell')) {
+                    this.combatRangedTotal += result.effect.attack;
+                    effectParts.push(`+${result.effect.attack} Fernkampf`);
+                }
+                if (result.effect.siege) {
+                    this.combatSiegeTotal += result.effect.attack; // Siege is also attack value
+                    effectParts.push(`+${result.effect.attack} Belagerung`);
+                }
+            }
         }
 
         if (phase === COMBAT_PHASE.ATTACK && result.effect.attack) {
@@ -981,7 +1011,7 @@ export class MageKnightGame {
             this.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
         }
         this.ui.addLog(result.message, 'combat');
-        this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase);
+        this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
 
         // Reset block total, prepare for attack phase
         this.combatBlockTotal = 0;
@@ -1003,6 +1033,8 @@ export class MageKnightGame {
         // Reset combat accumulation
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
+        this.combatRangedTotal = 0;
+        this.combatSiegeTotal = 0;
         this.combat = null;
 
         this.render();
@@ -1014,9 +1046,17 @@ export class MageKnightGame {
         this.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.combat.phase);
     }
 
-    // Execute attack with accumulated attack values
+    // Execute attack action (Button Click)
     executeAttackAction() {
-        if (!this.combat || this.combat.phase !== COMBAT_PHASE.ATTACK) return;
+        if (!this.combat) return;
+
+        // In Ranged Phase, the button is "End Phase / Skip"
+        if (this.combat.phase === 'ranged') {
+            this.endRangedPhase();
+            return;
+        }
+
+        if (this.combat.phase !== 'attack') return;
 
         if (this.combatAttackTotal === 0) {
             this.ui.addLog('Keine Angriffspunkte verfügbar!', 'info');
@@ -1029,8 +1069,53 @@ export class MageKnightGame {
             this.particleSystem.impactEffect(pixelPos.x, pixelPos.y);
         });
 
-        // Try to defeat enemies
+        // Normal Attack Phase
         const attackResult = this.combat.attackEnemies(this.combatAttackTotal, 'physical');
+
+        if (attackResult.success) {
+            this.ui.addLog(attackResult.message, 'success');
+
+            // Track stats
+            attackResult.defeated.forEach(enemy => {
+                this.statisticsManager.trackEnemyDefeated(enemy);
+            });
+
+            // Remove defeated enemies from map (game state)
+            this.enemies = this.enemies.filter(e =>
+                !attackResult.defeated.includes(e)
+            );
+
+            // Check victory
+            if (this.combat.enemies.length === 0) {
+                this.endCombat();
+            } else {
+                this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (e) => this.handleEnemyClick(e));
+                this.updateCombatTotals();
+            }
+        } else {
+            this.ui.addLog(attackResult.message, 'warning');
+        }
+    }
+
+    // Handle Enemy Click (Targeting for Ranged/Block - though Block is currently auto)
+    handleEnemyClick(enemy) {
+        if (!this.combat) return;
+
+        if (this.combat.phase === 'ranged') {
+            this.executeRangedAttack(enemy);
+        } else if (this.combat.phase === 'block') {
+            // Future: Targeted Block
+            // For now Block is auto-distributed in endBlockPhase
+        }
+    }
+
+    executeRangedAttack(enemy) {
+        // Calculate attack values from cards
+        const attackValue = this.combatRangedTotal + this.combatSiegeTotal;
+        const isSiege = this.combatSiegeTotal > 0;
+
+        const attackResult = this.combat.rangedAttackEnemy(enemy, attackValue, isSiege);
+
         this.ui.addLog(attackResult.message, 'combat');
 
         if (attackResult.success) {
@@ -1052,11 +1137,29 @@ export class MageKnightGame {
         }
 
         // Reset attack total after use
-        this.combatAttackTotal = 0;
+        this.combatRangedTotal = 0;
+        this.combatSiegeTotal = 0;
 
         this.render();
         this.updateStats();
         this.updateCombatTotals();
+    }
+
+    endRangedPhase() {
+        if (!this.combat) return;
+
+        const result = this.combat.endRangedPhase();
+        this.ui.addLog(result.message, 'combat');
+
+        if (result.phase === 'block') {
+            this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
+            this.renderUnitsInCombat();
+            this.updatePhaseIndicator();
+            this.updateStats();
+            this.updateCombatTotals();
+        } else if (result.victory) {
+            this.endCombat();
+        }
     }
 
     gainFame(amount) {
@@ -1091,9 +1194,10 @@ export class MageKnightGame {
         }
 
         // Apply Card
+        // Apply Card
         if (selection.card) {
-            this.hero.learnAdvancedAction(selection.card, 0); // Cost 0 for reward
-            this.ui.addLog(`Karte erhalten: ${selection.card.name}`, 'success');
+            this.hero.gainCardToHand(selection.card);
+            this.ui.addLog(`Karte erhalten (auf die Hand): ${selection.card.name}`, 'success');
         }
 
         // Apply Level Up stats
@@ -1144,7 +1248,9 @@ export class MageKnightGame {
     endTurn() {
         if (this.combat) {
             // End combat phase or combat
-            if (this.combat.phase === COMBAT_PHASE.BLOCK) {
+            if (this.combat.phase === COMBAT_PHASE.RANGED) {
+                this.endRangedPhase();
+            } else if (this.combat.phase === COMBAT_PHASE.BLOCK) {
                 this.endBlockPhase();
             } else if (this.combat.phase === COMBAT_PHASE.ATTACK) {
                 this.endCombat();
@@ -1309,6 +1415,15 @@ export class MageKnightGame {
     }
 
     // Save/Load functionality
+    saveGame() {
+        if (this.combat) {
+            this.ui.addLog('Kann nicht im Kampf speichern!', 'warning');
+            return;
+        }
+        this.saveManager.saveGame(0, this.getGameState()); // Slot 0 default
+        this.ui.addLog('Spiel gespeichert!', 'success');
+    }
+
     getGameState() {
         return {
             turn: this.turnNumber,

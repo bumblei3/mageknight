@@ -112,6 +112,14 @@ describe('Game Fuzzing', () => {
                             game.explore();
                         }
                         break;
+
+                    case 'enterCombat':
+                        // Find an enemy to fight if not in combat
+                        if (!game.combat && game.enemies.length > 0) {
+                            const enemy = game.enemies[randomInt(game.enemies.length)];
+                            game.initiateCombat(enemy);
+                        }
+                        break;
                 }
 
                 // --- Invariant Checks ---
@@ -120,23 +128,34 @@ describe('Game Fuzzing', () => {
                 expect(game.hero).toBeDefined();
                 expect(game.hexGrid).toBeDefined();
 
-                // 2. Resources are non-negative (soft check, logic might allow temp dips but usually shouldn't)
-                if (game.hero.movementPoints < 0) {
-                    // movementPoints might be cleared to 0, but technically shouldn't be negative unless logic error
-                    throw new Error('Negative movement points detected');
-                }
+                // 2. Resources are non-negative
+                if (game.hero.movementPoints < 0) throw new Error('Negative movementPoints');
+                if (game.hero.blockPoints < 0) throw new Error('Negative blockPoints');
+                if (game.hero.attackPoints < 0) throw new Error('Negative attackPoints');
+                if (game.hero.influencePoints < 0) throw new Error('Negative influencePoints');
+                if (game.hero.healingPoints < 0) throw new Error('Negative healingPoints');
 
                 // 3. Hand consistency
                 if (game.hero.hand.some(c => !c)) {
                     throw new Error('Undefined card found in hand');
                 }
 
-                // 4. Turn number sanity
+                // 4. Hand Limit Check (soft check, might be temporarily exceeded during draw/discard phases, but at end of turn it should satisfy)
+                // We'll just check if it's not absurdly large
+                if (game.hero.hand.length > 20) {
+                    // throw new Error(`Hand size suspiciously large: ${game.hero.hand.length}`);
+                    // Warning only for now as mechanics might stack
+                }
+
+                // 5. Turn number sanity
                 expect(game.turnNumber).toBeGreaterThanOrEqual(0);
 
             } catch (e) {
                 console.error(`Fuzz failure at iteration ${i}, action: ${action}`);
                 console.error(`Game State: Turn ${game.turnNumber}, Phase ${game.phase}, Hand Size ${game.hero.hand.length}`);
+                if (game.hero) {
+                    console.error(`Hero Pos: (${game.hero.position.q}, ${game.hero.position.r})`);
+                }
                 throw e;
             }
         }

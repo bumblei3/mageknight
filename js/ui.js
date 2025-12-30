@@ -407,9 +407,9 @@ export class UI {
     }
 
     // Show combat panel
-    showCombatPanel(enemies, phase) {
+    showCombatPanel(enemies, phase, onEnemyClick) {
         this.elements.combatPanel.style.display = 'block';
-        this.updateCombatInfo(enemies, phase);
+        this.updateCombatInfo(enemies, phase, onEnemyClick);
     }
 
     // Hide combat panel
@@ -419,7 +419,7 @@ export class UI {
     }
 
     // Update combat info
-    updateCombatInfo(enemies, phase) {
+    updateCombatInfo(enemies, phase, onEnemyClick) {
         this.elements.combatInfo.innerHTML = `
             <div style="margin-bottom: 1rem;">
                 <strong>Phase:</strong> ${this.getCombatPhaseName(phase)}
@@ -427,7 +427,7 @@ export class UI {
         `;
 
         enemies.forEach(enemy => {
-            const enemyDiv = this.renderEnemy(enemy); // Use the new renderEnemy method
+            const enemyDiv = this.renderEnemy(enemy, phase, onEnemyClick); // Use the new renderEnemy method
             this.elements.combatInfo.appendChild(enemyDiv);
         });
     }
@@ -458,6 +458,21 @@ export class UI {
                     <div style="font-size: 0.9em; opacity: 0.8;">Total Attack</div>
                     <div style="font-size: 1.5em; font-weight: bold; color: #ff4a4a;">${attackTotal}</div>
                 </div>`;
+            } else if (phase === 'ranged') {
+                // We need pass Ranged total here, but signature is (attackTotal, blockTotal, phase).
+                // Let's assume attackTotal contains ranged total for this phase call.
+                // Or we can modify the UI signature?
+                // game.js calls updateCombatTotals() with NO arguments usually, getting values from game context?
+                // The current signature assumes args are passed.
+                // But wait, line 436 definition: updateCombatTotals(attackTotal, blockTotal, phase).
+                // game.js usage: this.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.combat.phase);
+                // I need to change game.js to pass ranged total OR overload attackTotal.
+
+                // Let's overload attackTotal for Ranged Phase since it's "Attack" anyway.
+                html += `<div style="text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8;">Fernkampf</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #fbbf24;">${attackTotal}</div>
+                </div>`;
             }
 
             html += '</div>';
@@ -465,10 +480,27 @@ export class UI {
         }
 
         // Show/hide execute attack button based on phase
+        // Show/hide execute attack button based on phase
         const executeAttackBtn = document.getElementById('execute-attack-btn');
         if (executeAttackBtn) {
-            const COMBAT_PHASE = { ATTACK: 'attack' };
-            executeAttackBtn.style.display = phase === COMBAT_PHASE.ATTACK ? 'block' : 'none';
+            const COMBAT_PHASE = { ATTACK: 'attack', RANGED: 'ranged' };
+            // In Ranged phase, we don't have a single "Execute" button usually, we click enemies.
+            // But if we want to Skip Ranged Phase, we need a button.
+            // game.js needs to handle this button click.
+
+            // Actually, let's reuse this button for "End Phase" / "Next Phase".
+            if (phase === COMBAT_PHASE.RANGED) {
+                executeAttackBtn.textContent = "Fernkampf beenden -> Blocken";
+                executeAttackBtn.style.display = 'block';
+                // We need to ensure the click handler calls endRangedPhase.
+                // Currently it probably calls executeAttack?
+                // In game.js wiring needed.
+            } else if (phase === COMBAT_PHASE.ATTACK) {
+                executeAttackBtn.textContent = "Angriff ausführen";
+                executeAttackBtn.style.display = 'block';
+            } else {
+                executeAttackBtn.style.display = 'none';
+            }
         }
     }
 
@@ -476,6 +508,7 @@ export class UI {
     getCombatPhaseName(phase) {
         const names = {
             not_in_combat: 'Kein Kampf',
+            ranged: 'Fernkampf-Phase',
             block: 'Block-Phase',
             damage: 'Schadens-Phase',
             attack: 'Angriffs-Phase',
@@ -565,16 +598,67 @@ export class UI {
         this.elements.heroUnits.appendChild(grid);
     }
 
-    renderEnemy(enemy) {
+    renderEnemy(enemy, phase, onClick) {
         const el = document.createElement('div');
         el.className = 'enemy-card';
+
+        // Boss styling
+        if (enemy.isBoss) {
+            el.classList.add('boss-card');
+            el.style.border = '2px solid #fbbf24';
+            el.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.3))';
+        }
+
+        // Add interactive styling if clickable
+        // Ranged Phase: Click to Attack
+        if (phase === 'ranged' && onClick) {
+            el.style.cursor = 'crosshair';
+            el.title = 'Klicken für Fernkampf-Angriff';
+            el.addEventListener('click', () => onClick(enemy));
+            el.addEventListener('mouseenter', () => el.style.boxShadow = '0 0 10px red');
+            el.addEventListener('mouseleave', () => el.style.boxShadow = enemy.isBoss ? '0 0 8px rgba(251, 191, 36, 0.5)' : 'none');
+        }
+
+        // Build boss health bar HTML
+        let bossHealthHTML = '';
+        if (enemy.isBoss) {
+            const healthPercent = enemy.getHealthPercent() * 100;
+            const healthColor = healthPercent > 60 ? '#10b981' : healthPercent > 30 ? '#fbbf24' : '#ef4444';
+            const phaseName = enemy.getPhaseName();
+
+            bossHealthHTML = `
+                <div class="boss-health-section" style="margin-top: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                        <span style="color: #fbbf24;">👿 ${phaseName}</span>
+                        <span style="color: ${healthColor}">${enemy.currentHealth}/${enemy.maxHealth} HP</span>
+                    </div>
+                    <div class="boss-health-bar" style="
+                        width: 100%;
+                        height: 8px;
+                        background: rgba(0,0,0,0.5);
+                        border-radius: 4px;
+                        overflow: hidden;
+                    ">
+                        <div class="boss-health-fill" style="
+                            width: ${healthPercent}%;
+                            height: 100%;
+                            background: linear-gradient(90deg, ${healthColor}, ${healthColor}aa);
+                            transition: width 0.3s ease;
+                        "></div>
+                    </div>
+                    ${enemy.enraged ? '<div style="color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem;">🔥 WÜTEND! (Angriff erhöht)</div>' : ''}
+                </div>
+            `;
+        }
+
         el.innerHTML = `
-            <div class="enemy-icon" style="color: ${enemy.color}">${enemy.icon}</div>
-            <div class="enemy-name">${enemy.name}</div>
+            <div class="enemy-icon" style="color: ${enemy.color}; ${enemy.isBoss ? 'font-size: 2rem;' : ''}">${enemy.icon}</div>
+            <div class="enemy-name" style="${enemy.isBoss ? 'font-size: 1.1rem; color: #fbbf24;' : ''}">${enemy.name}</div>
             <div class="enemy-stats">
                 <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
-                <div class="stat" title="Angriff">⚔️ ${enemy.attack}</div>
+                <div class="stat" title="Angriff${enemy.enraged ? ' (Wütend!)' : ''}">⚔️ ${typeof enemy.getEffectiveAttack === 'function' ? enemy.getEffectiveAttack() : enemy.attack}</div>
             </div>
+            ${bossHealthHTML}
             <div class="enemy-traits">
                 ${enemy.fortified ? '<span title="Befestigt">🏰</span>' : ''}
                 ${enemy.swift ? '<span title="Flink (Doppelter Block)">💨</span>' : ''}
@@ -582,6 +666,7 @@ export class UI {
                 ${enemy.iceResist ? '<span title="Eis-Resistenz">❄️</span>' : ''}
                 ${enemy.physicalResist ? '<span title="Physische Resistenz">🗿</span>' : ''}
                 ${enemy.brutal ? '<span title="Brutal (Doppelter Schaden)">💪</span>' : ''}
+                ${enemy.isBoss ? '<span title="Boss">👑</span>' : ''}
             </div>
         `;
         return el;
@@ -844,6 +929,76 @@ export class UI {
         this.elements.heroArmor.textContent = '2'; // Default
         this.elements.heroHandLimit.textContent = '5'; // Default
         this.elements.heroWounds.textContent = '0';
+    }
+
+    // --- Level Up Modal Logic ---
+    showLevelUpModal(newLevel, choices, onConfirm) {
+        this.elements.newLevelDisplay.textContent = String(newLevel);
+        this.elements.levelUpModal.style.display = 'block';
+
+        let selectedSkill = null;
+        let selectedCard = null;
+
+        const updateConfirmButton = () => {
+            this.elements.confirmLevelUpBtn.disabled = !selectedSkill || !selectedCard;
+        };
+
+        // Render Skills
+        this.elements.skillChoices.innerHTML = '';
+        choices.skills.forEach(skill => {
+            const el = document.createElement('div');
+            el.className = 'skill-choice';
+            el.innerHTML = `
+                <div class="skill-icon">${skill.icon}</div>
+                <div class="skill-name">${skill.name}</div>
+                <div class="skill-description">${skill.description}</div>
+            `;
+
+            el.addEventListener('click', () => {
+                // Deselect others
+                Array.from(this.elements.skillChoices.children).forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                selectedSkill = skill;
+                updateConfirmButton();
+            });
+
+            this.elements.skillChoices.appendChild(el);
+        });
+
+        // Render Cards
+        this.elements.cardChoices.innerHTML = '';
+        choices.cards.forEach((card, index) => {
+            const el = this.createCardElement(card, index);
+            el.classList.add('card-choice');
+
+            // Remove hover tilt to simplify selection
+            // Or keep it, but ensure click works well.
+
+            el.addEventListener('click', () => {
+                // Deselect others
+                Array.from(this.elements.cardChoices.children).forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                selectedCard = card;
+                updateConfirmButton();
+            });
+
+            this.elements.cardChoices.appendChild(el);
+        });
+
+        // Setup confirm button
+        // Remove old listeners to prevent duplicates?
+        // Better: Clonenode or simple onclick property
+        const newBtn = this.elements.confirmLevelUpBtn.cloneNode(true);
+        this.elements.confirmLevelUpBtn.replaceWith(newBtn);
+        this.elements.confirmLevelUpBtn = newBtn; // Update reference
+
+        this.elements.confirmLevelUpBtn.disabled = true; // Start disabled
+        this.elements.confirmLevelUpBtn.addEventListener('click', () => {
+            this.elements.levelUpModal.style.display = 'none';
+            if (onConfirm) {
+                onConfirm({ skill: selectedSkill, card: selectedCard });
+            }
+        });
     }
 }
 

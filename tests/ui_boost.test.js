@@ -101,18 +101,47 @@ describe('UI Boost', () => {
         expect(actionSpy.called).toBe(true);
     });
 
-    it('should render simple button options', () => {
-        const actionSpy = createSpy(() => ({ success: true, message: 'Healed' }));
-        const options = [{
-            label: 'Heal',
-            enabled: true,
-            action: actionSpy
-        }];
+    it('should handle subItems with specialized success/failure branches', () => {
+        const data = {
+            icon: '🏢', name: 'Mage Tower', color: 'blue',
+            options: [{
+                title: 'Lernen',
+                subItems: [
+                    { type: 'card', data: { name: 'Fireball', color: 'red' }, cost: 5, action: () => ({ success: true, message: 'Lernt Fireball' }) },
+                    { type: 'card', data: { name: 'Heal', color: 'green' }, cost: 5, action: () => ({ success: false, message: 'Fehlgeschlagen' }) },
+                    { type: 'unit', data: { name: 'Guard', armor: 5 }, cost: 10, action: () => ({ success: true, message: 'Guard rekrutiert' }) }
+                ]
+            }]
+        };
+        ui.showSiteModal(data);
+        const items = ui.elements.siteOptions.querySelectorAll('.shop-item');
 
-        ui.renderSiteOptions(options);
+        // Success case (card red)
+        items[0].click();
+        expect(ui.showNotification.calledWith('Lernt Fireball', 'success')).toBe(true);
+
+        // Failure case (card green)
+        items[1].click();
+        expect(ui.showNotification.calledWith('Fehlgeschlagen', 'error')).toBe(true);
+
+        // Success case (unit)
+        items[2].click();
+        expect(ui.showNotification.calledWith('Guard rekrutiert', 'success')).toBe(true);
+    });
+
+    it('should handle site modal button action with success', () => {
+        const actionSpy = createSpy(() => ({ success: true, message: 'Sieg!' }));
+        const data = {
+            icon: '🏢', name: 'Battle', color: 'red',
+            options: [{
+                label: 'Sieg!', enabled: true, action: actionSpy
+            }]
+        };
+        ui.showSiteModal(data);
         const btn = ui.elements.siteOptions.querySelector('button');
         btn.click();
-        expect(actionSpy.called).toBe(true);
+        expect(ui.showNotification.calledWith('Sieg!', 'success')).toBe(true);
+        expect(ui.elements.siteModal.classList.contains('active')).toBe(false);
     });
 
     it('should handle subItems with unknown type', () => {
@@ -178,6 +207,44 @@ describe('UI Boost', () => {
 
         ui.renderUnits(null);
         expect(ui.elements.heroUnits.innerHTML).toContain('Keine Einheiten');
+    });
+
+    it('should handle addPlayedCard with formatting', () => {
+        const card = { name: 'Fireball', color: 'red' };
+        const effect = { type: 'attack', value: 5 };
+        ui.formatEffect = (eff) => `${eff.value} Damage`;
+
+        ui.addPlayedCard(card, effect);
+        expect(ui.elements.playedCards.children.length).toBe(1);
+        expect(ui.elements.playedCards.innerHTML).toContain('5 Damage');
+    });
+
+    it('should show all toast types', () => {
+        const types = ['info', 'success', 'error', 'warning', 'combat', 'unknown'];
+        types.forEach(type => {
+            ui.showToast(`Test ${type}`, type);
+        });
+        expect(ui.toastContainer.children.length).toBe(types.length);
+        // Ensure some iconic symbols are present
+        expect(ui.toastContainer.innerHTML).toContain('✅');
+        expect(ui.toastContainer.innerHTML).toContain('❌');
+        expect(ui.toastContainer.innerHTML).toContain('⚔️');
+    });
+
+    it('should handle toast removal animation', (done) => {
+        ui.showToast('Animating...', 'info');
+        const toast = ui.toastContainer.children[0];
+
+        // Wait for the timeout (we might need to mock setTimeout or just wait)
+        // In the test context, we can trigger the animationend event manually if we want to be fast
+        setTimeout(() => {
+            expect(toast.classList.contains('hiding')).toBe(true);
+            toast.dispatchEvent({ type: 'animationend' });
+            // Note: The toast.remove() call will remove it from the parent
+            // But our MockHTMLElement.remove() needs to be linked
+            expect(ui.toastContainer.children.length).toBe(0);
+            done();
+        }, 3100);
     });
 
     it('should highlight hex', () => {

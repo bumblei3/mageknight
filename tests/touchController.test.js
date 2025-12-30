@@ -78,14 +78,43 @@ describe('Touch Controller', () => {
         expect(game.selectHex.called).toBe(true);
     });
 
-    it('should handle swipe', () => {
+    it('should handle all swipe directions', () => {
         const touchStart = { clientX: 100, clientY: 100 };
-        const touchEnd = { clientX: 200, clientY: 100 };
 
+        // Swipe Right
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
-        controller.handleTouchEnd({ changedTouches: [touchEnd], preventDefault: () => { } });
+        controller.handleTouchEnd({ changedTouches: [{ clientX: 200, clientY: 100 }], preventDefault: () => { } });
+        expect(game.ui.addLog.calledWith('Swipe rechts', 'info')).toBe(true);
 
-        expect(game.ui.addLog.called).toBe(true);
+        // Swipe Left
+        controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
+        controller.handleTouchEnd({ changedTouches: [{ clientX: 0, clientY: 100 }], preventDefault: () => { } });
+        expect(game.ui.addLog.calledWith('Swipe links', 'info')).toBe(true);
+
+        // Swipe Down
+        controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
+        controller.handleTouchEnd({ changedTouches: [{ clientX: 100, clientY: 200 }], preventDefault: () => { } });
+        expect(game.ui.addLog.calledWith('Swipe runter', 'info')).toBe(true);
+
+        // Swipe Up
+        controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
+        controller.handleTouchEnd({ changedTouches: [{ clientX: 100, clientY: 0 }], preventDefault: () => { } });
+        expect(game.ui.addLog.calledWith('Swipe hoch', 'info')).toBe(true);
+    });
+
+    it('should show tooltips for enemies and terrain', () => {
+        const touch = { clientX: 105, clientY: 105 };
+        const hex = { q: 2, r: 2 };
+
+        // Enemy tooltip
+        game.enemies = [{ position: { q: 2, r: 2 }, name: 'Orc' }];
+        controller.showHexTooltip(touch, hex);
+        expect(game.ui.tooltipManager.showEnemyTooltip.called).toBe(true);
+
+        // Terrain tooltip
+        game.enemies = [];
+        controller.showHexTooltip(touch, hex);
+        expect(game.ui.tooltipManager.showTerrainTooltip.called).toBe(true);
     });
 
     it('should handle long press', async () => {
@@ -158,6 +187,16 @@ describe('Touch Controller', () => {
         expect(game.particleCanvas.width).toBe(500);
         expect(game.particleCanvas.height).toBe(400);
         done();
+    });
+
+    it('should render on resize if hero present', () => {
+        game.hero = { getStats: () => ({}) };
+        game.render = createSpy('render');
+        game.canvas.parentNode = createMockElement('div');
+        game.canvas.parentNode.getBoundingClientRect = () => ({ width: 1000, height: 800 });
+
+        controller.resizeCanvas();
+        expect(game.render.called).toBe(true);
     });
 
     it('should return device pixel ratio', () => {

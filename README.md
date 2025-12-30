@@ -2,8 +2,8 @@
 
 [![Test Suite](https://github.com/bumblei3/mageknight/actions/workflows/test.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/bumblei3/mageknight/branch/master/graph/badge.svg)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 410 passing](https://img.shields.io/badge/tests-410%20passing-brightgreen)
-![Coverage: 100%](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Tests: 712 passing](https://img.shields.io/badge/tests-712%20passing-brightgreen)
+![Coverage: 92.14%](https://img.shields.io/badge/coverage-92.14%25-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -16,6 +16,7 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 - **Kartenbasiertes Gameplay**: Nutze Aktionskarten für Bewegung, Angriff und Verteidigung
 - **Taktischer Kampf**: Bekämpfe Feinde in einem vereinfachten Kampfsystem
 - **Ressourcen-Management**: Verwalte Mana, Ruhm und Verletzungen
+- **Speichern & Laden**: Speichere deinen Fortschritt in mehreren Slots
 
 ## 🚀 Spielstart
 
@@ -106,12 +107,15 @@ Das Spiel ist modular aufgebaut:
 - `js/enemy.js` - Feind-System
 - `js/combat.js` - Kampf-Mechanik
 - `js/mana.js` - Mana-Quelle und Kristall-Verwaltung
+- `js/saveManager.js` - Robustes Speichersystem
+- `js/statistics.js` - Performance- und Spielstatistiken
 - `js/terrain.js` - Terrain-Definitionen
 - `js/ui.js` - UI-Rendering und Interaktion
+- `js/particles.js` - Leistungsstarkes Partikelsystem
 - `js/tooltip.js` - Tooltip-Management
 - `js/soundManager.js` - Sound-Effekte und Musik
 - `js/skills.js` - Fähigkeiten-System
-- `js/simpleTutorial.js` - Interaktives Tutorial
+- `js/tutorialManager.js` - Erweitertes Tutorial-System
 
 ### Technologie-Stack
 
@@ -134,6 +138,8 @@ Das Spiel ist modular aufgebaut:
 - Städte, Burgen, Magiertürme und Klöster
 - Einheiten-Rekrutierung in Siedlungen
 - Interaktives Tutorial und Hilfesystem
+- Robustes Speichern/Laden via LocalStorage
+- Partikeleffekte für alle Aktionen
 
 ❌ **Nicht in Basis-Version**:
 - Fern-/Belagerungsangriffe (teilweise)
@@ -148,27 +154,18 @@ Das Spiel ist modular aufgebaut:
 - **Karten-UX**: Visuelle Hinweise für Rechtsklick-Aktionen (seitlich spielen).
 - **Polished UI**: Verbessertes Design für Modals und Interaktionen.
 
-## 🔧 Entwicklung
+## 🧪 Testing & Qualitätssicherung
 
-### Lokaler Server
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **712 Tests** und **92.14% Global Statement Coverage**.
 
-Für beste Ergebnisse, starte einen lokalen Webserver:
+### Test-Methodologien
+- **Unit & Integration Tests**: Vollständige Abdeckung aller Kernkomponenten.
+- **Chaos Testing**: Überprüfung der Daten-Resilienz gegen korrupte Speicherstände (`chaos.test.js`).
+- **Property-Based Testing (PBT)**: Mathematische Verifikation der Kampfinvarianten unter zufälligen Szenarien (`pbt_combat.test.js`).
+- **Long Session Integration**: Stabilitätsprüfung über mehrere Spielrunden hinweg.
+- **Visual Validation**: Überprüfung der Rendering-Integrität via Canvas-API-Snapshots.
 
-```bash
-# Mit Python 3
-python -m http.server 8000
-
-# Mit Node.js (http-server)
-npx http-server
-```
-
-Dann öffne `http://localhost:8000` im Browser.
-
-### Testing
-
-Das Projekt verfügt über eine umfassende Test-Suite mit **410 Tests** und **100% Code Coverage**.
-
-#### Tests ausführen
+### Tests ausführen
 
 ```bash
 # Alle Tests ausführen
@@ -181,21 +178,6 @@ npm run test:coverage
 open coverage/index.html  # macOS
 xdg-open coverage/index.html  # Linux
 ```
-
-#### Test-Struktur
-
-```
-tests/
-├── unit tests      - Einzelne Module (410 Tests)
-├── integration     - Modulübergreifende Tests (z.B. game_integration.test.js)
-├── interaction     - UI Interactions (ui_interactions.test.js)
-└── test helpers    - Shared Mocks & Utilities (test-mocks.js, testRunner.js)
-```
-
-**Coverage-Highlights**:
-- ✅ 100% Coverage: `mapManager.js`, `skills.js`, `timeManager.js`, `sites.js`, `card.js`, `enemy.js`, `tooltip.js`
-- 📊 Gesamtabdeckung: 100% Statements
-- 🧪 Neue Tests: `ui_interactions.test.js` für Button/Click-Handling, `ui_tooltips.test.js`, `ui_hand.test.js`.
 
 Siehe [COVERAGE_ANALYSIS.md](COVERAGE_ANALYSIS.md) für detaillierte Informationen.
 
@@ -210,18 +192,15 @@ Siehe [COVERAGE_ANALYSIS.md](COVERAGE_ANALYSIS.md) für detaillierte Information
 
 - Mana-Verstärkung von Karten noch nicht voll implementiert
 - Einige Feind-Fähigkeiten sind vereinfacht
-- Speichern/Laden ist experimentell
 - KI ist deterministisch
 
 ## 🚧 Zukünftige Erweiterungen
 
 Mögliche Features für zukünftige Versionen:
 - Vollständiges Mana-System mit Verstärkung
-- Spielplan-Erkundung
 - Mehr Helden zur Auswahl
 - Level-System
 - Städte und Interaktion
-- Speichern/Laden
 - Verschiedene Szenarien
 
 ## 📜 Lizenz

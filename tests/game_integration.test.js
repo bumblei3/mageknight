@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
 import { createMockEnemy, createMockHexGrid } from './test-helpers.js';
 
@@ -10,6 +10,10 @@ describe('Game Integration', () => {
         game = new MageKnightGame();
         // Ensure we have a valid grid and hero for integration tests
         game.init();
+    });
+
+    afterEach(() => {
+        if (game && game.destroy) game.destroy();
     });
 
     it('should execute a full turn lifecycle', () => {

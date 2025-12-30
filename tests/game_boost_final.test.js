@@ -60,6 +60,14 @@ describe('Game Coverage Boost', () => {
         game.terrain.getName = () => 'plains';
     });
 
+    afterEach(() => {
+        if (game && game.destroy) game.destroy();
+        global.document.getElementById = originalGetElementById;
+        global.document.querySelector = originalQuerySelector;
+        global.document.querySelectorAll = originalQuerySelectorAll;
+        global.document.addEventListener = originalAddEventListener;
+    });
+
     it('should create enemies based on grid', () => {
         // Setup terrain so it spawns enemies
         game.terrain.getName = () => 'ruins';

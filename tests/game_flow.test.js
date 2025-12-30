@@ -8,7 +8,13 @@ describe('Game Flow Coverage Boost', () => {
     let mockUI;
     let mockLocalStorage;
 
+    let originalWindow, originalDocument, originalLocalStorage;
+
     beforeEach(() => {
+        originalWindow = global.window;
+        originalDocument = global.document;
+        originalLocalStorage = global.localStorage;
+
         mockLocalStorage = createMockLocalStorage();
 
         // Mock global dependencies
@@ -84,6 +90,14 @@ describe('Game Flow Coverage Boost', () => {
             endTurn: createSpy('endTurn')
         };
 
+        // Added tooltipManager and destroy to game mock
+        game.tooltipManager = {
+            hideTooltip: createSpy(),
+            showEnemyTooltip: createSpy(),
+            showTerrainTooltip: createSpy()
+        };
+        game.destroy = createSpy('game.destroy'); // Added destroy to game mock
+
         game.mapManager = {
             getSiteAt: () => null,
             revealMap: () => { },
@@ -97,7 +111,10 @@ describe('Game Flow Coverage Boost', () => {
     });
 
     afterEach(() => {
-        // Cleanup if needed
+        if (game && game.destroy) game.destroy();
+        global.window = originalWindow;
+        global.document = originalDocument;
+        global.localStorage = originalLocalStorage;
     });
 
     describe('Handling Site Interactions', () => {

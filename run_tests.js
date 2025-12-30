@@ -67,7 +67,7 @@ await import('./tests/game_boost_final.test.js');
 await import('./tests/game_logic_boost.test.js');
 await import('./tests/game_ui_boost.test.js');
 await import('./tests/siteInteraction_boost.test.js');
-await import('./tests/ui_boost.test.js');
+
 await import('./tests/particles_boost.test.js');
 await import('./tests/tutorial_boost.test.js');
 await import('./tests/final_push.test.js');

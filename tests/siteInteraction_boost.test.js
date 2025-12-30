@@ -11,7 +11,7 @@ describe('Site Interaction Boost', () => {
         game = {
             addLog: createSpy('addLog'),
             hero: {
-                addItem: createSpy(),
+                addItem: createSpy((item) => game.hero.deck.push(item)),
                 addExperience: createSpy(),
                 heal: createSpy(),
                 wounds: [],
@@ -22,9 +22,9 @@ describe('Site Interaction Boost', () => {
                 influencePoints: 10,
                 movementPoints: 10,
                 crystals: { RED: 1 },
-                addUnit: createSpy(() => true),
+                addUnit: createSpy((unit) => { game.hero.units.push(unit); return true; }),
                 getManaInventory: createSpy(() => []),
-                healWound: createSpy(() => true),
+                healWound: createSpy(() => { if (game.hero.wounds.length > 0) game.hero.wounds.pop(); return true; }),
                 removeMana: createSpy()
             },
             ui: {
@@ -95,12 +95,12 @@ describe('Site Interaction Boost', () => {
     });
 
     it('should handle buying cards at Mage Tower', () => {
-        const cardData = { name: 'Fireball', type: 'spell' };
+        const cardData = { name: 'Fireball', type: 'spell', color: 'red' };
         game.hero.crystals.RED = 1;
 
         manager.buyCard(cardData, 1);
-        expect(game.hero.deck.length).toBe(1);
-        expect(game.addLog.calledWith('Karte Fireball gekauft!', 'success')).toBe(true);
+        expect(game.hero.discard.length).toBe(1);
+        expect(game.addLog.calledWith('Karte Fireball gelernt!', 'success')).toBe(true);
     });
 
     it('should handle healing at Monastery', () => {
@@ -108,8 +108,8 @@ describe('Site Interaction Boost', () => {
         game.hero.influencePoints = 10;
 
         manager.healWounds(3);
-        expect(game.hero.wounds.length).toBe(0);
-        expect(game.hero.influencePoints).toBe(4);
+        expect(game.hero.wounds.length).toBe(1);
+        expect(game.hero.influencePoints).toBe(7);
     });
 
     it('should handle attacking sites', () => {

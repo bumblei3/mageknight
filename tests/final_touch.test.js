@@ -40,6 +40,7 @@ describe('Final Touch and Particles', () => {
 
 
     afterEach(() => {
+        if (game && game.destroy) game.destroy();
         global.navigator = originalNavigator;
     });
 

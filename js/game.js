@@ -25,10 +25,11 @@ import AchievementManager from './achievements.js';
 import StatisticsManager from './statistics.js';
 import { createEnemy } from './enemy.js';
 import { eventBus } from './eventBus.js';
-import { GAME_EVENTS, TIME_OF_DAY } from './constants.js';
+import { GAME_EVENTS, TIME_OF_DAY, COMBAT_PHASES } from './constants.js';
 
 export class MageKnightGame {
     constructor() {
+        this.abortController = new AbortController();
         this.canvas = document.getElementById('game-board');
         this.hexGrid = new HexGrid(this.canvas);
         this.terrain = new Terrain();
@@ -96,6 +97,14 @@ export class MageKnightGame {
 
         this.setupParticleSystem();
         this.debugManager = new DebugManager(this);
+    }
+
+    destroy() {
+        this.abortController.abort();
+        if (this.ui) this.ui.destroy();
+        if (this.touchController) this.touchController.destroy();
+        if (this.debugManager && this.debugManager.destroy) this.debugManager.destroy();
+        // TutoriaManagers don't have listeners yet in current view, but good practice
     }
 
     startNewGame() {
@@ -254,14 +263,16 @@ export class MageKnightGame {
     }
 
     setupEventListeners() {
+        const signal = this.abortController.signal;
+
         // End turn button
-        this.ui.elements.endTurnBtn.addEventListener('click', () => this.endTurn());
+        this.ui.elements.endTurnBtn.addEventListener('click', () => this.endTurn(), { signal });
 
         // Rest button
-        this.ui.elements.restBtn.addEventListener('click', () => this.rest());
+        this.ui.elements.restBtn.addEventListener('click', () => this.rest(), { signal });
 
         // Explore button
-        this.ui.elements.exploreBtn.addEventListener('click', () => this.explore());
+        this.ui.elements.exploreBtn.addEventListener('click', () => this.explore(), { signal });
 
         // Visit Site button (will be added dynamically or reused?)
         // Let's add a generic action button for sites if needed, or just use context menu?
@@ -271,31 +282,31 @@ export class MageKnightGame {
         // Let's add it to index.html in the next step, but I can add the listener here now if I assume the ID.
         // Visit Site button
         const visitBtn = document.getElementById('visit-btn');
-        if (visitBtn) visitBtn.addEventListener('click', () => this.visitSite());
+        if (visitBtn) visitBtn.addEventListener('click', () => this.visitSite(), { signal });
 
         // Execute Attack button (combat action)
         const executeAttackBtn = document.getElementById('execute-attack-btn');
-        if (executeAttackBtn) executeAttackBtn.addEventListener('click', () => this.executeAttackAction());
+        if (executeAttackBtn) executeAttackBtn.addEventListener('click', () => this.executeAttackAction(), { signal });
 
         // Save/Load buttons
         const saveBtn = document.getElementById('save-btn');
         const loadBtn = document.getElementById('load-btn');
-        if (saveBtn) saveBtn.addEventListener('click', () => this.openSaveDialog());
-        if (loadBtn) loadBtn.addEventListener('click', () => this.openLoadDialog());
+        if (saveBtn) saveBtn.addEventListener('click', () => this.openSaveDialog(), { signal });
+        if (loadBtn) loadBtn.addEventListener('click', () => this.openLoadDialog(), { signal });
 
         // New Game button
         if (this.ui.elements.newGameBtn) {
-            this.ui.elements.newGameBtn.addEventListener('click', () => this.reset());
+            this.ui.elements.newGameBtn.addEventListener('click', () => this.reset(), { signal });
         }
 
         // Canvas click for movement
-        this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+        this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e), { signal });
 
         // Canvas hover for tooltips
-        this.canvas.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e));
+        this.canvas.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e), { signal });
         this.canvas.addEventListener('mouseleave', () => {
             this.ui.tooltipManager.hideTooltip();
-        });
+        }, { signal });
 
         // Help system
         this.setupHelpSystem();
@@ -384,7 +395,7 @@ export class MageKnightGame {
                     setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
                 }
             }
-        });
+        }, { signal: this.abortController.signal });
     }
 
     updatePhaseIndicator() {
@@ -423,34 +434,37 @@ export class MageKnightGame {
     }
 
     setupHelpSystem() {
+        const signal = this.abortController.signal;
         const helpBtn = document.getElementById('help-btn');
         const helpModal = document.getElementById('help-modal');
         const helpClose = document.getElementById('help-close');
         const helpTabs = document.querySelectorAll('.help-tab');
 
+        if (!helpBtn || !helpModal || !helpClose) return;
+
         // Open help modal
         helpBtn.addEventListener('click', () => {
             helpModal.classList.add('active');
-        });
+        }, { signal });
 
         // Close help modal
         helpClose.addEventListener('click', () => {
             helpModal.classList.remove('active');
-        });
+        }, { signal });
 
         // Close on outside click
         helpModal.addEventListener('click', (e) => {
             if (e.target === helpModal) {
                 helpModal.classList.remove('active');
             }
-        });
+        }, { signal });
 
         // Close on ESC key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && helpModal.classList.contains('active')) {
                 helpModal.classList.remove('active');
             }
-        });
+        }, { signal });
 
         // Tab switching
         helpTabs.forEach(tab => {
@@ -463,8 +477,9 @@ export class MageKnightGame {
 
                 // Add active to clicked tab and corresponding content
                 tab.classList.add('active');
-                document.getElementById(`help - ${targetTab} `).classList.add('active');
-            });
+                const targetContent = document.getElementById(`help-${targetTab}`);
+                if (targetContent) targetContent.classList.add('active');
+            }, { signal });
         });
 
         // Show tutorial on first visit
@@ -1635,12 +1650,14 @@ export class MageKnightGame {
             const enabled = this.sound.toggle();
             soundBtn.innerHTML = enabled ? '🔊' : '🔇';
             this.addLog(enabled ? 'Sound aktiviert' : 'Sound deaktiviert', 'info');
-        });
+        }, { signal: this.abortController.signal });
 
         this.setupUIListeners();
     }
 
     setupUIListeners() {
+        const signal = this.abortController.signal;
+
         // Achievements Modal
         const achievementsBtn = document.getElementById('achievements-btn');
         const achievementsModal = document.getElementById('achievements-modal');

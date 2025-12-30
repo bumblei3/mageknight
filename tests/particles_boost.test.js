@@ -16,9 +16,12 @@ describe('Particles Boost', () => {
         expect(ps.particles.length).toBeGreaterThan(0);
     });
 
-    it('should handle level up celebration effect', () => {
+    it('should handle level up celebration effect', (done) => {
         ps.levelUpEffect(100, 100);
-        expect(ps.particles.length).toBeGreaterThan(0);
+        setTimeout(() => {
+            expect(ps.particles.length).toBeGreaterThan(0);
+            done();
+        }, 10);
     });
 
     it('should handle victory rain', () => {

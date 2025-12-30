@@ -30,6 +30,10 @@ describe('Tutorial Skip Reproduction', () => {
         tutorial = new SimpleTutorial(game);
     });
 
+    afterEach(() => {
+        if (game && game.destroy) game.destroy();
+    });
+
     it('should allow skipping the tutorial via method call', async () => {
         tutorial.start();
         expect(tutorial.active).toBe(true);

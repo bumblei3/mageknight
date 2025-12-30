@@ -3,7 +3,7 @@ import UI from '../js/ui.js';
 import { createMockElement, createSpy } from './test-mocks.js';
 
 describe('UI Boost', () => {
-    let ui;
+    let ui, game;
     let originalCreateElement, originalGetElementById;
 
     beforeEach(() => {
@@ -32,15 +32,19 @@ describe('UI Boost', () => {
 
         global.document.createElement = (tag) => createMockElement(tag);
 
-        const game = {
+        game = {
             addLog: createSpy(),
             showToast: createSpy(),
             sound: { cardPlay: createSpy(), diceRoll: createSpy(), success: createSpy() },
             hero: { position: { q: 0, r: 0 }, hand: [{ name: 'Test Card' }] },
             render: createSpy(),
             updateStats: createSpy(),
+            endTurn: createSpy(),
+            turnNumber: 0
         };
-        ui = new UI(game);
+        ui = new UI();
+        // Manually attach game to ui for tests that rely on it (legacy support)
+        ui.game = game;
         // Do not mock addLog/showToast globally as some tests need the real ones
         // ui.addLog = createSpy();
         // ui.showToast = createSpy();
@@ -82,8 +86,9 @@ describe('UI Boost', () => {
                 ]
             }]
         };
+        ui.showNotification = createSpy();
         ui.showSiteModal(data);
-        const item = document.querySelector('.shop-item');
+        const item = ui.elements.siteOptions.querySelector('.shop-item');
         expect(item.innerHTML).toContain('Fireball');
 
         item.click();
@@ -99,8 +104,9 @@ describe('UI Boost', () => {
                 action: () => ({ success: false, message: 'Attack failed' })
             }]
         };
+        ui.showNotification = createSpy();
         ui.showSiteModal(data);
-        const btn = document.querySelector('.btn-secondary');
+        const btn = ui.elements.siteOptions.querySelector('.btn-secondary');
         btn.click();
         expect(ui.showNotification.calledWith('Attack failed', 'error')).toBe(true);
     });
@@ -164,6 +170,7 @@ describe('UI Boost', () => {
                 label: 'Sieg!', enabled: true, action: actionSpy
             }]
         };
+        ui.showNotification = createSpy();
         ui.showSiteModal(data);
         const btn = ui.elements.siteOptions.querySelector('button');
         btn.click();

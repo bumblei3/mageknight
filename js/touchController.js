@@ -4,9 +4,11 @@
 export class TouchController {
     constructor(game) {
         this.game = game;
+        this.abortController = new AbortController();
         this.touchStartTime = 0;
         this.touchStartPos = null;
         this.longPressTimer = null;
+        this.cardLongPressTimer = null;
         this.longPressThreshold = 500; // ms
         this.isLongPress = false;
         this.swipeThreshold = 50; // pixels
@@ -15,20 +17,27 @@ export class TouchController {
         this.setupViewportResize();
     }
 
+    destroy() {
+        if (this.longPressTimer) clearTimeout(this.longPressTimer);
+        if (this.cardLongPressTimer) clearTimeout(this.cardLongPressTimer);
+        this.abortController.abort();
+    }
+
     setupTouchEvents() {
         const canvas = this.game.canvas;
+        const signal = this.abortController.signal;
 
         // Touch start
-        canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false, signal });
 
         // Touch end
-        canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+        canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false, signal });
 
         // Touch move
-        canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false, signal });
 
         // Touch cancel
-        canvas.addEventListener('touchcancel', (e) => this.handleTouchCancel(e));
+        canvas.addEventListener('touchcancel', (e) => this.handleTouchCancel(e), { signal });
 
         // Card touch events
         this.setupCardTouchEvents();
@@ -256,6 +265,8 @@ export class TouchController {
         const handContainer = document.getElementById('hand-cards');
         if (!handContainer) return;
 
+        const signal = this.abortController.signal;
+
         handContainer.addEventListener('touchstart', (e) => {
             if (e.target.closest('.card')) {
                 e.preventDefault();
@@ -267,7 +278,7 @@ export class TouchController {
                     this.handleCardLongPress(index);
                 }, this.longPressThreshold);
             }
-        }, { passive: false });
+        }, { passive: false, signal });
 
         handContainer.addEventListener('touchend', (e) => {
             if (e.target.closest('.card')) {
@@ -288,14 +299,14 @@ export class TouchController {
                     navigator.vibrate(10);
                 }
             }
-        });
+        }, { signal });
 
         handContainer.addEventListener('touchcancel', () => {
             if (this.cardLongPressTimer) {
                 clearTimeout(this.cardLongPressTimer);
                 this.cardLongPressTimer = null;
             }
-        });
+        }, { signal });
     }
 
     handleCardTap(index) {

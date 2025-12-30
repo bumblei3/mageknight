@@ -25,7 +25,7 @@ describe('Long Session - Integration', () => {
     });
 
     afterEach(() => {
-        if (game && game.ui) game.ui.destroy();
+        if (game && game.destroy) game.destroy();
         global.document.getElementById = originalGetElementById;
         global.document.querySelector = originalQuerySelector;
     });

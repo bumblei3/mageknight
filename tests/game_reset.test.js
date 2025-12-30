@@ -14,6 +14,7 @@ describe('Game Reset', () => {
     });
 
     afterEach(() => {
+        if (game && game.destroy) game.destroy();
         // Restore confirm
         global.confirm = originalConfirm;
     });

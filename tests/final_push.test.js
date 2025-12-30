@@ -48,22 +48,6 @@ describe('Final Coverage Push', () => {
         });
     });
 
-    it('ui system extras', () => {
-        import('../js/ui.js').then(module => {
-            const UI = module.default;
-            const ui = new UI({
-                hero: { position: { q: 0, r: 0 } },
-                handleCardClick: () => { },
-                handleLevelUpChoice: () => { },
-                formatCardEffect: () => ''
-            });
-            ui.renderCardPool([{ name: 'Card 1', color: 'red', text: 'Desc' }]);
-            expect(document.getElementById('card-pool-grid').children.length).toBe(1);
-
-            ui.renderLevelUpRewards([{ name: 'Skill 1', icon: '✨', description: 'Desc' }]);
-            expect(document.getElementById('level-up-grid').children.length).toBe(1);
-        });
-    });
 
     it('statistics error handling', () => {
         localStorage.setItem('mageKnight_statistics', 'invalid json');

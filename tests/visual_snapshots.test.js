@@ -50,8 +50,8 @@ describe('Visual Rendering Snapshots', () => {
         const logContainer = game.ui.elements.gameLog;
         game.ui.addLog('Test Log', 'info');
         expect(logContainer.children.length).toBeGreaterThan(0);
-        // Use textContent of the first child or search children
-        const entry = logContainer.children[0];
+        // Use textContent of the last child
+        const entry = logContainer.children[logContainer.children.length - 1];
         expect(entry.textContent).toBe('Test Log');
     });
 });

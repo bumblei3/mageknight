@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
 import { createMockDocument } from './test-mocks.js';
 
@@ -28,8 +28,14 @@ describe('Game Fuzzing', () => {
         };
     });
 
+    let game;
+
+    afterEach(() => {
+        if (game && game.destroy) game.destroy();
+    });
+
     it('should survive random input sequences', async () => {
-        const game = new MageKnightGame();
+        game = new MageKnightGame();
         // Mock UI elements that might be accessed
         if (!document.getElementById('end-turn-btn')) {
             ['end-turn-btn', 'rest-btn', 'explore-btn', 'save-btn', 'load-btn'].forEach(id => {

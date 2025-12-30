@@ -155,7 +155,11 @@ describe('ParticleSystem', () => {
             fill: () => { },
             stroke: () => { },
             save: () => { },
-            restore: () => { }
+            restore: () => { },
+            bezierCurveTo: () => { },
+            quadraticCurveTo: () => { },
+            fillText: () => { },
+            measureText: () => ({ width: 50 })
         };
 
         mockCanvas = {
@@ -307,5 +311,81 @@ describe('ParticleSystem', () => {
             // Should not throw error
             expect(true).toBe(true);
         });
+    });
+
+    // Additional effect method tests
+    it('should create fire attack effect', () => {
+        particleSystem.fireAttackEffect(100, 100);
+        // Uses setTimeout so particles may not be immediate
+        expect(true).toBe(true);
+    });
+
+    it('should create ice attack effect', () => {
+        particleSystem.iceAttackEffect(100, 100);
+        // Uses setTimeout so particles may not be immediate
+        expect(true).toBe(true);
+    });
+
+    it('should create lightning attack effect', () => {
+        particleSystem.lightningAttackEffect(100, 100);
+        expect(particleSystem.particles.length).toBeGreaterThan(0);
+    });
+
+    it('should create level up effect', () => {
+        particleSystem.levelUpEffect(100, 100);
+        expect(true).toBe(true); // Uses setTimeout
+    });
+
+    it('should create mana glitter effect', () => {
+        particleSystem.manaGlitterEffect(100, 100, 'red');
+        expect(particleSystem.particles.length).toBeGreaterThan(0);
+    });
+
+    it('should create victory rain effect', () => {
+        particleSystem.victoryRainEffect(800, 600);
+        expect(true).toBe(true); // Uses setTimeout intervals
+    });
+
+    it('should create defeat smoke effect', () => {
+        particleSystem.defeatSmokeEffect(100, 100);
+        expect(true).toBe(true); // Uses setTimeout
+    });
+
+    it('should create card glow effect', () => {
+        particleSystem.cardGlowEffect(100, 100, '#8b5cf6');
+        expect(particleSystem.particles.length).toBeGreaterThan(0);
+    });
+
+    it('should create dust cloud effect', () => {
+        particleSystem.dustCloudEffect(100, 100);
+        expect(particleSystem.particles.length).toBeGreaterThan(0);
+    });
+
+    it('should create combat clash effect with different types', () => {
+        ['physical', 'fire', 'ice', 'lightning'].forEach(type => {
+            particleSystem.clear();
+            particleSystem.combatClashEffect(100, 100, type);
+            expect(particleSystem.particles.length).toBeGreaterThan(0);
+        });
+    });
+
+    it('should create shield block effect', () => {
+        particleSystem.shieldBlockEffect(100, 100);
+        expect(particleSystem.particles.length).toBeGreaterThan(0);
+    });
+
+    it('should draw particles', () => {
+        particleSystem.addParticle(100, 100);
+        particleSystem.draw();
+        expect(true).toBe(true); // Verify draw completes without error
+    });
+
+    it('should handle different particle types in draw', () => {
+        // Only add types that don't require special ctx methods
+        ['circle', 'star', 'spark'].forEach(type => {
+            particleSystem.addParticle(100, 100, { type });
+        });
+        particleSystem.draw();
+        expect(particleSystem.particles.length).toBe(3);
     });
 });

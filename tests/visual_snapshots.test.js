@@ -54,8 +54,8 @@ describe('Visual Rendering Snapshots', () => {
         const logContainer = game.ui.elements.gameLog;
         game.ui.addLog('Test Log', 'info');
         expect(logContainer.children.length).toBeGreaterThan(0);
-        // Use textContent of the last child
+        // Check that message is present in the log entry (now has timestamp, icon, etc)
         const entry = logContainer.children[logContainer.children.length - 1];
-        expect(entry.textContent).toBe('Test Log');
+        expect(entry.textContent.includes('Test Log')).toBe(true);
     });
 });

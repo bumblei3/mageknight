@@ -102,9 +102,9 @@ describe('UI', () => {
         ui.addLog('Test message', 'info');
         // Children may accumulate across tests in mock
         expect(ui.elements.gameLog.children.length).toBeGreaterThanOrEqual(1);
-        // Check the last added child
+        // Check that message is present in the log entry (now has timestamp, icon, etc)
         const lastChild = ui.elements.gameLog.children[ui.elements.gameLog.children.length - 1];
-        expect(lastChild.textContent).toBe('Test message');
+        expect(lastChild.textContent.includes('Test message')).toBe(true);
     });
 
     it('should clear log', () => {

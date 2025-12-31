@@ -693,6 +693,63 @@ body>* {
     border-left-color: var(--color-mana-blue);
 }
 
+.log-entry.warning {
+    border-left-color: #f59e0b;
+}
+
+.log-entry.success {
+    border-left-color: #10b981;
+}
+
+.log-entry.error {
+    border-left-color: #ef4444;
+}
+
+.log-entry.level {
+    border-left-color: #a855f7;
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.log-entry.reward {
+    border-left-color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+}
+
+/* Enhanced log entry layout */
+.log-time {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-right: 0.4rem;
+    opacity: 0.6;
+}
+
+.log-icon {
+    margin-right: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.log-message {
+    flex: 1;
+}
+
+.log-message strong {
+    color: var(--color-accent-gold);
+}
+
+.log-message em {
+    font-style: italic;
+    color: var(--color-accent-primary);
+}
+
+.log-count {
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    color: var(--color-text-muted);
+}
+
 /* Hand Cards Area */
 .hand-area {
     background: var(--glass-bg);

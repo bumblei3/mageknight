@@ -433,14 +433,72 @@ export class UI {
         });
     }
 
-    // Add log entry
+    // Log configuration
+    static LOG_MAX_ENTRIES = 50;
+    static LOG_ICONS = {
+        info: 'ℹ️',
+        combat: '⚔️',
+        movement: '🚶',
+        warning: '⚠️',
+        success: '✅',
+        error: '❌',
+        level: '🎉',
+        reward: '🎁'
+    };
+
+    // Add log entry with enhanced features
     addLog(message, type = 'info') {
+        const logContainer = this.elements.gameLog;
+        if (!logContainer) return;
+
+        // Check for grouping (duplicate consecutive messages)
+        const lastEntry = logContainer.lastElementChild;
+        if (lastEntry && lastEntry.dataset.message === message) {
+            // Increment counter on existing entry
+            let count = parseInt(lastEntry.dataset.count || '1', 10) + 1;
+            lastEntry.dataset.count = count;
+            const countBadge = lastEntry.querySelector('.log-count');
+            if (countBadge) {
+                countBadge.textContent = `×${count}`;
+                countBadge.style.display = 'inline';
+            }
+            logContainer.scrollTop = logContainer.scrollHeight;
+            return;
+        }
+
+        // Create new entry
         const entry = document.createElement('div');
         entry.className = `log-entry ${type}`;
-        entry.textContent = message;
+        entry.dataset.message = message;
+        entry.dataset.count = '1';
 
-        this.elements.gameLog.appendChild(entry);
-        this.elements.gameLog.scrollTop = this.elements.gameLog.scrollHeight;
+        // Timestamp
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+        // Icon
+        const icon = UI.LOG_ICONS[type] || UI.LOG_ICONS.info;
+
+        // Rich text: convert **bold** and *italic*
+        let formattedMessage = message
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+        entry.innerHTML = `
+            <span class="log-time">${timeStr}</span>
+            <span class="log-icon">${icon}</span>
+            <span class="log-message">${formattedMessage}</span>
+            <span class="log-count" style="display: none;">×1</span>
+        `;
+
+        logContainer.appendChild(entry);
+
+        // Trim old entries
+        while (logContainer.childElementCount > UI.LOG_MAX_ENTRIES) {
+            logContainer.removeChild(logContainer.firstElementChild);
+        }
+
+        logContainer.scrollTop = logContainer.scrollHeight;
     }
 
     // Clear log

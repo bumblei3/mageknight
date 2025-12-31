@@ -113,6 +113,7 @@ export class UI {
             combatInfo: document.getElementById('combat-info'),
             combatUnits: document.getElementById('combat-units'),
             heroUnits: document.getElementById('hero-units'),
+            healBtn: document.getElementById('heal-btn'),
 
             // Canvas
             gameBoard: document.getElementById('game-board'),
@@ -201,6 +202,14 @@ export class UI {
             animateCounter(this.elements.reputationValue, currentRep, stats.reputation, 800, animator);
             const diff = stats.reputation - currentRep;
             if (diff !== 0) this.showFloatingText(this.elements.reputationValue, `${diff > 0 ? '+' : ''}${diff} 💬`, '#f3f4f6');
+        }
+
+        // Update healing button visibility
+        if (this.elements.healBtn) {
+            const hasWounds = stats.wounds > 0;
+            const hasHealing = hero.healingPoints > 0;
+            this.elements.healBtn.style.display = (hasWounds && hasHealing) ? 'block' : 'none';
+            this.elements.healBtn.textContent = `Heilen (${hero.healingPoints})`;
         }
     }
 
@@ -520,9 +529,13 @@ export class UI {
 
     // Update combat info
     updateCombatInfo(enemies, phase, onEnemyClick) {
+        const phaseLabel = this.getCombatPhaseName(phase);
+        const statusColor = phase === 'attack' ? '#ef4444' : (phase === 'ranged' ? '#10b981' : '#3b82f6');
+
         this.elements.combatInfo.innerHTML = `
-            <div style="margin-bottom: 1rem;">
-                <strong>Phase:</strong> ${this.getCombatPhaseName(phase)}
+            <div class="combat-status" style="border-left: 4px solid ${statusColor}; padding: 0.5rem; background: rgba(0,0,0,0.2); margin-bottom: 0.5rem;">
+                <strong>${phaseLabel}</strong><br>
+                <small>${this.getPhaseHint(phase)}</small>
             </div>
         `;
 
@@ -615,6 +628,15 @@ export class UI {
             complete: 'Abgeschlossen'
         };
         return names[phase] || phase;
+    }
+
+    getPhaseHint(phase) {
+        const hints = {
+            'ranged': 'Besiege Feinde mit Fernkampf- oder Belagerungswerten.',
+            'block': 'Blocke Feind-Angriffe. Ungeblockte Feinde verursachen Schaden.',
+            'attack': 'Besiege verbliebene Feinde mit normalen Angriffswerten.'
+        };
+        return hints[phase] || '';
     }
 
     // Render units in hero panel

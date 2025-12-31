@@ -9,9 +9,24 @@ export class InputHandler {
         const signal = this.abortController.signal;
 
         // UI Buttons
-        this.game.ui.elements.endTurnBtn.addEventListener('click', () => this.game.turnManager.endTurn(), { signal });
-        this.game.ui.elements.restBtn.addEventListener('click', () => this.game.rest(), { signal });
-        this.game.ui.elements.exploreBtn.addEventListener('click', () => this.game.explore(), { signal });
+        this.game.ui.elements.endTurnBtn.addEventListener('click', () => {
+            if (this.isUIBlocked()) return;
+            this.game.turnManager.endTurn();
+        }, { signal });
+        this.game.ui.elements.restBtn.addEventListener('click', () => {
+            if (this.isUIBlocked()) return;
+            this.game.rest();
+        }, { signal });
+        if (this.game.ui.elements.healBtn) {
+            this.game.ui.elements.healBtn.addEventListener('click', () => {
+                if (this.isUIBlocked()) return;
+                this.game.applyHealing();
+            }, { signal });
+        }
+        this.game.ui.elements.exploreBtn.addEventListener('click', () => {
+            if (this.isUIBlocked()) return;
+            this.game.explore();
+        }, { signal });
 
         const visitBtn = document.getElementById('visit-btn');
         if (visitBtn) visitBtn.addEventListener('click', () => this.game.visitSite(), { signal });
@@ -29,8 +44,14 @@ export class InputHandler {
         }
 
         // Canvas Events
-        this.canvas.addEventListener('click', (e) => this.game.interactionController.handleCanvasClick(e), { signal });
-        this.canvas.addEventListener('mousemove', (e) => this.game.interactionController.handleCanvasMouseMove(e), { signal });
+        this.canvas.addEventListener('click', (e) => {
+            if (this.isUIBlocked()) return;
+            this.game.interactionController.handleCanvasClick(e);
+        }, { signal });
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (this.isUIBlocked()) return;
+            this.game.interactionController.handleCanvasMouseMove(e);
+        }, { signal });
         this.canvas.addEventListener('mouseleave', () => {
             this.game.ui.tooltipManager.hideTooltip();
         }, { signal });
@@ -110,6 +131,19 @@ export class InputHandler {
                 }
             }
         }, { signal });
+    }
+
+    isUIBlocked() {
+        // Check if any modal is active
+        const activeModals = document.querySelectorAll('.modal.active, .site-modal.active');
+        if (activeModals.length > 0) return true;
+
+        const helpModal = document.getElementById('help-modal');
+        if (helpModal && helpModal.classList.contains('active')) return true;
+
+        if (this.game.gameState !== 'playing') return true;
+
+        return false;
     }
 
     destroy() {

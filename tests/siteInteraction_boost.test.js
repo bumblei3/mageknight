@@ -37,7 +37,8 @@ describe('Site Interaction Boost', () => {
             manaSource: {
                 useMana: createSpy(() => true)
             },
-            initiateCombat: createSpy()
+            initiateCombat: createSpy(),
+            updateStats: createSpy()
         };
         manager = new SiteInteractionManager(game);
     });

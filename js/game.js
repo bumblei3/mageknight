@@ -692,12 +692,17 @@ export class MageKnightGame {
         if (!this.combat) return;
 
         // Use accumulated block values to block enemies
-        if (this.combatBlockTotal > 0) {
+        if (this.combatBlockTotal > 0 || (this.combat && this.combat.unitBlockPoints > 0)) {
             // Try to block enemies with accumulated block
             this.combat.enemies.forEach(enemy => {
+                if (this.combatBlockTotal <= 0 && this.combat.unitBlockPoints <= 0) return;
+
                 const blockResult = this.combat.blockEnemy(enemy, this.combatBlockTotal);
-                if (blockResult.blocked) {
-                    this.addLog(`${enemy.name} geblockt mit ${this.combatBlockTotal} Block`, 'combat');
+                if (blockResult.success && blockResult.blocked) {
+                    this.addLog(`${enemy.name} geblockt mit ${blockResult.consumedPoints} Block`, 'combat');
+                    // Consume the value used from this.combatBlockTotal
+                    this.combatBlockTotal -= (blockResult.consumedPoints || 0);
+                    if (this.combatBlockTotal < 0) this.combatBlockTotal = 0;
                 }
             });
         }
@@ -828,16 +833,21 @@ export class MageKnightGame {
                 !attackResult.defeated.includes(e)
             );
 
-            // Check if combat is over
             if (this.combat.enemies.length === 0) {
                 this.endCombat();
                 return;
             }
         }
 
-        // Reset attack total after use
-        this.combatRangedTotal = 0;
-        this.combatSiegeTotal = 0;
+        if (attackResult.success && attackResult.consumedPoints > 0) {
+            if (isSiege) {
+                this.combatSiegeTotal -= attackResult.consumedPoints;
+                if (this.combatSiegeTotal < 0) this.combatSiegeTotal = 0;
+            } else {
+                this.combatRangedTotal -= attackResult.consumedPoints;
+                if (this.combatRangedTotal < 0) this.combatRangedTotal = 0;
+            }
+        }
 
         this.render();
         this.updateStats();
@@ -942,6 +952,26 @@ export class MageKnightGame {
 
     updateHeroMana() {
         this.ui.renderHeroMana(this.hero.getManaInventory());
+    }
+
+    applyHealing() {
+        if (this.hero.healingPoints <= 0) {
+            this.addLog('Keine Heilungspunkte verfügbar.', 'info');
+            return;
+        }
+
+        if (this.hero.wounds.length === 0) {
+            this.addLog('Keine Verletzungen zum Heilen.', 'info');
+            return;
+        }
+
+        const success = this.hero.healWound(true);
+        if (success) {
+            this.addLog('Verletzung geheilt!', 'success');
+            this.sound.heal();
+            this.updateStats();
+            this.renderHand();
+        }
     }
 
     endTurn() { this.turnManager.endTurn(); }

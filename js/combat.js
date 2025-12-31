@@ -23,7 +23,7 @@ export class Combat {
         this.unitBlockPoints = 0;
         this.unitRangedPoints = 0;
         this.unitSiegePoints = 0;
-        this.activatedUnits = new Set();
+        this.activatedUnits = new Set(); // Store unit IDs to allow multiple units of same type
     }
 
     // Start combat
@@ -63,17 +63,23 @@ export class Combat {
         }
 
         const multiplier = enemy.getResistanceMultiplier(element);
-        const totalAttack = attackValue + (isSiege ? this.unitSiegePoints : this.unitRangedPoints);
+        const totalAttack = attackValue; // Use passed value plus unit points
+        const unitPoints = isSiege ? this.unitSiegePoints : this.unitRangedPoints;
+        const combinedAttack = totalAttack + unitPoints;
 
         // Handle boss enemies (health-based damage)
         if (enemy.isBoss) {
-            const effectiveDamage = Math.floor(totalAttack * multiplier);
+            const effectiveDamage = Math.floor(combinedAttack * multiplier);
             const damageResult = enemy.takeDamage(effectiveDamage);
+
+            // Consume unit points after use
+            if (isSiege) this.unitSiegePoints = 0; else this.unitRangedPoints = 0;
 
             const result = {
                 success: true,
                 isBoss: true,
                 damage: effectiveDamage,
+                consumedPoints: totalAttack, // Amount of passed attackValue used
                 healthPercent: damageResult.healthPercent,
                 bossTransitions: [],
                 message: `${enemy.name} erleidet ${effectiveDamage} Fernkampf-Schaden! (${enemy.currentHealth}/${enemy.maxHealth} HP)`
@@ -107,22 +113,26 @@ export class Combat {
         // Handle regular enemies (armor-based defeat)
         const effectiveArmor = enemy.armor / multiplier;
 
-        if (totalAttack >= effectiveArmor) {
+        if (combinedAttack >= effectiveArmor) {
             this.defeatedEnemies.push(enemy);
             this.hero.gainFame(enemy.fame);
             this.enemies = this.enemies.filter(e => e.id !== enemy.id);
+
+            // Consume unit points after use
+            if (isSiege) this.unitSiegePoints = 0; else this.unitRangedPoints = 0;
 
             return {
                 success: true,
                 defeated: [enemy],
                 fameGained: enemy.fame,
+                consumedPoints: Math.max(0, effectiveArmor - unitPoints),
                 message: `${enemy.name} im Fernkampf besiegt!`
             };
         }
 
         return {
             success: false,
-            message: `Fernkampf zu schwach (${totalAttack} vs ${effectiveArmor})`
+            message: `Fernkampf zu schwach (${combinedAttack} vs ${effectiveArmor})`
         };
     }
 
@@ -172,16 +182,25 @@ export class Combat {
             return { success: false, error: 'Nicht in der Block-Phase' };
         }
 
+        if (this.blockedEnemies.has(enemy.id)) {
+            return { success: false, message: 'Feind bereits geblockt' };
+        }
+
         const blockRequired = enemy.getBlockRequirement();
         const totalBlock = blockValue + this.unitBlockPoints;
 
         if (totalBlock >= blockRequired) {
             this.blockedEnemies.add(enemy.id);
+
+            // Calculate how many unit points were used
+            const unitPointsUsed = Math.min(this.unitBlockPoints, blockRequired);
+            this.unitBlockPoints -= unitPointsUsed;
+
             return {
                 success: true,
                 blocked: true,
+                consumedPoints: Math.max(0, blockRequired - unitPointsUsed),
                 totalBlock: totalBlock,
-                unitContribution: this.unitBlockPoints,
                 message: `${enemy.name} erfolgreich geblockt! ${enemy.swift ? '(Flink: Doppelter Block nötig)' : ''}`
             };
         }
@@ -286,13 +305,14 @@ export class Combat {
             return { success: false, message: 'Einheit nicht bereit' };
         }
 
-        if (this.activatedUnits.has(unit.type)) {
+        const unitId = unit.id || unit.getName();
+        if (this.activatedUnits.has(unitId)) {
             return { success: false, message: 'Einheit bereits aktiviert' };
         }
 
         // Activate the unit
         unit.activate();
-        this.activatedUnits.add(unit.type);
+        this.activatedUnits.add(unitId);
 
         // Apply unit abilities based on phase
         const abilities = unit.getAbilities();

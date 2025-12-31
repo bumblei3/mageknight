@@ -2,7 +2,7 @@
 // Handles logic for visiting sites (Villages, Monasteries, etc.)
 
 import { SITE_TYPES } from './sites.js';
-import { UNIT_TYPES, getUnitsForLocation } from './unit.js';
+import { UNIT_TYPES, getUnitsForLocation, createUnit } from './unit.js';
 import { SAMPLE_SPELLS, SAMPLE_ADVANCED_ACTIONS, createDeck } from './card.js';
 
 export class SiteInteractionManager {
@@ -166,30 +166,21 @@ export class SiteInteractionManager {
 
     recruitUnit(unitInfo) {
         if (this.game.hero.influencePoints >= unitInfo.cost) {
-            // Reconstruct a unit instance (duck typing for Hero)
-            const unit = {
-                ...unitInfo,
-                ready: true,
-                wounds: 0,
-                getName: () => unitInfo.name,
-                getIcon: () => unitInfo.icon,
-                getCost: () => unitInfo.cost,
-                getArmor: () => unitInfo.armor,
-                getAbilities: () => unitInfo.abilities || [],
-                isReady: function () { return this.ready && this.wounds === 0; },
-                isWounded: function () { return this.wounds > 0; },
-                takeWound: function () { this.wounds++; },
-                heal: function () { this.wounds = 0; },
-                activate: function () { if (this.isReady()) { this.ready = false; return true; } return false; },
-                refresh: function () { this.ready = true; }
-            };
+            // Use proper createUnit factory if available, or construct from unitInfo
+            const instance = unitInfo.create ? unitInfo.create() : createUnit(unitInfo.type);
 
-            const instance = unitInfo.create ? unitInfo.create() : unit;
+            if (!instance) {
+                return { success: false, message: 'Einheiten-Typ unbekannt.' };
+            }
+
+            // Ensure ID is unique
+            instance.id = `${unitInfo.type}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
             if (this.game.hero.addUnit(instance)) {
                 this.game.hero.influencePoints -= unitInfo.cost;
                 const msg = `Einheit ${instance.name || instance.getName()} rekrutiert!`;
                 this.game.addLog(msg, 'success');
+                this.game.updateStats();
                 return { success: true, message: msg };
             } else {
                 return { success: false, message: 'Kein Platz für weitere Einheiten (Command Limit).' };

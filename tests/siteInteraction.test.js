@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { SiteInteractionManager } from '../js/siteInteraction.js';
 import { SITE_TYPES } from '../js/sites.js';
+import { UNIT_TYPES } from '../js/unit.js';
 
 // Mock dependencies
 const mockHero = {
@@ -16,7 +17,8 @@ const mockHero = {
 const mockGame = {
     hero: mockHero,
     addLog: () => { },
-    initiateCombat: () => { }
+    initiateCombat: () => { },
+    updateStats: () => { }
 };
 
 describe('SiteInteractionManager', () => {
@@ -73,7 +75,7 @@ describe('SiteInteractionManager', () => {
     });
 
     it('should recruit unit', () => {
-        const unitInfo = { name: 'Peasants', cost: 3 };
+        const unitInfo = { name: 'Peasants', cost: 3, type: UNIT_TYPES.PEASANTS };
 
         const result = manager.recruitUnit(unitInfo);
 
@@ -84,7 +86,7 @@ describe('SiteInteractionManager', () => {
 
     it('should fail recruit if command limit reached', () => {
         mockHero.units = ['Unit1', 'Unit2']; // Full (limit 2)
-        const unitInfo = { name: 'Peasants', cost: 3 };
+        const unitInfo = { name: 'Peasants', cost: 3, type: UNIT_TYPES.PEASANTS };
 
         const result = manager.recruitUnit(unitInfo);
 
@@ -153,7 +155,7 @@ describe('SiteInteractionManager', () => {
 
     it('should fail to recruit without enough influence', () => {
         mockHero.influencePoints = 1;
-        const unitInfo = { name: 'Knight', cost: 5 };
+        const unitInfo = { name: 'Knight', cost: 5, type: UNIT_TYPES.GUARDS };
 
         const result = manager.recruitUnit(unitInfo);
 

@@ -9,7 +9,8 @@ describe('Site Interactions', () => {
     const mockGame = {
         hero: new Hero('TestHero'),
         addLog: () => { },
-        initiateCombat: () => { }
+        initiateCombat: () => { },
+        updateStats: () => { }
     };
     const manager = new SiteInteractionManager(mockGame);
 

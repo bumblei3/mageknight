@@ -41,6 +41,7 @@ describe('Combat System', () => {
 
         mockUnit = {
             type: 'swordsmen',
+            id: 'unit_swordsmen_1',
             isReady: () => true,
             activate: () => { },
             getAbilities: () => [{ type: 'block', value: 2 }, { type: 'attack', value: 2 }],
@@ -202,7 +203,7 @@ describe('Combat System', () => {
             const result = combat.activateUnit(mockUnit); // Has block 2
             expect(result.success).toBe(true);
             expect(combat.unitBlockPoints).toBe(2);
-            expect(combat.activatedUnits.has(mockUnit.type)).toBe(true);
+            expect(combat.activatedUnits.has(mockUnit.id)).toBe(true);
         });
 
         it('should not activate twice', () => {

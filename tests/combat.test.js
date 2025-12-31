@@ -149,7 +149,8 @@ describe('Combat', () => {
 
         const result = combat.blockEnemy(enemy, 4); // 4 + 2 = 6
         expect(result.blocked).toBe(true);
-        expect(result.unitContribution).toBe(2);
+        expect(result.consumedPoints).toBe(4);
+        expect(combat.unitBlockPoints).toBe(0); // All 2 unit points used
     });
 
     it('should track unit contributions to attack', () => {

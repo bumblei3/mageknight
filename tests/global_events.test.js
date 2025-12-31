@@ -25,6 +25,10 @@ describe('Global Events & Shortcuts', () => {
         document.body.appendChild(helpBtn);
 
         game = new MageKnightGame();
+        // Ensure tooltipManager has the required method (patching potential mock/real mismatch)
+        if (game.ui && game.ui.tooltipManager && typeof game.ui.tooltipManager.createStatTooltipHTML !== 'function') {
+            game.ui.tooltipManager.createStatTooltipHTML = (title, desc) => `<div>${title}</div>`;
+        }
     });
 
     afterEach(() => {

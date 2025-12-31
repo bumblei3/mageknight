@@ -3,7 +3,7 @@
 [![Test Suite](https://github.com/bumblei3/mageknight/actions/workflows/test.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/bumblei3/mageknight/branch/master/graph/badge.svg)](https://codecov.io/gh/bumblei3/mageknight)
 ![Tests: 944 passing](https://img.shields.io/badge/tests-944%20passing-brightgreen)
-![Coverage: 94.54%](https://img.shields.io/badge/coverage-94.54%25-brightgreen)
+![Coverage: 94.67%](https://img.shields.io/badge/coverage-94.67%25-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -159,17 +159,18 @@ Das Spiel ist modular aufgebaut:
 
 ## 🧪 Testing & Qualitätssicherung
 
-Das Projekt verfügt über eine hochmoderne Test-Suite mit **944 Tests** und **94.54% Global Statement Coverage**.
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **944 Tests** und **94.67% Global Statement Coverage**.
 
 ### Test-Methodologien
 - **Unit & Integration Tests**: Vollständige Abdeckung aller Kernkomponenten.
 - **Deterministic Testing**: Implementierter seeded PRNG für 100% reproduzierbare Testläufe (`test-mocks.js`).
 - **UI Synchronization**: Verifikation der Bindung zwischen Spielstatus und UI-Elementen (`ui_sync.test.js`).
 - **Chaos Testing**: Überprüfung der Daten-Resilienz gegen korrupte Speicherstände (`chaos.test.js`).
-- **Property-Based Testing (PBT)**: Mathematische Verifikation der Kampfinvarianten unter zufälligen Szenarien (`pbt_combat.test.js`).
 - **Long Session & Resilience**: Stabilitätsprüfung über viele Züge hinweg und Resilienz gegen ungültige Daten.
 - **Visual Validation**: Überprüfung der Rendering-Integrität via Canvas-API-Snapshots.
 - **Process Isolation**: Jede Testdatei wird in einem eigenen Node.js-Prozess ausgeführt, um maximale Speicherstabilität (Vermeidung von OOM) und Test-Isolation zu garantieren.
+- **Performance Benchmarking**: Stress-Tests für massive Hex-Grids (1000+) und Partikel-Systeme (5000+).
+- **Mutation Verification**: Automatisierte Sanity-Checks zur Verifikation der Test-Robustheit.
 
 ### Tests ausführen
 

@@ -371,9 +371,11 @@ export class MockHTMLElement {
     querySelector(selector) {
         if (!selector) return null;
         const findIn = (parent) => {
+            if (!parent || !parent.children || !Array.isArray(parent.children)) return null;
             for (const child of parent.children) {
+                if (typeof child === 'string') continue;
                 if (selector.startsWith('#') && child.id === selector.substring(1)) return child;
-                if (selector.startsWith('.') && child.classList.contains(selector.substring(1))) return child;
+                if (selector.startsWith('.') && child.classList && child.classList.contains && child.classList.contains(selector.substring(1))) return child;
                 if (child.tagName === selector.toUpperCase()) return child;
                 const found = findIn(child);
                 if (found) return found;
@@ -394,10 +396,11 @@ export class MockHTMLElement {
         if (!selector) return [];
         const results = [];
         const findAllIn = (parent) => {
-            if (!parent || !parent.children) return;
+            if (!parent || !parent.children || !Array.isArray(parent.children)) return;
             for (const child of parent.children) {
+                if (typeof child === 'string') continue;
                 if (selector.startsWith('#') && child.id === selector.substring(1)) results.push(child);
-                else if (selector.startsWith('.') && child.classList.contains(selector.substring(1))) results.push(child);
+                else if (selector.startsWith('.') && child.classList && child.classList.contains && child.classList.contains(selector.substring(1))) results.push(child);
                 else if (child.tagName === selector.toUpperCase()) results.push(child);
                 findAllIn(child);
             }
@@ -503,10 +506,11 @@ export function createMockDocument() {
         },
         querySelector: (selector) => {
             const findIn = (parent) => {
+                if (!parent || !parent.children || !Array.isArray(parent.children)) return null;
                 if (selector.startsWith('#')) {
                     if (parent.id === selector.substring(1)) return parent;
                 } else if (selector.startsWith('.')) {
-                    if (parent.classList && parent.classList.contains(selector.substring(1))) return parent;
+                    if (parent.classList && parent.classList.contains && parent.classList.contains(selector.substring(1))) return parent;
                 } else if (parent.tagName === selector.toUpperCase()) {
                     return parent;
                 }
@@ -523,18 +527,16 @@ export function createMockDocument() {
         querySelectorAll: (selector) => {
             const results = [];
             const findIn = (parent) => {
-                if (!parent) return;
+                if (!parent || !parent.children || !Array.isArray(parent.children)) return;
                 if (selector.startsWith('.')) {
-                    if (parent.classList && parent.classList.contains(selector.substring(1))) results.push(parent);
+                    if (parent.classList && parent.classList.contains && parent.classList.contains(selector.substring(1))) results.push(parent);
                 } else if (parent.tagName === selector.toUpperCase()) {
                     results.push(parent);
                 }
 
-                if (parent.children && Array.isArray(parent.children)) {
-                    for (const child of parent.children) {
-                        if (typeof child === 'string') continue;
-                        findIn(child);
-                    }
+                for (const child of parent.children) {
+                    if (typeof child === 'string') continue;
+                    findIn(child);
                 }
             };
             findIn(doc.body);

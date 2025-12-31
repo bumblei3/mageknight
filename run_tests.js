@@ -86,6 +86,7 @@ await import('./tests/resilience.test.js');
 await import('./tests/ui_and_combat_flow.test.js');
 await import('./tests/achievements_integration.test.js');
 await import('./tests/animator_stress.test.js');
+await import('./tests/coverage_boost_v3.test.js');
 
 
 // Parse command line arguments

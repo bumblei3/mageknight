@@ -1054,7 +1054,9 @@ export class MageKnightGame {
     }
 
     render() {
-        this.hexGrid.render(this.hero, this.enemies);
+        if (this.hexGrid && typeof this.hexGrid.render === 'function') {
+            this.hexGrid.render(this.hero, this.enemies);
+        }
         this.updateStats();
     }
 

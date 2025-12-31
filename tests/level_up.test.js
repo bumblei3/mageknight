@@ -1,14 +1,19 @@
 
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import UI from '../js/ui.js';
-import { MockHTMLElement } from './test-mocks.js';
+import { MockHTMLElement, setupGlobalMocks, resetMocks } from './test-mocks.js';
 import { Card, CARD_TYPES, CARD_COLORS } from '../js/card.js';
+
+// Setup global mocks
+setupGlobalMocks();
 
 describe('Level Up UI', () => {
     let ui;
     let container;
 
     beforeEach(() => {
+        resetMocks();
+
         // Mock DOM
         container = new MockHTMLElement('div');
         container.id = 'game-container';
@@ -49,7 +54,7 @@ describe('Level Up UI', () => {
     });
 
     afterEach(() => {
-        document.body.innerHTML = '';
+        resetMocks();
     });
 
     it('should show level up modal', () => {

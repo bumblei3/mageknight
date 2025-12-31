@@ -507,6 +507,9 @@ export function createMockDocument() {
         _clearListeners: () => {
             Object.keys(listeners).forEach(key => delete listeners[key]);
         },
+        _clearElements: () => {
+            elements.clear();
+        },
         querySelector: (selector) => {
             const findIn = (parent) => {
                 if (!parent || !parent.children || !Array.isArray(parent.children)) return null;
@@ -765,9 +768,12 @@ export function resetMocks() {
             }
         }
 
-        // Reset document level listeners if it was created with createMockDocument
+        // Reset document level listeners and elements if it was created with createMockDocument
         if (global.document._clearListeners) {
             global.document._clearListeners();
+        }
+        if (global.document._clearElements) {
+            global.document._clearElements();
         }
     }
 

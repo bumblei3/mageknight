@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
 import { UI } from '../js/ui.js';
 import { AchievementManager } from '../js/achievements.js';
@@ -155,6 +155,17 @@ describe('Coverage Boost V3', () => {
     });
 
     describe('Achievements & Statistics Resilience', () => {
+        let originalConsoleError;
+
+        beforeEach(() => {
+            originalConsoleError = console.error;
+            console.error = () => { };
+        });
+
+        afterEach(() => {
+            console.error = originalConsoleError;
+        });
+
         it('should handle localStorage errors in AchievementManager', () => {
             const originalGetItem = localStorage.getItem;
             const originalSetItem = localStorage.setItem;

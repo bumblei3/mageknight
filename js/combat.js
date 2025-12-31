@@ -9,6 +9,7 @@ export class Combat {
     constructor(hero, enemies) {
         this.hero = hero;
         this.enemies = Array.isArray(enemies) ? enemies : [enemies];
+        this.enemy = this.enemies[0]; // For backward compatibility with CombatOrchestrator
         this.phase = COMBAT_PHASES.NOT_IN_COMBAT;
         this.defeatedEnemies = [];
         this.blockedEnemies = new Set();

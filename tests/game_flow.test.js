@@ -87,7 +87,9 @@ describe('Game Flow Coverage Boost', () => {
             gainFame: createSpy('gainFame'),
             heal: createSpy('heal'),
             resetHand: createSpy('resetHand'),
-            endTurn: createSpy('endTurn')
+            endTurn: createSpy('endTurn'),
+            getState: () => ({}),
+            loadState: () => { }
         };
 
         // Added tooltipManager and destroy to game mock
@@ -188,10 +190,21 @@ describe('Game Flow Coverage Boost', () => {
             game.unitOffer = { loadState: () => { } };
             game.spellOffer = { loadState: () => { } };
             game.advancedActionOffer = { loadState: () => { } };
-            game.achievementManager = { load: () => { } };
-            game.statisticsManager = { load: () => { } };
+            game.achievementManager = { loadState: () => { } }; // Fix: load -> loadState
+            game.statisticsManager = { loadState: () => { } }; // Fix: load -> loadState
 
-            game.loadGameState(mockState);
+            // Mock turn manager
+            game.turnManager = {
+                loadState: (s) => { game.turnNumber = s.turnNumber; },
+                getState: () => ({ turnNumber: game.turnNumber })
+            };
+
+            const mockObjState = {
+                ...mockState,
+                turn: { turnNumber: 5 }
+            };
+
+            game.loadGameState(mockObjState);
             expect(game.turnNumber).toBe(5);
         });
     });
@@ -206,7 +219,8 @@ describe('Game Flow Coverage Boost', () => {
             game.timeManager = {
                 isDay: () => true,
                 isNight: () => false,
-                endRound: () => ({ timeOfDay: 'night' })
+                endRound: () => ({ timeOfDay: 'night' }),
+                getState: () => ({ timeOfDay: 'day', dayNumber: 1 })
             };
             game.manaSource = { returnDice: () => { }, initialize: () => { } };
 

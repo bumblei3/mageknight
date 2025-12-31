@@ -66,7 +66,8 @@ describe('Advanced Combat Coverage', () => {
         it('should handle executeAttackAction variants', () => {
             game.combat = { phase: 'ranged' };
             let rangedEnded = false;
-            game.endRangedPhase = () => { rangedEnded = true; };
+            game.endRangedPhase = () => { rangedEnded = true; return { message: 'Ended' }; };
+            game.combat.endRangedPhase = () => { rangedEnded = true; return { message: 'Ended' }; };
 
             // Case 1: Ranged skip
             game.executeAttackAction();
@@ -77,7 +78,9 @@ describe('Advanced Combat Coverage', () => {
             game.combatAttackTotal = 5;
             const enemy = createEnemy('orc');
             enemy.position = { q: 1, r: 0 };
+            enemy.position = { q: 1, r: 0 };
             game.combat.enemies = [enemy];
+            game.combat.enemy = enemy; // Fix: Set active enemy for calculation
 
             // Mock
             game.hexGrid.axialToPixel = () => ({ x: 10, y: 20 });

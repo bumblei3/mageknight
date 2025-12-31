@@ -340,6 +340,21 @@ export class StatisticsManager {
     export() {
         return JSON.stringify(this.stats, null, 2);
     }
+
+    /**
+     * Gets state for persistence.
+     */
+    getState() {
+        return { ...this.stats };
+    }
+
+    /**
+     * Loads state from object.
+     */
+    loadState(state) {
+        if (!state) return;
+        this.stats = { ...this.createDefaultStats(), ...state };
+    }
 }
 
 export default StatisticsManager;

@@ -60,6 +60,30 @@ export class Animator {
     }
 
     /**
+     * Animate hero movement between hexes
+     * @param {Object} oldPos - Starting axial pos {q, r}
+     * @param {Object} newPos - Ending axial pos {q, r}
+     * @param {Object} screenPos - Target screen position {x, y}
+     * @returns {Promise} Resolves when animation complete
+     */
+    async animateHeroMove(oldPos, newPos, screenPos) {
+        return new Promise(resolve => {
+            // Simplified animation: just a small delay or dummy Tween
+            // In a real implementation we might tween a displayPosition property on the hero
+            // For now, assume we just wait a bit to simulate travel
+            this.animate({
+                from: 0,
+                to: 1,
+                duration: 300,
+                onUpdate: (progress) => {
+                    // Could update a visual marker here
+                },
+                onComplete: resolve
+            });
+        });
+    }
+
+    /**
      * Animate multiple properties of an object
      * @param {Object} target - Target object
      * @param {Object} properties - Properties to animate {prop: endValue}

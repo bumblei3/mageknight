@@ -40,6 +40,9 @@ export class NotificationManager {
         const logContainer = this.elements.gameLog;
         if (!logContainer) return;
 
+        if (message === null || message === undefined) return;
+        message = String(message);
+
         // Check for grouping (duplicate consecutive messages)
         const lastEntry = logContainer.lastElementChild;
         if (lastEntry && lastEntry.dataset.message === message) {
@@ -64,7 +67,10 @@ export class NotificationManager {
         const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
         const icon = NotificationManager.LOG_ICONS[type] || NotificationManager.LOG_ICONS.info;
 
-        let formattedMessage = message
+        if (message === null || message === undefined) return;
+        const msgStr = String(message);
+
+        let formattedMessage = msgStr
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.+?)\*/g, '<em>$1</em>');
 

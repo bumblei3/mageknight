@@ -31,6 +31,13 @@ import { createEnemy } from './enemy.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS, TIME_OF_DAY, COMBAT_PHASES } from './constants.js';
 
+// Refactored Game Managers
+import { PhaseManager } from './game/PhaseManager.js';
+import { EntityManager } from './game/EntityManager.js';
+import { ActionManager } from './game/ActionManager.js';
+import { GameStateManager } from './game/GameStateManager.js';
+import { CombatOrchestrator } from './game/CombatOrchestrator.js';
+
 /**
  * Main Game Controller Class
  * Orchestrates the game loop, state management, and interaction between subsystems.
@@ -50,7 +57,9 @@ export class MageKnightGame {
         this.timeManager = new TimeManager();
         this.achievementManager = new AchievementManager();
         this.statisticsManager = new StatisticsManager();
+        this.statisticsManager = new StatisticsManager();
         this.sound = new SoundManager();
+        this.animator = animator; // Initialize animator reference
 
         // Core Components
         this.canvas = document.getElementById('game-board');
@@ -62,6 +71,7 @@ export class MageKnightGame {
         }
         this.ctx = this.canvas.getContext('2d');
         this.hexGrid = new HexGrid(this.canvas);
+        this.hexGrid.setTerrainSystem(this.terrain); // Link terrain to hexGrid
         this.hero = new Hero('GOLDYX');
         this.enemies = [];
         this.manaSource = new ManaSource();
@@ -81,18 +91,16 @@ export class MageKnightGame {
         this.simpleTutorial = new SimpleTutorial(this);
         this.touchController = new TouchController(this);
 
+        // Core Game Managers (Phase 2 Refactor)
+        this.phaseManager = new PhaseManager(this);
+        this.entityManager = new EntityManager(this);
+        this.actionManager = new ActionManager(this);
+        this.stateManager = new GameStateManager(this);
+        this.combatOrchestrator = new CombatOrchestrator(this);
+
         // State
         this.movementMode = false;
         this.combat = null;
-
-        // Combat Accumulation
-        this.combatAttackTotal = 0;
-        this.combatBlockTotal = 0;
-        this.combatRangedTotal = 0;
-        this.combatSiegeTotal = 0;
-
-        // Debug Flags
-        this.debugTeleport = false;
 
         this.init();
     }
@@ -107,6 +115,16 @@ export class MageKnightGame {
 
     get turnNumber() { return this.turnManager ? this.turnManager.turnNumber : 1; }
     set turnNumber(value) { if (this.turnManager) this.turnManager.turnNumber = value; }
+
+    // Combat Totals compatibility getters for UI and Tests
+    get combatAttackTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatAttackTotal : 0; }
+    set combatAttackTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatAttackTotal = v; }
+    get combatBlockTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatBlockTotal : 0; }
+    set combatBlockTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatBlockTotal = v; }
+    get combatRangedTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatRangedTotal : 0; }
+    set combatRangedTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatRangedTotal = v; }
+    get combatSiegeTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatSiegeTotal : 0; }
+    set combatSiegeTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatSiegeTotal = v; }
 
     /**
      * Sets up event listeners, managers, and system components.
@@ -257,39 +275,7 @@ export class MageKnightGame {
         this.mapManager.createStartingMap();
     }
 
-    createEnemies() {
-        this.enemies = [];
-        // Generate enemies for all hexes that should have them
-        this.hexGrid.hexes.forEach((hex, key) => {
-            // Skip starting area (0,0) and adjacent
-            if (Math.abs(hex.q) <= 1 && Math.abs(hex.r) <= 1) return;
-
-            // Chance to spawn enemy based on terrain
-            let shouldSpawn = false;
-            const terrainName = this.terrain.getName(hex.terrain);
-
-            if (['ruins', 'keep', 'mage_tower', 'city'].includes(terrainName)) {
-                shouldSpawn = true;
-            } else if (Math.random() < 0.3 && terrainName !== 'water') {
-                shouldSpawn = true;
-            }
-
-            if (shouldSpawn) {
-                // Calculate level based on distance from center
-                const distance = Math.max(Math.abs(hex.q), Math.abs(hex.r), Math.abs(hex.q + hex.r));
-                const level = Math.max(1, Math.floor(distance / 2));
-
-                const enemy = this.enemyAI.generateEnemy(terrainName, level);
-                enemy.position = { q: hex.q, r: hex.r };
-                // Ensure unique ID
-                enemy.id = `enemy_${hex.q}_${hex.r}_${Date.now()}`;
-
-                this.enemies.push(enemy);
-            }
-        });
-
-        console.log(`Spawned ${this.enemies.length} enemies.`);
-    }
+    createEnemies() { this.entityManager.createEnemies(); }
 
     setupParticleSystem() {
         // Create overlay canvas for particles
@@ -323,40 +309,7 @@ export class MageKnightGame {
 
     // Removed in refactor: Moved to InputHandler
 
-    updatePhaseIndicator() {
-        const phaseText = document.querySelector('.phase-text');
-        const phaseHint = document.getElementById('phase-hint');
-
-        if (!phaseText || !phaseHint) return;
-
-        if (this.combat) {
-            const phaseNames = {
-                'ranged': 'Fernkampf-Phase',
-                'block': 'Block-Phase',
-                'damage': 'Schadens-Phase',
-                'attack': 'Angriffs-Phase',
-                'complete': 'Kampf Ende'
-            };
-
-            const hints = {
-                'ranged': '🏹 Nutze Fernkampf- oder Belagerungsangriffe (Töten sofort!)',
-                'block': '🛡️ Spiele blaue Karten zum Blocken',
-                'damage': '💔 Schaden wird verrechnet...',
-                'attack': '⚔️ Spiele rote Karten zum Angreifen',
-                'complete': '✅ Kampf abgeschlossen!'
-            };
-
-            phaseText.textContent = phaseNames[this.combat.phase] || 'Kampf';
-            phaseHint.textContent = hints[this.combat.phase] || 'Kämpfe!';
-        } else if (this.movementMode) {
-            phaseText.textContent = 'Bewegung';
-            phaseHint.textContent = `👣 ${this.hero.movementPoints} Punkte - Klicke auf ein Feld`;
-        } else {
-            const timeIcon = this.timeManager.isDay() ? '☀️' : '🌙';
-            phaseText.textContent = `Erkundung(${timeIcon})`;
-            phaseHint.textContent = '🎴 Spiele Karten oder bewege dich (1-5)';
-        }
-    }
+    updatePhaseIndicator() { this.phaseManager.updatePhaseIndicator(); }
 
     setupHelpSystem() {
         const signal = this.abortController.signal;
@@ -418,464 +371,38 @@ export class MageKnightGame {
     handleCardClick(index, card) { this.interactionController.handleCardClick(index, card); }
     handleCardRightClick(index, card) { this.interactionController.handleCardRightClick(index, card); }
 
-    enterMovementMode() {
-        this.movementMode = true;
-        this.calculateReachableHexes();
-        this.addLog(`Bewegungsmodus: ${this.hero.movementPoints} Punkte verfügbar`, 'movement');
-        this.updatePhaseIndicator();
-        this.render();
-    }
+    enterMovementMode() { this.actionManager.enterMovementMode(); }
+    exitMovementMode() { this.actionManager.exitMovementMode(); }
 
-    exitMovementMode() {
-        this.movementMode = false;
-        this.hexGrid.clearHighlights();
-        this.reachableHexes = [];
-        this.updatePhaseIndicator();
-        this.render();
-    }
+    calculateReachableHexes() { this.actionManager.calculateReachableHexes(); }
 
-    calculateReachableHexes() {
-        // Simple flood fill to find reachable hexes
-        this.reachableHexes = [];
-        const visited = new Set();
-        const queue = [{ pos: this.hero.position, cost: 0 }];
-
-        while (queue.length > 0) {
-            const { pos, cost } = queue.shift();
-            const key = `${pos.q},${pos.r} `;
-
-            if (visited.has(key)) continue;
-            visited.add(key);
-
-            if (cost <= this.hero.movementPoints) {
-                this.reachableHexes.push(pos);
-            }
-
-            const neighbors = this.hexGrid.getNeighbors(pos.q, pos.r);
-            neighbors.forEach(neighbor => {
-                if (!this.hexGrid.hasHex(neighbor.q, neighbor.r)) return;
-
-                const hexData = this.hexGrid.getHex(neighbor.q, neighbor.r);
-                const moveCost = this.terrain.getMovementCost(hexData.terrain, this.timeManager.isNight());
-                const newCost = cost + moveCost;
-
-                if (newCost <= this.hero.movementPoints) {
-                    queue.push({ pos: neighbor, cost: newCost });
-                }
-            });
-        }
-
-        this.hexGrid.highlightHexes(this.reachableHexes);
-    }
-
-    moveHero(q, r) {
-        // Check if hex is reachable
-        const isReachable = this.reachableHexes.some(hex => hex.q === q && hex.r === r);
-
-        if (!isReachable) {
-            this.addLog('Hex nicht erreichbar!', 'info');
-            return;
-        }
-
-        const hexData = this.hexGrid.getHex(q, r);
-        const moveCost = this.terrain.getMovementCost(hexData.terrain, this.timeManager.isNight());
-
-        const startQ = this.hero.displayPosition.q;
-        const startR = this.hero.displayPosition.r;
-
-        if (this.hero.moveTo(q, r, moveCost)) {
-            this.sound.move();
-            const terrainName = this.terrain.getName(hexData.terrain);
-            this.addLog(`Bewegt nach ${q},${r} (${terrainName}) - ${moveCost} Kosten`, 'movement');
-
-            // Animate movement
-            animator.animateProperties(
-                this.hero.displayPosition,
-                { q: q, r: r },
-                500,
-                {
-                    easing: 'easeInOutQuad',
-                    onUpdate: () => {
-                        this.render();
-                        // Optional: Add trail particles during movement
-                        if (Math.random() > 0.7) {
-                            const pixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
-                            this.particleSystem.trailEffect(pixel.x, pixel.y);
-                        }
-                    },
-                    onComplete: () => {
-                        this.render();
-                        // Reveal map at new position
-                        this.mapManager.revealMap(q, r, 2);
-
-                        // Check for exploration opportunity (if at edge)
-                        if (this.mapManager.canExplore(q, r)) {
-                            this.showNotification('Neues Gebiet kann erkundet werden! (Klicke auf leeres Feld)', 'info');
-                            // For now, auto-explore if very close to edge? 
-                            // Or better: let user click. But we don't have a specific "Explore" button yet.
-                            // Let's auto-explore for smooth gameplay in this version.
-                            const exploreResult = this.mapManager.explore(q, r);
-                            if (exploreResult.success) {
-                                this.addLog(exploreResult.message, 'success');
-                                // Reveal the new tile immediately
-                                this.mapManager.revealMap(exploreResult.center.q, exploreResult.center.r, 2);
-                            }
-                        }
-                    }
-                }
-            );
-
-            // Check if there's an enemy on this hex (BUG FIX: add null check for position)
-            const enemy = this.enemies.find(e => e.position && e.position.q === q && e.position.r === r);
-            if (enemy) {
-                this.addLog(`Feind entdeckt: ${enemy.name} !`, 'combat');
-                this.exitMovementMode();
-                this.initiateCombat(enemy);
-                return;
-            }
-
-            // Check for site
-            if (hexData.site) {
-                this.addLog(`Ort entdeckt: ${hexData.site.getName()} `, 'info');
-                // Show visit button
-                const visitBtn = document.getElementById('visit-btn');
-                if (visitBtn) {
-                    visitBtn.style.display = 'inline-block';
-                    visitBtn.disabled = false;
-                    // Highlight button to draw attention
-                    visitBtn.classList.add('pulse');
-                }
-            } else {
-                // Hide visit button if no site
-                const visitBtn = document.getElementById('visit-btn');
-                if (visitBtn) visitBtn.style.display = 'none';
-            }
-
-            if (this.hero.movementPoints === 0) {
-                this.exitMovementMode();
-            } else {
-                this.calculateReachableHexes();
-            }
-
-            this.updateStats();
-            // Render is handled by animation
-        }
-    }
+    moveHero(q, r) { return this.actionManager.moveHero(q, r); }
 
 
 
-    initiateCombat(enemy) {
-        this.combat = new Combat(this.hero, enemy);
-        const result = this.combat.start();
+    initiateCombat(enemy) { this.combatOrchestrator.initiateCombat(enemy); }
 
-        // Initialize combat accumulation
-        this.combatAttackTotal = 0;
-        this.combatBlockTotal = 0;
-        this.combatRangedTotal = 0;
-        this.combatSiegeTotal = 0;
-
-        this.addLog(result.message, 'combat');
-        this.ui.showCombatPanel(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
-
-        // Show units in combat
-
-        // Show units in combat
-        this.renderUnitsInCombat();
-
-        this.updatePhaseIndicator();
-        this.renderHand();
-        this.updateCombatTotals();
-    }
-
-    playCardInCombat(index, card) {
-        if (!this.combat || card.isWound()) return;
-
-        const phase = this.combat.phase;
-        const result = this.hero.playCard(index, false, this.timeManager.isNight());
-
-        if (!result) return;
-
-        // Particle Effect
-        const rect = this.ui.elements.playedCards.getBoundingClientRect();
-        const x = rect.right - 50;
-        const y = rect.top + 75;
-        this.particleSystem.playCardEffect(x, y, result.card.color);
-
-        // Build effect description
-        const effectParts = [];
-
-        // Accumulate attack and block values
-        if (phase === 'block' && result.effect.block) {
-            this.combatBlockTotal += result.effect.block;
-            effectParts.push(`+ ${result.effect.block} Block`);
-        } else if (phase === 'ranged') {
-            if (result.effect.ranged || result.effect.attack) { // Allow normal attack as Ranged? No. Ranged Only.
-                // Actually, some cards give "Ranged Attack". Normal Attack cards usually don't work in Ranged phase.
-                // But for simplicity/fun, maybe we allow "Attack" as "Ranged" with penalty? No, stick to rules.
-                // We need to check if card allows Ranged. 
-                // If default attack card is played, it does nothing?
-                // Let's assume we have specific Ranged cards or we treat Attack as Ranged / 2?
-                // MK Rule: Only Ranged attacks work.
-
-                // However, we don't have many Ranged cards defined yet.
-                // Let's check result.card for 'ranged' property or effect.
-                const isRanged = result.card.type === 'spell' || result.effect.ranged;
-                // Spells like Fireball are Ranged.
-
-                if (result.effect.attack && (result.effect.ranged || result.card.type === 'spell')) {
-                    this.combatRangedTotal += result.effect.attack;
-                    effectParts.push(`+ ${result.effect.attack} Fernkampf`);
-                }
-                if (result.effect.siege) {
-                    this.combatSiegeTotal += result.effect.attack; // Siege is also attack value
-                    effectParts.push(`+ ${result.effect.attack} Belagerung`);
-                }
-            }
-        }
-
-        if (phase === COMBAT_PHASES.ATTACK && result.effect.attack) {
-            this.combatAttackTotal += result.effect.attack;
-            effectParts.push(`+ ${result.effect.attack} Angriff`);
-        }
-
-        // Other effects (movement, influence, etc.) are also applied
-        if (result.effect.movement) {
-            effectParts.push(`+ ${result.effect.movement} Bewegung`);
-        }
-        if (result.effect.influence) {
-            effectParts.push(`+ ${result.effect.influence} Einfluss`);
-        }
-        if (result.effect.healing) {
-            effectParts.push(`+ ${result.effect.healing} Heilung`);
-        }
-
-        const effectDesc = effectParts.length > 0 ? effectParts.join(', ') : 'Effekt';
-        this.addLog(`${result.card.name}: ${effectDesc} `, 'combat');
-        this.ui.addPlayedCard(result.card, result.effect);
-        this.ui.showPlayArea();
-
-        this.renderHand();
-        this.updateStats();
-        this.updateCombatTotals();
-    }
+    playCardInCombat(index, card) { this.combatOrchestrator.playCardInCombat(index, card); }
 
     // Render units available for combat
-    renderUnitsInCombat() {
-        if (!this.combat) return;
+    renderUnitsInCombat() { this.combatOrchestrator.renderUnitsInCombat(); }
 
-        // Get ready units that can act in this phase
-        const readyUnits = this.hero.units.filter(unit => unit.isReady() || true); // Show all for now
+    activateUnitInCombat(unit) { this.combatOrchestrator.activateUnitInCombat(unit); }
 
-        this.ui.renderUnitsInCombat(
-            readyUnits,
-            this.combat.phase,
-            (unit) => this.activateUnitInCombat(unit)
-        );
-    }
+    endBlockPhase() { this.combatOrchestrator.endBlockPhase(); }
 
-    // Activate a unit in combat
-    activateUnitInCombat(unit) {
-        if (!this.combat) return;
-
-        const result = this.combat.activateUnit(unit);
-
-        if (result.success) {
-            this.addLog(result.message, 'combat');
-
-            // Visual feedback
-            const heroPixel = this.hexGrid.axialToPixel(this.hero.position.q, this.hero.position.r);
-            this.particleSystem.buffEffect(heroPixel.x, heroPixel.y);
-
-            // Re-render units to show updated status
-            this.renderUnitsInCombat();
-            this.updateStats();
-        } else {
-            this.addLog(result.message, 'info');
-        }
-    }
-
-    endBlockPhase() {
-        if (!this.combat) return;
-
-        // Use accumulated block values to block enemies
-        if (this.combatBlockTotal > 0 || (this.combat && this.combat.unitBlockPoints > 0)) {
-            // Try to block enemies with accumulated block
-            this.combat.enemies.forEach(enemy => {
-                if (this.combatBlockTotal <= 0 && this.combat.unitBlockPoints <= 0) return;
-
-                const blockResult = this.combat.blockEnemy(enemy, this.combatBlockTotal);
-                if (blockResult.success && blockResult.blocked) {
-                    this.addLog(`${enemy.name} geblockt mit ${blockResult.consumedPoints} Block`, 'combat');
-                    // Consume the value used from this.combatBlockTotal
-                    this.combatBlockTotal -= (blockResult.consumedPoints || 0);
-                    if (this.combatBlockTotal < 0) this.combatBlockTotal = 0;
-                }
-            });
-        }
-
-        const result = this.combat.endBlockPhase();
-
-        // Particle Effect for Damage
-        if (result.woundsReceived > 0) {
-            const heroPixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
-            this.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
-        }
-        this.addLog(result.message, 'combat');
-        this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
-
-        // Reset block total, prepare for attack phase
-        this.combatBlockTotal = 0;
-
-        // Update unit display for new phase
-        this.renderUnitsInCombat();
-
-        this.updatePhaseIndicator();
-        this.updateStats();
-        this.updateCombatTotals();
-    }
-
-    endCombat() {
-        if (!this.combat) return;
-
-        const result = this.combat.endCombat();
-        this.addLog(result.message, result.victory ? 'info' : 'combat');
-
-        // Reset combat accumulation
-        this.combatAttackTotal = 0;
-        this.combatBlockTotal = 0;
-        this.combatRangedTotal = 0;
-        this.combatSiegeTotal = 0;
-        this.combat = null;
-
-        this.render();
-    }
+    endCombat() { this.combatOrchestrator.onCombatEnd({ victory: false, enemy: this.combat ? this.combat.enemy : null }); }
 
     // Update combat totals display in UI
-    updateCombatTotals() {
-        if (!this.combat) return;
-        this.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.combat.phase);
-    }
+    updateCombatTotals() { this.combatOrchestrator.updateCombatTotals(); }
 
-    // Execute attack action (Button Click)
-    executeAttackAction() {
-        if (!this.combat) return;
+    executeAttackAction() { this.combatOrchestrator.executeAttackAction(); }
 
-        // In Ranged Phase, the button is "End Phase / Skip"
-        if (this.combat.phase === 'ranged') {
-            this.endRangedPhase();
-            return;
-        }
+    handleEnemyClick(enemy) { this.combatOrchestrator.handleEnemyClick(enemy); }
 
-        if (this.combat.phase !== 'attack') return;
+    executeRangedAttack(enemy) { this.combatOrchestrator.executeRangedAttack(enemy); }
 
-        if (this.combatAttackTotal === 0) {
-            this.addLog('Keine Angriffspunkte verfügbar!', 'info');
-            return;
-        }
-
-        // Particle Impact on enemies
-        this.combat.enemies.forEach(enemy => {
-            const pixelPos = this.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
-            this.particleSystem.impactEffect(pixelPos.x, pixelPos.y);
-        });
-
-        // Normal Attack Phase
-        const attackResult = this.combat.attackEnemies(this.combatAttackTotal, 'physical');
-
-        if (attackResult.success) {
-            this.addLog(attackResult.message, 'success');
-
-            // Track stats
-            attackResult.defeated.forEach(enemy => {
-                this.statisticsManager.trackEnemyDefeated(enemy);
-            });
-
-            // Remove defeated enemies from map (game state)
-            this.enemies = this.enemies.filter(e =>
-                !attackResult.defeated.includes(e)
-            );
-
-            // Check victory
-            if (this.combat.enemies.length === 0) {
-                this.endCombat();
-            } else {
-                this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (e) => this.handleEnemyClick(e));
-                this.updateCombatTotals();
-            }
-        } else {
-            this.addLog(attackResult.message, 'warning');
-        }
-    }
-
-    // Handle Enemy Click (Targeting for Ranged/Block - though Block is currently auto)
-    handleEnemyClick(enemy) {
-        if (!this.combat) return;
-
-        if (this.combat.phase === 'ranged') {
-            this.executeRangedAttack(enemy);
-        } else if (this.combat.phase === 'block') {
-            // Future: Targeted Block
-            // For now Block is auto-distributed in endBlockPhase
-        }
-    }
-
-    executeRangedAttack(enemy) {
-        // Calculate attack values from cards
-        const attackValue = this.combatRangedTotal + this.combatSiegeTotal;
-        const isSiege = this.combatSiegeTotal > 0;
-
-        const attackResult = this.combat.rangedAttackEnemy(enemy, attackValue, isSiege);
-
-        this.addLog(attackResult.message, 'combat');
-
-        if (attackResult.success) {
-            // Track defeated enemies
-            attackResult.defeated.forEach(enemy => {
-                this.statisticsManager.trackEnemyDefeated(enemy);
-            });
-
-            // Remove defeated enemies from map
-            this.enemies = this.enemies.filter(e =>
-                !attackResult.defeated.includes(e)
-            );
-
-            if (this.combat.enemies.length === 0) {
-                this.endCombat();
-                return;
-            }
-        }
-
-        if (attackResult.success && attackResult.consumedPoints > 0) {
-            if (isSiege) {
-                this.combatSiegeTotal -= attackResult.consumedPoints;
-                if (this.combatSiegeTotal < 0) this.combatSiegeTotal = 0;
-            } else {
-                this.combatRangedTotal -= attackResult.consumedPoints;
-                if (this.combatRangedTotal < 0) this.combatRangedTotal = 0;
-            }
-        }
-
-        this.render();
-        this.updateStats();
-        this.updateCombatTotals();
-    }
-
-    endRangedPhase() {
-        if (!this.combat) return;
-
-        const result = this.combat.endRangedPhase();
-        this.addLog(result.message, 'combat');
-
-        if (result.phase === 'block') {
-            this.ui.updateCombatInfo(this.combat.enemies, this.combat.phase, (enemy) => this.handleEnemyClick(enemy));
-            this.renderUnitsInCombat();
-            this.updatePhaseIndicator();
-            this.updateStats();
-            this.updateCombatTotals();
-        } else if (result.victory) {
-            this.endCombat();
-        }
-    }
+    endRangedPhase() { this.combatOrchestrator.endRangedPhase(); }
 
     gainFame(amount) {
         const result = this.hero.gainFame(amount);
@@ -986,47 +513,10 @@ export class MageKnightGame {
         return false;
     }
 
-    endTurn() { this.turnManager.endTurn(); }
+    endTurn() { this.phaseManager.endTurn(); }
+    rest() { this.phaseManager.rest(); }
 
-    rest() {
-        if (this.combat) {
-            this.addLog('Kann nicht im Kampf rasten!', 'info');
-            return;
-        }
-        // Particle Effect
-        const heroPixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
-        this.particleSystem.healAura(heroPixel.x, heroPixel.y);
-
-        // Simple rest: discard one card
-        if (this.hero.hand.length > 0) {
-            const nonWoundIndex = this.hero.hand.findIndex(c => !c.isWound());
-            if (nonWoundIndex >= 0) {
-                this.hero.discardCard(nonWoundIndex);
-                this.addLog('Rast: 1 Karte abgelegt', 'info');
-                this.renderHand();
-            }
-        }
-    }
-
-    explore() {
-        if (this.combat) return;
-
-        if (this.hero.movementPoints < 2) {
-            this.addLog('Nicht genug Bewegungspunkte (Kosten: 2)', 'info');
-            this.showToast('Nicht genug Bewegungspunkte!', 'warning');
-            return;
-        }
-
-        const result = this.mapManager.explore(this.hero.position.q, this.hero.position.r);
-        if (result.success) {
-            this.hero.movementPoints -= 2;
-            this.addLog(result.message, 'info');
-            this.updateStats();
-            this.render();
-        } else {
-            this.addLog(result.message, 'info');
-        }
-    }
+    explore() { this.actionManager.explore(); }
 
     renderHand() {
         this.ui.renderHandCards(
@@ -1079,21 +569,7 @@ export class MageKnightGame {
         }
     }
 
-    visitSite() {
-        if (this.combat) return;
-
-        const currentHex = this.hexGrid.getHex(this.hero.position.q, this.hero.position.r);
-        if (!currentHex || !currentHex.site) return;
-
-        const site = currentHex.site;
-        this.addLog(`Besuche ${site.getName()}...`, 'info');
-
-        // Get interaction data from manager
-        const interactionData = this.siteManager.visitSite(currentHex, site);
-
-        // Show UI
-        this.ui.showSiteModal(interactionData);
-    }
+    visitSite() { this.actionManager.visitSite(); }
 
     render() {
         if (this.hexGrid && typeof this.hexGrid.render === 'function') {
@@ -1103,130 +579,15 @@ export class MageKnightGame {
     }
 
     // Save/Load functionality
-    saveGame() {
-        if (this.combat) {
-            this.addLog('Kann nicht im Kampf speichern!', 'warning');
-            this.showToast('Kann nicht im Kampf speichern!', 'warning');
-            return;
-        }
-        this.saveManager.saveGame(0, this.getGameState()); // Slot 0 default
-        this.addLog('Spiel gespeichert!', 'success');
-        this.showToast('Spiel gespeichert (Slot 0)', 'success');
-    }
+    saveGame(slotId) { this.stateManager.saveGame(slotId); }
 
-    getGameState() {
-        return {
-            turn: this.turnNumber,
-            hero: this.hero,
-            enemies: this.enemies,
-            manaSource: this.manaSource,
-            terrain: this.terrain,
-            selectedHex: this.hexGrid.selectedHex || null,
-            movementMode: this.movementMode
-        };
-    }
+    getGameState() { return this.stateManager.getGameState(); }
 
-    loadGameState(state) {
-        if (!state) return;
-        this.turnNumber = state.turn || 0;
+    loadGameState(state) { this.stateManager.loadGameState(state); }
 
-        // Restore hero
-        this.hero.position = state.hero.position;
-        this.hero.deck = state.hero.deck.map(c => new Card(c));
-        this.hero.hand = state.hero.hand.map(c => new Card(c));
-        this.hero.discard = state.hero.discard.map(c => new Card(c));
-        this.hero.wounds = state.hero.wounds.map(c => new Card(c));
-        this.hero.fame = state.hero.fame;
-        this.hero.reputation = state.hero.reputation;
-        this.hero.crystals = state.hero.crystals;
-        this.hero.movementPoints = state.hero.movementPoints || 0;
-        this.hero.attackPoints = state.hero.attackPoints || 0;
-        this.hero.blockPoints = state.hero.blockPoints || 0;
-        this.hero.influencePoints = state.hero.influencePoints || 0;
-        this.hero.healingPoints = state.hero.healingPoints || 0;
+    openSaveDialog() { this.stateManager.openSaveDialog(); }
 
-        // Restore enemies
-        this.enemies = state.enemies.map(e => {
-            // We need to import createEnemy or use a helper
-            // Since we can't easily add import to top of file without reading it all,
-            // we'll assume we can add the import or use a workaround.
-            // Wait, I can add the import to the top of the file in a separate edit.
-            // For now, let's use a placeholder if I can't add import.
-            // Actually, I should add the import.
-            // But let's look at how I can fix this block first.
-            // If I can't import, I might be stuck.
-            // But I can use this.enemyAI.generateEnemy if I knew the terrain.
-            // But I have the type.
-            // Let's assume I will add the import.
-            const enemy = createEnemy(e.type);
-            if (enemy) {
-                enemy.position = e.position;
-                enemy.id = e.id || `enemy_${e.position.q}_${e.position.r}_${Date.now()} `;
-                if (e.currentHealth) enemy.currentHealth = e.currentHealth;
-            }
-            return enemy;
-        }).filter(e => e !== null);
-
-        // Update UI
-        this.renderHand();
-        this.renderMana();
-        this.render();
-        this.addLog('Spielstand geladen', 'info');
-        this.showToast('Spielstand geladen', 'success');
-    }
-
-    openSaveDialog() {
-        const saves = this.saveManager.listSaves();
-        let message = '💾 SPIELSTAND SPEICHERN\n\n';
-
-        saves.forEach(save => {
-            if (save.empty) {
-                message += `Slot ${save.slotId + 1}: [Leer]\n`;
-            } else {
-                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date} \n`;
-            }
-        });
-
-        message += '\nWähle Slot (1-5) oder Abbrechen:';
-        const slot = prompt(message);
-
-        if (slot && slot >= 1 && slot <= 5) {
-            const success = this.saveManager.saveGame(parseInt(slot) - 1, this.getGameState());
-            if (success) {
-                this.addLog(`Spiel in Slot ${slot} gespeichert`, 'info');
-                this.showToast(`Spiel in Slot ${slot} gespeichert`, 'success');
-            } else {
-                this.addLog('Fehler beim Speichern', 'error');
-                this.showToast('Fehler beim Speichern', 'error');
-            }
-        }
-    }
-
-    openLoadDialog() {
-        const saves = this.saveManager.listSaves();
-        let message = '📂 SPIELSTAND LADEN\n\n';
-
-        saves.forEach(save => {
-            if (save.empty) {
-                message += `Slot ${save.slotId + 1}: [Leer]\n`;
-            } else {
-                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date} \n`;
-            }
-        });
-
-        message += '\nWähle Slot (1-5) oder Abbrechen:';
-        const slot = prompt(message);
-
-        if (slot && slot >= 1 && slot <= 5) {
-            const state = this.saveManager.loadGame(parseInt(slot) - 1);
-            if (state) {
-                this.loadGameState(state);
-            } else {
-                this.addLog('Fehler beim Laden', 'info');
-                this.showToast('Fehler beim Laden', 'error');
-            }
-        }
-    }
+    openLoadDialog() { this.stateManager.openLoadDialog(); }
 
     setupTimeListener() {
         this.timeManager.addListener((state) => {

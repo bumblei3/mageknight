@@ -56,7 +56,37 @@ export class Enemy {
 
     // Check if enemy is defeated
     isDefeated(attackValue) {
-        return attackValue >= this.armor;
+        if (attackValue !== undefined) {
+            return attackValue >= this.armor;
+        }
+        return false;
+    }
+
+    /**
+     * Gets state for persistence.
+     */
+    getState() {
+        return {
+            id: this.id,
+            type: this.type,
+            name: this.name,
+            position: this.position ? { ...this.position } : null,
+            armor: this.armor,
+            attack: this.attack,
+            fame: this.fame,
+            icon: this.icon,
+            color: this.color,
+            isBoss: this.isBoss || false
+        };
+    }
+
+    /**
+     * Loads state from object.
+     */
+    loadState(state) {
+        if (!state) return;
+        this.position = state.position ? { ...state.position } : null;
+        // Other properties usually fixed from definition, but position is dynamic
     }
 
     // Clone enemy
@@ -187,6 +217,30 @@ export class BossEnemy extends Enemy {
     // Check if boss is defeated (health-based, not armor)
     isDefeated(attackValue = null) {
         return this.currentHealth <= 0;
+    }
+
+    /**
+     * Gets state for persistence.
+     */
+    getState() {
+        const state = super.getState();
+        return {
+            ...state,
+            maxHealth: this.maxHealth,
+            currentHealth: this.currentHealth,
+            phase: this.phase,
+            summonType: this.summonType,
+            summonCount: this.summonCount
+        };
+    }
+
+    /**
+     * Loads state from object.
+     */
+    loadState(state) {
+        super.loadState(state);
+        if (state.currentHealth !== undefined) this.currentHealth = state.currentHealth;
+        if (state.phase !== undefined) this.phase = state.phase;
     }
 
     // Get current health percentage

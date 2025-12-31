@@ -60,6 +60,10 @@ describe('EventBus Coverage', () => {
             const badCallback = () => { throw new Error('Test error'); };
             const goodCallback = createSpy();
 
+            // Suppress console.error for this test
+            const originalError = console.error;
+            console.error = () => { };
+
             eventBus.on('error-test', badCallback);
             eventBus.on('error-test', goodCallback);
 
@@ -67,6 +71,9 @@ describe('EventBus Coverage', () => {
             eventBus.emit('error-test', {});
 
             expect(goodCallback.called).toBe(true);
+
+            // Restore console.error
+            console.error = originalError;
         });
     });
 

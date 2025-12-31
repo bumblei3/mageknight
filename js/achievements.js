@@ -315,6 +315,23 @@ export class AchievementManager {
         this.notifications = [];
         this.save();
     }
+
+    /**
+     * Gets state for persistence.
+     */
+    getState() {
+        return {
+            unlocked: Array.from(this.unlockedAchievements)
+        };
+    }
+
+    /**
+     * Loads state from object.
+     */
+    loadState(state) {
+        if (!state || !state.unlocked) return;
+        this.unlockedAchievements = new Set(state.unlocked);
+    }
 }
 
 export default AchievementManager;

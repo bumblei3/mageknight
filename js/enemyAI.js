@@ -1,4 +1,4 @@
-import { ENEMY_TYPES, createEnemy } from './enemy.js';
+import { ENEMY_TYPES, createEnemy, createBoss } from './enemy.js';
 
 /**
  * Enemy AI Module
@@ -102,5 +102,23 @@ export class EnemyAI {
             default:
                 return null;
         }
+    }
+
+    /**
+     * Reconstitutes an enemy from saved data
+     */
+    reconstituteEnemy(eData) {
+        let enemy;
+        if (eData.isBoss) {
+            enemy = createBoss(eData.type, eData.position);
+        } else {
+            enemy = createEnemy(eData.type, eData.position);
+        }
+
+        if (enemy && enemy.loadState) {
+            enemy.loadState(eData);
+        }
+
+        return enemy;
     }
 }

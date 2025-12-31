@@ -355,6 +355,79 @@ export class Hero {
         // So yes, discard contains everything.
     }
 
+    // Get mana inventory for UI
+    getManaInventory() {
+        const inventory = [...this.tempMana];
+        for (const [color, count] of Object.entries(this.crystals)) {
+            for (let i = 0; i < count; i++) {
+                inventory.push(color);
+            }
+        }
+        return inventory;
+    }
+
+    /**
+     * Gets full state for persistence.
+     */
+    getState() {
+        return {
+            name: this.name,
+            level: this.level,
+            fame: this.fame,
+            reputation: this.reputation,
+            armor: this.armor,
+            movementPoints: this.movementPoints,
+            attackPoints: this.attackPoints,
+            blockPoints: this.blockPoints,
+            influencePoints: this.influencePoints,
+            healingPoints: this.healingPoints,
+            handLimit: this.handLimit,
+            commandLimit: this.commandLimit, // Added commandLimit to getState
+            position: { ...this.position },
+            deck: [...this.deck],
+            hand: [...this.hand],
+            discard: [...this.discard],
+            wounds: [...this.wounds], // Wounds should be copied
+            crystals: { ...this.crystals },
+            skills: [...this.skills], // Skills should be copied
+            tempMana: [...this.tempMana], // tempMana should be copied
+            units: this.units.map(u => (typeof u.getState === 'function' ? u.getState() : u))
+        };
+    }
+
+    /**
+     * Loads state from object.
+     */
+    loadState(state) {
+        if (!state) return;
+        this.name = state.name;
+        this.level = state.level;
+        this.fame = state.fame;
+        this.reputation = state.reputation;
+        this.armor = state.armor;
+        this.movementPoints = state.movementPoints;
+        this.attackPoints = state.attackPoints;
+        this.blockPoints = state.blockPoints;
+        this.influencePoints = state.influencePoints;
+        this.healingPoints = state.healingPoints;
+        this.handLimit = state.handLimit;
+        this.commandLimit = state.commandLimit !== undefined ? state.commandLimit : this.commandLimit; // Load commandLimit
+        this.position = state.position ? { ...state.position } : this.position;
+        this.displayPosition = { ...this.position }; // Assuming displayPosition is derived or set similarly
+        this.deck = state.deck ? [...state.deck] : this.deck;
+        this.hand = state.hand ? [...state.hand] : this.hand;
+        this.discard = state.discard ? [...state.discard] : this.discard;
+        this.wounds = state.wounds !== undefined ? [...state.wounds] : this.wounds; // Wounds should be copied
+        this.crystals = state.crystals ? { ...state.crystals } : this.crystals;
+        this.skills = state.skills !== undefined ? [...state.skills] : this.skills; // Load skills
+        this.tempMana = state.tempMana !== undefined ? [...state.tempMana] : this.tempMana; // Load tempMana
+
+        if (state.units) {
+            // Need to handle unit reconstitution if they are classes
+            this.units = state.units; // This might need deeper cloning/reconstitution if units are complex objects/classes
+        }
+    }
+
     // Get current stats
     getStats() {
         return {
@@ -520,9 +593,63 @@ export class Hero {
         this.tempMana = [];
     }
 
-    // Get mana inventory for UI
-    getManaInventory() {
-        return [...this.tempMana];
+
+
+    /**
+     * Gets full state for persistence.
+     */
+    getState() {
+        return {
+            name: this.name,
+            level: this.level,
+            fame: this.fame,
+            reputation: this.reputation,
+            armor: this.armor,
+            movementPoints: this.movementPoints,
+            attackPoints: this.attackPoints,
+            blockPoints: this.blockPoints,
+            influencePoints: this.influencePoints,
+            healingPoints: this.healingPoints,
+            handLimit: this.handLimit,
+            position: { ...this.position },
+            deck: [...this.deck],
+            hand: [...this.hand],
+            discard: [...this.discard],
+            wounds: this.wounds,
+            crystals: { ...this.crystals },
+            skills: [...this.skills],
+            units: this.units.map(u => (typeof u.getState === 'function' ? u.getState() : u))
+        };
+    }
+
+    /**
+     * Loads state from object.
+     */
+    loadState(state) {
+        if (!state) return;
+        this.name = state.name;
+        this.level = state.level;
+        this.fame = state.fame;
+        this.reputation = state.reputation;
+        this.armor = state.armor;
+        this.movementPoints = state.movementPoints;
+        this.attackPoints = state.attackPoints;
+        this.blockPoints = state.blockPoints;
+        this.influencePoints = state.influencePoints;
+        this.healingPoints = state.healingPoints;
+        this.handLimit = state.handLimit;
+        this.position = state.position ? { ...state.position } : this.position;
+        this.displayPosition = { ...this.position };
+        this.deck = state.deck ? [...state.deck] : this.deck;
+        this.hand = state.hand ? [...state.hand] : this.hand;
+        this.discard = state.discard ? [...state.discard] : this.discard;
+        this.wounds = state.wounds !== undefined ? state.wounds : this.wounds;
+        this.crystals = state.crystals ? { ...state.crystals } : this.crystals;
+        this.skills = state.skills ? [...state.skills] : [];
+
+        if (state.units) {
+            this.units = state.units;
+        }
     }
 }
 

@@ -27,6 +27,8 @@ describe('Combat Ranged Phase Integration', () => {
         game.ui = {
             addLog: createSpy(),
             showCombatPanel: createSpy(),
+            hideCombatPanel: createSpy(),
+            hidePlayArea: createSpy(),
             updateCombatInfo: createSpy(),
             updateCombatTotals: createSpy(),
             renderUnitsInCombat: createSpy(),

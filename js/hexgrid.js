@@ -19,6 +19,11 @@ export class HexGrid {
         this.ambientLight = 1.0; // Global lighting (0.0-1.0)
         this.heroPosition = null; // Track hero position for vision
         this.visionRadius = 2; // Default vision radius
+        this.terrainSystem = null; // Reference to terrain system for costs
+    }
+
+    setTerrainSystem(terrainSystem) {
+        this.terrainSystem = terrainSystem;
     }
 
     // Axial to Pixel conversion
@@ -33,6 +38,8 @@ export class HexGrid {
         const y = this.hexSize * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
         return { x: x + this.canvas.width / 2, y: y + this.canvas.height / 2 };
     }
+
+    getScreenPos(q, r) { return this.axialToPixel(q, r); }
 
     // Pixel to Axial conversion
     /**
@@ -113,6 +120,144 @@ export class HexGrid {
             }
         }
         return results;
+    }
+
+    /**
+     * Explore adjacent hexes from a center point.
+     * Reveals hidden hexes and returns the newly revealed ones.
+     * @param {Object} center - {q, r} center for exploration
+     * @returns {Array} List of newly revealed hexes
+     */
+    exploreAdjacent(center) {
+        const neighbors = this.getNeighbors(center.q, center.r);
+        const newHexes = [];
+
+        neighbors.forEach(n => {
+            const key = this.getHexKey(n.q, n.r);
+            if (this.hexes.has(key)) {
+                const hex = this.hexes.get(key);
+                if (!hex.revealed) {
+                    hex.revealed = true;
+                    this.hexes.set(key, hex);
+                    newHexes.push(hex);
+                }
+            } else {
+                // Generate new hex if map allows dynamic expansion (simplified)
+                // For now, we assume hexes exist but are unrevealed/hidden?
+                // Or we create them?
+                // Based on map generation logic usually in MapManager.
+                // If this method is responsible for 'revealing', it implies existence or creation.
+                // Let's assume basic revealing of existing 'fogged' hexes for now.
+                // If map is dynamic, MapManager usually handles generation. 
+                // But ActionManager called this.game.hexGrid.exploreAdjacent.
+                // Let's stub creation for now if missing.
+                const newHex = { q: n.q, r: n.r, revealed: true, terrain: this.getRandomTerrain() };
+                this.hexes.set(key, newHex);
+                newHexes.push(newHex);
+            }
+        });
+
+        return newHexes;
+    }
+
+    getRandomTerrain() {
+        const terrains = ['plains', 'forest', 'hills', 'mountains', 'desert', 'wasteland'];
+        return terrains[Math.floor(Math.random() * terrains.length)];
+    }
+
+    /**
+     * Calculates reachable hexes using BFS based on movement points.
+     * @param {Object} startPos - {q, r}
+     * @param {number} movementPoints 
+     * @param {boolean} isDay 
+     * @returns {Array} List of reachable {q, r}
+     */
+    getReachableHexes(startPos, movementPoints, isDay) {
+        if (!startPos) return [];
+
+        const reachable = [];
+        const queue = [{ q: startPos.q, r: startPos.r, cost: 0 }];
+        const visited = new Map();
+        const startKey = this.getHexKey(startPos.q, startPos.r);
+        visited.set(startKey, 0);
+
+        while (queue.length > 0) {
+            const current = queue.shift();
+
+            // Current position is reachable
+            if (current.q !== startPos.q || current.r !== startPos.r) {
+                reachable.push({ q: current.q, r: current.r });
+            }
+
+            const neighbors = this.getNeighbors(current.q, current.r);
+            for (const neighbor of neighbors) {
+                if (!this.hasHex(neighbor.q, neighbor.r)) continue;
+
+                const moveCost = this.getMovementCost(neighbor.q, neighbor.r, !isDay);
+                const totalCost = current.cost + moveCost;
+
+                if (totalCost <= movementPoints) {
+                    const key = this.getHexKey(neighbor.q, neighbor.r);
+                    if (!visited.has(key) || visited.get(key) > totalCost) {
+                        visited.set(key, totalCost);
+                        queue.push({ ...neighbor, cost: totalCost });
+                    }
+                }
+            }
+        }
+
+        return reachable;
+    }
+
+    /**
+     * Gets movement cost for a specific hex.
+     * @param {number} q 
+     * @param {number} r 
+     * @param {boolean} isNight 
+     * @returns {number} Cost
+     */
+    getMovementCost(q, r, isNight = false) {
+        const hex = this.getHex(q, r);
+        if (!hex) return 999;
+
+        if (this.terrainSystem) {
+            return this.terrainSystem.getMovementCost(hex.terrain, isNight);
+        }
+
+        // Fallback to basic costs if terrain system not linked
+        const costs = { plains: 2, forest: 3, hills: 3, mountains: 5, desert: 5, wasteland: 3, water: 999 };
+        const cost = costs[hex.terrain] || 2;
+
+        // Basic night modifier for forest/desert if no terrain system
+        if (isNight) {
+            if (hex.terrain === 'forest') return 5;
+            if (hex.terrain === 'desert') return 3;
+        }
+
+        return cost;
+    }
+
+    /**
+     * Gets state for persistence.
+     */
+    getState() {
+        return {
+            hexes: Array.from(this.hexes.entries()),
+            selectedHex: this.selectedHex,
+            ambientLight: this.ambientLight
+        };
+    }
+
+    /**
+     * Loads state from object.
+     */
+    loadState(state) {
+        if (!state) return;
+        if (state.hexes) {
+            this.hexes = new Map(state.hexes);
+        }
+        this.selectedHex = state.selectedHex || null;
+        this.ambientLight = state.ambientLight !== undefined ? state.ambientLight : 1.0;
     }
 
     setTimeOfDay(isNight) {

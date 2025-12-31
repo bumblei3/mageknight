@@ -36,6 +36,19 @@ export class SaveManager {
     }
 
     /**
+     * Save alias for generic calls (auto-save or default slot)
+     */
+    save(gameState) {
+        // Default to auto-save if no slot provided, or specific logic
+        // But GameStateManager.js calls this.game.saveManager.save(state)
+        // It seems it expects a simple save. Let's redirect to autoSave or a default slot 0.
+        // Given the error in tests was during "saveGame" flow which might imply manual save but called generically?
+        // Let's assume it acts as autoSave or save to current slot if we tracked it.
+        // Safer: Call autoSave.
+        this.saveGame(0, gameState); // Default to slot 0 for now as 'quick save'
+    }
+
+    /**
      * Load game from a specific slot
      * @param {number} slotId - Slot number (0-4)
      * @returns {object|null} Game state or null

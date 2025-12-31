@@ -21,9 +21,7 @@ describe('Card Animations', () => {
         global.cancelAnimationFrame = (id) => clearTimeout(id);
     });
 
-    afterEach(() => {
-        document.body.innerHTML = '';
-    });
+    // afterEach cleanup is handled globally by resetMocks
 
     describe('animateCardDraw', () => {
         it('should set initial transform and opacity', async () => {

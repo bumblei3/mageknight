@@ -248,6 +248,16 @@ export class MockHTMLElement {
         this._innerHTML = '';
     }
 
+    get listeners() {
+        const result = [];
+        this._listeners.forEach((callbacks, type) => {
+            callbacks.forEach(handler => {
+                result.push({ type, handler });
+            });
+        });
+        return result;
+    }
+
     get className() {
         return this._className;
     }
@@ -267,6 +277,31 @@ export class MockHTMLElement {
 
     set innerHTML(html) {
         this._innerHTML = html;
+        // Simple mock parsing for ids and classes to support querySelector
+        const idMatches = html.match(/id=["']([^"']+)["']/g);
+        if (idMatches) {
+            idMatches.forEach(m => {
+                const id = m.match(/id=["']([^"']+)["']/)[1];
+                if (!this.querySelector('#' + id)) {
+                    const el = new MockHTMLElement();
+                    el.id = id;
+                    this.appendChild(el);
+                }
+            });
+        }
+        const classMatches = html.match(/class=["']([^"']+)["']/g);
+        if (classMatches) {
+            classMatches.forEach(m => {
+                const cls = m.match(/class=["']([^"']+)["']/)[1];
+                // Only take the first class if multiple
+                const firstCls = cls.split(' ')[0];
+                if (!this.querySelector('.' + firstCls)) {
+                    const el = new MockHTMLElement();
+                    el.className = cls;
+                    this.appendChild(el);
+                }
+            });
+        }
         // Basic mock: if setting to empty string, clear children
         if (html === '' || html === null) {
             this.children = [];
@@ -385,7 +420,7 @@ export class MockHTMLElement {
         const found = findIn(this);
         if (found) return found;
 
-        // Return a dummy element to avoid null pointer errors in code that assumes elements exist
+        // Return a dummy element to avoid null pointer errors
         const dummy = new MockHTMLElement();
         if (selector.startsWith('#')) dummy.id = selector.substring(1);
         else if (selector.startsWith('.')) dummy.className = selector.substring(1);
@@ -402,6 +437,18 @@ export class MockHTMLElement {
                 if (selector.startsWith('#') && child.id === selector.substring(1)) results.push(child);
                 else if (selector.startsWith('.') && child.classList && child.classList.contains && child.classList.contains(selector.substring(1))) results.push(child);
                 else if (child.tagName === selector.toUpperCase()) results.push(child);
+                else if (selector.startsWith('[') && selector.endsWith(']')) {
+                    const [attr, val] = selector.substring(1, selector.length - 1).split('=');
+                    const cleanVal = val ? val.replace(/["']/g, '') : null;
+                    if (attr.startsWith('data-')) {
+                        const dataProp = attr.substring(5).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                        if (child.dataset[dataProp] === cleanVal || (cleanVal === null && child.dataset[dataProp] !== undefined)) {
+                            results.push(child);
+                        }
+                    } else if (child[attr] === cleanVal || (cleanVal === null && child[attr] !== undefined)) {
+                        results.push(child);
+                    }
+                }
                 findAllIn(child);
             }
         };
@@ -510,45 +557,10 @@ export function createMockDocument() {
         },
         _clearElements: () => {
             elements.clear();
+            doc.body.children = [];
         },
-        querySelector: (selector) => {
-            const findIn = (parent) => {
-                if (!parent || !parent.children || !Array.isArray(parent.children)) return null;
-                if (selector.startsWith('#')) {
-                    if (parent.id === selector.substring(1)) return parent;
-                } else if (selector.startsWith('.')) {
-                    if (parent.classList && parent.classList.contains && parent.classList.contains(selector.substring(1))) return parent;
-                } else if (parent.tagName === selector.toUpperCase()) {
-                    return parent;
-                }
-
-                for (const child of parent.children) {
-                    if (typeof child === 'string') continue;
-                    const found = findIn(child);
-                    if (found) return found;
-                }
-                return null;
-            };
-            return findIn(doc.body) || new MockHTMLElement();
-        },
-        querySelectorAll: (selector) => {
-            const results = [];
-            const findIn = (parent) => {
-                if (!parent || !parent.children || !Array.isArray(parent.children)) return;
-                if (selector.startsWith('.')) {
-                    if (parent.classList && parent.classList.contains && parent.classList.contains(selector.substring(1))) results.push(parent);
-                } else if (parent.tagName === selector.toUpperCase()) {
-                    results.push(parent);
-                }
-
-                for (const child of parent.children) {
-                    if (typeof child === 'string') continue;
-                    findIn(child);
-                }
-            };
-            findIn(doc.body);
-            return results;
-        },
+        querySelector: (selector) => doc.body.querySelector(selector),
+        querySelectorAll: (selector) => doc.body.querySelectorAll(selector),
         createElement: (tag) => new MockHTMLElement(tag),
         createTextNode: (text) => ({ nodeValue: text, textContent: text }),
         addEventListener: (event, callback) => {

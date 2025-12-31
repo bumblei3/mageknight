@@ -334,7 +334,7 @@ export class StatusEffectManager {
         // Trigger onRemove for all hero effects
         for (const [type, effect] of this.heroEffects) {
             if (effect.onRemove) {
-                effect.onRemove('hero');
+                effect.onRemove(effect.target);
             }
         }
         this.heroEffects.clear();

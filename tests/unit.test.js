@@ -1,5 +1,5 @@
 import { describe, it, expect } from './testRunner.js';
-import { Unit, UNIT_TYPES, UNIT_INFO, getUnitsForLocation } from '../js/unit.js';
+import { Unit, UNIT_TYPES, UNIT_INFO, getUnitsForLocation, createUnit } from '../js/unit.js';
 
 describe('Unit System', () => {
     it('should create a unit with correct properties', () => {
@@ -113,5 +113,10 @@ describe('Unit System', () => {
 
         expect(peasants.getCost()).toBeLessThan(swordsmen.getCost());
         expect(swordsmen.getCost()).toBeLessThan(golems.getCost());
+    });
+
+    it('should handle unknown unit type in createUnit', () => {
+        const unit = createUnit('unknown');
+        expect(unit).toBe(null);
     });
 });

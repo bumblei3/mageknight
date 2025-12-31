@@ -2,8 +2,8 @@
 
 [![Test Suite](https://github.com/bumblei3/mageknight/actions/workflows/test.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/bumblei3/mageknight/branch/master/graph/badge.svg)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 683 passing](https://img.shields.io/badge/tests-683%20passing-brightgreen)
-![Coverage: 91.18%](https://img.shields.io/badge/coverage-91.18%25-brightgreen)
+![Tests: 944 passing](https://img.shields.io/badge/tests-944%20passing-brightgreen)
+![Coverage: 94.54%](https://img.shields.io/badge/coverage-94.54%25-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -159,7 +159,7 @@ Das Spiel ist modular aufgebaut:
 
 ## 🧪 Testing & Qualitätssicherung
 
-Das Projekt verfügt über eine hochmoderne Test-Suite mit **712 Tests** und **92.14% Global Statement Coverage**.
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **944 Tests** und **94.54% Global Statement Coverage**.
 
 ### Test-Methodologien
 - **Unit & Integration Tests**: Vollständige Abdeckung aller Kernkomponenten.
@@ -169,6 +169,7 @@ Das Projekt verfügt über eine hochmoderne Test-Suite mit **712 Tests** und **9
 - **Property-Based Testing (PBT)**: Mathematische Verifikation der Kampfinvarianten unter zufälligen Szenarien (`pbt_combat.test.js`).
 - **Long Session & Resilience**: Stabilitätsprüfung über viele Züge hinweg und Resilienz gegen ungültige Daten.
 - **Visual Validation**: Überprüfung der Rendering-Integrität via Canvas-API-Snapshots.
+- **Process Isolation**: Jede Testdatei wird in einem eigenen Node.js-Prozess ausgeführt, um maximale Speicherstabilität (Vermeidung von OOM) und Test-Isolation zu garantieren.
 
 ### Tests ausführen
 

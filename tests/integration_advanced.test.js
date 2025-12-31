@@ -102,6 +102,10 @@ describe('Integration - Complete Game Workflow', () => {
 });
 
 describe('Integration - State Persistence', () => {
+    beforeEach(() => {
+        resetMocks();
+    });
+
     it('should save and load complete game state', () => {
         const game = new MageKnightGame();
 
@@ -131,8 +135,9 @@ describe('Integration - State Persistence', () => {
         const game = new MageKnightGame();
 
         if (game.saveManager) {
-            // Manually corrupt save data
-            localStorage.setItem('mageKnight_save_0', 'invalid{json}data');
+            // Manually corrupt save data using correct key
+            const saves = { 0: { version: '1.0', state: 'invalid{json}data' } };
+            localStorage.setItem(game.saveManager.storageKey, 'invalid{json}data'); // Corrupt the top-level JSON
 
             const loadResult = game.saveManager.loadGame(0);
             expect(loadResult).toBe(null);

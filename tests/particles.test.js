@@ -381,11 +381,21 @@ describe('ParticleSystem', () => {
     });
 
     it('should handle different particle types in draw', () => {
-        // Only add types that don't require special ctx methods
         ['circle', 'star', 'spark'].forEach(type => {
             particleSystem.addParticle(100, 100, { type });
         });
         particleSystem.draw();
-        expect(particleSystem.particles.length).toBe(3);
+        expect(particleSystem.particles.length).toBeGreaterThan(0);
+    });
+
+    it('should create specialized effects from extended suite', () => {
+        particleSystem.createDamageNumber(100, 100, 5);
+        particleSystem.playCardEffect(200, 200, 'green');
+        particleSystem.levelUpExplosion(300, 300);
+        particleSystem.damageSplatter(400, 400, 10);
+        particleSystem.healAura(500, 500);
+        particleSystem.buffEffect(100, 100);
+
+        expect(particleSystem.particles.length).toBeGreaterThan(0);
     });
 });

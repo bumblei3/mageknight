@@ -1,6 +1,6 @@
-
 import { describe, it, expect, beforeEach } from './testRunner.js';
-import { Combat, COMBAT_PHASES } from '../js/combat.js';
+import { Combat } from '../js/combat.js';
+import { COMBAT_PHASES } from '../js/constants.js';
 import { Hero } from '../js/hero.js';
 import { createEnemy } from '../js/enemy.js';
 
@@ -16,9 +16,8 @@ describe('Combat Coverage Tests', () => {
 
     describe('Complex Resistances', () => {
         it('should handle enemies with multiple resistances correctly', () => {
-            const enemy = createEnemy('dragon', { q: 0, r: 0 });
-            // Manually add resistances
-            enemy.resistances = ['physical', 'fire'];
+            const enemy = createEnemy('draconum', { q: 0, r: 0 });
+            // draconum has physical and fire resistance in constants.js
 
             combat = new Combat(hero, [enemy]);
             combat.start();
@@ -28,15 +27,15 @@ describe('Combat Coverage Tests', () => {
             // Ice attack: normal (1x needed)
 
             // Check resistance multiplier logic directly if accessible, or via attack result
-            expect(enemy.getResistanceMultiplier('physical')).toBe(2);
-            expect(enemy.getResistanceMultiplier('fire')).toBe(2);
+            expect(enemy.fireResist).toBe(true);
+            expect(enemy.getResistanceMultiplier('fire')).toBe(0.5);
             expect(enemy.getResistanceMultiplier('ice')).toBe(1);
         });
     });
 
     describe('Siege Attacks vs Fortified', () => {
         it('should bypass fortification with siege attack', () => {
-            const enemy = createEnemy('keep_guard', { q: 0, r: 0 });
+            const enemy = createEnemy('guard', { q: 0, r: 0 });
             enemy.fortified = true;
             enemy.armor = 4;
 
@@ -51,7 +50,7 @@ describe('Combat Coverage Tests', () => {
         });
 
         it('should fail against fortified with normal ranged attack', () => {
-            const enemy = createEnemy('keep_guard', { q: 0, r: 0 });
+            const enemy = createEnemy('guard', { q: 0, r: 0 });
             enemy.fortified = true;
 
             combat = new Combat(hero, [enemy]);

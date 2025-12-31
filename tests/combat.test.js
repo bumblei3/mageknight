@@ -1,6 +1,7 @@
 import { describe, it, expect } from './testRunner.js';
 import { Combat, COMBAT_PHASE } from '../js/combat.js';
 import { Hero } from '../js/hero.js';
+import { Unit } from '../js/unit.js';
 
 // Mock Enemy
 class MockEnemy {
@@ -358,5 +359,50 @@ describe('Combat', () => {
         const result = combat.endCombat();
         expect(combat.phase).toBe(COMBAT_PHASE.COMPLETE);
         expect(combat.isComplete()).toBe(true);
+    });
+
+    describe('Ranged & Siege Phase Mechanics', () => {
+        it('should handle siege attacks against fortified enemies', () => {
+            const hero = new Hero('TestHero');
+            const fortifiedEnemy = new MockEnemy(4, 4);
+            fortifiedEnemy.fortified = true;
+            const combat = new Combat(hero, fortifiedEnemy);
+            combat.start();
+
+            // Regular ranged attack fails
+            const rangedResult = combat.rangedAttackEnemy(fortifiedEnemy, 5, false);
+            expect(rangedResult.success).toBe(false);
+
+            // Siege attack succeeds
+            const siegeResult = combat.rangedAttackEnemy(fortifiedEnemy, 5, true);
+            expect(siegeResult.success).toBe(true);
+        });
+
+        it('should return error if endRangedPhase called in wrong phase', () => {
+            const hero = new Hero('TestHero');
+            const combat = new Combat(hero, new MockEnemy(3, 3));
+            const result = combat.endRangedPhase();
+            expect(result.error).toBeDefined();
+        });
+    });
+
+    describe('Boss Battle Mechanics', () => {
+        it('should handle boss phase transitions', () => {
+            const hero = new Hero('TestHero');
+            const boss = new MockEnemy(10, 5);
+            boss.isBoss = true;
+            boss.takeDamage = (dmg) => ({
+                defeated: false,
+                healthPercent: 0.5,
+                transitions: [{ phase: 'Phase 2', ability: 'enrage', message: 'Boss Enrages!' }]
+            });
+            boss.executePhaseAbility = () => ({ success: true });
+
+            const combat = new Combat(hero, boss);
+            combat.phase = COMBAT_PHASE.ATTACK;
+
+            const result = combat.attackEnemies(5);
+            expect(result.bossTransitions.length).toBeGreaterThan(0);
+        });
     });
 });

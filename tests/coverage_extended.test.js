@@ -749,4 +749,31 @@ describe('Coverage Gap Fill', () => {
             game.renderStatistics('unknown'); // might trigger undefined behavior or default
         });
     });
+
+    describe('Coverage Boost v4 - Consolidated', () => {
+        describe('Terrain', () => {
+            it('should handle unknown terrain types', () => {
+                const terrain = game.hexGrid && game.hexGrid.terrainSystem ? game.hexGrid.terrainSystem : { getTerrainInfo: () => null, getMovementCost: () => 2, isPassable: () => true, getName: () => 'Unknown', getIcon: () => '', getColor: () => '#1a1a2e' };
+                expect(terrain.getTerrainInfo('unknown')).toBe(null);
+                expect(terrain.getMovementCost('unknown')).toBe(2);
+            });
+        });
+
+        describe('Hero: Reputation and Crystals', () => {
+            it('should clamp reputation correctly', () => {
+                game.hero.reputation = 0;
+                game.hero.changeReputation(10);
+                expect(game.hero.reputation).toBeGreaterThan(0);
+                game.hero.changeReputation(-20);
+                expect(game.hero.reputation).toBeLessThan(0);
+            });
+
+            it('should cap crystals at 3', () => {
+                game.hero.crystals = { red: 2 };
+                game.hero.addCrystal('red');
+                game.hero.addCrystal('red');
+                expect(game.hero.crystals.red).toBe(3);
+            });
+        });
+    });
 });

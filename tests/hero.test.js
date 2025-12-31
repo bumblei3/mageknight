@@ -264,4 +264,46 @@ describe('Hero', () => {
         expect(added2).toBe(false); // Over limit
         expect(hero.units.length).toBe(1);
     });
+
+    it('should validate skills acquisition', () => {
+        const hero = new HeroBuilder().build();
+        const skill = { id: 'test', name: 'Test Skill' };
+        hero.addSkill(skill);
+        expect(hero.skills.length).toBe(1);
+        expect(hero.skills[0].name).toBe('Test Skill');
+    });
+
+    it('should learn spells and advanced actions', () => {
+        const hero = new HeroBuilder().withStats({ influencePoints: 10 }).build();
+        const spell = { name: 'Fireball', type: 'spell' };
+
+        const result = hero.learnSpell(spell, 7);
+        expect(result.success).toBe(true);
+        expect(hero.discard.length).toBe(1);
+        expect(hero.influencePoints).toBe(3);
+
+        const action = { name: 'Stamina', type: 'advanced' };
+        hero.learnAdvancedAction(action, 3);
+        expect(hero.discard.length).toBe(2);
+    });
+
+    it('should fail learnSpell if influence is too low', () => {
+        const hero = new HeroBuilder().withStats({ influencePoints: 2 }).build();
+        const spell = { name: 'Fireball', type: 'spell' };
+        const result = hero.learnSpell(spell, 5);
+        expect(result.success).toBe(false);
+        expect(result.message).toBe('Nicht genug Einfluss.');
+    });
+
+    it('should manage crystals with limits', () => {
+        const hero = new HeroBuilder().build();
+        hero.crystals = { red: 2 };
+        expect(hero.addCrystal('red')).toBe(true);
+        expect(hero.addCrystal('red')).toBe(false); // Cap at 3
+        expect(hero.crystals.red).toBe(3);
+
+        expect(hero.useCrystal('red')).toBe(true);
+        expect(hero.crystals.red).toBe(2);
+        expect(hero.useCrystal('blue')).toBe(false);
+    });
 });

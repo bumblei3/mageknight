@@ -135,12 +135,19 @@ describe('Integration - State Persistence', () => {
         const game = new MageKnightGame();
 
         if (game.saveManager) {
+            // Silence expected error
+            const originalError = console.error;
+            console.error = () => { };
+
             // Manually corrupt save data using correct key
             const saves = { 0: { version: '1.0', state: 'invalid{json}data' } };
             localStorage.setItem(game.saveManager.storageKey, 'invalid{json}data'); // Corrupt the top-level JSON
 
             const loadResult = game.saveManager.loadGame(0);
             expect(loadResult).toBe(null);
+
+            // Restore console.error
+            console.error = originalError;
         }
     });
 

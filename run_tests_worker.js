@@ -1,6 +1,7 @@
 import { runner } from './tests/testRunner.js';
 import { resetMocks } from './tests/test-mocks.js';
 import './tests/setup.js';
+import path from 'path';
 
 // Get test file from arguments
 const testFile = process.argv[2];
@@ -18,7 +19,8 @@ async function runWorker() {
         if (global.gc) global.gc();
 
         // Dynamically import the test file
-        await import(testFile);
+        const importPath = testFile.startsWith('./') || testFile.startsWith('/') ? testFile : './' + testFile;
+        await import(path.resolve(process.cwd(), testFile));
 
         // Run the tests
         // We do NOT use noExit: true here because we WANT to exit this process based on result

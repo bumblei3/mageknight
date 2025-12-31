@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { UI } from '../js/ui.js';
+import { TutorialManager } from '../js/tutorialManager.js';
+import { createSpy, createMockElement } from './test-mocks.js';
 
 // Mock TooltipManager since UI imports it
 // We need to ensure the import in UI.js doesn't fail or use the real one if it has side effects.
@@ -248,6 +250,48 @@ describe('UI', () => {
         it('should format movement effect', () => {
             const result = ui.formatEffect({ movement: 2 });
             expect(result).toContain('2');
+        });
+    });
+
+    it('should show and hide site modal', () => {
+        const data = {
+            icon: '🏠',
+            name: 'Village',
+            color: 'green',
+            description: 'A quiet village',
+            options: []
+        };
+        ui.showSiteModal(data);
+        expect(ui.elements.siteModal.classList.contains('active')).toBe(true);
+
+        ui.hideSiteModal();
+        expect(ui.elements.siteModal.classList.contains('active')).toBe(false);
+    });
+
+    it('should show toast notifications', () => {
+        ui.toastContainer = createMockElement('div');
+        ui.showToast('Test Toast', 'info');
+        expect(ui.toastContainer.children.length).toBe(1);
+        expect(ui.toastContainer.textContent).toContain('Test Toast');
+    });
+
+    describe('Healing Button', () => {
+        it('should show heal button when wounds AND points exist', () => {
+            const mockHero = {
+                getStats: () => ({ wounds: 1, name: 'Hero' }),
+                healingPoints: 1
+            };
+            ui.updateHeroStats(mockHero);
+            expect(ui.elements.healBtn.style.display).toBe('block');
+        });
+
+        it('should hide heal button when no wounds', () => {
+            const mockHero = {
+                getStats: () => ({ wounds: 0, name: 'Hero' }),
+                healingPoints: 5
+            };
+            ui.updateHeroStats(mockHero);
+            expect(ui.elements.healBtn.style.display).toBe('none');
         });
     });
 });

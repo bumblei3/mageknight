@@ -955,14 +955,18 @@ export class MageKnightGame {
     }
 
     applyHealing() {
+        if (!this.hero) {
+            return false;
+        }
+
         if (this.hero.healingPoints <= 0) {
             this.addLog('Keine Heilungspunkte verfügbar.', 'info');
-            return;
+            return false;
         }
 
         if (this.hero.wounds.length === 0) {
             this.addLog('Keine Verletzungen zum Heilen.', 'info');
-            return;
+            return false;
         }
 
         const success = this.hero.healWound(true);
@@ -971,7 +975,9 @@ export class MageKnightGame {
             this.sound.heal();
             this.updateStats();
             this.renderHand();
+            return true;
         }
+        return false;
     }
 
     endTurn() { this.turnManager.endTurn(); }
@@ -1241,7 +1247,7 @@ export class MageKnightGame {
                     const roundNum = document.getElementById('round-number');
                     if (timeIcon) {
                         timeIcon.textContent = isNight ? '🌙' : '☀️';
-                        timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
+                        timeIcon.className = `time - icon ${isNight ? 'night' : ''} `;
                     }
                     if (roundNum) roundNum.textContent = state.round;
 

@@ -158,8 +158,27 @@ describe('Animator', () => {
         expect(typeof animator.cancel).toBe('function');
     });
 
-    it('should have cancelAll method', () => {
-        expect(typeof animator.cancelAll).toBe('function');
+    it('should register animations', () => {
+        const animationId = animator.animate({
+            from: 0,
+            to: 100,
+            duration: 1000,
+            onUpdate: () => { }
+        });
+
+        expect(animationId).toBeDefined();
+        expect(animator.activeAnimations.has(animationId)).toBe(true);
+
+        // Cleanup
+        animator.cancel(animationId);
+        expect(animator.activeAnimations.has(animationId)).toBe(false);
+    });
+
+    it('should animate properties helper', () => {
+        const target = { x: 0 };
+        const id = animator.animateProperties(target, { x: 100 }, 1000);
+        expect(id).toBeDefined();
+        animator.cancel(id);
     });
 });
 

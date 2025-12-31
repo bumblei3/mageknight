@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { TutorialManager } from '../js/tutorialManager.js';
-import { createSpy } from './test-mocks.js';
+import { createSpy, createMockElement } from './test-mocks.js';
 
 // Mock DOM
 const mockElement = {
@@ -22,6 +22,12 @@ const mockDocument = {
 
 if (typeof document === 'undefined') {
     global.document = mockDocument;
+    global.localStorage = {
+        store: {},
+        getItem: (k) => global.localStorage.store[k] || null,
+        setItem: (k, v) => global.localStorage.store[k] = v,
+        clear: () => global.localStorage.store = {}
+    };
 }
 
 describe('TutorialManager', () => {
@@ -34,6 +40,7 @@ describe('TutorialManager', () => {
         tutorial = new TutorialManager(game);
         if (typeof localStorage !== 'undefined') localStorage.clear();
     });
+
 
     it('should initialize correctly', () => {
         expect(tutorial.currentStep).toBe(0);
@@ -78,5 +85,28 @@ describe('TutorialManager', () => {
         tutorial.start();
         tutorial.prevStep();
         expect(tutorial.isActive).toBe(false);
+    });
+
+    it('should handle highlighting and clearing accurately', () => {
+        tutorial.createTutorialUI();
+        // Mock querySelector to return null for non-existent
+        const originalQS = global.document.querySelector;
+        global.document.querySelector = (sel) => sel === '.non-existent' ? null : mockElement;
+
+        tutorial.highlightElement('.non-existent');
+        expect(tutorial.spotlight.style.display).toBe('none');
+
+        global.document.querySelector = originalQS;
+
+        const el = { style: {}, dataset: { tutorialHighlight: 'true' } };
+        global.document.querySelectorAll = () => [el];
+        tutorial.clearHighlight();
+        expect(el.style.zIndex).toBe('');
+    });
+
+    it('should position box correctly', () => {
+        tutorial.createTutorialUI();
+        tutorial.positionTutorialBox('bottom');
+        expect(tutorial.tutorialBox.style.bottom).toBe('20px');
     });
 });

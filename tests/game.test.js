@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
+import { createMockElement, createSpy, setupGlobalMocks } from './test-mocks.js';
+import { Hero } from '../js/hero.js';
 
 // --- Global Mocks Setup ---
 
@@ -84,6 +86,11 @@ describe('Game Core', () => {
         // Initialize game
         // Note: This will trigger a lot of initialization logic
         game = new MageKnightGame();
+        game.sound = {
+            play: createSpy('play'),
+            stop: createSpy('stop'),
+            heal: createSpy('heal')
+        };
     });
 
     it('should initialize game state', () => {
@@ -174,5 +181,52 @@ describe('Game Core', () => {
 
         expect(game.combat).toBeDefined();
         expect(game.combat.enemies).toContain(enemy);
+    });
+
+    describe('Healing Logic', () => {
+        it('should apply healing correctly', () => {
+            game.hero = new Hero('TestHero');
+            game.hero.healingPoints = 1;
+            game.hero.wounds = [{}];
+            game.hero.hand = [{ isWound: () => true }];
+
+            const result = game.applyHealing();
+            expect(result).toBe(true);
+            expect(game.hero.healingPoints).toBe(0);
+            expect(game.hero.wounds.length).toBe(0);
+        });
+
+        it('should NOT apply healing if no wounds', () => {
+            game.hero = new Hero('TestHero');
+            game.hero.healingPoints = 5;
+            game.hero.wounds = [];
+            const result = game.applyHealing();
+            expect(result).toBe(false);
+        });
+    });
+
+    describe('System Transitions', () => {
+        it('should reset game state', () => {
+            const el = document.getElementById('reset-modal');
+            let startCalled = false;
+            game.startNewGame = () => { startCalled = true; };
+
+            game.reset();
+            expect(el.classList.contains('active')).toBe(true);
+            game.startNewGame();
+            expect(startCalled).toBe(true);
+        });
+
+        it('should initialize system with touch controls', () => {
+            const originalMatch = window.matchMedia;
+            window.matchMedia = (query) => ({ matches: query.includes('pointer: coarse') });
+            global.navigator.maxTouchPoints = 1;
+
+            game.initializeSystem();
+            expect(game.touchController).toBeDefined();
+
+            window.matchMedia = originalMatch; // Restore
+            global.navigator.maxTouchPoints = 0; // Reset
+        });
     });
 });

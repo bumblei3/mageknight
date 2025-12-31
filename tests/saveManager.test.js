@@ -169,4 +169,29 @@ describe('SaveManager', () => {
         expect(saveManager.loadAutoSave()).toBeNull();
         expect(saveManager.hasAutoSave()).toBe(false);
     });
+
+    it('should handle missing metadata in listSaves', () => {
+        const saveManager = new SaveManager();
+        const minimalState = { hero: {} }; // Missing turn, fame, name
+        saveManager.saveGame(1, minimalState);
+
+        const list = saveManager.listSaves();
+        const slot1 = list[1];
+        expect(slot1.turn).toBe(0);
+        expect(slot1.heroName).toBe('Unknown');
+        expect(slot1.fame).toBe(0);
+    });
+
+    it('should handle serialization defaults', () => {
+        const saveManager = new SaveManager();
+        const state = {
+            hero: { name: 'Arythea' },
+            enemies: [],
+            manaSource: {}
+        };
+        const serialized = saveManager.serializeGameState(state);
+        expect(serialized.turn).toBe(0);
+        expect(serialized.movementMode).toBe(false);
+        expect(serialized.selectedHex).toBe(null);
+    });
 });

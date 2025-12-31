@@ -13,7 +13,11 @@ describe('CombatAnimations Coverage', () => {
         resetMocks();
         mockCtx = createMockContext();
         mockElement = createMockElement('div');
-        mockElement.style = {};
+        // Ensure style has setProperty method
+        mockElement.style = {
+            setProperty: (prop, val) => { mockElement.style[prop] = val; },
+            getPropertyValue: (prop) => mockElement.style[prop] || ''
+        };
 
         // Mock requestAnimationFrame
         global.requestAnimationFrame = (cb) => setTimeout(() => cb(performance.now()), 16);

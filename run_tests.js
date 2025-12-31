@@ -111,10 +111,18 @@ for (let i = 0; i < args.length; i++) {
         i++;
     } else if (args[i].startsWith('--shard=')) {
         const parts = args[i].split('=')[1].split('/');
-        shardIndex = parseInt(parts[0], 10) - 1; // 1-based to 0-based
+        shardIndex = parseInt(parts[0], 10) - 1;
         totalShards = parseInt(parts[1], 10);
+    } else if (args[i] === '--shard' && i + 1 < args.length) {
+        const parts = args[i + 1].split('/');
+        shardIndex = parseInt(parts[0], 10) - 1;
+        totalShards = parseInt(parts[1], 10);
+        i++;
     }
 }
+
+console.log(`Arguments: ${JSON.stringify(args)}`);
+console.log(`Sharding Config: Shard ${shardIndex + 1} of ${totalShards}`);
 
 // Filter files by shard
 let filesToRun = allTestFiles;

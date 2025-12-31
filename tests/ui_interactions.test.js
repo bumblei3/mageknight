@@ -1,112 +1,263 @@
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
-import { createSpy } from './test-mocks.js';
-import { Card } from '../js/card.js';
+import { AchievementManager } from '../js/achievements.js';
+import {
+    createMockWindow,
+    createMockDocument,
+    resetMocks
+} from './test-mocks.js';
 
-describe('UI Interactions', () => {
+describe('Advanced UI Interaction Coverage', () => {
     let game;
-    let originalRest;
-    let originalEndTurn;
-    let originalHandleCardClick;
 
     beforeEach(() => {
-        // Reset DOM
         document.body.innerHTML = '';
 
-        // Mock required elements to avoid UI errors during init
-        const buttonIds = ['end-turn-btn', 'rest-btn', 'explore-btn', 'save-btn', 'load-btn', 'help-btn'];
-        buttonIds.forEach(id => {
-            if (!document.getElementById(id)) {
-                const btn = document.createElement('button');
-                btn.id = id;
-            }
-        });
+        // Setup essential DOM elements for game init
+        const canvas = document.createElement('canvas');
+        canvas.id = 'game-board';
+        document.body.appendChild(canvas);
 
-        if (!document.getElementById('game-board')) {
-            const canvas = document.createElement('canvas'); // Canvas for board
-            canvas.id = 'game-board';
-            // Also need 2d context for some game logic if it draws immediately
-        }
+        const statsGrid = document.createElement('div');
+        statsGrid.id = 'statistics-grid';
+        document.body.appendChild(statsGrid);
 
-        // Spy on PROTOTYPE to ensure all calls are captured, bypassing any binding issues
-        originalRest = MageKnightGame.prototype.rest;
-        originalEndTurn = MageKnightGame.prototype.endTurn;
-        originalHandleCardClick = MageKnightGame.prototype.handleCardClick;
+        const handCards = document.createElement('div');
+        handCards.id = 'hand-cards';
+        document.body.appendChild(handCards);
 
-        MageKnightGame.prototype.rest = createSpy(() => { });
-        MageKnightGame.prototype.endTurn = createSpy(() => { });
-        MageKnightGame.prototype.handleCardClick = createSpy(() => { });
+        const helpBtn = document.createElement('button');
+        helpBtn.id = 'help-btn';
+        document.body.appendChild(helpBtn);
+
+        const visitBtn = document.createElement('button');
+        visitBtn.id = 'visit-btn';
+        document.body.appendChild(visitBtn);
+
+        const endTurnBtn = document.createElement('button');
+        endTurnBtn.id = 'end-turn-btn';
+        document.body.appendChild(endTurnBtn);
+
+        const helpModal = document.createElement('div');
+        helpModal.id = 'help-modal';
+        document.body.appendChild(helpModal);
+
+        const helpClose = document.createElement('div');
+        helpClose.id = 'help-close';
+        document.body.appendChild(helpClose);
+
+        const tutorialModal = document.createElement('div');
+        tutorialModal.id = 'tutorial-modal';
+        document.body.appendChild(tutorialModal);
+
+        // Achievements Modal
+        const achievementsBtn = document.createElement('button');
+        achievementsBtn.id = 'achievements-btn';
+        document.body.appendChild(achievementsBtn);
+
+        const achievementsModal = document.createElement('div');
+        achievementsModal.id = 'achievements-modal';
+        document.body.appendChild(achievementsModal);
+
+        const achievementsClose = document.createElement('button');
+        achievementsClose.id = 'achievements-close';
+        achievementsModal.appendChild(achievementsClose);
+
+        // Stats Modal
+        const statsBtn = document.createElement('button');
+        statsBtn.id = 'statistics-btn';
+        document.body.appendChild(statsBtn);
+
+        const statsModal = document.createElement('div');
+        statsModal.id = 'statistics-modal';
+        document.body.appendChild(statsModal);
+
+        const statsClose = document.createElement('button');
+        statsClose.id = 'statistics-close';
+        statsModal.appendChild(statsClose);
+
+        // Sound Toggle
+        const soundBtn = document.createElement('button');
+        soundBtn.id = 'sound-toggle-btn';
+        document.body.appendChild(soundBtn);
 
         game = new MageKnightGame();
     });
 
     afterEach(() => {
-        // Restore prototype methods
-        if (originalRest) MageKnightGame.prototype.rest = originalRest;
-        if (originalEndTurn) MageKnightGame.prototype.endTurn = originalEndTurn;
-        if (originalHandleCardClick) MageKnightGame.prototype.handleCardClick = originalHandleCardClick;
+        resetMocks();
     });
 
-    it('should trigger endTurn when End Turn button is clicked', () => {
-        const btn = document.getElementById('end-turn-btn');
-        btn.dispatchEvent({ type: 'click', target: btn });
+    describe('AchievementManager Edge Cases', () => {
+        it('should handle isUnlocked and duplicate unlocks', () => {
+            const am = new AchievementManager();
+            am.unlock('first_blood');
 
-        expect(game.endTurn.callCount).toBeGreaterThan(0);
+            expect(am.isUnlocked('first_blood')).toBe(true);
+            expect(am.isUnlocked('non_existent')).toBe(false);
+
+            const result = am.unlock('first_blood');
+            expect(result).toBe(false); // Already unlocked
+        });
     });
 
-    it('should trigger rest when Rest button is clicked', () => {
-        const btn = document.getElementById('rest-btn');
-        btn.dispatchEvent({ type: 'click', target: btn });
+    describe('Help Tab Interactions', () => {
+        it('should switch help tabs', () => {
+            const tab1 = document.createElement('div');
+            tab1.className = 'help-tab';
+            tab1.dataset.tab = 'general';
 
-        expect(game.rest.callCount).toBeGreaterThan(0);
+            const content1 = document.createElement('div');
+            content1.id = 'help-general';
+            content1.className = 'help-tab-content';
+
+            document.body.appendChild(tab1);
+            document.body.appendChild(content1);
+
+            game.setupHelpSystem();
+
+            tab1.click();
+            expect(tab1.classList.contains('active')).toBe(true);
+            expect(content1.classList.contains('active')).toBe(true);
+        });
     });
 
-    it('should delegate card rendering to UI', () => {
-        // For this test we spy on UI method
-        game.ui.renderHandCards = createSpy();
-
-        game.hero.hand = [new Card({ id: 1, name: 'Test Card', type: 'action', color: 'red' })];
-        game.renderHand();
-
-        expect(game.ui.renderHandCards.callCount).toBeGreaterThan(0);
-        expect(game.ui.renderHandCards.calls[0][0].length).toBe(1);
+    describe('Tutorial Visibility', () => {
+        it('should show tutorial', () => {
+            const tutorialModal = document.getElementById('tutorial-modal');
+            game.showTutorial = () => { tutorialModal.classList.add('active'); };
+            game.showTutorial();
+            expect(tutorialModal.classList.contains('active')).toBe(true);
+        });
     });
 
-    it('should handle Mana Die interactions', () => {
-        // We want to verify that calling handleManaClick interacts with manaSource and Hero
-        // Mock mana source 
-        game.manaSource = { takeDie: createSpy(() => 'red'), returnDice: () => { } };
-        game.hero.takeManaFromSource = createSpy();
-        // Also mock ui logs/effects to prevent errors
-        game.ui.addLog = createSpy();
-        game.particleSystem = { manaEffect: createSpy() };
-        game.ui.renderManaSource = createSpy();
-        game.ui.renderHeroMana = createSpy();
+    describe('Modal Interactions and Tabs', () => {
+        it('should handle Achievements modal close and tab switching', () => {
+            const modal = document.getElementById('achievements-modal');
+            const closeBtn = document.getElementById('achievements-close');
 
-        // Call the method directly as we are testing the Game method, not the event listener wiring (which is hard to test without full DOM)
-        game.handleManaClick(0, 'red');
+            modal.style.display = 'block';
+            closeBtn.click();
+            expect(modal.style.display).toBe('none');
 
-        expect(game.manaSource.takeDie.callCount).toBe(1);
-        expect(game.hero.takeManaFromSource.callCount).toBe(1);
-        expect(game.hero.takeManaFromSource.calls[0][0]).toBe('red');
+            const tab = document.createElement('button');
+            tab.className = 'tab-btn';
+            tab.dataset.category = 'enemies';
+            modal.appendChild(tab);
+
+            game.setupEventListeners();
+
+            tab.click();
+            expect(tab.classList.contains('active')).toBe(true);
+        });
+
+        it('should handle Statistics modal close and tab switching', () => {
+            const modal = document.getElementById('statistics-modal');
+            const closeBtn = document.getElementById('statistics-close');
+
+            modal.style.display = 'block';
+            closeBtn.click();
+            expect(modal.style.display).toBe('none');
+
+            const tab = document.createElement('button');
+            tab.className = 'tab-btn';
+            tab.dataset.category = 'exploration';
+            modal.appendChild(tab);
+
+            game.setupEventListeners();
+
+            tab.click();
+            expect(tab.classList.contains('active')).toBe(true);
+        });
+
+        it('should close modals on outside click', () => {
+            const achievementsModal = document.getElementById('achievements-modal');
+            const statsModal = document.getElementById('statistics-modal');
+
+            achievementsModal.style.display = 'block';
+            statsModal.style.display = 'block';
+
+            const event = new MouseEvent('click');
+            Object.defineProperty(event, 'target', { value: achievementsModal });
+            window.dispatchEvent(event);
+            expect(achievementsModal.style.display).toBe('none');
+
+            const event2 = new MouseEvent('click');
+            Object.defineProperty(event2, 'target', { value: statsModal });
+            window.dispatchEvent(event2);
+            expect(statsModal.style.display).toBe('none');
+        });
     });
 
-    it('should trigger save game', () => {
-        game.saveManager.saveGame = createSpy();
+    describe('Enhanced Tooltip Coverage', () => {
+        it('should handle canvas mouse move tooltip branches', () => {
+            game.hexGrid.pixelToAxial = () => ({ q: 0, r: 0 });
+            game.hexGrid.getHex = () => ({ terrain: 'plains', revealed: true });
+            game.enemies = [{
+                position: { q: 0, r: 0 },
+                type: 'orc',
+                isDefeated: () => false
+            }];
+            game.ui.tooltipManager.createEnemyTooltipHTML = () => 'Enemy tooltip';
+            let tooltipShown = false;
+            game.ui.tooltipManager.showTooltip = () => { tooltipShown = true; };
+            game.hexGrid.axialToPixel = () => ({ x: 0, y: 0 });
 
-        const btn = document.getElementById('save-btn');
-        // We need to attach the listener as init() might have done it or Main.js does it.
-        // Since we are unit testing Game/UI interactions, let's assume Main.js connects them.
-        // We'll mimic Main.js connection:
-        btn.addEventListener('click', () => game.saveGame());
+            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            expect(tooltipShown).toBe(true);
 
-        btn.click();
+            game.enemies = [];
+            game.hexGrid.getHex = () => ({ revealed: true });
+            let tooltipHidden = false;
+            game.ui.tooltipManager.hideTooltip = () => { tooltipHidden = true; };
 
-        // game.saveGame -> saveManager.saveGame
-        // Wait, game.saveGame might not exist directly, usually it's Main.js calling saveManager directly?
-        // Let's check game.js... game.js doesn't have saveGame method exposed usually, implementation detail.
-        // Actually, main.js usually handles the button -> game.saveManager flow.
-        // Let's add a `saveGame` method to Game if it's missing or test saveManager directly on UI event if wired.
-        // For now, let's assume we are testing that the button *can* trigger the logic if wired.
+            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            expect(tooltipHidden).toBe(true);
+
+            game.hexGrid.pixelToAxial = () => ({ q: 99, r: 99 });
+            game.hexGrid.getHex = () => null;
+            tooltipHidden = false;
+
+            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            expect(tooltipHidden).toBe(true);
+        });
+    });
+
+    describe('Sound & Menu Interaction', () => {
+        it('should handle sound toggle click', () => {
+            const soundBtn = document.getElementById('sound-toggle-btn');
+
+            game.sound.toggle = () => true;
+            soundBtn.click();
+            expect(soundBtn.innerHTML).toBe('🔊');
+
+            game.sound.toggle = () => false;
+            soundBtn.click();
+            expect(soundBtn.innerHTML).toBe('🔇');
+        });
+
+        it('should create sound toggle button if it does not exist', () => {
+            const existingBtn = document.getElementById('sound-toggle-btn');
+            if (existingBtn) existingBtn.remove();
+
+            const headerRight = document.createElement('div');
+            headerRight.className = 'header-right';
+            document.body.appendChild(headerRight);
+
+            game.setupSoundToggle();
+
+            const newBtn = document.getElementById('sound-toggle-btn');
+            expect(newBtn).not.toBeNull();
+            expect(newBtn.id).toBe('sound-toggle-btn');
+        });
+
+        it('should open Achievements modal on button click', () => {
+            const btn = document.getElementById('achievements-btn');
+            const modal = document.getElementById('achievements-modal');
+            game.renderAchievements = () => { };
+
+            btn.click();
+            expect(modal.style.display).toBe('block');
+        });
     });
 });

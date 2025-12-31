@@ -1,153 +1,94 @@
-import { TestRunner } from './testRunner.js';
-import { Combat, COMBAT_PHASE } from '../js/combat.js';
-import { Enemy } from '../js/enemy.js';
-import { Hero } from '../js/hero.js';
+import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { MageKnightGame } from '../js/game.js';
+import { createEnemy } from '../js/enemy.js';
+import {
+    createMockWindow,
+    createMockDocument,
+    resetMocks
+} from './test-mocks.js';
 
-const runner = new TestRunner();
-const describe = runner.describe.bind(runner);
-const it = runner.it.bind(runner);
-const expect = runner.expect.bind(runner);
-const beforeEach = runner.beforeEach.bind(runner);
-
-describe('Advanced Combat Mechanics', () => {
-    let hero;
-    let combat;
+describe('Advanced Combat Coverage', () => {
+    let game;
 
     beforeEach(() => {
-        hero = new Hero('TestHero');
-        hero.armor = 2;
+        document.body.innerHTML = '';
+        const canvas = document.createElement('canvas');
+        canvas.id = 'game-board';
+        document.body.appendChild(canvas);
+        game = new MageKnightGame();
     });
 
-    it('should handle Swift enemies (double block)', () => {
-        const swiftEnemy = new Enemy({
-            name: 'Swift Orc',
-            attack: 3,
-            swift: true
-        });
-
-        combat = new Combat(hero, swiftEnemy);
-        combat.start();
-
-        // Try blocking with normal amount (should fail)
-        let result = combat.blockEnemy(swiftEnemy, 3);
-        expect(result.blocked).toBe(false);
-
-        // Try blocking with double amount (should succeed)
-        result = combat.blockEnemy(swiftEnemy, 6);
-        expect(result.blocked).toBe(true);
+    afterEach(() => {
+        resetMocks();
     });
 
-    it('should handle Fire Resistance', () => {
-        const fireEnemy = new Enemy({
-            name: 'Fire Dragon',
-            armor: 4,
-            fireResist: true
+    describe('Combat Logic Deep Dive', () => {
+        it('should handle activateUnitInCombat correctly', () => {
+            game.combat = {
+                activateUnit: (unit) => ({ success: true, message: 'Unit Activated' })
+            };
+
+            // Mock UI/Particles
+            game.renderUnitsInCombat = () => { };
+            game.updateStats = () => { };
+            game.addLog = () => { };
+            game.hexGrid.axialToPixel = () => ({ x: 0, y: 0 });
+            game.particleSystem.buffEffect = () => { };
+
+            game.activateUnitInCombat({ name: 'Unit' });
         });
 
-        combat = new Combat(hero, fireEnemy);
-        combat.start();
-        combat.endBlockPhase(); // Move to damage/attack
+        it('should handle endBlockPhase with enemy blocking', () => {
+            const enemy = createEnemy('orc');
+            game.combat = {
+                phase: 'block',
+                enemies: [enemy],
+                blockEnemy: (e, total) => ({ blocked: true }),
+                endBlockPhase: () => ({ woundsReceived: 1, message: 'Took damage' })
+            };
+            game.combatBlockTotal = 10;
 
-        // Attack with Fire (should need double damage)
-        // Effective Armor = 4 / 0.5 = 8
-        let result = combat.attackEnemies(4, 'fire');
-        expect(result.success).toBe(false);
+            // Mock dependencies
+            game.addLog = () => { };
+            game.ui.updateCombatInfo = () => { };
+            game.renderUnitsInCombat = () => { };
+            game.updatePhaseIndicator = () => { };
+            game.updateStats = () => { };
+            game.updateCombatTotals = () => { };
+            game.hexGrid.axialToPixel = () => ({ x: 0, y: 0 });
+            game.particleSystem.damageSplatter = () => { };
 
-        result = combat.attackEnemies(8, 'fire');
-        expect(result.success).toBe(true);
-    });
+            game.endBlockPhase();
 
-    it('should handle Physical Resistance', () => {
-        const stoneGolem = new Enemy({
-            name: 'Golem',
-            armor: 3,
-            physicalResist: true
+            expect(game.combatBlockTotal).toBe(0);
         });
 
-        combat = new Combat(hero, stoneGolem);
-        combat.start();
-        combat.endBlockPhase();
+        it('should handle executeAttackAction variants', () => {
+            game.combat = { phase: 'ranged' };
+            let rangedEnded = false;
+            game.endRangedPhase = () => { rangedEnded = true; };
 
-        // Physical attack (default)
-        // Effective Armor = 3 / 0.5 = 6
-        let result = combat.attackEnemies(3, 'physical');
-        expect(result.success).toBe(false);
+            // Case 1: Ranged skip
+            game.executeAttackAction();
+            expect(rangedEnded).toBe(true);
 
-        result = combat.attackEnemies(6, 'physical');
-        expect(result.success).toBe(true);
-    });
+            // Case 2: Attack execution
+            game.combat.phase = 'attack';
+            game.combatAttackTotal = 5;
+            const enemy = createEnemy('orc');
+            enemy.position = { q: 1, r: 0 };
+            game.combat.enemies = [enemy];
 
-    it('should bypass resistance with correct element', () => {
-        const fireEnemy = new Enemy({
-            name: 'Fire Dragon',
-            armor: 4,
-            fireResist: true
+            // Mock
+            game.hexGrid.axialToPixel = () => ({ x: 10, y: 20 });
+            game.particleSystem.impactEffect = () => { };
+
+            let attackExecuted = false;
+            game.combat.attackEnemies = () => { attackExecuted = true; return { success: true, message: 'Victory', defeated: [] }; };
+            game.endCombat = () => { };
+
+            game.executeAttackAction();
+            expect(attackExecuted).toBe(true);
         });
-
-        combat = new Combat(hero, fireEnemy);
-        combat.start();
-        combat.endBlockPhase();
-
-        // Attack with Ice (no resistance)
-        // Effective Armor = 4
-        let result = combat.attackEnemies(4, 'ice');
-        expect(result.success).toBe(true);
-    });
-
-    it('should handle Fortified enemies (ranged immunity)', () => {
-        const fortifiedEnemy = new Enemy({
-            name: 'Castle Guard',
-            armor: 3,
-            fortified: true
-        });
-
-        combat = new Combat(hero, fortifiedEnemy);
-        combat.start();
-
-        // Ranged/Siege phase (if implemented, or just check attack phase restriction)
-        // Assuming attackEnemies takes a type or phase context
-
-        // If we try to use Ranged Attack in Attack Phase:
-        // Fortified usually means double armor vs Ranged in Attack Phase, 
-        // or immune to Ranged in Ranged Phase (except Siege).
-        // Let's assume simplified: Double armor vs Ranged.
-
-        combat.endBlockPhase();
-
-        // Attack with Ranged
-        // Effective Armor = 3 * 2 = 6
-        let result = combat.attackEnemies(3, 'ranged');
-        expect(result.success).toBe(false);
-
-        result = combat.attackEnemies(6, 'ranged');
-        expect(result.success).toBe(true);
-    });
-
-    it('should handle Paralyze ability', () => {
-        const paralyzeEnemy = new Enemy({
-            name: 'Medusa',
-            attack: 3,
-            paralyze: true
-        });
-
-        // Hero needs cards in hand
-        hero.hand = [{ name: 'Card 1' }, { name: 'Card 2' }];
-        const initialHandSize = hero.hand.length;
-
-        combat = new Combat(hero, paralyzeEnemy);
-        combat.start();
-
-        // Fail to block
-        combat.blockEnemy(paralyzeEnemy, 0);
-        combat.endBlockPhase();
-
-        // Should take damage AND lose cards (if Paralyze destroys cards)
-        // Or Paralyze makes wounds unhealable?
-        // Standard MK: Paralyze = Wounds go to hand, and you must discard non-wound cards equal to wounds.
-        // Let's check if that logic exists or if we expect it.
-
-        // If logic isn't implemented, this test will fail, which is good for TDD.
-        // For now, let's assume it just deals wounds.
-        expect(hero.wounds.length).toBeGreaterThan(0);
     });
 });

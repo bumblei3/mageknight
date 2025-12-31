@@ -4,6 +4,10 @@ import * as CardAnimations from './cardAnimations.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS } from './constants.js';
 
+/**
+ * User Interface Controller
+ * Manages all DOM interactions, event listeners (outside game loop), and visual updates.
+ */
 export class UI {
     constructor() {
         this.elements = this.getElements();
@@ -14,6 +18,11 @@ export class UI {
         this.setupGlobalListeners();
     }
 
+    /**
+     * Registers global event listeners for the EventBus.
+     * Handles logs, toasts, notifications, and stat updates.
+     * @private
+     */
     setupGlobalListeners() {
         this._logAddedHandler = ({ message, type }) => this.addLog(message, type);
         this._toastShowHandler = ({ message, type }) => this.showToast(message, type);
@@ -29,11 +38,18 @@ export class UI {
         eventBus.on(GAME_EVENTS.STAMP_STATS_UPDATED, this._statsHandler);
     }
 
+    /**
+     * Removes global event listeners to prevent memory leaks.
+     */
     destroy() {
         if (this._logAddedHandler) eventBus.off(GAME_EVENTS.LOG_ADDED, this._logAddedHandler);
         if (this._toastShowHandler) eventBus.off(GAME_EVENTS.TOAST_SHOW, this._toastShowHandler);
     }
 
+    /**
+     * Initializes tooltips for static UI elements.
+     * @private
+     */
     setupTooltips() {
         // Hero Stats
         this.tooltipManager.attachToElement(this.elements.heroArmor,
@@ -65,6 +81,11 @@ export class UI {
         document.body.appendChild(this.toastContainer);
     }
 
+    /**
+     * Caches references to critical DOM elements for performance.
+     * @private
+     * @returns {Object} Dictionary of DOM elements
+     */
     getElements() {
         return {
             // Stats

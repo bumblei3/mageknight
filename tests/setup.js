@@ -3,6 +3,9 @@
 
 import {
     MockHTMLElement,
+    MockCustomEvent,
+    MockMouseEvent,
+    MockKeyboardEvent,
     createMockDocument,
     createMockLocalStorage,
     createMockWindow
@@ -25,26 +28,10 @@ if (typeof document === 'undefined') {
     global.alert = () => { };
     global.confirm = () => true; // Mock confirm
     global.performance = { now: () => Date.now() };
-    global.CustomEvent = class CustomEvent {
-        constructor(type, options = {}) {
-            this.type = type;
-            Object.assign(this, options);
-            if (!this.preventDefault) this.preventDefault = () => { };
-        }
-    };
 
-    global.KeyboardEvent = class KeyboardEvent extends global.CustomEvent {
-        constructor(type, options = {}) {
-            super(type, options);
-            this.key = options.key || '';
-            this.code = options.code || '';
-            this.ctrlKey = !!options.ctrlKey;
-            this.metaKey = !!options.metaKey;
-            this.shiftKey = !!options.shiftKey;
-            this.altKey = !!options.altKey;
-            this.target = options.target || global.document.body;
-        }
-    };
+    global.CustomEvent = MockCustomEvent;
+    global.MouseEvent = MockMouseEvent;
+    global.KeyboardEvent = MockKeyboardEvent;
 
     // Expose AudioContext globally for SoundManager
     global.AudioContext = mockWindow.AudioContext;

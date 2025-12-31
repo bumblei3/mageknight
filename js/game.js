@@ -27,7 +27,14 @@ import { createEnemy } from './enemy.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS, TIME_OF_DAY, COMBAT_PHASES } from './constants.js';
 
+/**
+ * Main Game Controller Class
+ * Orchestrates the game loop, state management, and interaction between subsystems.
+ */
 export class MageKnightGame {
+    /**
+     * Initializes the game engine and subsystems.
+     */
     constructor() {
         this.abortController = new AbortController();
         this.canvas = document.getElementById('game-board');
@@ -73,11 +80,18 @@ export class MageKnightGame {
         this.init();
     }
 
+    /**
+     * Bootstraps the system and starts a new game.
+     */
     init() {
         this.initializeSystem();
         this.startNewGame();
     }
 
+    /**
+     * Sets up event listeners, managers, and system components.
+     * @private
+     */
     initializeSystem() {
         // Setup UI event listeners
         this.setupEventListeners();
@@ -99,6 +113,9 @@ export class MageKnightGame {
         this.debugManager = new DebugManager(this);
     }
 
+    /**
+     * Cleans up resources and listeners when the game instance is destroyed.
+     */
     destroy() {
         this.abortController.abort();
         if (this.ui) this.ui.destroy();
@@ -107,6 +124,9 @@ export class MageKnightGame {
         // TutoriaManagers don't have listeners yet in current view, but good practice
     }
 
+    /**
+     * Resets game state and starts a fresh session.
+     */
     startNewGame() {
         // Reset Game State
         this.turnNumber = 0;

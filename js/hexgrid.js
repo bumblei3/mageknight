@@ -1,6 +1,11 @@
 // Hex Grid System using Axial Coordinates
 // Reference: https://www.redblobgames.com/grids/hexagons/
 
+/**
+ * Hexagon Grid System
+ * Handles coordinate systems (Axial/Pixel), rendering, and pathfinding on the map.
+ * Based on: https://www.redblobgames.com/grids/hexagons/
+ */
 export class HexGrid {
     constructor(canvas) {
         this.canvas = canvas;
@@ -17,6 +22,12 @@ export class HexGrid {
     }
 
     // Axial to Pixel conversion
+    /**
+     * Converts axial (q, r) coordinates to screen pixel (x, y).
+     * @param {number} q - Column
+     * @param {number} r - Row
+     * @returns {Object} {x, y} pixel coordinates
+     */
     axialToPixel(q, r) {
         const x = this.hexSize * (3 / 2 * q);
         const y = this.hexSize * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
@@ -24,6 +35,12 @@ export class HexGrid {
     }
 
     // Pixel to Axial conversion
+    /**
+     * Converts screen pixel (x, y) to axial (q, r) coordinates.
+     * @param {number} x - Screen X
+     * @param {number} y - Screen Y
+     * @returns {Object} {q, r} axial coordinates (rounded)
+     */
     pixelToAxial(x, y) {
         x = x - this.canvas.width / 2;
         y = y - this.canvas.height / 2;
@@ -35,6 +52,12 @@ export class HexGrid {
     }
 
     // Round floating point axial coordinates to nearest hex
+    /**
+     * Rounds floating point axial coordinates to the nearest valid hex.
+     * @param {number} q 
+     * @param {number} r 
+     * @returns {Object} {q, r} integers
+     */
     roundAxial(q, r) {
         const s = -q - r;
 
@@ -69,6 +92,14 @@ export class HexGrid {
     }
 
     // Calculate distance between two hexes
+    /**
+     * Calculates the manhattan distance between two hexes.
+     * @param {number} q1 
+     * @param {number} r1 
+     * @param {number} q2 
+     * @param {number} r2 
+     * @returns {number} Distance in hex steps
+     */
     distance(q1, r1, q2, r2) {
         return (Math.abs(q1 - q2) + Math.abs(q1 + r1 - q2 - r2) + Math.abs(r1 - r2)) / 2;
     }
@@ -89,6 +120,12 @@ export class HexGrid {
     }
 
     // Draw a single hexagon
+    /**
+     * Renders a single hexagon with optional styles and effects.
+     * @param {number} q 
+     * @param {number} r 
+     * @param {Object} options - { fillColor, strokeColor, highlight, revealed, terrain }
+     */
     drawHex(q, r, options = {}) {
         const pos = this.axialToPixel(q, r);
         const { fillColor = '#1a1a2e', strokeColor = '#374151', lineWidth = 2, highlight = false, revealed = true, terrain = null } = options;

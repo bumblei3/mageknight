@@ -685,6 +685,45 @@ class MockAudioContext {
 }
 
 /**
+ * Mock CustomEvent class
+ */
+export class MockCustomEvent {
+    constructor(type, options = {}) {
+        this.type = type;
+        Object.assign(this, options);
+        if (!this.preventDefault) this.preventDefault = () => { };
+    }
+}
+
+/**
+ * Mock MouseEvent class
+ */
+export class MockMouseEvent extends MockCustomEvent {
+    constructor(type, options = {}) {
+        super(type, options);
+        this.clientX = options.clientX || 0;
+        this.clientY = options.clientY || 0;
+        this.button = options.button || 0;
+    }
+}
+
+/**
+ * Mock KeyboardEvent class
+ */
+export class MockKeyboardEvent extends MockCustomEvent {
+    constructor(type, options = {}) {
+        super(type, options);
+        this.key = options.key || '';
+        this.code = options.code || '';
+        this.ctrlKey = !!options.ctrlKey;
+        this.metaKey = !!options.metaKey;
+        this.shiftKey = !!options.shiftKey;
+        this.altKey = !!options.altKey;
+        this.target = options.target || (global.document ? global.document.body : null);
+    }
+}
+
+/**
  * Creates a mock window object
  */
 export function createMockWindow(width = 1024, height = 768) {
@@ -735,13 +774,9 @@ export function setupGlobalMocks() {
     global.window = createMockWindow();
     global.localStorage = createMockLocalStorage();
     global.HTMLElement = MockHTMLElement;
-
-    global.KeyboardEvent = class KeyboardEvent {
-        constructor(type, options = {}) {
-            this.type = type;
-            Object.assign(this, options);
-        }
-    };
+    global.CustomEvent = MockCustomEvent;
+    global.MouseEvent = MockMouseEvent;
+    global.KeyboardEvent = MockKeyboardEvent;
 
     if (typeof prompt === 'undefined' || global.prompt.toString().includes('native')) {
         global.prompt = () => '1';

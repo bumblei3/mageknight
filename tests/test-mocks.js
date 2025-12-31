@@ -504,6 +504,9 @@ export function createMockDocument() {
             }
             return elements.get(id);
         },
+        _clearListeners: () => {
+            Object.keys(listeners).forEach(key => delete listeners[key]);
+        },
         querySelector: (selector) => {
             const findIn = (parent) => {
                 if (!parent || !parent.children || !Array.isArray(parent.children)) return null;
@@ -710,7 +713,10 @@ export function createMockWindow(width = 1024, height = 768) {
         confirm: () => true,
         prompt: () => '1',
         AudioContext: MockAudioContext,
-        webkitAudioContext: MockAudioContext
+        webkitAudioContext: MockAudioContext,
+        _clearListeners: () => {
+            Object.keys(listeners).forEach(key => delete listeners[key]);
+        }
     };
 
     return mockWindow;
@@ -742,11 +748,30 @@ export function setupGlobalMocks() {
 }
 
 /**
- * Resets all mock storage state
- * Useful to call between tests
+ * Resets all mock storage state and DOM environment
+ * Useful to call between tests to prevent memory leaks
  */
 export function resetMocks() {
     if (global.localStorage) {
         global.localStorage.clear();
+    }
+
+    if (global.document) {
+        if (global.document.body) {
+            global.document.body.innerHTML = '';
+            // If the mock body has an internal listener storage, clear it
+            if (global.document.body._listeners && global.document.body._listeners.clear) {
+                global.document.body._listeners.clear();
+            }
+        }
+
+        // Reset document level listeners if it was created with createMockDocument
+        if (global.document._clearListeners) {
+            global.document._clearListeners();
+        }
+    }
+
+    if (global.window && global.window._clearListeners) {
+        global.window._clearListeners();
     }
 }

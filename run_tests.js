@@ -1,5 +1,11 @@
-import { runner } from './tests/testRunner.js';
+import { runner, afterEach } from './tests/testRunner.js';
+import { resetMocks } from './tests/test-mocks.js';
 import './tests/setup.js';
+
+// Global cleanup after each test to prevent memory leaks in CI
+afterEach(() => {
+    resetMocks();
+});
 
 // Import Test Suites
 import './tests/hero.test.js';

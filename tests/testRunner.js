@@ -362,6 +362,9 @@ export class TestRunner {
                     console.error(e.stack); // Added stack trace
                 }
             } finally {
+                // Release callback reference to allow GC of closures
+                test.callback = null;
+
                 // Run all matching afterEach hooks (hierarchy: child -> parent -> global)
                 const matchingAfter = this.afterEachCallbacks.filter(b =>
                     b.suitePath.every((name, i) => test.suitePath[i] === name)

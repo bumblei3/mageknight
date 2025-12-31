@@ -1369,6 +1369,7 @@ export class MageKnightGame {
     }
 
     loadGameState(state) {
+        if (!state) return;
         this.turnNumber = state.turn || 0;
 
         // Restore hero
@@ -1721,7 +1722,12 @@ export class MageKnightGame {
         const y = e.clientY - rect.top;
 
         // Convert to axial coordinates
+        // Convert to axial coordinates
         const axial = this.hexGrid.pixelToAxial(x, y);
+        if (!axial) {
+            this.ui.tooltipManager.hideTooltip();
+            return;
+        }
         const hex = this.hexGrid.getHex(axial.q, axial.r);
 
         if (hex && hex.revealed) {

@@ -26,7 +26,19 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run tests
-      run: npm test
+    - name: Run tests (no coverage)
+      run: node run_tests.js
       env:
-        NODE_OPTIONS: '--max-old-space-size=8192'
+        NODE_OPTIONS: '--max-old-space-size=4096'
+
+    - name: Run targeted coverage
+      run: npx c8 --reporter=text --reporter=html --include="js/game.js" --include="js/ui.js" --include="js/achievements.js" --include="js/combat.js" --include="js/hero.js" node run_targeted_coverage.js
+      env:
+        NODE_OPTIONS: '--max-old-space-size=4096'
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report-${{ matrix.node-version }}
+        path: coverage/
+        retention-days: 7

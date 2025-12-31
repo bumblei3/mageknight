@@ -168,7 +168,6 @@ export function createMockUI() {
         addPlayedCard: createSpy(),
         showPlayArea: createSpy(),
         reset: createSpy(),
-        reset: createSpy(),
         showSiteModal: createSpy(), // Added
         showSiteInteraction: createSpy(),
         updateCombatTotals: createSpy(), // Added
@@ -788,6 +787,81 @@ export function setupGlobalMocks() {
 }
 
 /**
+ * Creates the standard DOM structure required by the game's UI class
+ * @returns {Object} References to the created elements
+ */
+export function setupStandardGameDOM() {
+    if (!global.document || !global.document.body) return null;
+
+    global.document.body.innerHTML = '';
+
+    const elements = {};
+    const ids = [
+        // Stats
+        'fame-value', 'reputation-value', 'hero-name', 'hero-armor',
+        'hero-handlimit', 'hero-wounds', 'movement-points',
+        // Buttons
+        'end-turn-btn', 'rest-btn', 'explore-btn', 'new-game-btn', 'heal-btn',
+        // Areas
+        'hand-cards', 'played-cards', 'play-area', 'mana-source',
+        'game-log', 'combat-panel', 'combat-info', 'combat-units', 'hero-units',
+        // Canvas
+        'game-board',
+        // Containers
+        'ui-container', 'toast-container', 'card-viewer'
+    ];
+
+    ids.forEach(id => {
+        const el = global.document.createElement('div');
+        el.id = id;
+        global.document.body.appendChild(el);
+        elements[id] = el;
+    });
+
+    // Specialized structures
+    const canvas = global.document.getElementById('game-board');
+    if (canvas) {
+        canvas.width = 800;
+        canvas.height = 600;
+    }
+
+    // Site Modal Structure
+    const siteModal = global.document.getElementById('site-modal') || global.document.createElement('div');
+    siteModal.id = 'site-modal';
+    siteModal.innerHTML = `
+        <div id="site-close"></div>
+        <div id="site-modal-icon"></div>
+        <h2 id="site-modal-title"></h2>
+        <p id="site-modal-description"></p>
+        <div id="site-options"></div>
+        <button id="site-close-btn"></button>
+    `;
+    global.document.body.appendChild(siteModal);
+
+    // Level Up Modal Structure
+    const levelUpModal = global.document.getElementById('level-up-modal') || global.document.createElement('div');
+    levelUpModal.id = 'level-up-modal';
+    levelUpModal.innerHTML = `
+        <div id="new-level-display"></div>
+        <div id="skill-choices"></div>
+        <div id="card-choices"></div>
+        <button id="confirm-level-up"></button>
+    `;
+    global.document.body.appendChild(levelUpModal);
+
+    // Reset Modal Structure
+    const resetModal = global.document.getElementById('reset-modal') || global.document.createElement('div');
+    resetModal.id = 'reset-modal';
+    resetModal.innerHTML = `
+        <button id="confirm-reset-btn"></button>
+        <button id="cancel-reset-btn"></button>
+    `;
+    global.document.body.appendChild(resetModal);
+
+    return elements;
+}
+
+/**
  * Resets all mock storage state and DOM environment
  * Useful to call between tests to prevent memory leaks
  */
@@ -797,52 +871,11 @@ export function resetMocks() {
     }
 
     if (global.document) {
-        if (global.document.body) {
-            global.document.body.innerHTML = '';
+        setupStandardGameDOM();
 
-            // Restore essential game elements
-            const canvas = global.document.createElement('canvas');
-            canvas.id = 'game-board';
-            canvas.width = 800;
-            canvas.height = 600;
-            global.document.body.appendChild(canvas);
-
-            const uiContainer = global.document.createElement('div');
-            uiContainer.id = 'ui-container';
-            global.document.body.appendChild(uiContainer);
-
-            // Add other common elements required by tests
-            ['game-log', 'toast-container', 'card-viewer'].forEach(id => {
-                const el = global.document.createElement('div');
-                el.id = id;
-                global.document.body.appendChild(el);
-            });
-
-            // Level Up Modal Structure
-            const levelUpModal = global.document.createElement('div');
-            levelUpModal.id = 'level-up-modal';
-            levelUpModal.innerHTML = `
-                <h2 id="level-up-title"></h2>
-                <p id="level-up-description"></p>
-                <div id="skill-options"></div>
-                <div id="card-options"></div>
-                <button id="confirm-level-up"></button>
-            `;
-            global.document.body.appendChild(levelUpModal);
-
-            // Reset Modal Structure
-            const resetModal = global.document.createElement('div');
-            resetModal.id = 'reset-modal';
-            resetModal.innerHTML = `
-                <button id="confirm-reset-btn"></button>
-                <button id="cancel-reset-btn"></button>
-            `;
-            global.document.body.appendChild(resetModal);
-
-            // If the mock body has an internal listener storage, clear it
-            if (global.document.body._listeners && global.document.body._listeners.clear) {
-                global.document.body._listeners.clear();
-            }
+        // If the mock body has an internal listener storage, clear it
+        if (global.document.body && global.document.body._listeners && global.document.body._listeners.clear) {
+            global.document.body._listeners.clear();
         }
 
         // Reset document level listeners and elements if it was created with createMockDocument

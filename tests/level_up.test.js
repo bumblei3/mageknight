@@ -13,43 +13,6 @@ describe('Level Up UI', () => {
 
     beforeEach(() => {
         resetMocks();
-
-        // Mock DOM
-        container = new MockHTMLElement('div');
-        container.id = 'game-container';
-        document.body.appendChild(container);
-
-        // Required elements for UI constructor
-        const elementsToCheck = [
-            'fame-value', 'reputation-value', 'hero-name', 'hero-armor',
-            'hero-handlimit', 'hero-wounds', 'movement-points',
-            'end-turn-btn', 'rest-btn', 'explore-btn', 'new-game-btn',
-            'hand-cards', 'played-cards', 'play-area', 'mana-source',
-            'game-log', 'combat-panel', 'combat-info', 'combat-units', 'hero-units',
-            'game-board', 'site-modal', 'site-close', 'site-modal-icon',
-            'site-options', 'site-close-btn',
-            'level-up-modal', 'new-level-display', 'skill-choices', 'card-choices', 'confirm-level-up'
-        ];
-
-        elementsToCheck.forEach(id => {
-            const el = new MockHTMLElement('div');
-            el.id = id;
-            if (id === 'site-modal') {
-                const title = new MockHTMLElement('h2');
-                title.className = 'modal-title';
-                el.appendChild(title);
-                const desc = new MockHTMLElement('p');
-                desc.className = 'site-description';
-                el.appendChild(desc);
-            }
-            // Mock parentElement for tooltips
-            if (!el.parentElement) {
-                const p = new MockHTMLElement('div');
-                p.appendChild(el);
-            }
-            document.body.appendChild(el);
-        });
-
         ui = new UI();
     });
 

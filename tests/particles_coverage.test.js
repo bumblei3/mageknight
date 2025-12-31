@@ -1,18 +1,21 @@
 
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { ParticleSystem, Particle } from '../js/particles.js';
-import { setupGlobalMocks, resetMocks, createMockContext } from './test-mocks.js';
+import { setupGlobalMocks, resetMocks, createMockCanvas, createMockContext } from './test-mocks.js';
 
 setupGlobalMocks();
 
 describe('Particles Coverage Boost', () => {
     let particleSystem;
+    let mockCanvas;
     let mockCtx;
 
     beforeEach(() => {
         resetMocks();
-        mockCtx = createMockContext();
-        particleSystem = new ParticleSystem(mockCtx);
+        // ParticleSystem expects a canvas element, not a context
+        mockCanvas = createMockCanvas(800, 600);
+        mockCtx = mockCanvas.getContext('2d');
+        particleSystem = new ParticleSystem(mockCanvas);
     });
 
     describe('Particle class', () => {
@@ -74,8 +77,8 @@ describe('Particles Coverage Boost', () => {
     });
 
     describe('ParticleSystem effects', () => {
-        it('victoryFireworks should add particles', () => {
-            particleSystem.victoryFireworks(400, 300);
+        it('victoryRainEffect should add particles', () => {
+            particleSystem.victoryRainEffect(800, 600);
             // Particles are added via setTimeout, so just verify no crash
         });
 

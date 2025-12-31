@@ -243,7 +243,9 @@ export class SimpleTutorial {
         });
 
         this.game.ui?.addLog('✅ Tutorial abgeschlossen!', 'info');
-        this.game.ui?.showNotification('Tutorial abgeschlossen! Viel Erfolg!', 'success');
+        if (typeof this.game.ui?.showNotification === 'function') {
+            this.game.ui.showNotification('Tutorial abgeschlossen! Viel Erfolg!', 'success');
+        }
     }
 
     // Reset and restart tutorial

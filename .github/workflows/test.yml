@@ -32,6 +32,7 @@ jobs:
       run: node --max-old-space-size=4096 --expose-gc run_tests.js --shard=${{ matrix.shard }}/3
 
     - name: Run targeted coverage
+      if: matrix.shard == 1
       run: npx c8 --reporter=text --reporter=html --include="js/game.js" --include="js/ui.js" --include="js/achievements.js" --include="js/combat.js" --include="js/hero.js" node run_targeted_coverage.js
       env:
         NODE_OPTIONS: '--max-old-space-size=4096'

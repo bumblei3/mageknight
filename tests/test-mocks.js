@@ -188,7 +188,8 @@ export function createMockUI() {
         tooltipManager: {
             hideTooltip: createSpy(),
             showEnemyTooltip: createSpy(),
-            showTerrainTooltip: createSpy()
+            showTerrainTooltip: createSpy(),
+            createStatTooltipHTML: createSpy(() => '<div>Tooltip</div>')
         }
     };
 }
@@ -811,11 +812,32 @@ export function resetMocks() {
             global.document.body.appendChild(uiContainer);
 
             // Add other common elements required by tests
-            ['game-log', 'toast-container', 'level-up-modal', 'reset-modal', 'card-viewer'].forEach(id => {
+            ['game-log', 'toast-container', 'card-viewer'].forEach(id => {
                 const el = global.document.createElement('div');
                 el.id = id;
                 global.document.body.appendChild(el);
             });
+
+            // Level Up Modal Structure
+            const levelUpModal = global.document.createElement('div');
+            levelUpModal.id = 'level-up-modal';
+            levelUpModal.innerHTML = `
+                <h2 id="level-up-title"></h2>
+                <p id="level-up-description"></p>
+                <div id="skill-options"></div>
+                <div id="card-options"></div>
+                <button id="confirm-level-up"></button>
+            `;
+            global.document.body.appendChild(levelUpModal);
+
+            // Reset Modal Structure
+            const resetModal = global.document.createElement('div');
+            resetModal.id = 'reset-modal';
+            resetModal.innerHTML = `
+                <button id="confirm-reset-btn"></button>
+                <button id="cancel-reset-btn"></button>
+            `;
+            global.document.body.appendChild(resetModal);
 
             // If the mock body has an internal listener storage, clear it
             if (global.document.body._listeners && global.document.body._listeners.clear) {

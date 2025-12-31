@@ -2,19 +2,10 @@ import { describe, it, expect, beforeEach } from './testRunner.js';
 import { HexGrid } from '../js/hexgrid.js';
 
 // Mock Canvas
-const mockContext = {
-    beginPath: () => { },
-    moveTo: () => { },
-    lineTo: () => { },
-    closePath: () => { },
-    stroke: () => { },
-    fill: () => { },
-    clearRect: () => { },
-    save: () => { },
-    restore: () => { },
-    translate: () => { },
-    scale: () => { }
-};
+import { createMockContext } from './test-mocks.js';
+
+// Mock Canvas
+const mockContext = createMockContext();
 
 const mockCanvas = {
     getContext: () => mockContext,

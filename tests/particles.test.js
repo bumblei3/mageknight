@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { Particle, ParticleSystem } from '../js/particles.js';
+import { createMockContext } from './test-mocks.js';
 
 describe('Particle', () => {
     it('should initialize with default options', () => {
@@ -146,21 +147,9 @@ describe('ParticleSystem', () => {
     let particleSystem;
 
     beforeEach(() => {
-        mockCtx = {
-            beginPath: () => { },
-            arc: () => { },
-            moveTo: () => { },
-            lineTo: () => { },
-            closePath: () => { },
-            fill: () => { },
-            stroke: () => { },
-            save: () => { },
-            restore: () => { },
-            bezierCurveTo: () => { },
-            quadraticCurveTo: () => { },
-            fillText: () => { },
-            measureText: () => ({ width: 50 })
-        };
+        mockCtx = createMockContext();
+        // Custom override for measureText if needed, or rely on mock
+        mockCtx.measureText = () => ({ width: 50 });
 
         mockCanvas = {
             getContext: () => mockCtx

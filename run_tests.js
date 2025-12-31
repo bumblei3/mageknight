@@ -1,4 +1,4 @@
-import { runner, afterEach } from './tests/testRunner.js';
+import { runner, afterEach, reset } from './tests/testRunner.js';
 import { resetMocks } from './tests/test-mocks.js';
 import './tests/setup.js';
 
@@ -142,15 +142,37 @@ console.log(`Arguments: ${JSON.stringify(args)}`);
 console.log(`Sharding Config: Shard ${shardIndex + 1} of ${totalShards}`);
 console.log(`Running ${filesToRun.length} files out of ${allTestFiles.length}`);
 
-console.log('Starting dynamic imports...');
+console.log('Starting dynamic imports and execution...');
+
+let totalPassed = 0;
+let totalFailed = 0;
+
 for (const file of filesToRun) {
-    await import(file);
+    if (global.gc) global.gc(); // aggressive GC before loading
+
+    // console.log(`\n📄 Loading ${file}...`);
+    try {
+        await import(file);
+
+        // Run tests immediately for this file
+        const result = await runner.run({ ...options, noExit: true });
+        totalPassed += result.passed;
+        totalFailed += result.failed;
+
+        // Cleanup
+        reset(); // Clear registered tests
+        resetMocks(); // Clear mocks
+
+    } catch (e) {
+        console.error(`Error executing ${file}:`, e);
+        totalFailed++;
+    }
 }
 
-console.log(`Total tests registered: ${runner.tests.length}`);
-console.log('Starting tests...');
-if (options.grep) {
-    console.log(`Filtering tests by: "${options.grep}"`);
-}
+console.log('\n=============================================');
+console.log(`Global Results: Total: ${totalPassed + totalFailed} | Passed: ${totalPassed} | Failed: ${totalFailed}`);
+console.log('=============================================');
 
-runner.run(options);
+if (totalFailed > 0) {
+    process.exit(1);
+}

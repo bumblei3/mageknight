@@ -388,8 +388,16 @@ export class TestRunner {
             resultsContainer.prepend(summary);
         } else {
             console.log('\n' + summaryText);
-            if (failed > 0) process.exit(1);
+            if (!options.noExit && failed > 0) process.exit(1);
         }
+
+        return { passed, failed, total: this.tests.length };
+    }
+    reset() {
+        this.tests = [];
+        this.suiteStack = ['Global'];
+        this.beforeEachCallbacks = [];
+        this.afterEachCallbacks = [];
     }
 }
 
@@ -399,3 +407,4 @@ export const it = runner.it.bind(runner);
 export const beforeEach = runner.beforeEach.bind(runner);
 export const afterEach = runner.afterEach.bind(runner);
 export const expect = runner.expect.bind(runner);
+export const reset = runner.reset.bind(runner);

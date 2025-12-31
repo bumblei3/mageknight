@@ -317,9 +317,17 @@ export class Hero {
 
     // Reset hero for new game
     reset() {
-        this.position = { q: 0, r: 0 };
+        this.level = 1;
         this.fame = 0;
         this.reputation = 0;
+
+        // Base stats
+        this.armor = 2;
+        this.handLimit = 5;
+        this.commandLimit = 1; // Default starting limit? need to check constructor
+
+        // Dynamic stats
+        this.position = { q: 0, r: 0 };
         this.movementPoints = 0;
         this.attackPoints = 0;
         this.blockPoints = 0;
@@ -327,6 +335,9 @@ export class Hero {
         this.healingPoints = 0;
         this.wounds = [];
         this.units = [];
+        this.skills = []; // Also reset skills
+        this.crystals = []; // And crystals
+
         this.initializeDeck();
         this.drawCards();
     }

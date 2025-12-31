@@ -5,6 +5,9 @@ import './tests/setup.js';
 // Global cleanup after each test to prevent memory leaks in CI
 afterEach(() => {
     resetMocks();
+    if (global.gc) {
+        global.gc();
+    }
 });
 
 // Import Test Suites

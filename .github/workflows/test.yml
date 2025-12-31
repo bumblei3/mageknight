@@ -27,9 +27,7 @@ jobs:
       run: npm install
 
     - name: Run tests (no coverage)
-      run: node run_tests.js
-      env:
-        NODE_OPTIONS: '--max-old-space-size=4096'
+      run: node --max-old-space-size=4096 --expose-gc run_tests.js
 
     - name: Run targeted coverage
       run: npx c8 --reporter=text --reporter=html --include="js/game.js" --include="js/ui.js" --include="js/achievements.js" --include="js/combat.js" --include="js/hero.js" node run_targeted_coverage.js

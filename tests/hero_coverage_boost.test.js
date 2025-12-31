@@ -18,7 +18,7 @@ describe('Hero Coverage Boost', () => {
     describe('recruitUnit influence checks', () => {
         it('should fail recruitment with insufficient influence', () => {
             hero.influencePoints = 2;
-            const unit = new Unit('peasant');
+            const unit = new Unit('peasants');
 
             const result = hero.recruitUnit(unit, 5); // Cost 5, have 2
 
@@ -28,10 +28,10 @@ describe('Hero Coverage Boost', () => {
 
         it('should fail recruitment when at command limit', () => {
             hero.commandLimit = 1;
-            hero.units = [new Unit('peasant')]; // Already at limit
+            hero.units = [new Unit('peasants')]; // Already at limit
             hero.influencePoints = 10;
 
-            const result = hero.recruitUnit(new Unit('peasant'), 3);
+            const result = hero.recruitUnit(new Unit('peasants'), 3);
 
             expect(result.success).toBe(false);
             expect(result.message).toContain('Platz');
@@ -41,7 +41,7 @@ describe('Hero Coverage Boost', () => {
             hero.influencePoints = 10;
             hero.commandLimit = 3;
             hero.units = [];
-            const unit = new Unit('peasant');
+            const unit = new Unit('peasants');
 
             const result = hero.recruitUnit(unit, 3);
 

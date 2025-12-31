@@ -30,7 +30,8 @@ describe('Game Coverage Tests', () => {
             // Mock map manager to produce specific terrain
             game.mapManager = {
                 createStartingMap: () => { },
-                getTerrainAt: () => 'keep'
+                getTerrainAt: () => 'keep',
+                canExplore: () => false
             };
 
             // Override hex grid to have one test hex far from center

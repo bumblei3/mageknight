@@ -802,7 +802,7 @@ export function resetMocks() {
 
             // Restore essential game elements
             const canvas = global.document.createElement('canvas');
-            canvas.id = 'game-canvas';
+            canvas.id = 'game-board';
             canvas.width = 800;
             canvas.height = 600;
             global.document.body.appendChild(canvas);

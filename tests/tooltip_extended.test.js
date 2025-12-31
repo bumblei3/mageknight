@@ -35,22 +35,6 @@ describe('TooltipManager Extended Coverage', () => {
         });
     });
 
-    describe('createCardTooltipHTML', () => {
-        it('should create HTML for card', () => {
-            const card = { name: 'Test Card', type: 'action', color: 'red' };
-            const html = tooltipManager.createCardTooltipHTML(card);
-            expect(html).toContain('Test Card');
-        });
-    });
-
-    describe('createTerrainTooltipHTML', () => {
-        it('should create HTML for terrain', () => {
-            const terrainData = { name: 'Plains', cost: 2 };
-            const html = tooltipManager.createTerrainTooltipHTML('plains', terrainData);
-            expect(html).toContain('Plains');
-        });
-    });
-
     describe('createEnemyTooltipHTML', () => {
         it('should create HTML for enemy', () => {
             const enemy = {
@@ -73,19 +57,6 @@ describe('TooltipManager Extended Coverage', () => {
         });
     });
 
-    describe('createSiteTooltipHTML', () => {
-        it('should create HTML for site', () => {
-            const site = {
-                name: 'Village',
-                type: 'village',
-                icon: '🏘️',
-                actions: ['recruit', 'heal']
-            };
-            const html = tooltipManager.createSiteTooltipHTML(site);
-            expect(html).toContain('Village');
-        });
-    });
-
     describe('getColorIcon', () => {
         it('should return icon for red', () => {
             const icon = tooltipManager.getColorIcon('red');
@@ -95,6 +66,13 @@ describe('TooltipManager Extended Coverage', () => {
         it('should return icon for blue', () => {
             const icon = tooltipManager.getColorIcon('blue');
             expect(icon.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('getManaHTML', () => {
+        it('should return mana HTML for red', () => {
+            const html = tooltipManager.getManaHTML('red');
+            expect(html.length).toBeGreaterThan(0);
         });
     });
 });

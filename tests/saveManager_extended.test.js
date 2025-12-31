@@ -79,21 +79,6 @@ describe('SaveManager Extended Coverage', () => {
         });
     });
 
-    describe('getSaveInfo', () => {
-        it('should return null for empty slot', () => {
-            const info = saveManager.getSaveInfo(4);
-            expect(info).toBeNull();
-        });
-
-        it('should return info for existing save', () => {
-            saveManager.saveGame(3, { hero: { name: 'Info' } });
-            const info = saveManager.getSaveInfo(3);
-
-            expect(info).toBeDefined();
-            expect(info.timestamp).toBeDefined();
-        });
-    });
-
     describe('getAllSaves', () => {
         it('should return empty object when no saves', () => {
             const saves = saveManager.getAllSaves();

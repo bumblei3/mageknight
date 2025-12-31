@@ -1,22 +1,18 @@
-
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { SimpleTutorial } from '../js/simpleTutorial.js';
+import { createMockLocalStorage } from './test-mocks.js';
 
 describe('SimpleTutorial', () => {
     let tutorial;
     let mockGame;
-    let mockStorage;
+    let originalStorage;
     let mockOverlay;
     let mockElements;
 
     beforeEach(() => {
         // Mock localStorage
-        mockStorage = {};
-        global.localStorage = {
-            getItem: (key) => mockStorage[key] || null,
-            setItem: (key, val) => mockStorage[key] = val,
-            removeItem: (key) => delete mockStorage[key]
-        };
+        originalStorage = global.localStorage;
+        global.localStorage = createMockLocalStorage();
 
         // Mock Game
         mockGame = {
@@ -74,7 +70,7 @@ describe('SimpleTutorial', () => {
     });
 
     afterEach(() => {
-        delete global.localStorage;
+        global.localStorage = originalStorage;
     });
 
     describe('Initialization', () => {

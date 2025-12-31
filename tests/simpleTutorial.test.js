@@ -1,6 +1,10 @@
 import { describe, it, expect } from './testRunner.js';
 import { SimpleTutorial } from '../js/simpleTutorial.js';
-import { createSpy } from './test-mocks.js';
+import { createSpy, setupGlobalMocks, resetMocks } from './test-mocks.js';
+
+if (!global.localStorage) {
+    setupGlobalMocks();
+}
 
 describe('SimpleTutorial', () => {
     describe('Initialization', () => {
@@ -144,6 +148,7 @@ describe('SimpleTutorial', () => {
                 ui: { addLog: () => { } },
                 playCard: () => { },
                 moveHero: () => { },
+                handleCardClick: () => { },
                 hero: { hand: [] }
             };
             const tutorial = new SimpleTutorial(mockGame);
@@ -158,7 +163,8 @@ describe('SimpleTutorial', () => {
             const mockGame = {
                 ui: { addLog: () => { } },
                 playCard: () => { },
-                moveHero: () => { }
+                moveHero: () => { },
+                handleCardClick: () => { }
             };
             const tutorial = new SimpleTutorial(mockGame);
             tutorial.createOverlay();
@@ -168,7 +174,6 @@ describe('SimpleTutorial', () => {
             const title = tutorial.overlay.querySelector('.tutorial-title');
             const message = tutorial.overlay.querySelector('.tutorial-message');
 
-            // MockHTMLElement textContent is set by showStep
             expect(title.textContent).toBeDefined();
             expect(message.textContent).toBeDefined();
         });
@@ -178,6 +183,7 @@ describe('SimpleTutorial', () => {
                 ui: { addLog: () => { } },
                 playCard: () => { },
                 moveHero: () => { },
+                handleCardClick: () => { },
                 hero: { hand: [] }
             };
             const tutorial = new SimpleTutorial(mockGame);
@@ -208,6 +214,7 @@ describe('SimpleTutorial', () => {
                 ui: { addLog: () => { } },
                 playCard: () => { },
                 moveHero: () => { },
+                handleCardClick: () => { },
                 hero: { hand: [] }
             };
             const tutorial = new SimpleTutorial(mockGame);
@@ -217,7 +224,6 @@ describe('SimpleTutorial', () => {
             tutorial.showStep(2);
 
             const nextBtn = tutorial.overlay.querySelector('.btn-tutorial-next');
-            // Just verify that style.display is set (mock may not hold value)
             expect(nextBtn.style).toBeDefined();
         });
 
@@ -225,7 +231,8 @@ describe('SimpleTutorial', () => {
             const mockGame = {
                 ui: { addLog: () => { } },
                 playCard: () => { },
-                moveHero: () => { }
+                moveHero: () => { },
+                handleCardClick: () => { }
             };
             const tutorial = new SimpleTutorial(mockGame);
             tutorial.createOverlay();
@@ -234,7 +241,6 @@ describe('SimpleTutorial', () => {
             tutorial.showStep(0);
 
             const nextBtn = tutorial.overlay.querySelector('.btn-tutorial-next');
-            // MockHTMLElement doesn't set style.display properly, just check it exists
             expect(nextBtn).toBeDefined();
         });
 
@@ -242,7 +248,8 @@ describe('SimpleTutorial', () => {
             const mockGame = {
                 ui: { addLog: () => { } },
                 playCard: () => { },
-                moveHero: () => { }
+                moveHero: () => { },
+                handleCardClick: () => { }
             };
             const tutorial = new SimpleTutorial(mockGame);
             tutorial.createOverlay();
@@ -261,6 +268,7 @@ describe('SimpleTutorial', () => {
                 ui: { addLog: () => { } },
                 playCard: () => { },
                 moveHero: () => { },
+                handleCardClick: () => { },
                 hero: { hand: [] }
             };
             const tutorial = new SimpleTutorial(mockGame);
@@ -274,14 +282,11 @@ describe('SimpleTutorial', () => {
     });
 
     describe('skip', () => {
-        it('should call complete if confirmed', () => {
+        it('should call complete immediately', () => {
             const mockGame = { ui: { addLog: () => { }, showNotification: () => { } } };
             const tutorial = new SimpleTutorial(mockGame);
             tutorial.createOverlay();
             tutorial.active = true;
-
-            // Mock confirm to return true
-            global.confirm = () => true;
 
             const completeSpy = createSpy();
             tutorial.complete = completeSpy;
@@ -289,22 +294,6 @@ describe('SimpleTutorial', () => {
             tutorial.skip();
 
             expect(completeSpy.callCount).toBe(1);
-        });
-
-        it('should not complete if not confirmed', () => {
-            const mockGame = { ui: { addLog: () => { } } };
-            const tutorial = new SimpleTutorial(mockGame);
-            tutorial.createOverlay();
-
-            // Mock confirm to return false
-            global.confirm = () => false;
-
-            const completeSpy = createSpy();
-            tutorial.complete = completeSpy;
-
-            tutorial.skip();
-
-            expect(completeSpy.callCount).toBe(0);
         });
     });
 
@@ -329,8 +318,6 @@ describe('SimpleTutorial', () => {
             tutorial.complete();
 
             expect(localStorage.getItem('tutorial_completed')).toBe('true');
-
-            // Cleanup
             localStorage.clear();
         });
 
@@ -341,10 +328,8 @@ describe('SimpleTutorial', () => {
 
             tutorial.complete();
 
-            // Overlay should be marked as hiding
             expect(tutorial.overlay.classList.contains('hiding')).toBe(true);
 
-            // After timeout, overlay should be removed
             await new Promise(resolve => setTimeout(resolve, 350));
             expect(tutorial.overlay).toBe(null);
         });
@@ -377,8 +362,6 @@ describe('SimpleTutorial', () => {
             tutorial.restart();
 
             expect(localStorage.getItem('tutorial_completed')).toBe(null);
-
-            // Cleanup
             localStorage.clear();
         });
 
@@ -390,10 +373,8 @@ describe('SimpleTutorial', () => {
 
             tutorial.restart();
 
-            // Should deactivate
             expect(tutorial.active).toBe(false);
 
-            // After timeout, should start again
             await new Promise(resolve => setTimeout(resolve, 150));
             expect(tutorial.active).toBe(true);
         });
@@ -405,8 +386,6 @@ describe('SimpleTutorial', () => {
             const tutorial = new SimpleTutorial(mockGame);
             tutorial.createOverlay();
             tutorial.active = true;
-
-            global.confirm = () => true;
 
             const completeSpy = createSpy();
             tutorial.complete = completeSpy;
@@ -421,7 +400,7 @@ describe('SimpleTutorial', () => {
             const tutorial = new SimpleTutorial(mockGame);
             tutorial.createOverlay();
             tutorial.active = true;
-            tutorial.currentStep = 0; // Step 0 doesn't wait
+            tutorial.currentStep = 0;
 
             tutorial.handleKeyPress({ key: 'Enter' });
 
@@ -433,16 +412,16 @@ describe('SimpleTutorial', () => {
                 ui: { addLog: () => { } },
                 playCard: () => { },
                 moveHero: () => { },
+                handleCardClick: () => { },
                 hero: { hand: [] }
             };
             const tutorial = new SimpleTutorial(mockGame);
             tutorial.createOverlay();
             tutorial.active = true;
-            tutorial.showStep(2); // Step 2 waits for action
+            tutorial.showStep(2);
 
             tutorial.handleKeyPress({ key: 'Enter' });
 
-            // Should still be on step 2
             expect(tutorial.currentStep).toBe(2);
         });
 
@@ -455,7 +434,6 @@ describe('SimpleTutorial', () => {
 
             tutorial.handleKeyPress({ key: 'Enter' });
 
-            // Should not advance
             expect(tutorial.currentStep).toBe(0);
         });
     });

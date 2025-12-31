@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x]
+        shard: [1, 2, 3]
 
     steps:
     - uses: actions/checkout@v4
@@ -26,14 +28,8 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run Tests (Shard 1/3)
-      run: node --max-old-space-size=4096 --expose-gc run_tests.js --shard=1/3
-
-    - name: Run Tests (Shard 2/3)
-      run: node --max-old-space-size=4096 --expose-gc run_tests.js --shard=2/3
-
-    - name: Run Tests (Shard 3/3)
-      run: node --max-old-space-size=4096 --expose-gc run_tests.js --shard=3/3
+    - name: Run Tests (Shard ${{ matrix.shard }}/3)
+      run: node --max-old-space-size=4096 --expose-gc run_tests.js --shard=${{ matrix.shard }}/3
 
     - name: Run targeted coverage
       run: npx c8 --reporter=text --reporter=html --include="js/game.js" --include="js/ui.js" --include="js/achievements.js" --include="js/combat.js" --include="js/hero.js" node run_targeted_coverage.js

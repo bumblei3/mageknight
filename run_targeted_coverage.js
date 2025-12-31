@@ -10,12 +10,29 @@ const testsDir = path.join(__dirname, 'tests');
 
 console.log('Starting targeted coverage tests...');
 
-// Dynamically import all test files
+// Force garbage collection if available
+function maybeGC() {
+    if (global.gc) {
+        global.gc();
+    }
+}
+
+// Dynamically import all test files with GC between batches
 const files = fs.readdirSync(testsDir)
     .filter(file => file.endsWith('.test.js'));
 
+let count = 0;
 for (const file of files) {
     await import(`./tests/${file}`);
+    count++;
+
+    // Run GC every 10 test files to keep memory down
+    if (count % 10 === 0) {
+        maybeGC();
+    }
 }
+
+// Final GC before running tests
+maybeGC();
 
 runner.run();

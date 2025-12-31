@@ -101,9 +101,9 @@ export function createMockContext() {
         createLinearGradient: createSpy(() => ({
             addColorStop: createSpy()
         })),
-        measureText: createSpy((text) => ({ width: text.length * 8 })),
         fillText: createSpy(),
         strokeText: createSpy(),
+        measureText: createSpy((text) => ({ width: text.length * 8 })),
         arc: createSpy(),
         arcTo: createSpy(),
         bezierCurveTo: createSpy(),
@@ -798,6 +798,25 @@ export function resetMocks() {
     if (global.document) {
         if (global.document.body) {
             global.document.body.innerHTML = '';
+
+            // Restore essential game elements
+            const canvas = global.document.createElement('canvas');
+            canvas.id = 'game-canvas';
+            canvas.width = 800;
+            canvas.height = 600;
+            global.document.body.appendChild(canvas);
+
+            const uiContainer = global.document.createElement('div');
+            uiContainer.id = 'ui-container';
+            global.document.body.appendChild(uiContainer);
+
+            // Add other common elements required by tests
+            ['game-log', 'toast-container', 'level-up-modal', 'reset-modal', 'card-viewer'].forEach(id => {
+                const el = global.document.createElement('div');
+                el.id = id;
+                global.document.body.appendChild(el);
+            });
+
             // If the mock body has an internal listener storage, clear it
             if (global.document.body._listeners && global.document.body._listeners.clear) {
                 global.document.body._listeners.clear();

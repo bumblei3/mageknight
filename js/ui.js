@@ -379,8 +379,11 @@ export class UI {
 
             // Add tooltip
             const manaInfo = this.getManaTooltipInfo(die.color);
-            this.tooltipManager.attachToElement(dieEl,
-                this.tooltipManager.createStatTooltipHTML(manaInfo.title, manaInfo.desc));
+            let tooltipContent = '';
+            if (this.tooltipManager && typeof this.tooltipManager.createStatTooltipHTML === 'function') {
+                tooltipContent = this.tooltipManager.createStatTooltipHTML(manaInfo.title, manaInfo.desc);
+            }
+            this.tooltipManager.attachToElement(dieEl, tooltipContent);
 
             this.elements.manaSource.appendChild(dieEl);
         });

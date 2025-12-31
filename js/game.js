@@ -54,6 +54,12 @@ export class MageKnightGame {
 
         // Core Components
         this.canvas = document.getElementById('game-board');
+        if (!this.canvas) {
+            console.warn('Game canvas not found, creating fallback.');
+            this.canvas = document.createElement('canvas');
+            this.canvas.width = 800;
+            this.canvas.height = 600;
+        }
         this.ctx = this.canvas.getContext('2d');
         this.hexGrid = new HexGrid(this.canvas);
         this.hero = new Hero('GOLDYX');

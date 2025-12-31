@@ -3,6 +3,8 @@ import { MageKnightGame } from '../js/game.js';
 import { ACHIEVEMENTS } from '../js/achievements.js';
 import { createMockWindow, createMockDocument, MockHTMLElement } from './test-mocks.js';
 import { describe, it, expect, beforeEach } from './testRunner.js';
+import { eventBus } from '../js/eventBus.js';
+import { GAME_EVENTS } from '../js/constants.js';
 
 describe('Achievements Integration', () => {
     let game;
@@ -27,10 +29,11 @@ describe('Achievements Integration', () => {
         // Init game
         game = new MageKnightGame();
 
-        // Mock UI showNotification to verify
-        game.ui.showNotification = (msg, type) => {
-            game.ui.lastNotification = { msg, type };
-        };
+        // Listen for notifications via event bus
+        game.ui.lastNotification = null;
+        eventBus.on(GAME_EVENTS.NOTIFICATION_SHOW, (data) => {
+            game.ui.lastNotification = { msg: data.message, type: data.type };
+        });
 
         // Reset achievements
         game.achievementManager.reset();
@@ -84,22 +87,17 @@ describe('Achievements Integration', () => {
             tilesExplored: 10    // CARTOGRAPHER
         };
 
-        // Capture all notifications
+        // Capture all notifications via event bus
         const notifications = [];
-        game.ui.showNotification = (msg) => notifications.push(msg);
+        const listener = (data) => notifications.push(data.message);
+        eventBus.on(GAME_EVENTS.NOTIFICATION_SHOW, listener);
 
         game.checkAndShowAchievements();
 
-        // Should unlock FIRST_BLOOD, SLAYER, CARTOGRAPHER, EXPLORER... 
-        // Depending on incremental logic or simple strict checks.
-        // checkAttributes loops over ALL.
-
-        // FIRST_BLOOD: enemies >= 1 (Yes)
-        // SLAYER: enemies >= 10 (Yes)
-        // EXPLORER: tiles >= 3 (Yes)
-        // CARTOGRAPHER: tiles >= 10 (Yes)
-
         expect(notifications.length).toBeGreaterThanOrEqual(4);
+
+        // Clean up
+        eventBus.off(GAME_EVENTS.NOTIFICATION_SHOW, listener);
         expect(notifications.some(n => n.includes('Schlächter'))).toBe(true);
         expect(notifications.some(n => n.includes('Kartograph'))).toBe(true);
     });

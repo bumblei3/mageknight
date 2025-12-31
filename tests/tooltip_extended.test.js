@@ -1,6 +1,6 @@
 
 import { describe, it, expect, beforeEach } from './testRunner.js';
-import TooltipManager from '../js/tooltip.js';
+import TooltipManager from '../js/ui/TooltipManager.js';
 import { setupGlobalMocks, resetMocks, setupStandardGameDOM, createMockElement } from './test-mocks.js';
 
 setupGlobalMocks();

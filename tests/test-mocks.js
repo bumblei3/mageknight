@@ -267,6 +267,18 @@ export class MockHTMLElement {
         this._classes = new Set(val.split(' ').filter(c => c));
     }
 
+    get firstElementChild() {
+        return this.children.length > 0 ? this.children[0] : null;
+    }
+
+    get lastElementChild() {
+        return this.children.length > 0 ? this.children[this.children.length - 1] : null;
+    }
+
+    get childElementCount() {
+        return this.children.length;
+    }
+
     get innerHTML() {
         if (this._innerHTML) return this._innerHTML;
         return this.children.map(child => {
@@ -277,33 +289,35 @@ export class MockHTMLElement {
 
     set innerHTML(html) {
         this._innerHTML = html;
-        // Simple mock parsing for ids and classes to support querySelector
-        const idMatches = html.match(/id=["']([^"']+)["']/g);
-        if (idMatches) {
-            idMatches.forEach(m => {
-                const id = m.match(/id=["']([^"']+)["']/)[1];
-                if (!this.querySelector('#' + id)) {
-                    const el = new MockHTMLElement();
-                    el.id = id;
-                    this.appendChild(el);
-                }
-            });
+        this.children = []; // Clear existing children
+
+        if (!html || typeof html !== 'string') return;
+
+        // More robust mock parsing for ids, classes, and content
+        // Matches tags and tries to find attributes and content
+        const tagRegex = /<(div|span|button|section|h3|p)\b([^>]*?)>([\s\S]*?)<\/\1>/gi;
+        let match;
+        while ((match = tagRegex.exec(html)) !== null) {
+            const tagName = match[1];
+            const attrs = match[2];
+            const content = match[3];
+
+            const el = new MockHTMLElement(tagName);
+
+            const idMatch = attrs.match(/id="([^"]+)"/);
+            if (idMatch) el.id = idMatch[1];
+
+            const classMatch = attrs.match(/class="([^"]+)"/);
+            if (classMatch) el.className = classMatch[1];
+
+            // Set textContent from content (strip any nested tags for simplicity)
+            el.textContent = content.replace(/<[^>]*>/g, '').trim();
+
+            this.appendChild(el);
         }
-        const classMatches = html.match(/class=["']([^"']+)["']/g);
-        if (classMatches) {
-            classMatches.forEach(m => {
-                const cls = m.match(/class=["']([^"']+)["']/)[1];
-                // Only take the first class if multiple
-                const firstCls = cls.split(' ')[0];
-                if (!this.querySelector('.' + firstCls)) {
-                    const el = new MockHTMLElement();
-                    el.className = cls;
-                    this.appendChild(el);
-                }
-            });
-        }
+
         // Basic mock: if setting to empty string, clear children
-        if (html === '' || html === null) {
+        if (html === '') {
             this.children = [];
             this._textContent = '';
         }

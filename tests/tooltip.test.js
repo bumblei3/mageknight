@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
-import { TooltipManager } from '../js/tooltip.js';
+import { TooltipManager } from '../js/ui/TooltipManager.js';
 
 // Mock DOM
 const mockDocument = {

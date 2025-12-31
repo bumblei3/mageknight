@@ -269,10 +269,10 @@ describe('UI', () => {
     });
 
     it('should show toast notifications', () => {
-        ui.toastContainer = createMockElement('div');
+        ui.notifications.toastContainer = createMockElement('div');
         ui.showToast('Test Toast', 'info');
-        expect(ui.toastContainer.children.length).toBe(1);
-        expect(ui.toastContainer.textContent).toContain('Test Toast');
+        expect(ui.notifications.toastContainer.children.length).toBe(1);
+        expect(ui.notifications.toastContainer.textContent).toContain('Test Toast');
     });
 
     describe('Healing Button', () => {

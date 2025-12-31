@@ -76,7 +76,7 @@ describe('UI Robustness', () => {
         ui.showNotification('Message 1', 'info');
         ui.showNotification('Message 2', 'success');
 
-        const toasts = ui.toastContainer;
+        const toasts = ui.notifications.toastContainer;
         expect(toasts.children.length).toBe(2);
 
         // Check content

@@ -1,20 +1,28 @@
-import TooltipManager from './tooltip.js';
+import { TooltipManager } from './ui/TooltipManager.js';
+import { NotificationManager } from './ui/NotificationManager.js';
+import { ModalManager } from './ui/ModalManager.js';
+import { CombatUIManager } from './ui/CombatUIManager.js';
 import { animator, animateCounter } from './animator.js';
 import * as CardAnimations from './cardAnimations.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS } from './constants.js';
 
 /**
- * User Interface Controller
- * Manages all DOM interactions, event listeners (outside game loop), and visual updates.
+ * User Interface Controller (Orchestrator)
+ * Manages core HUD elements and delegates specific UI logic to specialized managers.
  */
 export class UI {
     constructor() {
         this.elements = this.getElements();
+
+        // Initialize specialized managers
         this.tooltipManager = new TooltipManager();
+        this.notifications = new NotificationManager(this.elements);
+        this.modals = new ModalManager(this.elements, this);
+        this.combatUI = new CombatUIManager(this.elements, this);
+
         this.setupEventListeners();
         this.setupTooltips();
-        this.setupToastContainer();
         this.setupGlobalListeners();
     }
 
@@ -24,9 +32,9 @@ export class UI {
      * @private
      */
     setupGlobalListeners() {
-        this._logAddedHandler = ({ message, type }) => this.addLog(message, type);
-        this._toastShowHandler = ({ message, type }) => this.showToast(message, type);
-        this._notificationHandler = ({ message, type }) => this.showNotification(message, type);
+        this._logAddedHandler = ({ message, type }) => this.notifications.addLog(message, type);
+        this._toastShowHandler = ({ message, type }) => this.notifications.showToast(message, type);
+        this._notificationHandler = ({ message, type }) => this.notifications.showNotification(message, type);
         this._statsHandler = (hero) => {
             this.updateHeroStats(hero);
             this.updateMovementPoints(hero.movementPoints);
@@ -44,6 +52,7 @@ export class UI {
     destroy() {
         if (this._logAddedHandler) eventBus.off(GAME_EVENTS.LOG_ADDED, this._logAddedHandler);
         if (this._toastShowHandler) eventBus.off(GAME_EVENTS.TOAST_SHOW, this._toastShowHandler);
+        if (this._notificationHandler) eventBus.off(GAME_EVENTS.NOTIFICATION_SHOW, this._notificationHandler);
     }
 
     /**
@@ -75,11 +84,6 @@ export class UI {
         }
     }
 
-    setupToastContainer() {
-        this.toastContainer = document.createElement('div');
-        this.toastContainer.className = 'toast-container';
-        document.body.appendChild(this.toastContainer);
-    }
 
     /**
      * Caches references to critical DOM elements for performance.
@@ -456,201 +460,17 @@ export class UI {
     }
 
     // Log configuration
-    static LOG_MAX_ENTRIES = 50;
-    static LOG_ICONS = {
-        info: 'ℹ️',
-        combat: '⚔️',
-        movement: '🚶',
-        warning: '⚠️',
-        success: '✅',
-        error: '❌',
-        level: '🎉',
-        reward: '🎁'
-    };
 
-    // Add log entry with enhanced features
-    addLog(message, type = 'info') {
-        const logContainer = this.elements.gameLog;
-        if (!logContainer) return;
+    addLog(message, type = 'info') { this.notifications.addLog(message, type); }
+    clearLog() { this.notifications.clearLog(); }
 
-        // Check for grouping (duplicate consecutive messages)
-        const lastEntry = logContainer.lastElementChild;
-        if (lastEntry && lastEntry.dataset.message === message) {
-            // Increment counter on existing entry
-            let count = parseInt(lastEntry.dataset.count || '1', 10) + 1;
-            lastEntry.dataset.count = count;
-            const countBadge = lastEntry.querySelector('.log-count');
-            if (countBadge) {
-                countBadge.textContent = `×${count}`;
-                countBadge.style.display = 'inline';
-            }
-            logContainer.scrollTop = logContainer.scrollHeight;
-            return;
-        }
+    showCombatPanel(enemies, phase, onEnemyClick) { this.combatUI.showCombatPanel(enemies, phase, onEnemyClick); }
+    hideCombatPanel() { this.combatUI.hideCombatPanel(); }
+    updateCombatInfo(enemies, phase, onEnemyClick) { this.combatUI.updateCombatInfo(enemies, phase, onEnemyClick); }
+    updateCombatTotals(attackTotal, blockTotal, phase) { this.combatUI.updateCombatTotals(attackTotal, blockTotal, phase); }
 
-        // Create new entry
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${type}`;
-        entry.dataset.message = message;
-        entry.dataset.count = '1';
-
-        // Timestamp
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-
-        // Icon
-        const icon = UI.LOG_ICONS[type] || UI.LOG_ICONS.info;
-
-        // Rich text: convert **bold** and *italic*
-        let formattedMessage = message
-            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-        entry.innerHTML = `
-            <span class="log-time">${timeStr}</span>
-            <span class="log-icon">${icon}</span>
-            <span class="log-message">${formattedMessage}</span>
-            <span class="log-count" style="display: none;">×1</span>
-        `;
-
-        logContainer.appendChild(entry);
-
-        // Trim old entries
-        while (logContainer.childElementCount > UI.LOG_MAX_ENTRIES) {
-            logContainer.removeChild(logContainer.firstElementChild);
-        }
-
-        logContainer.scrollTop = logContainer.scrollHeight;
-    }
-
-    // Clear log
-    clearLog() {
-        this.elements.gameLog.innerHTML = '';
-    }
-
-    // Show combat panel
-    showCombatPanel(enemies, phase, onEnemyClick) {
-        this.elements.combatPanel.style.display = 'block';
-        this.updateCombatInfo(enemies, phase, onEnemyClick);
-    }
-
-    // Hide combat panel
-    hideCombatPanel() {
-        this.elements.combatPanel.style.display = 'none';
-        this.elements.combatInfo.innerHTML = '';
-    }
-
-    // Update combat info
-    updateCombatInfo(enemies, phase, onEnemyClick) {
-        const phaseLabel = this.getCombatPhaseName(phase);
-        const statusColor = phase === 'attack' ? '#ef4444' : (phase === 'ranged' ? '#10b981' : '#3b82f6');
-
-        this.elements.combatInfo.innerHTML = `
-            <div class="combat-status" style="border-left: 4px solid ${statusColor}; padding: 0.5rem; background: rgba(0,0,0,0.2); margin-bottom: 0.5rem;">
-                <strong>${phaseLabel}</strong><br>
-                <small>${this.getPhaseHint(phase)}</small>
-            </div>
-        `;
-
-        enemies.forEach(enemy => {
-            const enemyDiv = this.renderEnemy(enemy, phase, onEnemyClick); // Use the new renderEnemy method
-            this.elements.combatInfo.appendChild(enemyDiv);
-        });
-    }
-
-    // Update combat totals (accumulated attack/block)
-    updateCombatTotals(attackTotal, blockTotal, phase) {
-        const totalsDiv = document.getElementById('combat-totals');
-        if (!totalsDiv) {
-            // Create totals div if it doesn't exist
-            const newTotalsDiv = document.createElement('div');
-            newTotalsDiv.id = 'combat-totals';
-            newTotalsDiv.style.cssText = 'margin: 1rem 0; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;';
-            this.elements.combatInfo.insertBefore(newTotalsDiv, this.elements.combatInfo.firstChild);
-        }
-
-        const totalsDisplay = document.getElementById('combat-totals');
-        if (totalsDisplay) {
-            const COMBAT_PHASE = { BLOCK: 'block', ATTACK: 'attack' };
-            let html = '<div style="display: flex; gap: 1rem; justify-content: space-around;">';
-
-            if (phase === COMBAT_PHASE.BLOCK) {
-                html += `<div style="text-align: center;">
-                    <div style="font-size: 0.9em; opacity: 0.8;">Total Block</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #4a9eff;">${blockTotal}</div>
-                </div>`;
-            } else if (phase === COMBAT_PHASE.ATTACK) {
-                html += `<div style="text-align: center;">
-                    <div style="font-size: 0.9em; opacity: 0.8;">Total Attack</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #ff4a4a;">${attackTotal}</div>
-                </div>`;
-            } else if (phase === 'ranged') {
-                // We need pass Ranged total here, but signature is (attackTotal, blockTotal, phase).
-                // Let's assume attackTotal contains ranged total for this phase call.
-                // Or we can modify the UI signature?
-                // game.js calls updateCombatTotals() with NO arguments usually, getting values from game context?
-                // The current signature assumes args are passed.
-                // But wait, line 436 definition: updateCombatTotals(attackTotal, blockTotal, phase).
-                // game.js usage: this.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.combat.phase);
-                // I need to change game.js to pass ranged total OR overload attackTotal.
-
-                // Let's overload attackTotal for Ranged Phase since it's "Attack" anyway.
-                html += `<div style="text-align: center;">
-                    <div style="font-size: 0.9em; opacity: 0.8;">Fernkampf</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #fbbf24;">${attackTotal}</div>
-                </div>`;
-            }
-
-            html += '</div>';
-            totalsDisplay.innerHTML = html;
-        }
-
-        // Show/hide execute attack button based on phase
-        // Show/hide execute attack button based on phase
-        const executeAttackBtn = document.getElementById('execute-attack-btn');
-        if (executeAttackBtn) {
-            const COMBAT_PHASE = { ATTACK: 'attack', RANGED: 'ranged' };
-            // In Ranged phase, we don't have a single "Execute" button usually, we click enemies.
-            // But if we want to Skip Ranged Phase, we need a button.
-            // game.js needs to handle this button click.
-
-            // Actually, let's reuse this button for "End Phase" / "Next Phase".
-            if (phase === COMBAT_PHASE.RANGED) {
-                executeAttackBtn.textContent = "Fernkampf beenden -> Blocken";
-                executeAttackBtn.style.display = 'block';
-                // We need to ensure the click handler calls endRangedPhase.
-                // Currently it probably calls executeAttack?
-                // In game.js wiring needed.
-            } else if (phase === COMBAT_PHASE.ATTACK) {
-                executeAttackBtn.textContent = "Angriff ausführen";
-                executeAttackBtn.style.display = 'block';
-            } else {
-                executeAttackBtn.style.display = 'none';
-            }
-        }
-    }
-
-    // Get combat phase name
-    getCombatPhaseName(phase) {
-        const names = {
-            not_in_combat: 'Kein Kampf',
-            ranged: 'Fernkampf-Phase',
-            block: 'Block-Phase',
-            damage: 'Schadens-Phase',
-            attack: 'Angriffs-Phase',
-            complete: 'Abgeschlossen'
-        };
-        return names[phase] || phase;
-    }
-
-    getPhaseHint(phase) {
-        const hints = {
-            'ranged': 'Besiege Feinde mit Fernkampf- oder Belagerungswerten.',
-            'block': 'Blocke Feind-Angriffe. Ungeblockte Feinde verursachen Schaden.',
-            'attack': 'Besiege verbliebene Feinde mit normalen Angriffswerten.'
-        };
-        return hints[phase] || '';
-    }
+    getCombatPhaseName(phase) { return this.combatUI.getCombatPhaseName(phase); }
+    getPhaseHint(phase) { return this.combatUI.getPhaseHint(phase); }
 
     // Render units in hero panel
     renderUnits(units) {
@@ -741,152 +561,9 @@ export class UI {
         this.elements.heroUnits.appendChild(grid);
     }
 
-    renderEnemy(enemy, phase, onClick) {
-        const el = document.createElement('div');
-        el.className = 'enemy-card';
+    renderEnemy(enemy, phase, onClick) { return this.combatUI.renderEnemy(enemy, phase, onClick); }
 
-        // Boss styling
-        if (enemy.isBoss) {
-            el.classList.add('boss-card');
-            el.style.border = '2px solid #fbbf24';
-            el.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.3))';
-        }
-
-        // Add interactive styling if clickable
-        // Ranged Phase: Click to Attack
-        if (phase === 'ranged' && onClick) {
-            el.style.cursor = 'crosshair';
-            el.title = 'Klicken für Fernkampf-Angriff';
-            el.addEventListener('click', () => onClick(enemy));
-            el.addEventListener('mouseenter', () => el.style.boxShadow = '0 0 10px red');
-            el.addEventListener('mouseleave', () => el.style.boxShadow = enemy.isBoss ? '0 0 8px rgba(251, 191, 36, 0.5)' : 'none');
-        }
-
-        // Build boss health bar HTML
-        let bossHealthHTML = '';
-        if (enemy.isBoss) {
-            const healthPercent = enemy.getHealthPercent() * 100;
-            const healthColor = healthPercent > 60 ? '#10b981' : healthPercent > 30 ? '#fbbf24' : '#ef4444';
-            const phaseName = enemy.getPhaseName();
-
-            bossHealthHTML = `
-                <div class="boss-health-section" style="margin-top: 0.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
-                        <span style="color: #fbbf24;">👿 ${phaseName}</span>
-                        <span style="color: ${healthColor}">${enemy.currentHealth}/${enemy.maxHealth} HP</span>
-                    </div>
-                    <div class="boss-health-bar" style="
-                        width: 100%;
-                        height: 8px;
-                        background: rgba(0,0,0,0.5);
-                        border-radius: 4px;
-                        overflow: hidden;
-                    ">
-                        <div class="boss-health-fill" style="
-                            width: ${healthPercent}%;
-                            height: 100%;
-                            background: linear-gradient(90deg, ${healthColor}, ${healthColor}aa);
-                            transition: width 0.3s ease;
-                        "></div>
-                    </div>
-                    ${enemy.enraged ? '<div style="color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem;">🔥 WÜTEND! (Angriff erhöht)</div>' : ''}
-                </div>
-            `;
-        }
-
-        el.innerHTML = `
-            <div class="enemy-icon" style="color: ${enemy.color}; ${enemy.isBoss ? 'font-size: 2rem;' : ''}">${enemy.icon}</div>
-            <div class="enemy-name" style="${enemy.isBoss ? 'font-size: 1.1rem; color: #fbbf24;' : ''}">${enemy.name}</div>
-            <div class="enemy-stats">
-                <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
-                <div class="stat" title="Angriff${enemy.enraged ? ' (Wütend!)' : ''}">⚔️ ${typeof enemy.getEffectiveAttack === 'function' ? enemy.getEffectiveAttack() : enemy.attack}</div>
-            </div>
-            ${bossHealthHTML}
-            <div class="enemy-traits">
-                ${enemy.fortified ? '<span title="Befestigt">🏰</span>' : ''}
-                ${enemy.swift ? '<span title="Flink (Doppelter Block)">💨</span>' : ''}
-                ${enemy.fireResist ? '<span title="Feuer-Resistenz">🔥</span>' : ''}
-                ${enemy.iceResist ? '<span title="Eis-Resistenz">❄️</span>' : ''}
-                ${enemy.physicalResist ? '<span title="Physische Resistenz">🗿</span>' : ''}
-                ${enemy.brutal ? '<span title="Brutal (Doppelter Schaden)">💪</span>' : ''}
-                ${enemy.isBoss ? '<span title="Boss">👑</span>' : ''}
-            </div>
-        `;
-        return el;
-    }
-
-    renderUnitsInCombat(units, phase, onUnitActivate) {
-        if (!this.elements.combatUnits) return;
-
-        this.elements.combatUnits.innerHTML = '';
-
-        if (!units || units.length === 0) {
-            return;
-        }
-
-        const title = document.createElement('h3');
-        title.textContent = '🎖️ Deine Einheiten';
-        title.style.fontSize = '0.9rem';
-        title.style.marginBottom = '0.5rem';
-        this.elements.combatUnits.appendChild(title);
-
-        const grid = document.createElement('div');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = '1fr';
-        grid.style.gap = '0.5rem';
-
-        units.forEach(unit => {
-            const unitCard = document.createElement('div');
-            unitCard.className = 'unit-combat-card';
-            unitCard.style.padding = '0.5rem';
-            unitCard.style.background = 'rgba(139, 92, 246, 0.1)';
-            unitCard.style.border = '1px solid rgba(139, 92, 246, 0.3)';
-            unitCard.style.borderRadius = '4px';
-            unitCard.style.cursor = unit.isReady() ? 'pointer' : 'not-allowed';
-            unitCard.style.opacity = unit.isReady() ? '1' : '0.5';
-
-            if (!unit.isReady()) {
-                unitCard.style.filter = 'grayscale(0.5)';
-            }
-
-            // Get relevant abilities for current phase
-            const abilities = unit.getAbilities().filter(a => {
-                if (phase === 'block') return a.type === 'block';
-                if (phase === 'attack') return a.type === 'attack';
-                return false;
-            });
-
-            const hasRelevantAbility = abilities.length > 0;
-
-            unitCard.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div>
-                        <span style="font-size: 1.2rem;">${unit.getIcon()}</span>
-                        <strong>${unit.getName()}</strong>
-                    </div>
-                    <div style="font-size: 0.85rem; color: ${hasRelevantAbility ? '#10b981' : '#6b7280'};">
-                        ${abilities.map(a => a.text).join(', ') || 'Keine passende Fähigkeit'}
-                    </div>
-                </div>
-            `;
-
-            if (unit.isReady() && hasRelevantAbility && onUnitActivate) {
-                unitCard.addEventListener('click', () => onUnitActivate(unit));
-                unitCard.addEventListener('mouseenter', () => {
-                    unitCard.style.background = 'rgba(139, 92, 246, 0.2)';
-                    unitCard.style.borderColor = 'rgba(139, 92, 246, 0.6)';
-                });
-                unitCard.addEventListener('mouseleave', () => {
-                    unitCard.style.background = 'rgba(139, 92, 246, 0.1)';
-                    unitCard.style.borderColor = 'rgba(139, 92, 246, 0.3)';
-                });
-            }
-
-            grid.appendChild(unitCard);
-        });
-
-        this.elements.combatUnits.appendChild(grid);
-    }
+    renderUnitsInCombat(units, phase, onUnitActivate) { this.combatUI.renderUnitsInCombat(units, phase, onUnitActivate); }
 
     // Show played cards area
     showPlayArea() {
@@ -919,35 +596,8 @@ export class UI {
         }
     }
 
-    // Show notification
-    showNotification(message, type = 'info') {
-        this.addLog(message, type);
-        this.showToast(message, type);
-    }
-
-    // Show toast notification
-    showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-
-        let icon = 'ℹ️';
-        if (type === 'success') icon = '✅';
-        if (type === 'error') icon = '❌';
-        if (type === 'warning') icon = '⚠️';
-        if (type === 'combat') icon = '⚔️';
-
-        toast.innerHTML = `<span style="font-size: 1.2em;">${icon}</span> <span>${message}</span>`;
-
-        this.toastContainer.appendChild(toast);
-
-        // Remove after delay
-        setTimeout(() => {
-            toast.classList.add('hiding');
-            toast.addEventListener('animationend', () => {
-                toast.remove();
-            });
-        }, 3000);
-    }
+    showNotification(message, type = 'info') { this.notifications.showNotification(message, type); }
+    showToast(message, type = 'info') { this.notifications.showToast(message, type); }
 
     // Enable/disable buttons
     setButtonEnabled(button, enabled) {
@@ -961,95 +611,9 @@ export class UI {
         hexGrid.selectHex(q, r);
     }
 
-    // Site Interaction UI
-    showSiteModal(interactionData) {
-        this.elements.siteModalIcon.textContent = interactionData.icon;
-        this.elements.siteModalTitle.textContent = interactionData.name;
-        this.elements.siteModalTitle.style.color = interactionData.color;
-        this.elements.siteModalDescription.textContent = interactionData.description;
-
-        this.renderSiteOptions(interactionData.options);
-        this.elements.siteModal.classList.add('active');
-    }
-
-    hideSiteModal() {
-        this.elements.siteModal.classList.remove('active');
-    }
-
-    renderSiteOptions(options) {
-        this.elements.siteOptions.innerHTML = '';
-
-        options.forEach(opt => {
-            const group = document.createElement('div');
-            group.className = 'site-option-group';
-
-            const title = document.createElement('span');
-            title.className = 'site-option-title';
-            title.textContent = opt.label;
-            group.appendChild(title);
-
-            if (opt.subItems) {
-                // Render shop grid
-                const grid = document.createElement('div');
-                grid.className = 'shop-grid';
-
-                opt.subItems.forEach(item => {
-                    const itemEl = document.createElement('div');
-                    itemEl.className = 'shop-item';
-
-                    if (item.type === 'unit') {
-                        itemEl.innerHTML = `
-                            <div class="shop-item-icon">${item.data.icon}</div>
-                            <div class="shop-item-name">${item.data.name}</div>
-                            <div class="shop-item-cost">${item.cost} Einfluss</div>
-                            <div class="shop-item-stats">🛡️ ${item.data.armor}</div>
-                        `;
-                    } else if (item.type === 'card') {
-                        itemEl.innerHTML = `
-                            <div class="shop-item-icon">${item.data.color === 'red' ? '⚔️' : item.data.color === 'green' ? '👣' : '✨'}</div>
-                            <div class="shop-item-name">${item.data.name}</div>
-                            <div class="shop-item-cost">${item.cost} Einfluss</div>
-                        `;
-                    }
-
-                    itemEl.addEventListener('click', () => {
-                        const result = item.action();
-                        if (result.success) {
-                            this.showNotification(result.message, 'success');
-                            this.hideSiteModal(); // Close after action? Or refresh?
-                            // For MVP close.
-                        } else {
-                            this.showNotification(result.message, 'error');
-                        }
-                    });
-
-                    grid.appendChild(itemEl);
-                });
-
-                group.appendChild(grid);
-            } else {
-                // Simple button action
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-secondary';
-                btn.textContent = 'Ausführen';
-                btn.disabled = !opt.enabled;
-
-                btn.addEventListener('click', () => {
-                    const result = opt.action();
-                    if (result.success) {
-                        this.showNotification(result.message, 'success');
-                        this.hideSiteModal();
-                    } else {
-                        this.showNotification(result.message, 'error');
-                    }
-                });
-
-                group.appendChild(btn);
-            }
-
-            this.elements.siteOptions.appendChild(group);
-        });
-    }
+    showSiteModal(interactionData) { this.modals.showSiteModal(interactionData); }
+    hideSiteModal() { this.modals.hideSiteModal(); }
+    renderSiteOptions(options) { this.modals.renderSiteOptions(options); }
 
     // Reset UI for new game
     reset() {
@@ -1076,80 +640,7 @@ export class UI {
 
     // --- Level Up Modal Logic ---
     showLevelUpModal(newLevel, choices, onConfirm) {
-        // Early return if required elements are missing
-        if (!this.elements.newLevelDisplay || !this.elements.levelUpModal ||
-            !this.elements.skillChoices || !this.elements.cardChoices ||
-            !this.elements.confirmLevelUpBtn) {
-            console.warn('Level up modal elements not found');
-            return;
-        }
-
-        this.elements.newLevelDisplay.textContent = String(newLevel);
-        this.elements.levelUpModal.style.display = 'block';
-
-        let selectedSkill = null;
-        let selectedCard = null;
-
-        const updateConfirmButton = () => {
-            this.elements.confirmLevelUpBtn.disabled = !selectedSkill || !selectedCard;
-        };
-
-        // Render Skills
-        this.elements.skillChoices.innerHTML = '';
-        choices.skills.forEach(skill => {
-            const el = document.createElement('div');
-            el.className = 'skill-choice';
-            el.innerHTML = `
-                <div class="skill-icon">${skill.icon}</div>
-                <div class="skill-name">${skill.name}</div>
-                <div class="skill-description">${skill.description}</div>
-            `;
-
-            el.addEventListener('click', () => {
-                // Deselect others
-                Array.from(this.elements.skillChoices.children).forEach(c => c.classList.remove('selected'));
-                el.classList.add('selected');
-                selectedSkill = skill;
-                updateConfirmButton();
-            });
-
-            this.elements.skillChoices.appendChild(el);
-        });
-
-        // Render Cards
-        this.elements.cardChoices.innerHTML = '';
-        choices.cards.forEach((card, index) => {
-            const el = this.createCardElement(card, index);
-            el.classList.add('card-choice');
-
-            // Remove hover tilt to simplify selection
-            // Or keep it, but ensure click works well.
-
-            el.addEventListener('click', () => {
-                // Deselect others
-                Array.from(this.elements.cardChoices.children).forEach(c => c.classList.remove('selected'));
-                el.classList.add('selected');
-                selectedCard = card;
-                updateConfirmButton();
-            });
-
-            this.elements.cardChoices.appendChild(el);
-        });
-
-        // Setup confirm button
-        // Remove old listeners to prevent duplicates?
-        // Better: Clonenode or simple onclick property
-        const newBtn = this.elements.confirmLevelUpBtn.cloneNode(true);
-        this.elements.confirmLevelUpBtn.replaceWith(newBtn);
-        this.elements.confirmLevelUpBtn = newBtn; // Update reference
-
-        this.elements.confirmLevelUpBtn.disabled = true; // Start disabled
-        this.elements.confirmLevelUpBtn.addEventListener('click', () => {
-            this.elements.levelUpModal.style.display = 'none';
-            if (onConfirm) {
-                onConfirm({ skill: selectedSkill, card: selectedCard });
-            }
-        });
+        this.modals.showLevelUpModal(newLevel, choices, onConfirm);
     }
 }
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { UI } from '../js/ui.js';
-import { TooltipManager } from '../js/tooltip.js';
+import { TooltipManager } from '../js/ui/TooltipManager.js';
 import { animator } from '../js/animator.js';
 import { setupStandardGameDOM, setupGlobalMocks, resetMocks, createMockElement, createSpy } from './test-mocks.js';
 
@@ -94,7 +94,7 @@ describe('UI Coverage Final', () => {
             types.forEach(type => {
                 ui.showNotification('Test message', type);
             });
-            expect(ui.toastContainer.children.length).toBe(4);
+            expect(ui.notifications.toastContainer.children.length).toBe(4);
         });
 
         it('should render site options with sub-items (shop)', () => {
@@ -169,7 +169,7 @@ describe('UI Coverage Final', () => {
             res = options[2].action();
             if (!res.success) { ui.showNotification(res.message, 'error'); }
 
-            expect(ui.toastContainer.children.length).toBe(4);
+            expect(ui.notifications.toastContainer.children.length).toBe(4);
         });
 
         it('should trigger site option actions success', () => {
@@ -191,7 +191,7 @@ describe('UI Coverage Final', () => {
             const btn = document.querySelector('.btn-secondary');
             if (btn) btn.click();
             expect(failAction.called).toBe(true);
-            expect(ui.toastContainer.children.length).toBeGreaterThan(0);
+            expect(ui.notifications.toastContainer.children.length).toBeGreaterThan(0);
         });
 
         it('should trigger shop item actions success', () => {
@@ -219,7 +219,7 @@ describe('UI Coverage Final', () => {
             const item = document.querySelector('.shop-item');
             if (item) item.click();
             expect(failAction.called).toBe(true);
-            expect(ui.toastContainer.children.length).toBeGreaterThan(0);
+            expect(ui.notifications.toastContainer.children.length).toBeGreaterThan(0);
         });
 
         it('should highlight hex on canvas', () => {
@@ -230,13 +230,13 @@ describe('UI Coverage Final', () => {
 
         it('should handle toast cleanup', (done) => {
             ui.showNotification('Cleanup test', 'info');
-            const toast = ui.toastContainer.children[0];
+            const toast = ui.notifications.toastContainer.children[0];
 
             // Trigger timeout logic manually to avoid long wait
             setTimeout(() => {
                 expect(toast.classList.contains('hiding')).toBe(true);
                 toast.dispatchEvent({ type: 'animationend' });
-                expect(ui.toastContainer.children.length).toBe(0);
+                expect(ui.notifications.toastContainer.children.length).toBe(0);
                 done();
             }, 3500);
         }, 5000);

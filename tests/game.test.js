@@ -3,75 +3,7 @@ import { createMockElement, createSpy, setupGlobalMocks } from './test-mocks.js'
 import { Hero } from '../js/hero.js';
 
 // --- Global Mocks Setup ---
-
-// Mock HTMLElement
-class MockHTMLElement {
-    constructor() {
-        this.style = {};
-        this.classList = {
-            add: () => { },
-            remove: () => { },
-            contains: () => false
-        };
-        this.dataset = {};
-        this.children = [];
-        this.innerHTML = '';
-        this.textContent = '';
-        this.value = '';
-    }
-
-    addEventListener() { }
-    removeEventListener() { }
-    appendChild(child) { this.children.push(child); }
-    getBoundingClientRect() { return { left: 0, top: 0, width: 800, height: 600 }; }
-    getContext() {
-        return {
-            beginPath: () => { },
-            moveTo: () => { },
-            lineTo: () => { },
-            closePath: () => { },
-            stroke: () => { },
-            fill: () => { },
-            clearRect: () => { },
-            save: () => { },
-            restore: () => { },
-            translate: () => { },
-            scale: () => { },
-            drawImage: () => { },
-            measureText: () => ({ width: 10 }),
-            fillText: () => { },
-            strokeText: () => { }
-        };
-    }
-}
-
-// Mock Document
-const mockDocument = {
-    getElementById: (id) => new MockHTMLElement(),
-    querySelector: (sel) => new MockHTMLElement(),
-    querySelectorAll: (sel) => [],
-    createElement: (tag) => new MockHTMLElement(),
-    addEventListener: () => { },
-    body: new MockHTMLElement()
-};
-
-// Mock LocalStorage
-const mockLocalStorage = {
-    store: {},
-    getItem: (key) => mockLocalStorage.store[key] || null,
-    setItem: (key, val) => { mockLocalStorage.store[key] = val.toString(); },
-    removeItem: (key) => { delete mockLocalStorage.store[key]; },
-    clear: () => { mockLocalStorage.store = {}; }
-};
-
-// Apply Mocks
-if (typeof document === 'undefined') {
-    global.document = mockDocument;
-    global.window = { addEventListener: () => { } };
-    global.localStorage = mockLocalStorage;
-    global.HTMLElement = MockHTMLElement;
-    global.prompt = () => '1'; // Mock prompt for sideways play
-}
+// Rely on setupGlobalMocks() from test-mocks.js called via setup.js
 
 // Import Game
 import { MageKnightGame } from '../js/game.js';

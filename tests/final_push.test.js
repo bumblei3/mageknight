@@ -57,8 +57,19 @@ describe('Final Coverage Push', () => {
 
         // Save error (e.g. storage full)
         const originalSet = localStorage.setItem;
+        const originalConsoleError = console.error;
+        let errorLogged = false;
+
+        console.error = () => { errorLogged = true; };
         localStorage.setItem = () => { throw new Error('Full'); };
-        sm.save(); // Should catch error
-        localStorage.setItem = originalSet;
+
+        try {
+            sm.save(); // Should catch error internally
+        } finally {
+            localStorage.setItem = originalSet;
+            console.error = originalConsoleError;
+        }
+
+        expect(errorLogged).toBe(true);
     });
 });

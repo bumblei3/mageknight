@@ -15,6 +15,10 @@ describe('Combat Integration Tests', () => {
         // Start combat
         const startResult = combat.start();
         console.log('Combat started:', startResult.message);
+        expect(combat.phase).toBe(COMBAT_PHASE.RANGED);
+
+        // End ranged phase
+        combat.endRangedPhase();
         expect(combat.phase).toBe(COMBAT_PHASE.BLOCK);
 
         // Block phase - try to block
@@ -65,7 +69,8 @@ describe('Combat Integration Tests', () => {
             console.log('No block card in hand, skipping block test');
         }
 
-        // Move to attack phase
+        // Move through phases to attack
+        combat.endRangedPhase();
         combat.endBlockPhase();
         expect(combat.phase).toBe(COMBAT_PHASE.ATTACK);
 
@@ -98,6 +103,7 @@ describe('Combat Integration Tests', () => {
 
         const combat = new Combat(hero, [enemy1, enemy2]);
         combat.start();
+        combat.endRangedPhase();
 
         expect(combat.enemies.length).toBe(2);
         console.log('Combat started with', combat.enemies.length, 'enemies');
@@ -136,8 +142,13 @@ describe('Combat Integration Tests', () => {
 
         // Start combat
         combat.start();
+        expect(combat.phase).toBe(COMBAT_PHASE.RANGED);
+        console.log('Phase 1: RANGED');
+
+        // End ranged phase
+        combat.endRangedPhase();
         expect(combat.phase).toBe(COMBAT_PHASE.BLOCK);
-        console.log('Phase 1: BLOCK');
+        console.log('Phase 2: BLOCK');
 
         // Try to attack in block phase - should fail
         const earlyAttack = combat.attackEnemies(5);
@@ -147,7 +158,7 @@ describe('Combat Integration Tests', () => {
         // End block phase
         combat.endBlockPhase();
         expect(combat.phase).toBe(COMBAT_PHASE.ATTACK);
-        console.log('Phase 2: ATTACK');
+        console.log('Phase 3: ATTACK');
 
         // Try to block in attack phase - should fail
         const lateBlock = combat.blockEnemy(enemy, 5);
@@ -160,7 +171,7 @@ describe('Combat Integration Tests', () => {
         // End combat
         combat.endCombat();
         expect(combat.phase).toBe(COMBAT_PHASE.COMPLETE);
-        console.log('Phase 3: COMPLETE');
+        console.log('Phase 4: COMPLETE');
         console.log('✓ All phase transitions correct');
     });
 
@@ -175,7 +186,7 @@ describe('Combat Integration Tests', () => {
         const result = combat.start();
 
         expect(combat).toBeDefined();
-        expect(combat.phase).toBe(COMBAT_PHASE.BLOCK);
+        expect(combat.phase).toBe(COMBAT_PHASE.RANGED);
         expect(combat.enemies.length).toBe(1);
         expect(result.message).toContain('Kampf');
 

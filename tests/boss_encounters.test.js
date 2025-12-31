@@ -156,7 +156,8 @@ describe('Combat with Bosses', () => {
 
             expect(result.success).toBe(true);
             expect(result.damaged.length).toBe(1);
-            expect(boss.currentHealth).toBe(20);
+            // 10 attack * 0.5 physical resist = 5 damage
+            expect(boss.currentHealth).toBe(25);
             expect(result.defeated.length).toBe(0);
         });
 
@@ -164,7 +165,13 @@ describe('Combat with Bosses', () => {
             combat.endRangedPhase();
             combat.endBlockPhase();
 
-            const result = combat.attackEnemies(30, 'physical');
+            // 10 armor * 1/0.5 multiplier = 20 attack required per health point? 
+            // Wait, armor is 10, fame is 50. 
+            // In combat.js: if (totalAttack >= effectiveArmor) { ... } for regular.
+            // But for boss: const effectiveDamage = Math.floor(totalAttack * multiplier);
+            // Dark Lord has 30 HP. Physical resist = 0.5. 
+            // So 60 physical attack needed to defeat.
+            const result = combat.attackEnemies(60, 'physical');
 
             expect(result.success).toBe(true);
             expect(result.defeated.length).toBe(1);
@@ -176,8 +183,8 @@ describe('Combat with Bosses', () => {
             combat.endRangedPhase();
             combat.endBlockPhase();
 
-            // Deal 20 damage (to 33% health)
-            const result = combat.attackEnemies(20, 'physical');
+            // Deal 40 damage (40 * 0.5 = 20 effective damage, to 10/30 health = 33%)
+            const result = combat.attackEnemies(40, 'physical');
 
             expect(result.bossTransitions.length).toBeGreaterThan(0);
         });
@@ -189,12 +196,14 @@ describe('Combat with Bosses', () => {
 
             expect(result.success).toBe(true);
             expect(result.isBoss).toBe(true);
-            expect(result.damage).toBe(10);
-            expect(boss.currentHealth).toBe(20);
+            // 10 * 0.5 resist = 5
+            expect(result.damage).toBe(5);
+            expect(boss.currentHealth).toBe(25);
         });
 
         it('should defeat boss with enough ranged damage', () => {
-            const result = combat.rangedAttackEnemy(boss, 30, false, 'physical');
+            // Need 60 physical ranged
+            const result = combat.rangedAttackEnemy(boss, 60, false, 'physical');
 
             expect(result.success).toBe(true);
             expect(result.defeated.length).toBe(1);
@@ -202,10 +211,10 @@ describe('Combat with Bosses', () => {
         });
 
         it('should report boss transitions on ranged damage', () => {
-            // Deal 20 damage
-            const result = combat.rangedAttackEnemy(boss, 20, false, 'physical');
+            // Deal 40 damage -> 20 effective
+            const result = combat.rangedAttackEnemy(boss, 40, false, 'physical');
 
-            expect(result.bossTransitions.length).toBeGreaterThan(0);
+            expect(result.bossTransitions && result.bossTransitions.length).toBeGreaterThan(0);
         });
     });
 });

@@ -38,7 +38,11 @@ describe('Global Events & Shortcuts', () => {
             const calls = {};
             methods.forEach(m => {
                 calls[m] = 0;
-                game[m] = () => { calls[m]++; };
+                if (m === 'endTurn') {
+                    game.turnManager.endTurn = () => { calls[m]++; };
+                } else {
+                    game[m] = () => { calls[m]++; };
+                }
             });
 
             // Space -> endTurn

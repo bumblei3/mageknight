@@ -1,3 +1,7 @@
+import { TurnManager } from './turnManager.js';
+import { InputHandler } from './inputHandler.js';
+import { InteractionController } from './interactionController.js';
+
 // Main game controller for Mage Knight
 
 import { HexGrid } from './hexgrid.js';
@@ -37,45 +41,52 @@ export class MageKnightGame {
      */
     constructor() {
         this.abortController = new AbortController();
-        this.canvas = document.getElementById('game-board');
-        this.hexGrid = new HexGrid(this.canvas);
-        this.terrain = new Terrain();
-        this.hero = null;
-        this.enemies = [];
-        this.manaSource = null;
-        this.combat = null;
+        this.gameState = 'playing';
+
+        // Managers
         this.ui = new UI();
+        this.terrain = new Terrain();
         this.saveManager = new SaveManager();
         this.timeManager = new TimeManager();
-        this.mapManager = new MapManager(this.hexGrid);
-        this.tutorialManager = null;  // Will be initialized after game setup
-        this.turnNumber = 0;
-        this.gameState = 'playing'; // 'playing', 'victory', 'defeat'
-
-        this.selectedCard = null;
-        this.movementMode = false;
-        this.reachableHexes = [];
-
-        // Particle System
-        this.particleCanvas = null;
-        this.particleSystem = null;
-
-        this.siteManager = new SiteInteractionManager(this);
-        this.debugManager = null;
-        this.debugTeleport = false;
-
-        // Sound System
-        this.sound = new SoundManager();
-
-        // Touch Controller for mobile
-        this.touchController = null;
-
-        // Achievements and Statistics
         this.achievementManager = new AchievementManager();
         this.statisticsManager = new StatisticsManager();
+        this.sound = new SoundManager();
 
-        // Enemy AI
-        this.enemyAI = new EnemyAI(this);
+        // Core Components
+        this.canvas = document.getElementById('game-board');
+        this.ctx = this.canvas.getContext('2d');
+        this.hexGrid = new HexGrid(this.canvas);
+        this.hero = new Hero('GOLDYX');
+        this.enemies = [];
+        this.manaSource = new ManaSource();
+        this.enemyAI = new EnemyAI(this.hexGrid);
+        this.particleSystem = new ParticleSystem(this.canvas);
+        this.mapManager = new MapManager(this.hexGrid);
+        this.siteManager = new SiteInteractionManager(this);
+        this.debug = new DebugManager(this);
+
+        // New Refactored Controllers
+        this.turnManager = new TurnManager(this);
+        this.interactionController = new InteractionController(this);
+        this.inputHandler = new InputHandler(this);
+
+        // UI Helpers
+        this.tutorial = new TutorialManager(this);
+        this.simpleTutorial = new SimpleTutorial(this);
+        this.touchController = new TouchController(this);
+
+        // State
+        this.movementMode = false;
+        this.combat = null;
+
+        // Combat Accumulation
+        this.combatAttackTotal = 0;
+        this.combatBlockTotal = 0;
+        this.combatRangedTotal = 0;
+        this.combatSiegeTotal = 0;
+
+        // Debug Flags
+        this.debugTeleport = false;
 
         this.init();
     }
@@ -88,29 +99,27 @@ export class MageKnightGame {
         this.startNewGame();
     }
 
+    get turnNumber() { return this.turnManager ? this.turnManager.turnNumber : 1; }
+    set turnNumber(value) { if (this.turnManager) this.turnManager.turnNumber = value; }
+
     /**
      * Sets up event listeners, managers, and system components.
      * @private
      */
     initializeSystem() {
-        // Setup UI event listeners
-        this.setupEventListeners();
+        this.updateStats();
+        this.renderHand();
+        this.renderMana();
 
-        // Setup Time Manager Listener
         this.setupTimeListener();
+        this.inputHandler.setup();
 
-        // Initialize tutorial manager
-        this.tutorialManager = new TutorialManager(this);
-        this.simpleTutorial = new SimpleTutorial(this);
-
-        // Initialize touch controls if on mobile device
         if (TouchController.isTouchDevice()) {
             this.touchController = new TouchController(this);
             this.addLog('Touch-Steuerung aktiviert', 'info');
         }
 
         this.setupParticleSystem();
-        this.debugManager = new DebugManager(this);
     }
 
     /**
@@ -169,9 +178,15 @@ export class MageKnightGame {
         this.addLog('Willkommen bei Mage Knight!', 'info');
         this.addLog('Spiel gestartet. Viel Erfolg!', 'info');
         this.updatePhaseIndicator();
-        this.renderHand();
-        this.renderMana();
-        this.ui.updateHeroStats(this.hero);
+    }
+
+    /**
+     * Shows the tutorial (wrapper for simpleTutorial.start)
+     */
+    showTutorial() {
+        if (this.simpleTutorial) {
+            this.simpleTutorial.start();
+        }
     }
 
     /**
@@ -300,148 +315,7 @@ export class MageKnightGame {
         };
     }
 
-    setupEventListeners() {
-        const signal = this.abortController.signal;
-
-        // End turn button
-        this.ui.elements.endTurnBtn.addEventListener('click', () => this.endTurn(), { signal });
-
-        // Rest button
-        this.ui.elements.restBtn.addEventListener('click', () => this.rest(), { signal });
-
-        // Explore button
-        this.ui.elements.exploreBtn.addEventListener('click', () => this.explore(), { signal });
-
-        // Visit Site button (will be added dynamically or reused?)
-        // Let's add a generic action button for sites if needed, or just use context menu?
-        // Plan: Add a "Visit Site" button to UI or reuse an existing slot?
-        // Better: Add a new button to index.html first.
-        // For now, let's assume we add it to UI class dynamically or use a new button.
-        // Let's add it to index.html in the next step, but I can add the listener here now if I assume the ID.
-        // Visit Site button
-        const visitBtn = document.getElementById('visit-btn');
-        if (visitBtn) visitBtn.addEventListener('click', () => this.visitSite(), { signal });
-
-        // Execute Attack button (combat action)
-        const executeAttackBtn = document.getElementById('execute-attack-btn');
-        if (executeAttackBtn) executeAttackBtn.addEventListener('click', () => this.executeAttackAction(), { signal });
-
-        // Save/Load buttons
-        const saveBtn = document.getElementById('save-btn');
-        const loadBtn = document.getElementById('load-btn');
-        if (saveBtn) saveBtn.addEventListener('click', () => this.openSaveDialog(), { signal });
-        if (loadBtn) loadBtn.addEventListener('click', () => this.openLoadDialog(), { signal });
-
-        // New Game button
-        if (this.ui.elements.newGameBtn) {
-            this.ui.elements.newGameBtn.addEventListener('click', () => this.reset(), { signal });
-        }
-
-        // Canvas click for movement
-        this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e), { signal });
-
-        // Canvas hover for tooltips
-        this.canvas.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e), { signal });
-        this.canvas.addEventListener('mouseleave', () => {
-            this.ui.tooltipManager.hideTooltip();
-        }, { signal });
-
-        // Help system
-        this.setupHelpSystem();
-
-        // Keyboard shortcuts
-        this.setupKeyboardShortcuts();
-
-        // Sound toggle
-        this.setupSoundToggle();
-    }
-
-    setupKeyboardShortcuts() {
-        document.addEventListener('keydown', (e) => {
-            // Ignore if typing in input or help modal is open
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            if (document.getElementById('help-modal').classList.contains('active')) return;
-
-            // Number keys 1-5 to play cards
-            if (e.key >= '1' && e.key <= '5') {
-                const index = parseInt(e.key) - 1;
-                if (index < this.hero.hand.length) {
-                    this.handleCardClick(index, this.hero.hand[index]);
-                    this.addLog(`Karte ${e.key} gespielt(Tastatur)`, 'info');
-                }
-                e.preventDefault();
-            }
-
-            // Space to end turn
-            if (e.key === ' ' || e.code === 'Space') {
-                this.endTurn();
-                e.preventDefault();
-            }
-
-            // H for help
-            if (e.key === 'h' || e.key === 'H') {
-                document.getElementById('help-btn').click();
-                e.preventDefault();
-            }
-
-            // R for rest
-            if (e.key === 'r' || e.key === 'R') {
-                this.rest();
-                e.preventDefault();
-            }
-
-            // E for explore
-            if (e.key === 'e' || e.key === 'E') {
-                this.explore();
-                e.preventDefault();
-            }
-
-
-            // Ctrl+S for save
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                this.openSaveDialog();
-            }
-
-            // Ctrl+L for load
-            if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
-                e.preventDefault();
-                this.openLoadDialog();
-            }
-
-            // T for tutorial
-            if (e.key === 't' || e.key === 'T') {
-                this.showTutorial();
-                e.preventDefault();
-            }
-
-            // Escape to exit movement mode or close modals
-            if (e.key === 'Escape') {
-                if (this.movementMode) {
-                    this.exitMovementMode();
-                    this.addLog('Bewegungsmodus abgebrochen', 'info');
-                }
-            }
-
-            // Tab to cycle cards (visual only for now)
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                // Logic to cycle selection could go here
-                // For now just log
-                // this.addLog('Tab: Karte wählen (WIP)', 'info');
-            }
-
-            // M for Mana Panel highlight
-            if (e.key === 'm' || e.key === 'M') {
-                const manaPanel = document.querySelector('.mana-panel');
-                if (manaPanel) {
-                    manaPanel.scrollIntoView({ behavior: 'smooth' });
-                    manaPanel.classList.add('highlight-pulse');
-                    setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
-                }
-            }
-        }, { signal: this.abortController.signal });
-    }
+    // Removed in refactor: Moved to InputHandler
 
     updatePhaseIndicator() {
         const phaseText = document.querySelector('.phase-text');
@@ -532,135 +406,11 @@ export class MageKnightGame {
 
 
 
-    handleCanvasClick(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const hex = this.hexGrid.pixelToAxial(x, y);
-
-        // Check if hex exists
-        if (!this.hexGrid.hasHex(hex.q, hex.r)) {
-            return;
-        }
-
-        // Debug Teleport
-        if (this.debugTeleport) {
-            this.hero.position = { q: hex.q, r: hex.r };
-            this.hero.displayPosition = { q: hex.q, r: hex.r };
-            this.render();
-            this.addLog(`Debug: Teleported to ${hex.q},${hex.r} `, 'info');
-            this.debugTeleport = false;
-            return;
-        }
-
-        if (this.movementMode) {
-            this.moveHero(hex.q, hex.r);
-        } else {
-            this.selectHex(hex.q, hex.r);
-        }
-    }
-
-
-
-    selectHex(q, r) {
-        this.hexGrid.selectHex(q, r);
-
-        // Check if there's an enemy here (BUG FIX: add null check for position)
-        const enemy = this.enemies.find(e => e.position && e.position.q === q && e.position.r === r);
-
-        if (enemy) {
-            this.addLog(`Feind gefunden: ${enemy.name} (Rüstung: ${enemy.armor}, Angriff: ${enemy.attack})`, 'combat');
-
-            // Check if hero is adjacent
-            const distance = this.hexGrid.distance(this.hero.position.q, this.hero.position.r, q, r);
-            if (distance === 0) {
-                // Hero is on the same hex - offer to attack
-                this.initiateCombat(enemy);
-            }
-        }
-
-        const hexData = this.hexGrid.getHex(q, r);
-        if (hexData) {
-            const terrainName = this.terrain.getName(hexData.terrain);
-            this.addLog(`Hex ausgewählt: ${q},${r} - ${terrainName} `, 'info');
-        }
-
-        this.render();
-    }
-
-    handleCardClick(index, card) {
-        if (this.combat) {
-            // In combat, cards are handled differently
-            this.playCardInCombat(index, card);
-            return;
-        }
-
-        if (card.isWound()) {
-            this.sound.error();
-            this.addLog('Verletzungen können nicht gespielt werden.', 'info');
-            return;
-        }
-
-        // Play card for basic effect
-        const result = this.hero.playCard(index, false, this.timeManager.isNight());
-        if (result) {
-            this.sound.cardPlay();
-            this.addLog(`${result.card.name} gespielt: ${this.ui.formatEffect(result.effect)} `, 'info');
-            this.ui.addPlayedCard(result.card, result.effect);
-            this.ui.showPlayArea();
-
-            // Particle Effect (BUG FIX: add null check)
-            if (this.particleSystem) {
-                const rect = this.ui.elements.playedCards.getBoundingClientRect();
-                // Center of the last played card (approximate)
-                const x = rect.right - 50;
-                const y = rect.top + 75;
-                this.particleSystem.playCardEffect(x, y, result.card.color);
-            }
-
-            // If movement was gained, enter movement mode
-            if (result.effect.movement && result.effect.movement > 0) {
-                this.enterMovementMode();
-            }
-
-            this.renderHand();
-            this.updateStats();
-        }
-    }
-
-    handleCardRightClick(index, card) {
-        // Right click for sideways play
-        if (card.isWound() || this.combat) {
-            return;
-        }
-
-        // Show menu for sideways options
-        const options = ['movement', 'attack', 'block', 'influence'];
-        const chosen = prompt(`${card.name} seitlich spielen für: \n1: +1 Bewegung\n2: +1 Angriff\n3: +1 Block\n4: +1 Einfluss\n\nWähle Option(1 - 4): `);
-
-        // BUG FIX: prompt() returns string, convert to number
-        const chosenNum = parseInt(chosen, 10);
-        if (chosenNum >= 1 && chosenNum <= 4) {
-            const effectType = options[chosenNum - 1];
-            const result = this.hero.playCardSideways(index, effectType);
-            if (result) {
-                this.sound.cardPlaySideways();
-
-                // Particle Effect (BUG FIX: add null check)
-                if (this.particleSystem) {
-                    const rect = this.ui.elements.handCards.getBoundingClientRect();
-                    const x = rect.left + (rect.width / 2);
-                    const y = rect.top + 50;
-                    this.particleSystem.playCardEffect(x, y, result.card.color);
-                }
-
-                this.addLog(`${result.card.name} seitlich gespielt: ${this.ui.formatEffect(result.effect)} `, 'info');
-                this.renderHand();
-                this.updateStats();
-            }
-        }
-    }
+    handleCanvasClick(e) { this.interactionController.handleCanvasClick(e); }
+    handleCanvasMouseMove(e) { this.interactionController.handleCanvasMouseMove(e); }
+    selectHex(q, r) { this.interactionController.selectHex(q, r); }
+    handleCardClick(index, card) { this.interactionController.handleCardClick(index, card); }
+    handleCardRightClick(index, card) { this.interactionController.handleCardRightClick(index, card); }
 
     enterMovementMode() {
         this.movementMode = true;
@@ -1194,63 +944,7 @@ export class MageKnightGame {
         this.ui.renderHeroMana(this.hero.getManaInventory());
     }
 
-    endTurn() {
-        if (this.combat) {
-            // End combat phase or combat
-            if (this.combat.phase === COMBAT_PHASES.RANGED) {
-                this.endRangedPhase();
-            } else if (this.combat.phase === COMBAT_PHASES.BLOCK) {
-                this.endBlockPhase();
-            } else if (this.combat.phase === COMBAT_PHASES.ATTACK) {
-                this.endCombat();
-            }
-            return;
-        }
-
-        this.turnNumber++;
-        this.statisticsManager.trackTurn();
-        this.hero.endTurn();
-        this.manaSource.returnDice();
-        this.exitMovementMode();
-
-        // Check for end of round (empty deck and empty hand)
-        // Note: hero.endTurn() draws new cards, so we check if hand is empty AFTER draw attempt?
-        // No, hero.endTurn() discards hand then draws. If deck was empty, hand might be smaller or empty.
-        // Standard rule: Round ends when a player has no cards in deck and announces end of round.
-        // Simplified: If deck is empty, trigger end of round.
-
-        if (this.hero.deck.length === 0) {
-            const roundInfo = this.timeManager.endRound();
-            this.addLog(`🌙 Runde beendet! Es ist jetzt ${roundInfo.timeOfDay === TIME_OF_DAY.DAY ? 'Tag' : 'Nacht'}.`, 'info');
-
-            // Re-roll mana source completely for new round
-            this.manaSource.initialize();
-
-            // Shuffle hero deck for new round
-            this.hero.prepareNewRound();
-        }
-
-        this.addLog(`-- - Zug ${this.turnNumber} beendet-- - `, 'info');
-        this.addLog('Neue Karten gezogen', 'info');
-        this.ui.hidePlayArea();
-
-        this.renderHand();
-        this.renderMana();
-        this.updateStats();
-
-        // Auto-save after each turn
-        this.saveManager.autoSave(this.getGameState());
-
-        // Check victory condition
-        if (this.enemies.length === 0) {
-            this.gameState = 'victory';
-            this.statisticsManager.endGame(true);
-            this.statisticsManager.set('turns', this.turnNumber);
-            this.checkAndShowAchievements();
-            this.addLog('🎉 SIEG! Alle Feinde wurden besiegt!', 'info');
-            this.ui.setButtonEnabled(this.ui.elements.endTurnBtn, false);
-        }
-    }
+    endTurn() { this.turnManager.endTurn(); }
 
     rest() {
         if (this.combat) {
@@ -1734,65 +1428,7 @@ export class MageKnightGame {
         }
     }
 
-    handleCanvasMouseMove(e) {
-        if (!this.hexGrid || !this.ui.tooltipManager) return;
-
-        const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Convert to axial coordinates
-        // Convert to axial coordinates
-        const axial = this.hexGrid.pixelToAxial(x, y);
-        if (!axial) {
-            this.ui.tooltipManager.hideTooltip();
-            return;
-        }
-        const hex = this.hexGrid.getHex(axial.q, axial.r);
-
-        if (hex && hex.revealed) {
-            // Priority: Enemy > Site > Terrain
-            // Check for enemies at this position
-            const enemy = this.enemies.find(e =>
-                !e.isDefeated() &&
-                e.position &&
-                e.position.q === axial.q &&
-                e.position.r === axial.r
-            );
-
-            // Create fake element for positioning relative to the hex center
-            const hexCenter = this.hexGrid.axialToPixel(axial.q, axial.r);
-            // Adjust to screen coordinates
-            const screenX = rect.left + hexCenter.x;
-            const screenY = rect.top + hexCenter.y;
-
-            const fakeElement = {
-                getBoundingClientRect: () => ({
-                    left: screenX,
-                    top: screenY,
-                    right: screenX,
-                    bottom: screenY,
-                    width: 0,
-                    height: 0
-                })
-            };
-
-            if (enemy) {
-                const content = this.ui.tooltipManager.createEnemyTooltipHTML(enemy);
-                this.ui.tooltipManager.showTooltip(fakeElement, content);
-            } else if (hex.site) {
-                const content = this.ui.tooltipManager.createSiteTooltipHTML(hex.site);
-                this.ui.tooltipManager.showTooltip(fakeElement, content);
-            } else if (hex.terrain) {
-                const content = this.ui.tooltipManager.createTerrainTooltipHTML(hex.terrain);
-                this.ui.tooltipManager.showTooltip(fakeElement, content);
-            } else {
-                this.ui.tooltipManager.hideTooltip();
-            }
-        } else {
-            this.ui.tooltipManager.hideTooltip();
-        }
-    }
+    // Moved to InteractionController
 }
 
 

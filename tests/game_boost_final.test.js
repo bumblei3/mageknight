@@ -48,6 +48,7 @@ describe('Game Coverage Boost', () => {
         game.hexGrid = {
             hexes: new Map(),
             getHexAt: () => null,
+            getHex: () => null,
             render: () => { }
         };
         // Populate valid hexes

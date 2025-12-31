@@ -145,7 +145,7 @@ describe('Advanced UI Interaction Coverage', () => {
             tab.dataset.category = 'enemies';
             modal.appendChild(tab);
 
-            game.setupEventListeners();
+            game.inputHandler.setup();
 
             tab.click();
             expect(tab.classList.contains('active')).toBe(true);
@@ -164,7 +164,7 @@ describe('Advanced UI Interaction Coverage', () => {
             tab.dataset.category = 'exploration';
             modal.appendChild(tab);
 
-            game.setupEventListeners();
+            game.inputHandler.setup();
 
             tab.click();
             expect(tab.classList.contains('active')).toBe(true);

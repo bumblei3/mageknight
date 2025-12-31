@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import * as cardAnimations from '../js/cardAnimations.js';
+import { createSpy, MockHTMLElement } from './test-mocks.js';
 
 describe('Card Animations', () => {
     let cardElement;
@@ -122,9 +123,64 @@ describe('Card Animations', () => {
 
     describe('animateCardPlay', () => {
         it('should hide original card during animation', async () => {
-            cardAnimations.animateCardPlay(cardElement, targetElement);
+            // Mock appendChild to track the clone
+            const appendSpy = createSpy();
+            document.body.appendChild = (el) => {
+                appendSpy(el);
+                document.body.children.push(el); // Mock append
+            };
+
+            // We need our own mock of remove since we're tracking children
+            const removeSpy = createSpy();
+            MockHTMLElement.prototype.remove = function () {
+                removeSpy(this);
+                if (this.parentNode) {
+                    this.parentNode.removeChild(this);
+                }
+            };
+
+            const promise = cardAnimations.animateCardPlay(cardElement, targetElement);
             await new Promise(r => setTimeout(r, 50));
             expect(cardElement.style.opacity).toBe('0');
+
+            // Fast-forward to end
+            await promise;
+
+            // Verify clone was removed
+            // The clone is created inside the function, so we rely on tracking appended elements
+            // We expect the clone to be removed.
+            // But since we can't easily access the internal clone variable, we rely on the behavior:
+            // It should have been removed from body.
+            // If we assume it was appended to body.
+
+            // Re-verify logic: animateCardPlay appends clone to document.body
+            // Then removes it.
+        });
+
+        it('should clean up clone after animation', async () => {
+            const originalAppend = document.body.appendChild;
+            let clone;
+            document.body.appendChild = (el) => {
+                clone = el;
+                // mock remove on this specific element if not present
+                if (!clone.remove) {
+                    clone.remove = createSpy();
+                } else {
+                    // wrap existing remove
+                    const origRemove = clone.remove;
+                    clone.remove = createSpy(() => origRemove.call(clone));
+                }
+                return originalAppend.call(document.body, el);
+            };
+
+            await cardAnimations.animateCardPlay(cardElement, targetElement);
+
+            expect(clone).toBeDefined();
+            // Check if remove was called on the clone
+            expect(clone.remove.called).toBe(true);
+
+            // Restore
+            document.body.appendChild = originalAppend;
         });
     });
 });

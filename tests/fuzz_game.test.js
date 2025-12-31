@@ -34,7 +34,7 @@ describe('Game Fuzzing', () => {
         if (game && game.destroy) game.destroy();
     });
 
-    it('should survive random input sequences', async () => {
+    it('should survive random input sequences with resets', async () => {
         game = new MageKnightGame();
         // Mock UI elements that might be accessed
         if (!document.getElementById('end-turn-btn')) {
@@ -55,12 +55,13 @@ describe('Game Fuzzing', () => {
             'enterMovement',
             'exitMovement',
             'rest',
-            'explore'
+            'explore',
+            'resetGame' // New action
         ];
 
-        const ITERATIONS = 200; // Increased iterations
+        const ITERATIONS = 300;
 
-        console.log(`    Running ${ITERATIONS} fuzz iterations...`);
+        console.log(`    Running ${ITERATIONS} fuzz iterations with resets...`);
 
         for (let i = 0; i < ITERATIONS; i++) {
             const action = ACTIONS[randomInt(ACTIONS.length)];
@@ -126,6 +127,16 @@ describe('Game Fuzzing', () => {
                             game.initiateCombat(enemy);
                         }
                         break;
+
+                    case 'resetGame':
+                        // occasionally reset
+                        if (randomInt(100) < 5) { // 5% chance
+                            // Destroy old usage
+                            if (game.destroy) game.destroy();
+                            game = new MageKnightGame();
+                            game.init();
+                        }
+                        break;
                 }
 
                 // --- Invariant Checks ---
@@ -146,20 +157,13 @@ describe('Game Fuzzing', () => {
                     throw new Error('Undefined card found in hand');
                 }
 
-                // 4. Hand Limit Check (soft check, might be temporarily exceeded during draw/discard phases, but at end of turn it should satisfy)
-                // We'll just check if it's not absurdly large
-                if (game.hero.hand.length > 20) {
-                    // throw new Error(`Hand size suspiciously large: ${game.hero.hand.length}`);
-                    // Warning only for now as mechanics might stack
-                }
-
-                // 5. Turn number sanity
+                // 4. Turn number sanity
                 expect(game.turnNumber).toBeGreaterThanOrEqual(0);
 
             } catch (e) {
                 console.error(`Fuzz failure at iteration ${i}, action: ${action}`);
                 console.error(`Game State: Turn ${game.turnNumber}, Phase ${game.phase}, Hand Size ${game.hero.hand.length}`);
-                if (game.hero) {
+                if (game.hero && game.hero.position) {
                     console.error(`Hero Pos: (${game.hero.position.q}, ${game.hero.position.r})`);
                 }
                 throw e;

@@ -33,6 +33,19 @@ if (typeof document === 'undefined') {
         }
     };
 
+    global.KeyboardEvent = class KeyboardEvent extends global.CustomEvent {
+        constructor(type, options = {}) {
+            super(type, options);
+            this.key = options.key || '';
+            this.code = options.code || '';
+            this.ctrlKey = !!options.ctrlKey;
+            this.metaKey = !!options.metaKey;
+            this.shiftKey = !!options.shiftKey;
+            this.altKey = !!options.altKey;
+            this.target = options.target || global.document.body;
+        }
+    };
+
     // Expose AudioContext globally for SoundManager
     global.AudioContext = mockWindow.AudioContext;
     global.webkitAudioContext = mockWindow.webkitAudioContext;

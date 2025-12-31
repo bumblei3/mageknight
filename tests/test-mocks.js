@@ -419,6 +419,7 @@ export class MockHTMLElement {
 
     focus() { }
     blur() { }
+    scrollIntoView() { }
 
     cloneNode(deep) {
         const clone = new MockHTMLElement(this.tagName.toLowerCase());

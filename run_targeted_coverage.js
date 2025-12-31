@@ -27,6 +27,7 @@ import './tests/ui_boost.test.js';
 import './tests/coverage_boost_v3.test.js';
 import './tests/coverage_final_boost.test.js';
 import './tests/coverage_gap_fill.test.js';
+import './tests/advanced_improvements.test.js';
 
 console.log('Starting targeted coverage tests...');
 runner.run();

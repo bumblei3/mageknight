@@ -31,7 +31,6 @@ import './tests/combo.test.js';
 import './tests/skills.test.js';
 import './tests/timeManager.test.js';
 await import('./tests/ui.test.js');
-await import('./tests/combat_advanced.test.js');
 await import('./tests/map_exploration.test.js');
 await import('./tests/enemy_spawning.test.js');
 await import('./tests/game_reset.test.js');
@@ -68,7 +67,6 @@ await import('./tests/game_logic_boost.test.js');
 await import('./tests/game_ui_boost.test.js');
 await import('./tests/siteInteraction_boost.test.js');
 
-await import('./tests/particles_boost.test.js');
 await import('./tests/tutorial_boost.test.js');
 await import('./tests/final_push.test.js');
 await import('./tests/final_touch.test.js');

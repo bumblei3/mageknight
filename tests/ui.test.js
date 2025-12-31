@@ -179,4 +179,75 @@ describe('UI', () => {
             expect(ui.elements.endTurnBtn).toBeDefined();
         });
     });
+
+    describe('Helper Methods', () => {
+        it('should get color name for red', () => {
+            expect(ui.getColorName('red')).toBe('Angriff');
+        });
+
+        it('should get color name for blue', () => {
+            expect(ui.getColorName('blue')).toBe('Block');
+        });
+
+        it('should get color name for unknown', () => {
+            expect(ui.getColorName('unknown')).toBe('unknown');
+        });
+
+        it('should get color hex for red', () => {
+            expect(ui.getColorHex('red')).toBe('#ef4444');
+        });
+
+        it('should get color hex for blue', () => {
+            expect(ui.getColorHex('blue')).toBe('#3b82f6');
+        });
+
+        it('should get color hex for unknown', () => {
+            expect(ui.getColorHex('unknown')).toBe('#6b7280');
+        });
+
+        it('should get mana icon for red', () => {
+            expect(ui.getManaIcon('red')).toBe('🔥');
+        });
+
+        it('should get mana icon for blue', () => {
+            expect(ui.getManaIcon('blue')).toBe('💧');
+        });
+
+        it('should get combat phase name for ranged', () => {
+            expect(ui.getCombatPhaseName('ranged')).toBe('Fernkampf-Phase');
+        });
+
+        it('should get combat phase name for block', () => {
+            expect(ui.getCombatPhaseName('block')).toBe('Block-Phase');
+        });
+
+        it('should get combat phase name for attack', () => {
+            expect(ui.getCombatPhaseName('attack')).toBe('Angriffs-Phase');
+        });
+
+        it('should get card icon for move card', () => {
+            const card = { color: 'green' };
+            expect(ui.getCardIcon(card)).toBe('👣');
+        });
+
+        it('should get card icon for attack card', () => {
+            const card = { color: 'red' };
+            expect(ui.getCardIcon(card)).toBe('⚔️');
+        });
+
+        it('should format attack effect', () => {
+            const result = ui.formatEffect({ attack: 3 });
+            expect(result).toContain('3');
+        });
+
+        it('should format block effect', () => {
+            const result = ui.formatEffect({ block: 2 });
+            expect(result).toContain('2');
+        });
+
+        it('should format movement effect', () => {
+            const result = ui.formatEffect({ movement: 2 });
+            expect(result).toContain('2');
+        });
+    });
 });

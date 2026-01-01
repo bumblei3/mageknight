@@ -125,7 +125,7 @@ export class TouchController {
         }
     }
 
-    handleTouchCancel(e) {
+    handleTouchCancel(_e) {
         // Clear long press timer on cancel
         if (this.longPressTimer) {
             clearTimeout(this.longPressTimer);

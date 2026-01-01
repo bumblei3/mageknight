@@ -1,8 +1,7 @@
 /**
  * Manages hero actions: Movement, Exploration, and Site Interactions.
  */
-import { eventBus } from '../eventBus.js';
-import { GAME_EVENTS } from '../constants.js';
+// ActionManager.js
 
 export class ActionManager {
     constructor(game) {

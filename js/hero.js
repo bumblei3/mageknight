@@ -2,7 +2,7 @@
 
 import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK } from './card.js';
 import { MANA_COLORS } from './mana.js';
-import { SKILLS } from './skills.js';
+// Skills are added via HeroController
 
 // Fame thresholds for levels
 // Level 1 starts at 0

@@ -10,7 +10,7 @@ export class TimeManager {
     }
 
     // Get current movement cost modifier for a terrain type
-    getMovementCostModifier(terrainType) {
+    getMovementCostModifier(_terrainType) {
         // This will be used by Terrain class, but logic is here or there?
         // Let's keep logic in Terrain class, passing isNight boolean
         return this.isNight();

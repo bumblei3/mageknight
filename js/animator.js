@@ -66,7 +66,7 @@ export class Animator {
      * @param {Object} screenPos - Target screen position {x, y}
      * @returns {Promise} Resolves when animation complete
      */
-    async animateHeroMove(oldPos, newPos, screenPos) {
+    async animateHeroMove(_oldPos, _newPos, _screenPos) {
         return new Promise(resolve => {
             // Simplified animation: just a small delay or dummy Tween
             // In a real implementation we might tween a displayPosition property on the hero
@@ -75,7 +75,7 @@ export class Animator {
                 from: 0,
                 to: 1,
                 duration: 300,
-                onUpdate: (progress) => {
+                onUpdate: (_progress) => {
                     // Could update a visual marker here
                 },
                 onComplete: resolve

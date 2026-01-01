@@ -488,7 +488,7 @@ export class ParticleSystem {
     /**
      * Victory rain effect - Confetti falling from top
      */
-    victoryRainEffect(canvasWidth, canvasHeight) {
+    victoryRainEffect(canvasWidth, _canvasHeight) {
         const colors = ['#fbbf24', '#ec4899', '#8b5cf6', '#10b981', '#3b82f6', '#ef4444'];
 
         // Create confetti bursts over time

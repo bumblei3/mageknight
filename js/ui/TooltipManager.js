@@ -215,7 +215,7 @@ export class TooltipManager {
      * @param {object} terrainData - Terrain data object with cost info
      * @returns {string} HTML string
      */
-    createTerrainTooltipHTML(terrainType, terrainData) {
+    createTerrainTooltipHTML(terrainType, _terrainData) {
         const terrainInfo = {
             'plains': { icon: '🌾', name: 'Ebenen', cost: 2, desc: 'Offenes Grasland' },
             'forest': { icon: '🌲', name: 'Wald', cost: 3, desc: 'Dichter Wald' },

@@ -9,8 +9,8 @@ export class SoundManager {
     }
 
     toggle() { return false; }
-    setVolume(vol) { }
-    playTone(frequency, duration, type = 'sine') { }
+    setVolume(_vol) { }
+    playTone(_frequency, _duration, _type = 'sine') { }
 
     // Sound effects - all empty
     cardPlay() { }

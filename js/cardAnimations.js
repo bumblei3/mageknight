@@ -1,7 +1,7 @@
 // Card Animation System for Mage Knight
 // Premium card interactions with smooth, physics-based animations
 
-import { animator } from './animator.js';
+
 
 /**
  * Animate a card being drawn from the deck

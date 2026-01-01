@@ -1,4 +1,4 @@
-import { TERRAIN_TYPES, TERRAIN_COSTS, TERRAIN_VISUALS } from './constants.js';
+import { TERRAIN_COSTS, TERRAIN_VISUALS } from './constants.js';
 
 export class Terrain {
     constructor() {

@@ -2,7 +2,7 @@
 // Handles logic for visiting sites (Villages, Monasteries, etc.)
 
 import { SITE_TYPES } from './sites.js';
-import { UNIT_TYPES, getUnitsForLocation, createUnit } from './unit.js';
+import { getUnitsForLocation, createUnit } from './unit.js';
 import { SAMPLE_SPELLS, SAMPLE_ADVANCED_ACTIONS, createDeck } from './card.js';
 
 export class SiteInteractionManager {

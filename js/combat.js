@@ -1,5 +1,5 @@
-import { StatusEffectManager, EFFECT_TYPES } from './statusEffects.js';
-import { BossEnemy } from './enemy.js';
+import { StatusEffectManager } from './statusEffects.js';
+// Enemy types imported as needed
 import { COMBAT_PHASES } from './constants.js';
 
 // For backward compatibility

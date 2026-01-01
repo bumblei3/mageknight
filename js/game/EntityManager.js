@@ -1,7 +1,7 @@
 /**
  * Manages game entities: Hero, Units, and Enemies.
  */
-import { createEnemy } from '../enemy.js';
+// Dependencies handled by EnemyAI
 
 export class EntityManager {
     constructor(game) {
@@ -29,7 +29,7 @@ export class EntityManager {
         }
 
         // Generate enemies for all hexes that should have them
-        hexGrid.hexes.forEach((hex, key) => {
+        hexGrid.hexes.forEach((hex, _key) => {
             // Skip starting area (0,0) and adjacent
             if (Math.abs(hex.q) <= 1 && Math.abs(hex.r) <= 1) return;
 

@@ -62,7 +62,7 @@ describe('Game Flow Coverage Boost', () => {
             createElement: (tag) => mockElement,
             querySelector: () => mockElement,
             querySelectorAll: () => [], // Fix: Add querySelectorAll
-            body: { appendChild: () => { }, classList: { add: () => { }, remove: () => { } } },
+            body: { appendChild: () => { }, classList: { add: () => { }, remove: () => { }, toggle: () => { } } },
             addEventListener: () => { }
         };
 

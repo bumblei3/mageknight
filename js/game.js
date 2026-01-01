@@ -167,6 +167,10 @@ export class MageKnightGame {
         this.movementMode = false;
         this.reachableHexes = [];
 
+        // Reset Time
+        this.timeManager.loadState({ round: 1, timeOfDay: TIME_OF_DAY.DAY });
+        this.updateTimeUI();
+
         // Clear particles
         if (this.particleSystem) {
             this.particleSystem.clear();
@@ -503,7 +507,7 @@ export class MageKnightGame {
                     const roundNum = document.getElementById('round-number');
                     if (timeIcon) {
                         timeIcon.textContent = isNight ? '🌙' : '☀️';
-                        timeIcon.className = `time - icon ${isNight ? 'night' : ''} `;
+                        timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
                     }
                     if (roundNum) roundNum.textContent = state.round;
 
@@ -519,11 +523,31 @@ export class MageKnightGame {
                 this.render();
             }
 
-            this.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'} `, 'info');
+            this.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
         });
     }
 
+    /**
+     * Updates the Round and Time icons in the UI based on TimeManager state.
+     */
+    updateTimeUI() {
+        const state = this.timeManager.getState();
+        const isNight = state.timeOfDay === TIME_OF_DAY.NIGHT;
 
+        const timeIcon = document.getElementById('time-icon');
+        const roundNum = document.getElementById('round-number');
+
+        if (timeIcon) {
+            timeIcon.textContent = isNight ? '🌙' : '☀️';
+            timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
+        }
+        if (roundNum) {
+            roundNum.textContent = state.round;
+        }
+
+        document.body.classList.toggle('night-mode', isNight);
+        this.hexGrid.setTimeOfDay(isNight);
+    }
 
     /**
      * Check for new achievements and display notifications
@@ -539,7 +563,7 @@ export class MageKnightGame {
                 `🏆 ${achievement.name} freigeschaltet!`,
                 'success'
             );
-            this.addLog(`🏆 Achievement: ${achievement.name} - ${achievement.description} `, 'success');
+            this.addLog(`🏆 Achievement: ${achievement.name} - ${achievement.description}`, 'success');
 
             // Apply rewards
             if (achievement.reward && achievement.reward.fame) {

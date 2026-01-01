@@ -1,10 +1,33 @@
 // Statistics Tracking for Mage Knight
 // Tracks all game statistics for achievements and analytics
 
+import { eventBus } from './eventBus.js';
+import { GAME_EVENTS } from './constants.js';
 export class StatisticsManager {
     constructor() {
         this.stats = this.createDefaultStats();
         this.load();
+        this._setupEventListeners();
+    }
+
+    /**
+     * Subscribe to game events for automatic tracking
+     */
+    _setupEventListeners() {
+        eventBus.on(GAME_EVENTS.HERO_MOVED, (data) => {
+            this.trackMovement(data.cost || 1);
+        });
+
+        eventBus.on(GAME_EVENTS.COMBAT_ENDED, (data) => {
+            if (data.victory && data.enemy) {
+                this.trackEnemyDefeated(data.enemy);
+            }
+            this.trackCombat(data.victory, 0);
+        });
+
+        eventBus.on(GAME_EVENTS.COMBAT_STARTED, () => {
+            this.increment('combatsStarted');
+        });
     }
 
     createDefaultStats() {
@@ -29,6 +52,7 @@ export class StatisticsManager {
             totalDamageTaken: 0,
             combatsWon: 0,
             combatsLost: 0,
+            combatsStarted: 0,
 
             // Card Stats
             cardsPlayed: 0,

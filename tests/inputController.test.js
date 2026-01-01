@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { UI } from '../js/ui.js';
-import { InputHandler } from '../js/inputHandler.js';
+import { InputController } from '../js/game/InputController.js';
 import { createMockElement, createSpy, setupGlobalMocks } from './test-mocks.js';
 
 describe('UI Healing & Input Blocking', () => {
@@ -33,7 +33,8 @@ describe('UI Healing & Input Blocking', () => {
             restBtn: createMockElement(),
             exploreBtn: createMockElement(),
             newGameBtn: createMockElement(),
-            phaseIndicator: createMockElement()
+            phaseIndicator: createMockElement(),
+            soundToggleBtn: createMockElement('button') // Added for InputController setup
         };
 
         // Some elements need parents for tooltip attachment
@@ -43,6 +44,9 @@ describe('UI Healing & Input Blocking', () => {
 
         // document.getElementById should return these
         global.document.getElementById = (id) => {
+            if (id === 'sound-toggle-btn') return mockElements.soundToggleBtn;
+            if (id === 'achievements-btn') return createMockElement();
+            if (id === 'statistics-btn') return createMockElement();
             const camelId = id.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
             return mockElements[id] || mockElements[camelId] || null;
         };
@@ -66,7 +70,10 @@ describe('UI Healing & Input Blocking', () => {
             },
             setupSoundToggle: createSpy(),
             setupUIListeners: createSpy(),
-            isUIBlocked: () => false
+            isUIBlocked: () => false,
+            sound: { enabled: true, toggle: createSpy() },
+            addLog: createSpy(), // Added for sound toggle
+            renderController: { renderAchievements: createSpy(), renderStatistics: createSpy() } // Mock renderController
         };
     });
 
@@ -94,11 +101,11 @@ describe('UI Healing & Input Blocking', () => {
         });
     });
 
-    describe('InputHandler Blocking', () => {
+    describe('InputController Blocking', () => {
         let handler;
 
         beforeEach(() => {
-            handler = new InputHandler(mockGame);
+            handler = new InputController(mockGame);
             handler.setup();
         });
 

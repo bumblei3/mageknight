@@ -145,7 +145,7 @@ describe('Advanced UI Interaction Coverage', () => {
             tab.dataset.category = 'enemies';
             modal.appendChild(tab);
 
-            game.inputHandler.setup();
+            game.inputController.setup();
 
             tab.click();
             expect(tab.classList.contains('active')).toBe(true);
@@ -164,7 +164,7 @@ describe('Advanced UI Interaction Coverage', () => {
             tab.dataset.category = 'exploration';
             modal.appendChild(tab);
 
-            game.inputHandler.setup();
+            game.inputController.setup();
 
             tab.click();
             expect(tab.classList.contains('active')).toBe(true);
@@ -203,7 +203,7 @@ describe('Advanced UI Interaction Coverage', () => {
             game.ui.tooltipManager.showTooltip = () => { tooltipShown = true; };
             game.hexGrid.axialToPixel = () => ({ x: 0, y: 0 });
 
-            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
             expect(tooltipShown).toBe(true);
 
             game.enemies = [];
@@ -211,14 +211,14 @@ describe('Advanced UI Interaction Coverage', () => {
             let tooltipHidden = false;
             game.ui.tooltipManager.hideTooltip = () => { tooltipHidden = true; };
 
-            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
             expect(tooltipHidden).toBe(true);
 
             game.hexGrid.pixelToAxial = () => ({ q: 99, r: 99 });
             game.hexGrid.getHex = () => null;
             tooltipHidden = false;
 
-            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
             expect(tooltipHidden).toBe(true);
         });
     });
@@ -244,7 +244,7 @@ describe('Advanced UI Interaction Coverage', () => {
             headerRight.className = 'header-right';
             document.body.appendChild(headerRight);
 
-            game.setupSoundToggle();
+            game.inputController.setupSoundToggle();
 
             const newBtn = document.getElementById('sound-toggle-btn');
             expect(newBtn).not.toBeNull();
@@ -254,7 +254,10 @@ describe('Advanced UI Interaction Coverage', () => {
         it('should open Achievements modal on button click', () => {
             const btn = document.getElementById('achievements-btn');
             const modal = document.getElementById('achievements-modal');
-            game.renderAchievements = () => { };
+            game.renderController.renderAchievements = () => { };
+
+            // Need to attach listeners
+            game.inputController.setup();
 
             btn.click();
             expect(modal.style.display).toBe('block');

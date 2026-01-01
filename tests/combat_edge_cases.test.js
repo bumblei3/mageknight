@@ -41,7 +41,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
             }
         };
 
-        game.setupSoundToggle();
+        game.inputController.setupSoundToggle();
         const soundBtn = document.getElementById('sound-toggle-btn');
         expect(soundBtn).toBeDefined();
 
@@ -92,7 +92,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         statsTab.dataset.category = 'global';
         statsModal.appendChild(statsTab);
 
-        game.setupUIListeners();
+        game.inputController.setupUIListeners();
 
         // Test Achievement Modal
         achBtn.click();
@@ -142,7 +142,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         document.body.appendChild(helpBtn);
         helpBtn.click = createSpy();
 
-        game.setupKeyboardShortcuts();
+        game.inputController.setupKeyboardShortcuts();
 
         // Mock activeElement
         document.activeElement = { tagName: 'BODY' };
@@ -245,7 +245,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         const achId = 'first_blood';
         game.achievementManager.unlock(achId);
 
-        game.renderAchievements('all');
+        game.renderController.renderAchievements('all');
 
         const achCard = list.querySelector('.achievement-card.unlocked');
         expect(achCard).toBeDefined();
@@ -258,7 +258,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         grid.id = 'statistics-grid';
         document.body.appendChild(grid);
 
-        game.renderStatistics('current');
+        game.renderController.renderStatistics('current');
 
         expect(grid.innerHTML).toContain('Runde');
         expect(grid.innerHTML).toContain('Ruhm');
@@ -271,7 +271,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
 
         // 1. Unrevealed hex
         game.hexGrid.getHex = () => ({ revealed: false });
-        game.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
         expect(game.ui.tooltipManager.hideTooltip.called).toBe(true);
         game.ui.tooltipManager.hideTooltip.reset();
 
@@ -286,7 +286,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         game.ui.tooltipManager.createEnemyTooltipHTML = () => 'enemy-tooltip';
         game.ui.tooltipManager.showTooltip = createSpy();
 
-        game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
         expect(game.ui.tooltipManager.showTooltip.called).toBe(true);
         expect(game.ui.tooltipManager.showTooltip.calls[0][1]).toBe('enemy-tooltip');
         game.ui.tooltipManager.showTooltip.reset();
@@ -296,7 +296,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         game.hexGrid.getHex = () => ({ revealed: true, site: { name: 'Village' } });
         game.ui.tooltipManager.createSiteTooltipHTML = () => 'site-tooltip';
 
-        game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
         expect(game.ui.tooltipManager.showTooltip.called).toBe(true);
         expect(game.ui.tooltipManager.showTooltip.calls[0][1]).toBe('site-tooltip');
         game.ui.tooltipManager.showTooltip.reset();
@@ -305,7 +305,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         game.hexGrid.getHex = () => ({ revealed: true, terrain: 'forest' });
         game.ui.tooltipManager.createTerrainTooltipHTML = () => 'terrain-tooltip';
 
-        game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
         expect(game.ui.tooltipManager.showTooltip.called).toBe(true);
         expect(game.ui.tooltipManager.showTooltip.calls[0][1]).toBe('terrain-tooltip');
     });
@@ -314,7 +314,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         game.hexGrid.pixelToAxial = () => ({ q: 5, r: 5 });
         game.hexGrid.getHex = () => ({ revealed: true }); // No enemy, site, or terrain (unlikely but possible in mock)
 
-        game.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
         expect(game.ui.tooltipManager.hideTooltip.called).toBe(true);
     });
 
@@ -326,7 +326,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
 
         // 1. Non-existent hex
         game.hexGrid.pixelToAxial = () => ({ q: 99, r: 99 });
-        game.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
         expect(game.ui.tooltipManager.hideTooltip.called).toBe(true);
         game.ui.tooltipManager.hideTooltip.reset();
 
@@ -341,7 +341,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         game.ui.tooltipManager.createEnemyTooltipHTML = () => 'enemy-tooltip';
         game.ui.tooltipManager.showTooltip = createSpy();
 
-        game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
         expect(game.ui.tooltipManager.showTooltip.called).toBe(true);
     });
 });

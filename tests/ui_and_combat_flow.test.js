@@ -223,7 +223,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             document.body.appendChild(statsGrid);
 
             // Re-setup listeners
-            game.inputHandler.setup();
+            game.inputController.setup();
 
             statsBtn.click();
             expect(statsModal.style.display).toBe('block');
@@ -245,7 +245,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             document.body.appendChild(modal);
 
             // Re-run setup to bind window click listener
-            game.inputHandler.setup();
+            game.inputController.setup();
 
             // Dispatch manual click on the MODAL itself (the backdrop)
             const event = { type: 'click', target: modal };
@@ -297,7 +297,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
                 game.achievementManager.achievements = {};
             }
 
-            game.inputHandler.setup();
+            game.inputController.setup();
 
             // Retrieve the button that the game actually found (handles fallback case)
             const targetBtn = document.getElementById('achievements-btn');
@@ -436,7 +436,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             document.body.appendChild(modal);
             document.body.appendChild(closeBtn);
 
-            game.inputHandler.setup();
+            game.inputController.setup();
 
             // Manually mock sound manager to avoid environment issues and ensure predictable state
             game.sound = {
@@ -473,7 +473,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             }
 
             // Setup listeners should trigger creation
-            game.inputHandler.setup();
+            game.inputController.setup();
 
             const createdBtn = document.getElementById('sound-toggle-btn');
             // It might be created in headerRight or body depending on implementation

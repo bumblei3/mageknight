@@ -1,5 +1,4 @@
 import { TurnManager } from './turnManager.js';
-import { InputHandler } from './inputHandler.js';
 import { InteractionController } from './interactionController.js';
 
 // Main game controller for Mage Knight
@@ -37,6 +36,8 @@ import { EntityManager } from './game/EntityManager.js';
 import { ActionManager } from './game/ActionManager.js';
 import { GameStateManager } from './game/GameStateManager.js';
 import { CombatOrchestrator } from './game/CombatOrchestrator.js';
+import { InputController } from './game/InputController.js';
+import { RenderController } from './game/RenderController.js';
 
 /**
  * Main Game Controller Class
@@ -84,7 +85,8 @@ export class MageKnightGame {
         // New Refactored Controllers
         this.turnManager = new TurnManager(this);
         this.interactionController = new InteractionController(this);
-        this.inputHandler = new InputHandler(this);
+        this.inputController = new InputController(this);
+        this.renderController = new RenderController(this);
 
         // UI Helpers
         this.tutorial = new TutorialManager(this);
@@ -136,7 +138,7 @@ export class MageKnightGame {
         this.renderMana();
 
         this.setupTimeListener();
-        this.inputHandler.setup();
+        this.inputController.setup();
 
         if (TouchController.isTouchDevice()) {
             this.touchController = new TouchController(this);
@@ -453,23 +455,7 @@ export class MageKnightGame {
         this.render();
     }
 
-    handleManaClick(index, color) {
-        const mana = this.manaSource.takeDie(index, this.timeManager.isNight());
-        if (mana) {
-            // Add to hero's mana inventory
-            this.hero.takeManaFromSource(mana);
 
-            this.addLog(`Mana genommen: ${this.getManaEmoji(color)} ${color} `, 'info');
-
-            // Particle Effect
-            const heroPixel = this.hexGrid.axialToPixel(this.hero.position.q, this.hero.position.r);
-            this.particleSystem.manaEffect(heroPixel.x, heroPixel.y, color);
-
-            // Update UI
-            this.renderMana();
-            this.updateHeroMana();
-        }
-    }
 
     getManaEmoji(color) {
         const emojis = {
@@ -519,19 +505,11 @@ export class MageKnightGame {
     explore() { this.actionManager.explore(); }
 
     renderHand() {
-        this.ui.renderHandCards(
-            this.hero.hand,
-            (index, card) => this.handleCardClick(index, card),
-            (index, card) => this.handleCardRightClick(index, card)
-        );
+        this.renderController.renderHand();
     }
 
     renderMana() {
-        this.ui.renderManaSource(
-            this.manaSource,
-            (index, color) => this.handleManaClick(index, color),
-            this.timeManager.isNight()
-        );
+        this.renderController.renderMana();
     }
 
     updateStats() {
@@ -634,6 +612,10 @@ export class MageKnightGame {
         });
     }
 
+    updatePhaseIndicator() {
+        this.renderController.updatePhaseIndicator();
+    }
+
     /**
      * Check for new achievements and display notifications
      */
@@ -660,178 +642,7 @@ export class MageKnightGame {
         return newAchievements;
     }
 
-    setupSoundToggle() {
-        // Create sound toggle button if it doesn't exist
-        let soundBtn = document.getElementById('sound-toggle-btn');
 
-        if (!soundBtn) {
-            // Add to header
-            const headerRight = document.querySelector('.header-right');
-            if (!headerRight) return; // Guard if header doesn't exist
-
-            soundBtn = document.createElement('button');
-            soundBtn.id = 'sound-toggle-btn';
-            soundBtn.className = 'btn-icon';
-            soundBtn.title = 'Sound ein/aus';
-            soundBtn.innerHTML = this.sound.enabled ? '🔊' : '🔇';
-            headerRight.insertBefore(soundBtn, headerRight.firstChild);
-        }
-
-        // Toggle sound on click
-        soundBtn.addEventListener('click', () => {
-            const enabled = this.sound.toggle();
-            soundBtn.innerHTML = enabled ? '🔊' : '🔇';
-            this.addLog(enabled ? 'Sound aktiviert' : 'Sound deaktiviert', 'info');
-        }, { signal: this.abortController.signal });
-
-        this.setupUIListeners();
-    }
-
-    setupUIListeners() {
-        const signal = this.abortController.signal;
-
-        // Achievements Modal
-        const achievementsBtn = document.getElementById('achievements-btn');
-        const achievementsModal = document.getElementById('achievements-modal');
-        const achievementsClose = document.getElementById('achievements-close');
-
-        if (achievementsBtn && achievementsModal) {
-            achievementsBtn.addEventListener('click', () => {
-                this.renderAchievements('all');
-                achievementsModal.style.display = 'block';
-            });
-
-            achievementsClose.addEventListener('click', () => {
-                achievementsModal.style.display = 'none';
-            });
-
-            // Tabs
-            const tabs = achievementsModal.querySelectorAll('.tab-btn');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    e.target.classList.add('active');
-                    this.renderAchievements(e.target.dataset.category);
-                });
-            });
-        }
-
-        // Statistics Modal
-        const statsBtn = document.getElementById('statistics-btn');
-        const statsModal = document.getElementById('statistics-modal');
-        const statsClose = document.getElementById('statistics-close');
-
-        if (statsBtn && statsModal) {
-            statsBtn.addEventListener('click', () => {
-                this.renderStatistics('global');
-                statsModal.style.display = 'block';
-            });
-
-            statsClose.addEventListener('click', () => {
-                statsModal.style.display = 'none';
-            });
-
-            // Tabs
-            const tabs = statsModal.querySelectorAll('.tab-btn');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    e.target.classList.add('active');
-                    this.renderStatistics(e.target.dataset.category);
-                });
-            });
-        }
-
-        // Close modals on outside click
-        window.addEventListener('click', (e) => {
-            if (e.target === achievementsModal) achievementsModal.style.display = 'none';
-            if (e.target === statsModal) statsModal.style.display = 'none';
-        });
-    }
-
-    renderAchievements(category) {
-        const list = document.getElementById('achievements-list');
-        const progressBar = document.getElementById('achievements-progress-bar');
-        const progressText = document.getElementById('achievements-progress-text');
-
-        if (!list) return;
-
-        list.innerHTML = '';
-
-        // Update Progress
-        const progress = this.achievementManager.getProgress();
-        progressBar.style.width = `${progress.percentage}% `;
-        progressText.textContent = `${progress.unlocked}/${progress.total} Freigeschaltet (${progress.percentage}%)`;
-
-        // Filter and Render
-        const allAchievements = Object.values(this.achievementManager.achievements);
-        const filtered = category === 'all'
-            ? allAchievements
-            : allAchievements.filter(a => a.category === category);
-
-        filtered.forEach(ach => {
-            const isUnlocked = this.achievementManager.isUnlocked(ach.id);
-            const card = document.createElement('div');
-            card.className = `achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`;
-
-            let dateStr = '';
-            if (isUnlocked) {
-                // Timestamps currently not tracked per achievement
-                /*
-               const timestamp = this.achievementManager.unlockedAchievements.get(ach.id);
-               if (timestamp) {
-                   const date = new Date(timestamp);
-                   dateStr = `<span class="achievement-date">Freigeschaltet: ${date.toLocaleDateString()}</span>`;
-               }
-               */
-            }
-
-            card.innerHTML = `
-                <div class="achievement-icon">${ach.icon || '🏆'}</div>
-                <div class="achievement-info">
-                    <h3>${ach.name}</h3>
-                    <p>${ach.description}</p>
-                    ${dateStr}
-                </div>
-            `;
-            list.appendChild(card);
-        });
-    }
-
-    renderStatistics(category) {
-        const grid = document.getElementById('statistics-grid');
-        if (!grid) return;
-
-        grid.innerHTML = '';
-        const stats = this.statisticsManager.getAll();
-
-        const createStatCard = (label, value) => {
-            const card = document.createElement('div');
-            card.className = 'stat-card';
-            card.innerHTML = `
-                <span class="value">${value}</span>
-                <span class="label">${label}</span>
-            `;
-            grid.appendChild(card);
-        };
-
-        if (category === 'global') {
-            createStatCard('Spiele gespielt', stats.gamesPlayed || 0);
-            createStatCard('Siege', stats.gamesWon || 0);
-            createStatCard('Niederlagen', stats.gamesLost || 0);
-            createStatCard('Feinde besiegt (Total)', stats.enemiesDefeated || 0);
-            createStatCard('Höchstes Level', stats.highestLevel || 1);
-            createStatCard('Perfekte Kämpfe', stats.perfectCombats || 0);
-        } else {
-            // Current Game Stats (some might need to be tracked separately per game if not reset)
-            // For now showing session stats
-            createStatCard('Runde', this.turnNumber || 1);
-            createStatCard('Ruhm', this.hero.fame || 0);
-            createStatCard('Verletzungen', this.hero.wounds || 0);
-            createStatCard('Deck Größe', this.hero.deck.length + this.hero.hand.length + this.hero.discard.length);
-            createStatCard('Einheiten', this.hero.units.length);
-        }
-    }
 
     // Moved to InteractionController
 }

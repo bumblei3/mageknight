@@ -4,6 +4,7 @@ import { UI } from '../js/ui.js';
 import { createEnemy } from '../js/enemy.js';
 import { Card } from '../js/card.js';
 import { animator } from '../js/animator.js';
+import { createSpy } from './test-mocks.js';
 
 describe('Coverage Gap Fill', () => {
     let game;
@@ -140,7 +141,7 @@ describe('Coverage Gap Fill', () => {
             localGame.hero.fame = 10;
 
             // Render
-            localGame.renderStatistics('session');
+            localGame.renderController.renderStatistics('current');
 
             expect(container.innerHTML).toContain('Runde');
             expect(container.innerHTML).toContain('5');
@@ -338,16 +339,15 @@ describe('Coverage Gap Fill', () => {
         });
 
         it('should handle mana interaction', () => {
-            game.manaSource = {
-                takeDie: () => 'red',
-                getAvailableDice: () => []
-            };
-            // Mock hero taking mana
-            game.hero.takeManaFromSource = (color) => {
-                expect(color).toBe('red');
-            };
+            game.manaSource = { takeDie: () => 'red' };
+            game.hero.takeManaFromSource = createSpy();
+            game.renderController = { renderMana: createSpy() }; // usage in handleManaClick
+            game.updateHeroMana = createSpy(); // Assuming this is called if it existed, or mock UI update
 
-            game.handleManaClick(0, 'red');
+            // InteractionController handles this now
+            game.interactionController.handleManaClick(0, 'red');
+
+            expect(game.hero.takeManaFromSource.calls.length).toBe(1);
         });
 
         it('should handle endTurn and round reset', () => {
@@ -708,7 +708,7 @@ describe('Coverage Gap Fill', () => {
             game.combat = false;
             window.prompt = () => 'invalid'; // Mock prompt
 
-            game.handleCardRightClick(0, { isWound: () => false, name: 'Card' });
+            game.interactionController.handleCardRightClick(0, { isWound: () => false, name: 'Card' });
             // Should do nothing
         });
 
@@ -754,7 +754,7 @@ describe('Coverage Gap Fill', () => {
             // Trigger session stats (already covered?)
             // Maybe game.renderStatistics() with unknown category?
             // Or verify all branches of `createStatCard`?
-            game.renderStatistics('unknown'); // might trigger undefined behavior or default
+            game.renderController.renderStatistics('unknown'); // might trigger undefined behavior or default
         });
     });
 

@@ -178,4 +178,25 @@ export class InteractionController {
             }
         }
     }
+
+    handleManaClick(index, color) {
+        const mana = this.game.manaSource.takeDie(index, this.game.timeManager.isNight());
+        if (mana) {
+            // Add to hero's mana inventory
+            this.game.hero.takeManaFromSource(mana);
+
+            this.game.addLog(`Mana genommen: ${color}`, 'info');
+
+            // Particle Effect
+            if (this.game.particleSystem) {
+                const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+                this.game.particleSystem.manaEffect(heroPixel.x, heroPixel.y, color);
+            }
+
+            // Update UI
+            this.game.renderMana();
+            // this.game.updateHeroMana(); // Assuming RenderController or UI handles this. game.js had updateHeroMana().
+            if (this.game.ui.updateHeroMana) this.game.ui.updateHeroMana(this.game.hero);
+        }
+    }
 }

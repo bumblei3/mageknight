@@ -1,4 +1,4 @@
-export class InputHandler {
+export class InputController {
     constructor(game) {
         this.game = game;
         this.canvas = game.canvas;
@@ -60,8 +60,96 @@ export class InputHandler {
         this.setupKeyboardShortcuts(signal);
 
         // UI Modals & Toggles
-        this.game.setupSoundToggle();
-        this.game.setupUIListeners();
+        this.setupSoundToggle();
+        this.setupUIListeners();
+    }
+
+    setupSoundToggle() {
+        const signal = this.abortController.signal;
+        // Create sound toggle button if it doesn't exist
+        let soundBtn = document.getElementById('sound-toggle-btn');
+
+        if (!soundBtn) {
+            // Add to header
+            const headerRight = document.querySelector('.header-right');
+            if (!headerRight) return; // Guard if header doesn't exist
+
+            soundBtn = document.createElement('button');
+            soundBtn.id = 'sound-toggle-btn';
+            soundBtn.className = 'btn-icon';
+            soundBtn.title = 'Sound ein/aus';
+            soundBtn.innerHTML = this.game.sound.enabled ? '🔊' : '🔇';
+            headerRight.insertBefore(soundBtn, headerRight.firstChild);
+        }
+
+        // Toggle sound on click
+        soundBtn.addEventListener('click', () => {
+            const enabled = this.game.sound.toggle();
+            soundBtn.innerHTML = enabled ? '🔊' : '🔇';
+            this.game.addLog(enabled ? 'Sound aktiviert' : 'Sound deaktiviert', 'info');
+        }, { signal });
+    }
+
+    setupUIListeners() {
+        const signal = this.abortController.signal;
+
+        // Achievements Modal
+        const achievementsBtn = document.getElementById('achievements-btn');
+        const achievementsModal = document.getElementById('achievements-modal');
+        const achievementsClose = document.getElementById('achievements-close');
+
+        if (achievementsBtn && achievementsModal) {
+            achievementsBtn.addEventListener('click', () => {
+                this.game.renderController.renderAchievements('all');
+                achievementsModal.style.display = 'block';
+            }, { signal });
+
+            achievementsClose.addEventListener('click', () => {
+                achievementsModal.style.display = 'none';
+            }, { signal });
+
+            // Tabs
+            const tabs = achievementsModal.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.game.renderController.renderAchievements(e.target.dataset.category);
+                }, { signal });
+            });
+        }
+
+        // Statistics Modal
+        const statsBtn = document.getElementById('statistics-btn');
+        const statsModal = document.getElementById('statistics-modal');
+        const statsClose = document.getElementById('statistics-close');
+
+        if (statsBtn && statsModal) {
+            statsBtn.addEventListener('click', () => {
+                this.game.renderController.renderStatistics('global');
+                statsModal.style.display = 'block';
+            }, { signal });
+
+            statsClose.addEventListener('click', () => {
+                statsModal.style.display = 'none';
+            }, { signal });
+
+            // Tabs
+            const tabs = statsModal.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.game.renderController.renderStatistics(e.target.dataset.category);
+                }, { signal });
+            });
+        }
+
+        // Close modals on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target === achievementsModal) achievementsModal.style.display = 'none';
+            if (e.target === statsModal) statsModal.style.display = 'none';
+        }, { signal });
     }
 
     setupKeyboardShortcuts(signal) {

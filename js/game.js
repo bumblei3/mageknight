@@ -56,7 +56,6 @@ export class MageKnightGame {
         this.timeManager = new TimeManager();
         this.achievementManager = new AchievementManager();
         this.statisticsManager = new StatisticsManager();
-        this.statisticsManager = new StatisticsManager();
         this.sound = new SoundManager();
         this.animator = animator; // Initialize animator reference
         this.levelUpManager = new LevelUpManager(this);
@@ -606,14 +605,6 @@ export class MageKnightGame {
 
         return newAchievements;
     }
-
-
-
-    // Moved to InteractionController
 }
 
-
-// Start the game when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.game = new MageKnightGame();
-});
+// Game class is imported and instantiated in main.js

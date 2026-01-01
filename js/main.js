@@ -1,6 +1,7 @@
 import { MageKnightGame } from './game.js';
 
 window.addEventListener('load', () => {
+    if (window.game) return; // Prevent double initialization
     console.log('Starting Mage Knight...');
     try {
         window.game = new MageKnightGame();

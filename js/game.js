@@ -299,7 +299,11 @@ export class MageKnightGame {
 
     setupParticleSystem() {
         // Create overlay canvas for particles
-        const container = document.querySelector('.board-wrapper');
+        const container = document.querySelector('.canvas-layer');
+        if (!container) {
+            console.warn('Canvas layer not found for particle system');
+            return;
+        }
         this.particleCanvas = document.createElement('canvas');
         this.particleCanvas.width = this.canvas.width;
         this.particleCanvas.height = this.canvas.height;

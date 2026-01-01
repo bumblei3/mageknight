@@ -448,33 +448,83 @@ export class HexGrid {
         this.ctx.globalAlpha = 1.0;
     }
 
-    // Forest texture with subtle dots
+    // Forest texture with tree silhouettes
     drawForestTexture(pos) {
-        this.ctx.globalAlpha = 0.08;
-        this.ctx.fillStyle = '#166534';
-
-        // Randomized but consistent dots based on position
         const seed = pos.x * 7 + pos.y * 13;
-        for (let i = 0; i < 15; i++) {
-            const x = pos.x + (((seed + i * 3) % 100) - 50) * 0.5;
-            const y = pos.y + (((seed + i * 7) % 100) - 50) * 0.5;
+
+        // Draw scattered tree shapes
+        this.ctx.globalAlpha = 0.15;
+        for (let i = 0; i < 6; i++) {
+            const offsetX = (((seed + i * 37) % 80) - 40) * 0.6;
+            const offsetY = (((seed + i * 53) % 80) - 40) * 0.6;
+            const treeSize = 4 + ((seed + i) % 4);
+
+            // Tree trunk
+            this.ctx.fillStyle = '#5c4033';
+            this.ctx.fillRect(pos.x + offsetX - 1, pos.y + offsetY, 2, treeSize);
+
+            // Tree crown (triangle)
+            this.ctx.fillStyle = '#166534';
+            this.ctx.beginPath();
+            this.ctx.moveTo(pos.x + offsetX, pos.y + offsetY - treeSize);
+            this.ctx.lineTo(pos.x + offsetX - treeSize, pos.y + offsetY);
+            this.ctx.lineTo(pos.x + offsetX + treeSize, pos.y + offsetY);
+            this.ctx.closePath();
+            this.ctx.fill();
+        }
+
+        // Subtle undergrowth dots
+        this.ctx.globalAlpha = 0.08;
+        this.ctx.fillStyle = '#15803d';
+        for (let i = 0; i < 12; i++) {
+            const x = pos.x + (((seed + i * 5) % 100) - 50) * 0.5;
+            const y = pos.y + (((seed + i * 11) % 100) - 50) * 0.5;
             this.ctx.fillRect(x, y, 2, 2);
         }
 
         this.ctx.globalAlpha = 1.0;
     }
 
-    // Mountain texture with lines
+    // Mountain texture with layered peaks
     drawMountainTexture(pos) {
-        this.ctx.globalAlpha = 0.12;
+        const seed = pos.x * 11 + pos.y * 19;
+
+        // Draw mountain peaks
+        this.ctx.globalAlpha = 0.2;
+        for (let i = 0; i < 3; i++) {
+            const offsetX = (((seed + i * 23) % 60) - 30) * 0.5;
+            const offsetY = (((seed + i * 17) % 40) - 20) * 0.4;
+            const peakHeight = 8 + ((seed + i) % 6);
+            const peakWidth = 6 + ((seed + i * 3) % 5);
+
+            // Mountain shape
+            this.ctx.fillStyle = '#78716c';
+            this.ctx.beginPath();
+            this.ctx.moveTo(pos.x + offsetX, pos.y + offsetY - peakHeight);
+            this.ctx.lineTo(pos.x + offsetX - peakWidth, pos.y + offsetY + 4);
+            this.ctx.lineTo(pos.x + offsetX + peakWidth, pos.y + offsetY + 4);
+            this.ctx.closePath();
+            this.ctx.fill();
+
+            // Snow cap
+            this.ctx.fillStyle = '#e5e7eb';
+            this.ctx.globalAlpha = 0.25;
+            this.ctx.beginPath();
+            this.ctx.moveTo(pos.x + offsetX, pos.y + offsetY - peakHeight);
+            this.ctx.lineTo(pos.x + offsetX - peakWidth * 0.3, pos.y + offsetY - peakHeight * 0.5);
+            this.ctx.lineTo(pos.x + offsetX + peakWidth * 0.3, pos.y + offsetY - peakHeight * 0.5);
+            this.ctx.closePath();
+            this.ctx.fill();
+        }
+
+        // Rocky texture lines
+        this.ctx.globalAlpha = 0.08;
         this.ctx.strokeStyle = '#57534e';
         this.ctx.lineWidth = 1;
-
-        // Diagonal lines for rocky appearance
-        for (let i = -3; i <= 3; i++) {
+        for (let i = -2; i <= 2; i++) {
             this.ctx.beginPath();
-            this.ctx.moveTo(pos.x + i * 10 - this.hexSize, pos.y - this.hexSize);
-            this.ctx.lineTo(pos.x + i * 10 + this.hexSize, pos.y + this.hexSize);
+            this.ctx.moveTo(pos.x + i * 12 - this.hexSize * 0.5, pos.y - this.hexSize * 0.3);
+            this.ctx.lineTo(pos.x + i * 12 + this.hexSize * 0.3, pos.y + this.hexSize * 0.3);
             this.ctx.stroke();
         }
 
@@ -497,21 +547,40 @@ export class HexGrid {
         this.ctx.globalAlpha = 1.0;
     }
 
-    // Plains texture with subtle grass
+    // Plains texture with grass blades
     drawPlainsTexture(pos) {
-        this.ctx.globalAlpha = 0.06;
+        const seed = pos.x * 5 + pos.y * 11;
+
+        // Grass tufts
+        this.ctx.globalAlpha = 0.12;
         this.ctx.strokeStyle = '#15803d';
         this.ctx.lineWidth = 1;
 
-        // Vertical grass strokes
-        const seed = pos.x * 5 + pos.y * 11;
-        for (let i = 0; i < 12; i++) {
-            const x = pos.x + (((seed + i * 5) % 100) - 50) * 0.4;
-            const y = pos.y + (((seed + i * 7) % 100) - 50) * 0.4;
+        for (let i = 0; i < 18; i++) {
+            const x = pos.x + (((seed + i * 5) % 100) - 50) * 0.5;
+            const y = pos.y + (((seed + i * 7) % 100) - 50) * 0.5;
+            const height = 3 + ((seed + i) % 4);
+            const sway = Math.sin((seed + i) * 0.3) * 2;
+
+            // Three blades per tuft
+            for (let j = -1; j <= 1; j++) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(x + j, y);
+                this.ctx.quadraticCurveTo(x + j + sway * 0.5, y - height * 0.6, x + sway + j * 0.5, y - height);
+                this.ctx.stroke();
+            }
+        }
+
+        // Flowers scattered
+        this.ctx.globalAlpha = 0.15;
+        for (let i = 0; i < 4; i++) {
+            const fx = pos.x + (((seed + i * 17) % 80) - 40) * 0.5;
+            const fy = pos.y + (((seed + i * 23) % 80) - 40) * 0.5;
+            const colors = ['#fbbf24', '#f472b6', '#a78bfa', '#60a5fa'];
+            this.ctx.fillStyle = colors[(seed + i) % 4];
             this.ctx.beginPath();
-            this.ctx.moveTo(x, y);
-            this.ctx.lineTo(x, y - 3);
-            this.ctx.stroke();
+            this.ctx.arc(fx, fy, 2, 0, Math.PI * 2);
+            this.ctx.fill();
         }
 
         this.ctx.globalAlpha = 1.0;

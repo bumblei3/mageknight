@@ -141,23 +141,59 @@ export class Particle {
 }
 
 export class ParticleSystem {
+    static MAX_PARTICLES = 500;
+
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.particles = [];
+        this.pool = []; // Object pool for reusing particles
         this.isRunning = false;
         this.lastTime = performance.now();
+        this.targetFPS = 60;
+        this.frameInterval = 1000 / this.targetFPS;
     }
 
     /**
      * Add a single particle
      */
     addParticle(x, y, options) {
-        this.particles.push(new Particle(x, y, options));
+        // Limit total particles for performance
+        if (this.particles.length >= ParticleSystem.MAX_PARTICLES) {
+            return;
+        }
+
+        // Reuse from pool if available
+        let particle;
+        if (this.pool.length > 0) {
+            particle = this.pool.pop();
+            this.resetParticle(particle, x, y, options);
+        } else {
+            particle = new Particle(x, y, options);
+        }
+
+        this.particles.push(particle);
 
         if (!this.isRunning) {
             this.start();
         }
+    }
+
+    /**
+     * Reset a pooled particle with new values
+     */
+    resetParticle(particle, x, y, options = {}) {
+        particle.x = x;
+        particle.y = y;
+        particle.vx = options.vx || (Math.random() - 0.5) * 2;
+        particle.vy = options.vy || (Math.random() - 0.5) * 2;
+        particle.life = options.life || 1.0;
+        particle.decay = options.decay || 0.01;
+        particle.size = options.size || 3;
+        particle.color = options.color || '#ffffff';
+        particle.gravity = options.gravity || 0;
+        particle.opacity = 1;
+        particle.type = options.type || 'circle';
     }
 
     /**
@@ -432,8 +468,19 @@ export class ParticleSystem {
         const deltaTime = Math.min((currentTime - this.lastTime) / 16.67, 2); // Cap at 2x for performance
         this.lastTime = currentTime;
 
-        // Update and filter out dead particles
-        this.particles = this.particles.filter(particle => particle.update(deltaTime));
+        // Update particles and recycle dead ones to pool
+        const alive = [];
+        for (const particle of this.particles) {
+            if (particle.update(deltaTime)) {
+                alive.push(particle);
+            } else {
+                // Return to pool for reuse (limit pool size)
+                if (this.pool.length < 100) {
+                    this.pool.push(particle);
+                }
+            }
+        }
+        this.particles = alive;
 
         // Stop animation loop if no particles
         if (this.particles.length === 0) {

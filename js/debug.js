@@ -25,7 +25,9 @@ export class DebugManager {
         toggleBtn.textContent = '🔧';
         toggleBtn.className = 'debug-toggle';
         toggleBtn.onclick = () => this.togglePanel();
-        document.body.appendChild(toggleBtn);
+        const sidebar = document.querySelector('.hud-sidebar.hud-left');
+        const target = sidebar || document.body;
+        target.appendChild(toggleBtn);
 
         // Create panel
         this.panel = document.createElement('div');
@@ -74,7 +76,7 @@ export class DebugManager {
         `;
 
         this.panel.querySelector('.close-btn').onclick = () => this.togglePanel();
-        document.body.appendChild(this.panel);
+        target.appendChild(this.panel);
 
         this.setupLoggerUI();
     }

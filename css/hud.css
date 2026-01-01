@@ -70,7 +70,8 @@
 }
 
 /* Panel Override for Floating Look */
-.panel {
+.panel,
+.debug-panel {
     background: rgba(15, 23, 42, 0.92);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -85,7 +86,8 @@
     transition: var(--transition-normal);
 }
 
-.panel:hover {
+.panel:hover,
+.debug-panel:hover {
     border-color: var(--glass-border-highlight);
     background: var(--glass-bg-hover);
     transform: translateY(-4px) scale(1.005);
@@ -94,7 +96,8 @@
         0 0 30px rgba(168, 85, 247, 0.15);
 }
 
-.panel h2 {
+.panel h2,
+.debug-panel h3 {
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--color-text-primary);
@@ -103,7 +106,8 @@
     letter-spacing: 0.05em;
 }
 
-.panel h3 {
+.panel h3,
+.debug-section h4 {
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--color-text-secondary);
@@ -111,14 +115,16 @@
 }
 
 /* Collapsible Panel Headers */
-.panel-header {
+.panel-header,
+.debug-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--spacing-sm);
 }
 
-.panel-toggle {
+.panel-toggle,
+.close-btn {
     background: none;
     border: none;
     color: var(--color-text-secondary);
@@ -129,11 +135,17 @@
 }
 
 /* Hero Avatar in HUD Sidebar */
+.hero-panel {
+    padding-bottom: var(--spacing-lg);
+    /* More space at bottom */
+}
+
 .hero-panel .hero-info {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
+    /* Increased gap */
 }
 
 .hero-avatar {
@@ -158,13 +170,16 @@
 .hero-name {
     font-weight: 600;
     color: var(--color-text-primary);
-    font-size: 0.95rem;
+    font-size: 1rem;
+    /* Slightly larger */
+    margin-bottom: 4px;
 }
 
 .hero-stats-grid {
     display: flex;
-    gap: 8px;
-    font-size: 0.8rem;
+    gap: 12px;
+    /* Increased gap */
+    font-size: 0.85rem;
     margin-top: 4px;
     color: var(--color-text-secondary);
 }
@@ -172,14 +187,53 @@
 .hero-stats-grid .stat-item {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
 }
 
 /* Action Panel */
 .action-grid {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
+    /* Increased gap */
+}
+
+/* Debug Panel Specifics */
+.debug-panel.hidden {
+    display: none;
+}
+
+.debug-section {
+    margin-bottom: var(--spacing-sm);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: var(--spacing-sm);
+}
+
+.debug-section button {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    margin: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.debug-section button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.debug-toggle {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed var(--glass-border);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    text-align: center;
+    border-radius: var(--radius-md);
 }
 
 /* Movement Display */

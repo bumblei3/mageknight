@@ -350,6 +350,15 @@ export class MockHTMLElement {
         this._listeners.get(event).push(callback);
     }
 
+    removeEventListener(event, callback) {
+        if (!this._listeners.has(event)) return;
+        const listeners = this._listeners.get(event);
+        const index = listeners.indexOf(callback);
+        if (index > -1) {
+            listeners.splice(index, 1);
+        }
+    }
+
     dispatchEvent(event) {
         const type = event.type;
         if (this._listeners.has(type)) {
@@ -361,6 +370,17 @@ export class MockHTMLElement {
                 }
             });
         }
+
+        // Also check for on[type] properties
+        const onHandler = this[`on${type}`];
+        if (typeof onHandler === 'function') {
+            try {
+                onHandler(event);
+            } catch (e) {
+                console.error(`Error in mock on${type} handler:`, e);
+            }
+        }
+
         return true;
     }
 
@@ -846,6 +866,12 @@ export function setupStandardGameDOM() {
         el.id = id;
         global.document.body.appendChild(el);
         elements[id] = el;
+
+        // Also add camelCase version for code that expects it: hero-name -> heroName
+        const camelId = id.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+        if (camelId !== id) {
+            elements[camelId] = el;
+        }
     });
 
     // Specialized structures
@@ -878,6 +904,19 @@ export function setupStandardGameDOM() {
         <button id="confirm-level-up"></button>
     `;
     global.document.body.appendChild(levelUpModal);
+
+    // Card Play Modal Structure
+    const cardPlayModal = global.document.getElementById('card-play-modal') || global.document.createElement('div');
+    cardPlayModal.id = 'card-play-modal';
+    cardPlayModal.innerHTML = `
+        <div id="basic-effect-desc"></div>
+        <div id="strong-effect-desc"></div>
+        <div id="strong-cost-desc"></div>
+        <button id="play-basic-btn"></button>
+        <button id="play-strong-btn"></button>
+        <button id="card-play-close"></button>
+    `;
+    global.document.body.appendChild(cardPlayModal);
 
     // Reset Modal Structure
     const resetModal = global.document.getElementById('reset-modal') || global.document.createElement('div');

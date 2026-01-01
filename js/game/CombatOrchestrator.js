@@ -309,11 +309,20 @@ export class CombatOrchestrator {
         );
 
         // Visual Polish: Ranged Impact
-        const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
-        this.game.particleSystem.impactEffect(pixelPos.x, pixelPos.y, 'blue');
         const damageDealt = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);
-        if (damageDealt > 0) {
-            this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, damageDealt);
+        if (enemy.position) {
+            const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+            this.game.particleSystem.impactEffect(pixelPos.x, pixelPos.y, 'blue');
+            if (damageDealt > 0) {
+                this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, damageDealt);
+            }
+        } else if (this.game.hero.position) {
+            // Fallback: use hero position for visual effects (site combat)
+            const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+            this.game.particleSystem.impactEffect(heroPixel.x, heroPixel.y - 50, 'blue');
+            if (damageDealt > 0) {
+                this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y - 50, damageDealt);
+            }
         }
 
         this.game.addLog(attackResult.message, 'combat');
@@ -333,3 +342,4 @@ export class CombatOrchestrator {
         }
     }
 }
+

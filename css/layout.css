@@ -5,8 +5,54 @@
 
 body {
     overflow: hidden;
-    /* Prevent scrolling */
     background: #050510;
+}
+
+.background-aura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background:
+        radial-gradient(circle at 10% 20%, hsla(var(--h-primary), 50%, 15%, 0.3), transparent 40%),
+        radial-gradient(circle at 90% 80%, hsla(var(--h-teal), 40%, 15%, 0.2), transparent 40%),
+        radial-gradient(circle at 50% 50%, hsla(var(--h-gold), 30%, 5%, 0.1), transparent 60%);
+    filter: blur(60px);
+    z-index: -2;
+    animation: aura-pulse 20s infinite alternate ease-in-out;
+}
+
+@keyframes aura-pulse {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+
+    100% {
+        transform: scale(1.1) translate(20px, 10px);
+    }
+}
+
+.background-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white' fill-opacity='0.05'/%3E%3C/svg%3E");
+    z-index: -1;
+    opacity: 0.5;
+    animation: particles-float 60s linear infinite;
+}
+
+@keyframes particles-float {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 1000px 1000px;
+    }
 }
 
 .canvas-layer {
@@ -102,11 +148,12 @@ body {
     right: 0;
     bottom: 0;
     background: radial-gradient(circle at center,
-            transparent 50%,
-            rgba(5, 5, 10, 0.6) 90%,
-            rgba(0, 0, 0, 0.8) 100%);
+            transparent 40%,
+            rgba(5, 5, 15, 0.4) 70%,
+            rgba(0, 0, 0, 0.85) 100%);
     pointer-events: none;
     z-index: 2;
+    box-shadow: inset 0 0 150px rgba(0, 0, 0, 1);
 }
 
 .board-wrapper {

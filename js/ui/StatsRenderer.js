@@ -36,7 +36,9 @@ export class StatsRenderer {
             if (currentArmor !== stats.armor) {
                 animateCounter(this.elements.heroArmor, currentArmor, stats.armor, 500, animator);
                 const diff = stats.armor - currentArmor;
-                if (diff !== 0) this.showFloatingText(this.elements.heroArmor, `${diff > 0 ? '+' : ''}${diff} 🛡️`, diff > 0 ? '#10b981' : '#ef4444');
+                if (diff !== 0) {
+                    this.showFloatingText(this.elements.heroArmor, `${diff > 0 ? '+' : ''}${diff} 🛡️`, diff > 0 ? 'var(--color-mana-green)' : 'var(--color-mana-red)');
+                }
             }
         }
 
@@ -45,7 +47,9 @@ export class StatsRenderer {
             if (currentHand !== stats.handLimit) {
                 this.elements.heroHandLimit.textContent = stats.handLimit;
                 const diff = stats.handLimit - currentHand;
-                if (diff !== 0) this.showFloatingText(this.elements.heroHandLimit, `${diff > 0 ? '+' : ''}${diff} 🎴`, '#3b82f6');
+                if (diff !== 0) {
+                    this.showFloatingText(this.elements.heroHandLimit, `${diff > 0 ? '+' : ''}${diff} 🎴`, 'var(--color-mana-blue)');
+                }
             }
         }
 
@@ -54,7 +58,9 @@ export class StatsRenderer {
             if (currentWounds !== stats.wounds) {
                 this.elements.heroWounds.textContent = stats.wounds;
                 const diff = stats.wounds - currentWounds;
-                if (diff > 0) this.showFloatingText(this.elements.heroWounds, `+${diff} 💔`, '#ef4444');
+                if (diff > 0) {
+                    this.showFloatingText(this.elements.heroWounds, `+${diff} 💔`, 'var(--color-mana-red)');
+                }
             }
         }
 
@@ -63,7 +69,9 @@ export class StatsRenderer {
             if (currentFame !== stats.fame) {
                 animateCounter(this.elements.fameValue, currentFame, stats.fame, 1000, animator);
                 const diff = stats.fame - currentFame;
-                if (diff > 0) this.showFloatingText(this.elements.fameValue, `+${diff} ⭐`, '#fbbf24');
+                if (diff > 0) {
+                    this.showFloatingText(this.elements.fameValue, `+${diff} ⭐`, 'var(--color-accent-gold)');
+                }
             }
         }
 
@@ -72,7 +80,9 @@ export class StatsRenderer {
             if (currentRep !== stats.reputation) {
                 animateCounter(this.elements.reputationValue, currentRep, stats.reputation, 800, animator);
                 const diff = stats.reputation - currentRep;
-                if (diff !== 0) this.showFloatingText(this.elements.reputationValue, `${diff > 0 ? '+' : ''}${diff} 💬`, '#f3f4f6');
+                if (diff !== 0) {
+                    this.showFloatingText(this.elements.reputationValue, `${diff > 0 ? '+' : ''}${diff} 💬`, 'var(--color-text-primary)');
+                }
             }
         }
 

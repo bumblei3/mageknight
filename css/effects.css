@@ -400,3 +400,67 @@
         transform: translate(5px, 5px) rotate(1deg);
     }
 }
+
+/* Floating Text Effect */
+.floating-text {
+    position: fixed;
+    pointer-events: none;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.5rem;
+    z-index: 1000;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.8);
+    animation: floatUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    white-space: nowrap;
+    transform: translate(-50%, 0);
+}
+
+@keyframes floatUpFade {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 20px) scale(0.5);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -60px) scale(1);
+    }
+}
+
+/* Magical Impact Flash */
+.impact-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    transform: translate(-50%, -50%);
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.impact-flash.active {
+    animation: screenFlash 0.4s ease-out forwards;
+}
+
+@keyframes screenFlash {
+    0% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Screen Shake - Global Utility */
+.shake-screen {
+    animation: screenShake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+}

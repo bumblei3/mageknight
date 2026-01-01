@@ -57,6 +57,12 @@ describe('Advanced Combat Coverage', () => {
             game.updateCombatTotals = () => { };
             game.hexGrid.axialToPixel = () => ({ x: 0, y: 0 });
             game.particleSystem.damageSplatter = () => { };
+            game.particleSystem.triggerShake = () => { };
+            game.particleSystem.createDamageNumber = () => { };
+            game.particleSystem.fireAttackEffect = () => { };
+            game.particleSystem.iceAttackEffect = () => { };
+            game.particleSystem.lightningAttackEffect = () => { };
+            game.combat.enemy = { attackType: 'physical' };
 
             game.endBlockPhase();
 

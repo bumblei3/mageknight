@@ -32,6 +32,7 @@ export class Hero {
         this.reputation = 0;
         this.commandLimit = 1; // Start with 1 unit slot
         this.skills = [];
+        this.usedSkills = new Set(); // Track active skills used this round
 
         // Cards
         this.deck = [];
@@ -302,6 +303,21 @@ export class Hero {
         return this.skills.some(s => s.id === skillId);
     }
 
+    /**
+     * Skill Usage (Active Skills)
+     */
+    canUseSkill(skillId) {
+        const skill = this.skills.find(s => s.id === skillId);
+        if (!skill || skill.type !== 'active') return false;
+        return !this.usedSkills.has(skillId);
+    }
+
+    useSkill(skillId) {
+        if (!this.canUseSkill(skillId)) return false;
+        this.usedSkills.add(skillId);
+        return true;
+    }
+
     // Add Skill
     addSkill(skill) {
         this.skills.push(skill);
@@ -380,6 +396,9 @@ export class Hero {
             const randomColor = Object.values(MANA_COLORS)[Math.floor(Math.random() * 4)]; // R,G,B,W
             this.addCrystal(randomColor);
         }
+
+        // Reset active skills
+        this.usedSkills.clear();
         // In game.js: hero.endTurn() (discards hand) -> check deck empty -> prepareNewRound
         // So yes, discard contains everything.
     }

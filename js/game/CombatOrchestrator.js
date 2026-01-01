@@ -98,6 +98,16 @@ export class CombatOrchestrator {
             // Visual Polish: Screen Shake and Damage Numbers
             this.game.particleSystem.triggerShake(result.woundsReceived * 2, 0.4);
             this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y, result.woundsReceived, true);
+
+            // Elemental Effects based on enemy attack type
+            const attackType = this.game.combat.enemy.attackType;
+            if (attackType === 'fire') {
+                this.game.particleSystem.fireAttackEffect(heroPixel.x, heroPixel.y);
+            } else if (attackType === 'ice' || attackType === 'cold') {
+                this.game.particleSystem.iceAttackEffect(heroPixel.x, heroPixel.y);
+            } else if (attackType === 'lightning') {
+                this.game.particleSystem.lightningAttackEffect(heroPixel.x, heroPixel.y);
+            }
         }
 
         this.game.addLog(result.message, 'combat');

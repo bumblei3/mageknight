@@ -6,6 +6,7 @@ import { HandRenderer } from './ui/HandRenderer.js';
 import { ManaRenderer } from './ui/ManaRenderer.js';
 import { UnitRenderer } from './ui/UnitRenderer.js';
 import { StatsRenderer } from './ui/StatsRenderer.js';
+import { SkillRenderer } from './ui/SkillRenderer.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS } from './constants.js';
 
@@ -28,6 +29,7 @@ export class UI {
         this.manaRenderer = new ManaRenderer(this.elements, this.tooltipManager);
         this.unitRenderer = new UnitRenderer(this.elements);
         this.handRenderer = new HandRenderer(this.elements, this.tooltipManager);
+        this.skillRenderer = new SkillRenderer(this);
 
         this.setupEventListeners();
         this.setupTooltips();
@@ -41,6 +43,9 @@ export class UI {
     setGame(game) {
         this.game = game;
         this.combatUI.game = game;
+        if (this.elements.skillList) {
+            this.skillRenderer.setContainer(this.elements.skillList);
+        }
     }
 
     /**
@@ -134,6 +139,7 @@ export class UI {
             heroHandLimit: document.getElementById('hero-handlimit'),
             heroWounds: document.getElementById('hero-wounds'),
             movementPoints: document.getElementById('movement-points'),
+            skillList: document.getElementById('skill-list'),
 
             // Buttons
             endTurnBtn: document.getElementById('end-turn-btn'),
@@ -199,6 +205,7 @@ export class UI {
     // Update hero stats display
     updateHeroStats(hero) {
         this.statsRenderer.updateHeroStats(hero);
+        this.skillRenderer.render(hero);
     }
 
     // Update movement points display

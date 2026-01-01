@@ -1,5 +1,5 @@
 // Tutorial Manager for Mage Knight
-// Provides interactive, step-by-step tutorial with spotlight effects
+// Provides interactive, step-by-step tutorial with spotlight effects and interaction detection
 
 export class TutorialManager {
     constructor(game) {
@@ -10,6 +10,7 @@ export class TutorialManager {
         this.overlay = null;
         this.spotlight = null;
         this.tutorialBox = null;
+        this.originalHandlers = {};
     }
 
     /**
@@ -22,6 +23,10 @@ export class TutorialManager {
         this.currentStep = 0;
         this.createTutorialUI();
         this.showStep(0);
+
+        if (this.game && this.game.addLog) {
+            this.game.addLog('🎓 Tutorial gestartet', 'info');
+        }
     }
 
     /**
@@ -49,8 +54,8 @@ export class TutorialManager {
             this.tutorialBox.id = 'tutorial-box-custom';
             this.tutorialBox.className = 'tutorial-box-custom';
             this.tutorialBox.innerHTML = `
-                <div class="tutorial-progress" id="tutorial-progress">
-                    <span id="tutorial-step-counter"></span>
+                <div class="tutorial-progress-wrapper" style="text-align:center;">
+                    <div class="tutorial-progress" id="tutorial-step-counter"></div>
                 </div>
                 <h3 id="tutorial-title-custom"></h3>
                 <p id="tutorial-text-custom"></p>
@@ -69,6 +74,14 @@ export class TutorialManager {
             document.getElementById('tutorial-next-btn').addEventListener('click', () => this.nextStep());
             document.getElementById('tutorial-prev-btn').addEventListener('click', () => this.prevStep());
             document.getElementById('tutorial-skip-btn').addEventListener('click', () => this.skip());
+
+            // Keyboard support
+            this.keyboardHandler = (e) => {
+                if (!this.isActive) return;
+                if (e.key === 'Escape') this.skip();
+                if (e.key === 'Enter' && !this.steps[this.currentStep].waitForAction) this.nextStep();
+            };
+            document.addEventListener('keydown', this.keyboardHandler);
         }
     }
 
@@ -81,29 +94,37 @@ export class TutorialManager {
             return;
         }
 
+        // Cleanup previous interactive wait
+        this.restoreHandlers();
+
         this.currentStep = stepIndex;
         const step = this.steps[stepIndex];
 
         // Update UI
-        if (document.getElementById('tutorial-step-counter')) {
-            document.getElementById('tutorial-step-counter').textContent = `${stepIndex + 1} / ${this.steps.length}`;
-        }
-        if (document.getElementById('tutorial-title-custom')) {
-            document.getElementById('tutorial-title-custom').textContent = step.title;
-        }
-        if (document.getElementById('tutorial-text-custom')) {
-            document.getElementById('tutorial-text-custom').textContent = step.text;
-        }
-
-        // Update button states
-        const prevBtn = document.getElementById('tutorial-prev-btn');
+        const counter = document.getElementById('tutorial-step-counter');
+        const title = document.getElementById('tutorial-title-custom');
+        const text = document.getElementById('tutorial-text-custom');
         const nextBtn = document.getElementById('tutorial-next-btn');
+        const prevBtn = document.getElementById('tutorial-prev-btn');
+
+        if (counter) counter.textContent = `Schritt ${stepIndex + 1} / ${this.steps.length}`;
+        if (title) title.textContent = step.title;
+        if (text) text.innerHTML = step.text.replace(/\n/g, '<br>');
 
         if (prevBtn) {
             prevBtn.disabled = stepIndex === 0;
+            prevBtn.style.visibility = step.waitForAction ? 'hidden' : 'visible';
         }
+
         if (nextBtn) {
-            nextBtn.textContent = stepIndex === this.steps.length - 1 ? "Los geht's!" : 'Weiter →';
+            if (stepIndex === this.steps.length - 1) {
+                nextBtn.textContent = "Los geht's!";
+            } else if (step.waitForAction) {
+                nextBtn.textContent = 'Aktion ausführen...';
+            } else {
+                nextBtn.textContent = 'Weiter →';
+            }
+            nextBtn.disabled = !!step.waitForAction;
         }
 
         // Show overlay
@@ -120,6 +141,11 @@ export class TutorialManager {
 
         // Position tutorial box
         this.positionTutorialBox(step.boxPosition || 'center');
+
+        // Setup interactive wait if needed
+        if (step.waitForAction) {
+            this.setupActionWait(step.waitForAction);
+        }
     }
 
     /**
@@ -141,7 +167,10 @@ export class TutorialManager {
             this.spotlight.style.height = `${rect.height + 20}px`;
         }
 
-        // Make element temporarily higher z-index
+        // Add highlight class
+        if (element.classList) {
+            element.classList.add('tutorial-highlight');
+        }
         element.style.zIndex = '10000';
         element.dataset.tutorialHighlight = 'true';
     }
@@ -154,9 +183,9 @@ export class TutorialManager {
             this.spotlight.style.display = 'none';
         }
 
-        // Reset z-index of previously highlighted elements
-        const highlighted = document.querySelectorAll('[data-tutorial-highlight="true"]');
-        highlighted.forEach(el => {
+        // Reset all highlighted elements
+        document.querySelectorAll('[data-tutorial-highlight="true"]').forEach(el => {
+            if (el.classList) el.classList.remove('tutorial-highlight');
             el.style.zIndex = '';
             delete el.dataset.tutorialHighlight;
         });
@@ -166,60 +195,91 @@ export class TutorialManager {
      * Position tutorial box
      */
     positionTutorialBox(position) {
-        this.tutorialBox.className = 'tutorial-box-custom';
+        if (!this.tutorialBox) return;
+
+        this.tutorialBox.style.top = '';
+        this.tutorialBox.style.bottom = '';
+        this.tutorialBox.style.left = '50%';
+        this.tutorialBox.style.transform = 'translateX(-50%)';
 
         switch (position) {
-        case 'top':
-            this.tutorialBox.style.top = '20px';
-            this.tutorialBox.style.bottom = 'auto';
-            break;
-        case 'bottom':
-            this.tutorialBox.style.top = 'auto';
-            this.tutorialBox.style.bottom = '20px';
-            break;
-        case 'center':
-        default:
-            this.tutorialBox.style.top = '50%';
-            this.tutorialBox.style.bottom = 'auto';
-            this.tutorialBox.style.transform = 'translate(-50%, -50%)';
-            break;
+            case 'top':
+                this.tutorialBox.style.top = '20px';
+                break;
+            case 'bottom':
+                this.tutorialBox.style.bottom = '20px';
+                break;
+            case 'center':
+            default:
+                this.tutorialBox.style.top = '50%';
+                this.tutorialBox.style.transform = 'translate(-50%, -50%)';
+                break;
         }
     }
 
     /**
-     * Next step
+     * Interactive Action Wait
+     */
+    setupActionWait(actionType) {
+        if (actionType === 'card_played') {
+            this.originalHandlers.playCard = this.game.handleCardClick;
+            this.game.handleCardClick = (index, card) => {
+                const result = this.originalHandlers.playCard.call(this.game, index, card);
+                if (card) {
+                    this.game.addLog('Perfekt! Karte gespielt.', 'success');
+                    setTimeout(() => this.nextStep(), 500);
+                }
+                return result;
+            };
+        } else if (actionType === 'hero_moved') {
+            this.originalHandlers.moveHero = this.game.moveHero;
+            this.game.moveHero = (q, r) => {
+                const result = this.originalHandlers.moveHero.call(this.game, q, r);
+                this.game.addLog('Sehr gut! Du hast dich bewegt.', 'success');
+                setTimeout(() => this.nextStep(), 500);
+                return result;
+            };
+        }
+    }
+
+    restoreHandlers() {
+        if (this.originalHandlers.playCard) {
+            this.game.handleCardClick = this.originalHandlers.playCard;
+            delete this.originalHandlers.playCard;
+        }
+        if (this.originalHandlers.moveHero) {
+            this.game.moveHero = this.originalHandlers.moveHero;
+            delete this.originalHandlers.moveHero;
+        }
+    }
+
+    /**
+     * Navigation
      */
     nextStep() {
         this.showStep(this.currentStep + 1);
     }
 
-    /**
-     * Previous step
-     */
     prevStep() {
         this.showStep(this.currentStep - 1);
     }
 
-    /**
-     * Skip tutorial
-     */
     skip() {
         this.complete();
     }
 
-    /**
-     * Complete tutorial
-     */
     complete() {
         this.isActive = false;
+        this.restoreHandlers();
         this.clearHighlight();
-        this.overlay.style.display = 'none';
+        if (this.overlay) this.overlay.style.display = 'none';
+        if (this.keyboardHandler) {
+            document.removeEventListener('keydown', this.keyboardHandler);
+        }
         localStorage.setItem('mageKnightTutorialCompleted', 'true');
+        if (this.game.addLog) this.game.addLog('🎓 Tutorial abgeschlossen!', 'success');
     }
 
-    /**
-     * Check if tutorial has been completed
-     */
     static hasCompleted() {
         return localStorage.getItem('mageKnightTutorialCompleted') === 'true';
     }
@@ -237,44 +297,52 @@ export class TutorialManager {
     defineTutorialSteps() {
         return [
             {
-                title: '👋 Willkommen bei Mage Knight!',
-                text: 'Dieser kurze Tutorial führt dich durch die Grundlagen des Spiels. Du kannst jederzeit überspringen oder mit "T" neu starten.',
+                title: '👋 Willkommen, Held!',
+                text: 'In dieser Welt bist du ein mächtiger Mage Knight. Dein Ziel: Die Karte erkunden, Ruhm sammeln und am Ende die stärksten Gegner besiegen.\n\nKlicke auf "Weiter" um die Steuerung zu lernen.',
                 highlightSelector: null,
                 boxPosition: 'center'
             },
             {
-                title: '🎴 Deine Handkarten',
-                text: 'Hier unten siehst du deine Handkarten. Hover über Karten zeigt Details. Linksklick spielt die Karte, Rechtsklick für seitlich (+1). Nutze auch Tasten 1-5!',
+                title: '🎴 Deine Macht: Handkarten',
+                text: 'Alles in diesem Spiel passiert durch Karten. Du findest sie hier unten.\n\n🌿 **Grün**: Bewegung\n🛡️ **Blau**: Verteidigung\n⚔️ **Rot**: Angriff\n👑 **Weiß**: Einfluss',
                 highlightSelector: '.hand-area',
                 boxPosition: 'top'
             },
             {
-                title: '👣 Bewegung',
-                text: 'Spiele grüne Bewegungskarten (🌿). Das Spiel zeigt dann erreichbare Felder violett an. Klicke auf ein Feld um dich zu bewegen. Verschiedene Terrains kosten unterschiedlich viel!',
-                highlightSelector: '.movement-panel',
+                title: '👣 Grundbewegung',
+                text: 'Um dich zu bewegen, brauchst du Bewegungspunkte. Klicke jetzt auf eine **grüne Karte**, um sie zu spielen.',
+                highlightSelector: '.hand-area',
+                boxPosition: 'top',
+                waitForAction: 'card_played'
+            },
+            {
+                title: '🗺️ Die Welt erkunden',
+                text: 'Hervorragend! Die violett markierten Felder sind nun erreichbar. Klicke auf ein benachbartes Feld, um den Helden dorthin zu ziehen.',
+                highlightSelector: '#game-board',
+                boxPosition: 'center',
+                waitForAction: 'hero_moved'
+            },
+            {
+                title: '💎 Mana & Quellen',
+                text: 'Oben rechts siehst du die **Mana-Quelle**. Mana verstärkt deine Karten drastisch! Du kannst pro Zug einen Würfel aus der Quelle nutzen, indem du ihn anklickst.',
+                highlightSelector: '.mana-source-container',
+                boxPosition: 'bottom'
+            },
+            {
+                title: '⚔️ Der Kampf',
+                text: 'Triffst du auf Gegner, beginnt der Kampf. Er hat drei Phasen:\n\n1. **Fernkampf**: Besiege Gegner, bevor sie zuschlagen.\n2. **Block**: Verteidige dich gegen den Gegenangriff.\n3. **Angriff**: Gib dem Gegner den Rest.',
+                highlightSelector: null,
                 boxPosition: 'center'
             },
             {
-                title: '⚔️ Kampf',
-                text: 'Betritt ein Feld mit einem Feind um zu kämpfen. Zuerst Block-Phase (blaue Karten 🛡️), dann Angriffs-Phase (rote Karten ⚔️). Drücke Space um die Phase zu beenden.',
-                highlightSelector: '#game-board',
+                title: '🦅 Skills & Level-Up',
+                text: 'Durch Siege sammelst du Ruhm und steigst Level auf. Bei jedem Level-Up darfst du mächtige **Skills** wie *Flug* oder *Belagerungs-Meister* wählen.',
+                highlightSelector: '.hero-stats-panel',
                 boxPosition: 'bottom'
             },
             {
-                title: '💾 Speichern & Laden',
-                text: 'Oben rechts findest du Save (💾) und Load (📂) Buttons. Das Spiel speichert auch automatisch nach jedem Zug! Nutze Ctrl+S und Ctrl+L als Shortcuts.',
-                highlightSelector: '.header-right',
-                boxPosition: 'bottom'
-            },
-            {
-                title: '⌨️ Keyboard Shortcuts',
-                text: 'Unten siehst du alle Tastenkürzel. Mit 1-5 spielst du Karten schnell, R für Rasten, H für Hilfe, T für Tutorial. Viel schneller als nur mit Maus!',
-                highlightSelector: '.shortcuts-bar',
-                boxPosition: 'top'
-            },
-            {
-                title: '🎯 Spielziel',
-                text: 'Besiege alle 3 Feinde auf der Karte! Verwalte deine Karten klug, nutze Terrain zu deinem Vorteil und vergiss nicht zu rasten wenn du schlechte Karten hast. Viel Erfolg!',
+                title: '🎲 Dein Abenteuer beginnt!',
+                text: 'Nutze Shortcuts (1-5 für Karten, R für Rasten, Space für Zug-Ende). Jetzt bist du bereit. Befreie das Land!\n\nTipp: Mit **"T"** kannst du dieses Tutorial jederzeit neu starten.',
                 highlightSelector: null,
                 boxPosition: 'center'
             }

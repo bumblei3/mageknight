@@ -20,7 +20,6 @@ import { SiteInteractionManager } from './siteInteraction.js';
 import { DebugManager } from './debug.js';
 import AchievementManager from './achievements.js';
 import { StatisticsManager } from './statistics.js';
-import SimpleTutorial from './simpleTutorial.js';
 import SoundManager from './soundManager.js';
 import TouchController from './touchController.js';
 import { eventBus } from './eventBus.js';
@@ -95,7 +94,6 @@ export class MageKnightGame {
 
         // UI Helpers
         this.tutorial = new TutorialManager(this);
-        this.simpleTutorial = new SimpleTutorial(this);
         this.touchController = new TouchController(this);
 
         // Core Game Managers (Phase 2 Refactor)
@@ -228,8 +226,8 @@ export class MageKnightGame {
         logger.debug('Initial game state rendered.');
 
         // Show interactive tutorial on first visit
-        if (this.simpleTutorial.shouldStart()) {
-            setTimeout(() => this.simpleTutorial.start(), 1500);
+        if (!TutorialManager.hasCompleted()) {
+            setTimeout(() => this.tutorial.start(), 1500);
         }
 
         this.addLog('Willkommen bei Mage Knight!', 'info');
@@ -237,12 +235,9 @@ export class MageKnightGame {
         this.updatePhaseIndicator();
     }
 
-    /**
-     * Shows the tutorial (wrapper for simpleTutorial.start)
-     */
     showTutorial() {
-        if (this.simpleTutorial) {
-            this.simpleTutorial.start();
+        if (this.tutorial) {
+            this.tutorial.start();
         }
     }
 

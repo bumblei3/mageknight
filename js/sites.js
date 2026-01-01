@@ -43,6 +43,13 @@ export const SITE_INFO = {
         color: '#374151', // Dark Gray
         description: 'Ein gefährliches Verlies. Betreten auf eigene Gefahr!',
         actions: ['explore']
+    },
+    [SITE_TYPES.CITY]: {
+        name: 'Stadt',
+        icon: '🏰',
+        color: '#60a5fa', // Blue
+        description: 'Eine große Stadt. Rekrutiere Elite-Einheiten, lerne Zauber und heile dich.',
+        actions: ['heal', 'recruit_elite', 'learn']
     }
 };
 

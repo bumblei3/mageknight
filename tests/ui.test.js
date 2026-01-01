@@ -38,7 +38,9 @@ describe('UI', () => {
                 wounds: 0,
                 fame: 10,
                 reputation: 2
-            })
+            }),
+            skills: [],
+            usedSkills: new Set()
         };
 
         // Pre-set some text content to test changes
@@ -279,7 +281,9 @@ describe('UI', () => {
         it('should show heal button when wounds AND points exist', () => {
             const mockHero = {
                 getStats: () => ({ wounds: 1, name: 'Hero' }),
-                healingPoints: 1
+                healingPoints: 1,
+                skills: [],
+                usedSkills: new Set()
             };
             ui.updateHeroStats(mockHero);
             expect(ui.elements.healBtn.style.display).toBe('block');
@@ -288,7 +292,9 @@ describe('UI', () => {
         it('should hide heal button when no wounds', () => {
             const mockHero = {
                 getStats: () => ({ wounds: 0, name: 'Hero' }),
-                healingPoints: 5
+                healingPoints: 5,
+                skills: [],
+                usedSkills: new Set()
             };
             ui.updateHeroStats(mockHero);
             expect(ui.elements.healBtn.style.display).toBe('none');

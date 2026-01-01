@@ -48,7 +48,7 @@ export class GameStateManager {
 
     /**
      * Restores game state from an object
-     * @param {Object} state 
+     * @param {Object} state
      */
     loadGameState(state) {
         if (!state) return false;

@@ -61,8 +61,8 @@ export class HexGrid {
     // Round floating point axial coordinates to nearest hex
     /**
      * Rounds floating point axial coordinates to the nearest valid hex.
-     * @param {number} q 
-     * @param {number} r 
+     * @param {number} q
+     * @param {number} r
      * @returns {Object} {q, r} integers
      */
     roundAxial(q, r) {
@@ -101,10 +101,10 @@ export class HexGrid {
     // Calculate distance between two hexes
     /**
      * Calculates the manhattan distance between two hexes.
-     * @param {number} q1 
-     * @param {number} r1 
-     * @param {number} q2 
-     * @param {number} r2 
+     * @param {number} q1
+     * @param {number} r1
+     * @param {number} q2
+     * @param {number} r2
      * @returns {number} Distance in hex steps
      */
     distance(q1, r1, q2, r2) {
@@ -148,7 +148,7 @@ export class HexGrid {
                 // Based on map generation logic usually in MapManager.
                 // If this method is responsible for 'revealing', it implies existence or creation.
                 // Let's assume basic revealing of existing 'fogged' hexes for now.
-                // If map is dynamic, MapManager usually handles generation. 
+                // If map is dynamic, MapManager usually handles generation.
                 // But ActionManager called this.game.hexGrid.exploreAdjacent.
                 // Let's stub creation for now if missing.
                 const newHex = { q: n.q, r: n.r, revealed: true, terrain: this.getRandomTerrain() };
@@ -168,8 +168,8 @@ export class HexGrid {
     /**
      * Calculates reachable hexes using BFS based on movement points.
      * @param {Object} startPos - {q, r}
-     * @param {number} movementPoints 
-     * @param {boolean} isDay 
+     * @param {number} movementPoints
+     * @param {boolean} isDay
      * @returns {Array} List of reachable {q, r}
      */
     getReachableHexes(startPos, movementPoints, isDay) {
@@ -211,9 +211,9 @@ export class HexGrid {
 
     /**
      * Gets movement cost for a specific hex.
-     * @param {number} q 
-     * @param {number} r 
-     * @param {boolean} isNight 
+     * @param {number} q
+     * @param {number} r
+     * @param {boolean} isNight
      * @returns {number} Cost
      */
     getMovementCost(q, r, isNight = false) {
@@ -267,8 +267,8 @@ export class HexGrid {
     // Draw a single hexagon
     /**
      * Renders a single hexagon with optional styles and effects.
-     * @param {number} q 
-     * @param {number} r 
+     * @param {number} q
+     * @param {number} r
      * @param {Object} options - { fillColor, strokeColor, highlight, revealed, terrain }
      */
     drawHex(q, r, options = {}) {
@@ -409,21 +409,21 @@ export class HexGrid {
         this.ctx.clip();
 
         switch (terrain) {
-            case 'water':
-                this.drawWaterTexture(pos);
-                break;
-            case 'forest':
-                this.drawForestTexture(pos);
-                break;
-            case 'mountains':
-                this.drawMountainTexture(pos);
-                break;
-            case 'desert':
-                this.drawDesertTexture(pos);
-                break;
-            case 'plains':
-                this.drawPlainsTexture(pos);
-                break;
+        case 'water':
+            this.drawWaterTexture(pos);
+            break;
+        case 'forest':
+            this.drawForestTexture(pos);
+            break;
+        case 'mountains':
+            this.drawMountainTexture(pos);
+            break;
+        case 'desert':
+            this.drawDesertTexture(pos);
+            break;
+        case 'plains':
+            this.drawPlainsTexture(pos);
+            break;
         }
 
         this.ctx.restore();

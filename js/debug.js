@@ -131,7 +131,7 @@ export class DebugManager {
         // Add a random unit
         const types = ['peasants', 'thugs', 'guards'];
         const type = types[Math.floor(Math.random() * types.length)];
-        // Need to import createUnit or mock it. 
+        // Need to import createUnit or mock it.
         // Since we are in debug.js, we can try to use the game's methods or just mock for now if imports are tricky without changing module type.
         // But we are a module.
         import('./unit.js').then(module => {

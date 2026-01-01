@@ -183,7 +183,7 @@ export class TooltipManager {
         if (effects.influence) html += `<div>💬 Einfluss: <span class="value">+${effects.influence}</span></div>`;
         if (effects.healing) html += `<div>❤️ Heilung: <span class="value">+${effects.healing}</span></div>`;
 
-        html += `</div>`;
+        html += '</div>';
 
         // Sideways option
         if (sidewaysEffects) {
@@ -205,7 +205,7 @@ export class TooltipManager {
             `;
         }
 
-        html += `</div></div>`;
+        html += '</div></div>';
         return html;
     }
 

@@ -7,7 +7,6 @@ import { HexGrid } from './hexgrid.js';
 import Hero from './hero.js';
 import { ManaSource } from './mana.js';
 import { EnemyAI } from './enemyAI.js';
-import { Combat } from './combat.js';
 import { UI } from './ui.js';
 import Terrain from './terrain.js';
 import SaveManager from './saveManager.js';
@@ -17,18 +16,14 @@ import { MapManager } from './mapManager.js';
 import ParticleSystem from './particles.js';
 import { animator } from './animator.js';
 import { SiteInteractionManager } from './siteInteraction.js';
-import { createUnit } from './unit.js';
 import { DebugManager } from './debug.js';
-import { getRandomSkills } from './skills.js';
-import { SAMPLE_ADVANCED_ACTIONS, createDeck, Card } from './card.js';
 import AchievementManager from './achievements.js';
 import { StatisticsManager } from './statistics.js';
 import SimpleTutorial from './simpleTutorial.js';
 import SoundManager from './soundManager.js';
 import TouchController from './touchController.js';
-import { createEnemy } from './enemy.js';
 import { eventBus } from './eventBus.js';
-import { GAME_EVENTS, TIME_OF_DAY, COMBAT_PHASES } from './constants.js';
+import { GAME_EVENTS, TIME_OF_DAY } from './constants.js';
 
 // Refactored Game Managers
 import { PhaseManager } from './game/PhaseManager.js';
@@ -219,8 +214,8 @@ export class MageKnightGame {
 
     /**
      * Helper to add a log entry via event bus
-     * @param {string} message 
-     * @param {string} type 
+     * @param {string} message
+     * @param {string} type
      */
     addLog(message, type = 'info') {
         eventBus.emit(GAME_EVENTS.LOG_ADDED, { message, type });
@@ -228,8 +223,8 @@ export class MageKnightGame {
 
     /**
      * Helper to show a toast notification via event bus
-     * @param {string} message 
-     * @param {string} type 
+     * @param {string} message
+     * @param {string} type
      */
     showToast(message, type = 'info') {
         eventBus.emit(GAME_EVENTS.TOAST_SHOW, { message, type });
@@ -237,8 +232,8 @@ export class MageKnightGame {
 
     /**
      * Helper to show a notification via event bus
-     * @param {string} message 
-     * @param {string} type 
+     * @param {string} message
+     * @param {string} type
      */
     showNotification(message, type = 'info') {
         eventBus.emit(GAME_EVENTS.NOTIFICATION_SHOW, { message, type });
@@ -441,11 +436,11 @@ export class MageKnightGame {
         this.ui.setButtonEnabled(this.ui.elements.exploreBtn, canExplore && hasPoints && !this.combat);
 
         if (canExplore && hasPoints) {
-            this.ui.elements.exploreBtn.title = "Erkunden (2 Bewegungspunkte)";
+            this.ui.elements.exploreBtn.title = 'Erkunden (2 Bewegungspunkte)';
         } else if (!canExplore) {
-            this.ui.elements.exploreBtn.title = "Kein unbekanntes Gebiet angrenzend";
+            this.ui.elements.exploreBtn.title = 'Kein unbekanntes Gebiet angrenzend';
         } else {
-            this.ui.elements.exploreBtn.title = "Nicht genug Bewegungspunkte (2 benötigt)";
+            this.ui.elements.exploreBtn.title = 'Nicht genug Bewegungspunkte (2 benötigt)';
         }
 
         // Update Visit Button

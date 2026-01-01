@@ -169,20 +169,20 @@ export class TutorialManager {
         this.tutorialBox.className = 'tutorial-box-custom';
 
         switch (position) {
-            case 'top':
-                this.tutorialBox.style.top = '20px';
-                this.tutorialBox.style.bottom = 'auto';
-                break;
-            case 'bottom':
-                this.tutorialBox.style.top = 'auto';
-                this.tutorialBox.style.bottom = '20px';
-                break;
-            case 'center':
-            default:
-                this.tutorialBox.style.top = '50%';
-                this.tutorialBox.style.bottom = 'auto';
-                this.tutorialBox.style.transform = 'translate(-50%, -50%)';
-                break;
+        case 'top':
+            this.tutorialBox.style.top = '20px';
+            this.tutorialBox.style.bottom = 'auto';
+            break;
+        case 'bottom':
+            this.tutorialBox.style.top = 'auto';
+            this.tutorialBox.style.bottom = '20px';
+            break;
+        case 'center':
+        default:
+            this.tutorialBox.style.top = '50%';
+            this.tutorialBox.style.bottom = 'auto';
+            this.tutorialBox.style.transform = 'translate(-50%, -50%)';
+            break;
         }
     }
 

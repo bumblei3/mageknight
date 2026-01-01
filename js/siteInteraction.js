@@ -28,20 +28,20 @@ export class SiteInteractionManager {
 
         // Generate options based on site type
         switch (site.type) {
-            case SITE_TYPES.VILLAGE:
-                interactionData.options = this.getVillageOptions();
-                break;
-            case SITE_TYPES.MONASTERY:
-                interactionData.options = this.getMonasteryOptions();
-                break;
-            case SITE_TYPES.MAGE_TOWER:
-                interactionData.options = this.getMageTowerOptions();
-                break;
-            case SITE_TYPES.KEEP:
-                interactionData.options = this.getKeepOptions();
-                break;
-            default:
-                interactionData.options = [];
+        case SITE_TYPES.VILLAGE:
+            interactionData.options = this.getVillageOptions();
+            break;
+        case SITE_TYPES.MONASTERY:
+            interactionData.options = this.getMonasteryOptions();
+            break;
+        case SITE_TYPES.MAGE_TOWER:
+            interactionData.options = this.getMageTowerOptions();
+            break;
+        case SITE_TYPES.KEEP:
+            interactionData.options = this.getKeepOptions();
+            break;
+        default:
+            interactionData.options = [];
         }
 
         return interactionData;

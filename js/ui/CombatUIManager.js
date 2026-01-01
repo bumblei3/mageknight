@@ -92,10 +92,10 @@ export class CombatUIManager {
         const executeAttackBtn = document.getElementById('execute-attack-btn');
         if (executeAttackBtn) {
             if (phase === COMBAT_PHASE.RANGED) {
-                executeAttackBtn.textContent = "Fernkampf beenden -> Blocken";
+                executeAttackBtn.textContent = 'Fernkampf beenden -> Blocken';
                 executeAttackBtn.style.display = 'block';
             } else if (phase === COMBAT_PHASE.ATTACK) {
-                executeAttackBtn.textContent = "Angriff ausführen";
+                executeAttackBtn.textContent = 'Angriff ausführen';
                 executeAttackBtn.style.display = 'block';
             } else {
                 executeAttackBtn.style.display = 'none';

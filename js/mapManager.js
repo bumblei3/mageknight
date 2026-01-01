@@ -148,18 +148,18 @@ export class MapManager {
 
     getRandomSiteForTerrain(terrain) {
         switch (terrain) {
-            case TERRAIN_TYPES.PLAINS:
-                return Math.random() < 0.7 ? SITE_TYPES.VILLAGE : null;
-            case TERRAIN_TYPES.HILLS:
-                return Math.random() < 0.5 ? SITE_TYPES.KEEP : SITE_TYPES.MONASTERY;
-            case TERRAIN_TYPES.FOREST:
-                return Math.random() < 0.3 ? SITE_TYPES.KEEP : null;
-            case TERRAIN_TYPES.WASTELAND:
-                return Math.random() < 0.6 ? SITE_TYPES.MAGE_TOWER : SITE_TYPES.DUNGEON;
-            case TERRAIN_TYPES.DESERT:
-                return Math.random() < 0.4 ? SITE_TYPES.MAGE_TOWER : null;
-            default:
-                return null;
+        case TERRAIN_TYPES.PLAINS:
+            return Math.random() < 0.7 ? SITE_TYPES.VILLAGE : null;
+        case TERRAIN_TYPES.HILLS:
+            return Math.random() < 0.5 ? SITE_TYPES.KEEP : SITE_TYPES.MONASTERY;
+        case TERRAIN_TYPES.FOREST:
+            return Math.random() < 0.3 ? SITE_TYPES.KEEP : null;
+        case TERRAIN_TYPES.WASTELAND:
+            return Math.random() < 0.6 ? SITE_TYPES.MAGE_TOWER : SITE_TYPES.DUNGEON;
+        case TERRAIN_TYPES.DESERT:
+            return Math.random() < 0.4 ? SITE_TYPES.MAGE_TOWER : null;
+        default:
+            return null;
         }
     }
 

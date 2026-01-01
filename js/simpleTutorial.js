@@ -157,13 +157,13 @@ export class SimpleTutorial {
         // Remove old 'highlight-pulse' from button if any
         nextBtn.classList.remove('btn-disabled');
         nextBtn.disabled = false;
-        nextBtn.title = "";
+        nextBtn.title = '';
 
         if (step.waitForAction) {
             // Instead of hiding, we disable it and explain why
             nextBtn.disabled = true;
             nextBtn.classList.add('btn-disabled');
-            nextBtn.title = "Führe die Aktion aus um fortzufahren";
+            nextBtn.title = 'Führe die Aktion aus um fortzufahren';
             nextBtn.textContent = 'Aktion ausführen...';
             this.waitForAction(step.actionType);
         } else {

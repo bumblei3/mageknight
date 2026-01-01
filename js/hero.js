@@ -496,7 +496,7 @@ export class Hero {
         }
 
         this.influencePoints -= influenceCost;
-        // Spells usually go to top of deck or discard depending on source, 
+        // Spells usually go to top of deck or discard depending on source,
         // simplified: add to discard for now (standard for gaining cards)
         this.discard.push(spellCard);
         return { success: true, message: `${spellCard.name} gelernt!` };
@@ -516,7 +516,7 @@ export class Hero {
     // Gain card directly to hand (e.g. from Level Up)
     gainCardToHand(card) {
         this.hand.push(card);
-        // Maybe sort hand or trigger UI update? 
+        // Maybe sort hand or trigger UI update?
         // UI update happens in Game.render()
         return { success: true, message: `${card.name} erhalten!` };
     }

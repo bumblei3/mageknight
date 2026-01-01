@@ -170,7 +170,14 @@ export class UI {
             newLevelDisplay: document.getElementById('new-level-display'),
             skillChoices: document.getElementById('skill-choices'),
             cardChoices: document.getElementById('card-choices'),
-            confirmLevelUpBtn: document.getElementById('confirm-level-up')
+            confirmLevelUpBtn: document.getElementById('confirm-level-up'),
+
+            // Event Modal
+            eventModal: document.getElementById('event-modal'),
+            eventClose: document.getElementById('event-close'),
+            eventTitle: document.getElementById('event-title'),
+            eventDescription: document.getElementById('event-description'),
+            eventOptions: document.getElementById('event-options')
         };
     }
 
@@ -178,6 +185,9 @@ export class UI {
         // Event listeners will be set from game.js
         if (this.elements.siteClose) {
             this.elements.siteClose.addEventListener('click', () => this.hideSiteModal());
+        }
+        if (this.elements.eventClose) {
+            this.elements.eventClose.addEventListener('click', () => this.elements.eventModal.classList.remove('active'));
         }
     }
 
@@ -301,6 +311,64 @@ export class UI {
 
     renderSiteOptions(options) {
         this.modals.renderSiteOptions(options);
+    }
+
+    // World Event Modal
+    showEventModal(eventData) {
+        if (!eventData || !eventData.type) return;
+
+        this.elements.eventTitle.textContent = eventData.title;
+        this.elements.eventDescription.textContent = eventData.description;
+        this.elements.eventOptions.innerHTML = '';
+
+        eventData.options.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary event-option';
+
+            // Allow styling based on action (e.g. fight = red)
+            if (option.action === 'fight') btn.classList.add('btn-danger');
+
+            btn.innerHTML = `<span class="option-label">${option.label}</span>`;
+
+            btn.addEventListener('click', () => {
+                // Determine logic. Best to delegate to Game/WorldEventManager or callback
+                // But WorldEventManager is not available here directly usually...
+                // Actually game.worldEvents IS available via game.
+
+                // Close modal first
+                this.elements.eventModal.classList.remove('active');
+
+                // Execute
+                const result = this.game.mapManager.worldEvents.resolveEventOption(eventData, index);
+
+                if (result) {
+                    if (result.success) {
+                        this.showToast(result.message, 'success');
+                    } else if (result.action === 'fight') {
+                        // Initiate Combat if it was an ambush
+                        // Find enemy at current pos (MapManager already spawned it maybe? No, Ambush spawns NOW)
+                        // Ambush logic in resolveEventOption just returned 'fight'.
+                        // We need to trigger a fight.
+                        // Let's manually trigger a combat check at current position.
+                        // But MapManager.explore called createEnemies already?
+
+                        // If it's a "Spawn Enemy" event, we might need to physically spawn it now.
+                        // WorldEvents.js logic for 'fight' was incomplete.
+
+                        // Quick Fix: Ambush -> Spawn enemy at hero pos and start combat.
+                        const enemy = this.game.enemyAI.generateEnemy(this.game.hexGrid.getHex(this.game.hero.position.q, this.game.hero.position.r).terrain, this.game.hero.level);
+                        enemy.position = { ...this.game.hero.position };
+                        this.game.enemies.push(enemy);
+                        this.game.initiateCombat(enemy);
+                    } else if (result.message) {
+                        this.showToast(result.message, 'error');
+                    }
+                }
+            });
+            this.elements.eventOptions.appendChild(btn);
+        });
+
+        this.elements.eventModal.classList.add('active');
     }
 
     // Helper Methods for external use

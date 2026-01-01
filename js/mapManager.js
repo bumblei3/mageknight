@@ -7,6 +7,11 @@ export class MapManager {
         this.tilesDeck = [];
         this.initializeDeck();
         this.revealedHexes = new Set();
+        this.worldEvents = null; // Will be set by Game
+    }
+
+    setWorldEventManager(manager) {
+        this.worldEvents = manager;
     }
 
     initializeDeck() {
@@ -113,10 +118,18 @@ export class MapManager {
 
         this.placeTile(targetCenter.q, targetCenter.r, tileTerrains);
 
+        // Check for Event
+        let event = null;
+        if (this.worldEvents) {
+            event = this.worldEvents.checkForEvent(tileTerrains[0]);
+            // Add event data to the return object
+        }
+
         return {
             success: true,
             message: 'Neues Gebiet entdeckt!',
-            center: targetCenter
+            center: targetCenter,
+            event: event
         };
     }
 
@@ -148,18 +161,18 @@ export class MapManager {
 
     getRandomSiteForTerrain(terrain) {
         switch (terrain) {
-        case TERRAIN_TYPES.PLAINS:
-            return Math.random() < 0.7 ? SITE_TYPES.VILLAGE : null;
-        case TERRAIN_TYPES.HILLS:
-            return Math.random() < 0.5 ? SITE_TYPES.KEEP : SITE_TYPES.MONASTERY;
-        case TERRAIN_TYPES.FOREST:
-            return Math.random() < 0.3 ? SITE_TYPES.KEEP : null;
-        case TERRAIN_TYPES.WASTELAND:
-            return Math.random() < 0.6 ? SITE_TYPES.MAGE_TOWER : SITE_TYPES.DUNGEON;
-        case TERRAIN_TYPES.DESERT:
-            return Math.random() < 0.4 ? SITE_TYPES.MAGE_TOWER : null;
-        default:
-            return null;
+            case TERRAIN_TYPES.PLAINS:
+                return Math.random() < 0.7 ? SITE_TYPES.VILLAGE : null;
+            case TERRAIN_TYPES.HILLS:
+                return Math.random() < 0.5 ? SITE_TYPES.KEEP : SITE_TYPES.MONASTERY;
+            case TERRAIN_TYPES.FOREST:
+                return Math.random() < 0.3 ? SITE_TYPES.KEEP : null;
+            case TERRAIN_TYPES.WASTELAND:
+                return Math.random() < 0.6 ? SITE_TYPES.MAGE_TOWER : SITE_TYPES.DUNGEON;
+            case TERRAIN_TYPES.DESERT:
+                return Math.random() < 0.4 ? SITE_TYPES.MAGE_TOWER : null;
+            default:
+                return null;
         }
     }
 

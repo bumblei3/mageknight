@@ -88,20 +88,112 @@ export class EnemyAI {
      */
     applyAbility(ability, target, source) {
         switch (ability) {
-        case ENEMY_ABILITIES.POISON:
-            // Add extra wound to hand
-            return { effect: 'wound', count: 1, message: 'Vergiftet! +1 Verletzung' };
-        case ENEMY_ABILITIES.FIRE:
-            // Double damage calculation handled in combat
-            return { effect: 'damage_boost', message: 'Feuerangriff! Doppelter Schaden' };
-        case ENEMY_ABILITIES.VAMPIRIC: {
-            // Heal source
-            const heal = 1;
-            source.currentHealth = Math.min(source.maxHealth, source.currentHealth + heal);
-            return { effect: 'heal', value: heal, message: 'Lebensraub! Feind heilt sich' };
+            case ENEMY_ABILITIES.POISON:
+                // Add extra wound to hand
+                return { effect: 'wound', count: 1, message: 'Vergiftet! +1 Verletzung' };
+            case ENEMY_ABILITIES.FIRE:
+                // Double damage calculation handled in combat
+                return { effect: 'damage_boost', message: 'Feuerangriff! Doppelter Schaden' };
+            case ENEMY_ABILITIES.VAMPIRIC: {
+                // Heal source
+                const heal = 1;
+                source.currentHealth = Math.min(source.maxHealth, source.currentHealth + heal);
+                return { effect: 'heal', value: heal, message: 'Lebensraub! Feind heilt sich' };
+            }
+            default:
+                return null;
         }
-        default:
-            return null;
+    }
+
+    /**
+     * Update all enemies (movement, regeneration, etc.)
+     * Called at end of round
+     * @param {Array} enemies 
+     * @param {Object} hero 
+     */
+    updateEnemies(enemies, hero) {
+        const moveLog = [];
+
+        enemies.forEach(enemy => {
+            if (enemy.isDefeated) return;
+
+            // Simple regeneration
+            if (enemy.currentHealth < enemy.maxHealth) {
+                enemy.currentHealth = Math.min(enemy.maxHealth, enemy.currentHealth + 1);
+            }
+
+            // Movement Logic
+            // Only move non-fortified enemies (Orcs, Draconum, etc. in open terrain)
+            // Bosses might have special movement rules
+            // Keeps/Mage Towers/Cities are static usually, unless we add roaming armies.
+            // For now, let's assume all basic enemies can move if they are not in a site.
+
+            // Check if enemy is "roaming" capable
+            if (this.canMove(enemy)) {
+                const move = this.getBestMove(enemy, hero.position, enemies);
+                if (move) {
+                    enemy.position = move;
+                    moveLog.push(`${enemy.name} bewegt sich.`);
+                }
+            }
+        });
+
+        return moveLog;
+    }
+
+    canMove(enemy) {
+        // Basic enemies roam. Static sites do not.
+        // We can check enemy type or a 'static' flag.
+        // For now, assume Orcs, Draconum, Elementals roam.
+        const roamingTypes = [ENEMY_TYPES.ORC, ENEMY_TYPES.DRACONUM, ENEMY_TYPES.ELEMENTAL, ENEMY_TYPES.ROBBER];
+        return roamingTypes.includes(enemy.type);
+    }
+
+    getBestMove(enemy, heroPos, allEnemies) {
+        if (!enemy.position) return null;
+
+        const currentQ = enemy.position.q;
+        const currentR = enemy.position.r;
+        const neighbors = this.game.hexGrid.getNeighbors(currentQ, currentR);
+
+        // Filter valid moves
+        const validMoves = neighbors.filter(n => {
+            // Must have hex
+            if (!this.game.hexGrid.hasHex(n.q, n.r)) return false;
+
+            // Avoid Water/Mountains (unless flying?)
+            const hex = this.game.hexGrid.getHex(n.q, n.r);
+            if (!hex || hex.terrain === 'water' || hex.terrain === 'mountains') return false;
+
+            // Avoid other enemies
+            const isOccupied = allEnemies.some(e => e !== enemy && !e.isDefeated && e.position && e.position.q === n.q && e.position.r === n.r);
+            if (isOccupied) return false;
+
+            // Avoid Hero collision (unless attacking? For now avoid stacking)
+            if (heroPos.q === n.q && heroPos.r === n.r) return false;
+
+            return true;
+        });
+
+        if (validMoves.length === 0) return null;
+
+        // Behavior: Aggressive (move towards hero) or Passive (random)
+        // Aggro range: 3 hexes
+        const distToHero = this.game.hexGrid.distance(currentQ, currentR, heroPos.q, heroPos.r);
+        const isAggro = distToHero <= 3;
+
+        if (isAggro) {
+            // Move closer
+            validMoves.sort((a, b) => {
+                const da = this.game.hexGrid.distance(a.q, a.r, heroPos.q, heroPos.r);
+                const db = this.game.hexGrid.distance(b.q, b.r, heroPos.q, heroPos.r);
+                return da - db;
+            });
+            return validMoves[0];
+        } else {
+            // Random wander (20% chance to stay still)
+            if (Math.random() < 0.2) return null;
+            return validMoves[Math.floor(Math.random() * validMoves.length)];
         }
     }
 

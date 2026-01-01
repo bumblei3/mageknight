@@ -222,6 +222,9 @@ export class ActionManager {
     /**
      * Explores adjacent unknown hexes
      */
+    /**
+     * Explores adjacent unknown hexes
+     */
     explore() {
         if (this.game.gameState !== 'playing' || this.game.combat) return;
 
@@ -234,19 +237,31 @@ export class ActionManager {
         // Exploration reveals new info -> IRREVERSIBLE
         this.clearHistory();
 
+        // Use MapManager to potentially place new tiles or just reveal
+        const result = this.game.mapManager.explore(this.game.hero.position.q, this.game.hero.position.r);
+
+        // Also reveal existing fog of war
         const newHexes = this.game.hexGrid.exploreAdjacent(this.game.hero.position);
-        if (newHexes.length > 0) {
+
+        if (result.success || newHexes.length > 0) {
             this.game.hero.movementPoints -= cost;
-            this.game.addLog(`${newHexes.length} neue Gebiete entdeckt!`, 'discovery');
-            this.game.statisticsManager.increment('tilesExplored', newHexes.length);
+            const count = (result.success ? 7 : 0) + newHexes.length; // Approx 7 for a new tile
+
+            this.game.addLog(`Neues Gebiet entdeckt!`, 'discovery');
+            this.game.statisticsManager.increment('tilesExplored', count);
 
             // Visual Feedback
-            newHexes.forEach(hex => {
-                const pixel = this.game.hexGrid.axialToPixel(hex.q, hex.r);
-                this.game.particleSystem.discoveryEffect(pixel.x, pixel.y);
-            });
+            this.game.particleSystem.discoveryEffect(
+                this.game.hexGrid.getScreenPos(this.game.hero.position.q, this.game.hero.position.r).x,
+                this.game.hexGrid.getScreenPos(this.game.hero.position.q, this.game.hero.position.r).y
+            );
 
             this.game.entityManager.createEnemies();
+
+            // Handle World Event
+            if (result.event) {
+                this.game.ui.showEventModal(result.event);
+            }
 
             this.game.updateStats();
             this.game.render();

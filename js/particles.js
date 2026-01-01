@@ -147,11 +147,18 @@ export class ParticleSystem {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.particles = [];
-        this.pool = []; // Object pool for reusing particles
+        this.pool = [];
+        this.floatingTexts = []; // New separate list for text
         this.isRunning = false;
         this.lastTime = performance.now();
         this.targetFPS = 60;
         this.frameInterval = 1000 / this.targetFPS;
+
+        // Screen Shake
+        this.shakeTime = 0;
+        this.shakeMagnitude = 0;
+        this.shakeOffsetX = 0;
+        this.shakeOffsetY = 0;
     }
 
     /**
@@ -482,8 +489,24 @@ export class ParticleSystem {
         }
         this.particles = alive;
 
-        // Stop animation loop if no particles
-        if (this.particles.length === 0) {
+        // Update shake
+        if (this.shakeTime > 0) {
+            this.shakeTime -= deltaTime / 60; // Approximate seconds
+            const damping = this.shakeTime;
+            this.shakeOffsetX = (Math.random() - 0.5) * this.shakeMagnitude * damping * 20;
+            this.shakeOffsetY = (Math.random() - 0.5) * this.shakeMagnitude * damping * 20;
+            if (this.shakeTime <= 0) {
+                this.shakeTime = 0;
+                this.shakeOffsetX = 0;
+                this.shakeOffsetY = 0;
+            }
+        }
+
+        // Update floating texts
+        this.floatingTexts = this.floatingTexts.filter(ft => ft.update());
+
+        // Stop animation loop if no active elements
+        if (this.particles.length === 0 && this.floatingTexts.length === 0 && this.shakeTime <= 0) {
             this.stop();
         }
     }
@@ -492,7 +515,17 @@ export class ParticleSystem {
      * Draw all particles
      */
     draw() {
+        this.ctx.save();
+
+        // Apply Screen Shake globally
+        if (this.shakeTime > 0) {
+            this.ctx.translate(this.shakeOffsetX, this.shakeOffsetY);
+        }
+
         this.particles.forEach(particle => particle.draw(this.ctx));
+        this.floatingTexts.forEach(ft => ft.draw(this.ctx));
+
+        this.ctx.restore();
     }
 
     /**
@@ -704,52 +737,49 @@ export class ParticleSystem {
      * Damage numbers - Floating text effect
      * Note: This uses canvas text rendering
      */
-    createDamageNumber(x, y, damage, isCritical = false) {
-        // Create special particle for damage number
-        const color = isCritical ? '#fbbf24' : '#ef4444';
-        const particle = {
+    triggerShake(magnitude = 1.0, duration = 0.5) {
+        this.shakeMagnitude = magnitude;
+        this.shakeTime = duration;
+        if (!this.isRunning) this.start();
+    }
+
+    createFloatingText(x, y, text, color = '#ffffff') {
+        const ft = {
             x,
             y,
-            vx: (Math.random() - 0.5) * 0.5,
-            vy: -2,
+            text,
+            color,
+            vx: 0,
+            vy: -1,
             life: 1.5,
-            decay: 0.01,
             opacity: 1,
-            damage,
-            isCritical,
 
-            update(deltaTime = 1) {
-                this.x += this.vx * deltaTime;
-                this.y += this.vy * deltaTime;
-                this.vy += 0.05 * deltaTime; // Slight upward deceleration
-                this.life -= this.decay * deltaTime;
-                this.opacity = Math.max(0, this.life / 1.5);
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.016; // approx 60fps
+                this.opacity = Math.max(0, this.life);
                 return this.life > 0;
             },
 
             draw(ctx) {
                 ctx.save();
                 ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = color;
-                ctx.strokeStyle = '#000';
+                ctx.fillStyle = this.color;
+                ctx.font = 'bold 24px Arial';
+                ctx.strokeStyle = 'black';
                 ctx.lineWidth = 3;
-                ctx.font = `${this.isCritical ? 'bold ' : ''}${this.isCritical ? 28 : 20}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-
-                // Stroke (outline)
-                ctx.strokeText(this.damage.toString(), this.x, this.y);
-                // Fill
-                ctx.fillText(this.damage.toString(), this.x, this.y);
-
+                ctx.strokeText(this.text, this.x, this.y);
+                ctx.fillText(this.text, this.x, this.y);
                 ctx.restore();
             }
         };
+        this.floatingTexts.push(ft);
+        if (!this.isRunning) this.start();
+    }
 
-        this.particles.push(particle);
-        if (!this.isRunning) {
-            this.start();
-        }
+    createDamageNumber(x, y, damage, isCritical = false) {
+        this.createFloatingText(x, y, damage.toString(), isCritical ? '#fbbf24' : '#ef4444');
     }
     /**
      * Card played effect

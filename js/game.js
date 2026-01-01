@@ -13,6 +13,7 @@ import SaveManager from './saveManager.js';
 import TutorialManager from './tutorialManager.js';
 import { TimeManager } from './timeManager.js';
 import { MapManager } from './mapManager.js';
+import { WorldEventManager } from './worldEvents.js';
 import ParticleSystem from './particles.js';
 import { animator } from './animator.js';
 import { SiteInteractionManager } from './siteInteraction.js';
@@ -46,6 +47,9 @@ export class MageKnightGame {
      * Initializes the game engine and subsystems.
      */
     constructor() {
+        // Clear global event bus to prevent listener accumulation from previous instances
+        eventBus.clear();
+
         this.abortController = new AbortController();
         this.gameState = 'playing';
 
@@ -77,6 +81,9 @@ export class MageKnightGame {
         this.enemyAI = new EnemyAI(this.hexGrid);
         this.particleSystem = new ParticleSystem(this.canvas);
         this.mapManager = new MapManager(this.hexGrid);
+        this.worldEventManager = new WorldEventManager(this);
+        this.mapManager.setWorldEventManager(this.worldEventManager);
+
         this.siteManager = new SiteInteractionManager(this);
         this.debug = new DebugManager(this);
 
@@ -138,6 +145,7 @@ export class MageKnightGame {
         this.renderMana();
 
         this.setupTimeListener();
+        this.setupVisualEffectsListeners(); // New listener cleanup
         this.inputController.setup();
 
         if (TouchController.isTouchDevice()) {
@@ -244,6 +252,7 @@ export class MageKnightGame {
      * @param {string} type
      */
     addLog(message, type = 'info') {
+        if (!message) return;
         logger.info(`Game Log: ${message}`);
         eventBus.emit(GAME_EVENTS.LOG_ADDED, { message, type });
     }
@@ -551,6 +560,13 @@ export class MageKnightGame {
             }
 
             this.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
+
+            // Enemy Turn / World Update
+            const enemyLogs = this.enemyAI.updateEnemies(this.enemies, this.hero);
+            if (enemyLogs && enemyLogs.length > 0) {
+                enemyLogs.forEach(log => this.addLog(log, 'warning'));
+                this.showToast('Feinde haben sich bewegt!', 'warning');
+            }
         });
     }
 
@@ -573,7 +589,50 @@ export class MageKnightGame {
         }
 
         document.body.classList.toggle('night-mode', isNight);
+        document.body.classList.toggle('night-mode', isNight);
         this.hexGrid.setTimeOfDay(isNight);
+    }
+
+    /**
+     * Set up listeners for visual effects (Game Juice)
+     */
+    setupVisualEffectsListeners() {
+        // Trigger screen shake on damage notification
+        // We listen to LOG_ADDED for specific keywords or add new dedicated events
+        // Better: Use new dedicated events if available, or piggyback on log messages for now
+        // if no dedicated 'HERO_TOOK_DAMAGE' event exists.
+        // Checking constants.js for events.
+
+        // Actually, let's subscribe to generic game events that imply impact
+        // But for now, let's look at where damage happens. 
+        // CombatOrchestrator emits logs. 
+
+        // Let's add specific logic for dedicated effects
+        eventBus.on(GAME_EVENTS.LOG_ADDED, (data) => {
+            if (data.type === 'error' && (data.message.includes('Verletzung') || data.message.includes('Damage'))) {
+                this.particleSystem.triggerShake(5, 0.4);
+                // Add visual redness?
+            }
+        });
+
+        // If we want floating numbers for damage, we need to intercept the moments damage is dealt.
+        // We can expose a method 'triggerDamageVisuals(target, amount)' or listen to an event.
+    }
+
+    /**
+     * Triggers visual feedback for damage
+     */
+    triggerDamageFeedback(x, y, amount) {
+        // Calculate screen coordinates from hex/world if needed
+        // For simplicity, center screen or specific UI element? 
+        // Ideally we want world coordinates mapped to screen.
+        // HexGrid has hexToPixel(q, r).
+
+        // If x,y are World Coords (pixels on canvas)
+        if (this.particleSystem) {
+            this.particleSystem.createDamageNumber(x, y, amount, amount > 3);
+            this.particleSystem.triggerShake(amount * 2, 0.3);
+        }
     }
 
     /**

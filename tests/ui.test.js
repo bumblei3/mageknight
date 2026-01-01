@@ -262,10 +262,10 @@ describe('UI', () => {
             options: []
         };
         ui.showSiteModal(data);
-        expect(ui.elements.siteModal.classList.contains('active')).toBe(true);
+        expect(ui.elements.siteModal.classList.contains('show')).toBe(true);
 
         ui.hideSiteModal();
-        expect(ui.elements.siteModal.classList.contains('active')).toBe(false);
+        expect(ui.elements.siteModal.classList.contains('show')).toBe(false);
     });
 
     it('should show toast notifications', () => {

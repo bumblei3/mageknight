@@ -16,13 +16,16 @@ export class ModalManager {
             return;
         }
 
+        // Ensure we handle the 'show' class correctly
+        this.elements.siteModal.classList.remove('active');
+
         this.elements.siteModalIcon.textContent = interactionData.icon;
         this.elements.siteModalTitle.textContent = interactionData.name;
         this.elements.siteModalTitle.style.color = interactionData.color;
         this.elements.siteModalDescription.textContent = interactionData.description;
 
         this.renderSiteOptions(interactionData.options);
-        this.elements.siteModal.classList.add('active');
+        this.elements.siteModal.classList.add('show');
     }
 
     /**
@@ -30,7 +33,7 @@ export class ModalManager {
      */
     hideSiteModal() {
         if (this.elements.siteModal) {
-            this.elements.siteModal.classList.remove('active');
+            this.elements.siteModal.classList.remove('show');
         }
     }
 

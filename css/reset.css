@@ -1,32 +1,39 @@
 /* ===================================
    CSS VARIABLES & DESIGN SYSTEM
    =================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap');
 
 :root {
-    /* Colors - Deep Space / Magic Theme */
-    --color-bg-primary: #05050a;
-    --color-bg-secondary: #0c0c1d;
-    --color-bg-tertiary: #13132e;
+    /* Fantasy Fonts */
+    --font-display: 'Cinzel', serif;
+    --font-body: 'Inter', sans-serif;
 
-    /* Accents - More Vibrant */
-    --color-accent-primary: #a855f7;
-    /* Brighter Violet */
-    --color-accent-secondary: #f472b6;
-    /* Brighter Pink */
-    --color-accent-cyan: #22d3ee;
-    /* Brighter Cyan */
-    --color-accent-gold: #fbbf24;
-    /* Rich Gold */
+    /* Colors - Fantasy Theme */
+    --color-bg-primary: #0a0808;
+    --color-bg-secondary: #1a120d;
+    --color-bg-tertiary: #2a1a10;
 
-    /* Glassmorphism - Premium Polish */
-    --glass-bg: rgba(15, 15, 30, 0.7);
-    --glass-bg-hover: rgba(25, 25, 50, 0.8);
-    --glass-border: rgba(168, 85, 247, 0.2);
-    --glass-border-highlight: rgba(168, 85, 247, 0.5);
-    --glass-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.7);
-    --backdrop-blur: blur(16px) saturate(180%);
-    --glass-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    /* Accents - Warm Fantasy Colors */
+    --color-accent-primary: #d4a574;
+    /* Antique Gold */
+    --color-accent-secondary: #c9302c;
+    /* Deep Crimson */
+    --color-accent-cyan: #4a9f8e;
+    /* Muted Teal */
+    --color-accent-gold: #daa520;
+    /* Goldenrod */
+
+    /* Glassmorphism - Fantasy Parchment */
+    --glass-bg: rgba(26, 18, 13, 0.85);
+    --glass-bg-hover: rgba(42, 26, 16, 0.9);
+    --glass-border: rgba(212, 165, 116, 0.3);
+    --glass-border-highlight: rgba(218, 165, 32, 0.6);
+    --glass-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
+    --backdrop-blur: blur(12px) saturate(140%);
+
+    /* Parchment Texture */
+    --parchment-bg: linear-gradient(145deg, rgba(42, 32, 22, 0.95), rgba(26, 18, 13, 0.98));
+    --parchment-border: 2px solid rgba(139, 90, 43, 0.5);
 
     /* Mana Colors */
     --color-mana-red: #ff3333;
@@ -113,9 +120,10 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Scrollbar Styling */

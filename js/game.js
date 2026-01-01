@@ -38,6 +38,7 @@ import { GameStateManager } from './game/GameStateManager.js';
 import { CombatOrchestrator } from './game/CombatOrchestrator.js';
 import { InputController } from './game/InputController.js';
 import { RenderController } from './game/RenderController.js';
+import { HeroController } from './game/HeroController.js';
 
 /**
  * Main Game Controller Class
@@ -99,6 +100,7 @@ export class MageKnightGame {
         this.actionManager = new ActionManager(this);
         this.stateManager = new GameStateManager(this);
         this.combatOrchestrator = new CombatOrchestrator(this);
+        this.heroController = new HeroController(this);
 
         // State
         this.movementMode = false;
@@ -406,98 +408,12 @@ export class MageKnightGame {
 
     endRangedPhase() { this.combatOrchestrator.endRangedPhase(); }
 
-    gainFame(amount) {
-        const result = this.hero.gainFame(amount);
-        if (result.leveledUp) {
-            this.statisticsManager.trackLevelUp(result.newLevel);
-            this.addLog(`🎉 STUFENAUFSTIEG! Stufe ${result.newLevel} erreicht!`, 'success');
-            this.showNotification(`Stufe ${result.newLevel} erreicht!`, 'success');
-            this.triggerLevelUp(result.newLevel);
-        }
-    }
-
-    triggerLevelUp(newLevel) {
-        // Pause game / block input?
-
-        // Generate choices
-        const skills = getRandomSkills('GOLDYX', 2, this.hero.skills);
-
-        // Get 3 random advanced actions (simplified: just take samples)
-        const cards = createDeck(SAMPLE_ADVANCED_ACTIONS); // In real game, draw 3 from advanced deck
-
-        this.ui.showLevelUpModal(newLevel, { skills, cards }, (selection) => {
-            this.handleLevelUpSelection(selection);
-        });
-    }
-
-    handleLevelUpSelection(selection) {
-        // Apply Skill
-        if (selection.skill) {
-            this.hero.addSkill(selection.skill);
-            this.addLog(`Fertigkeit gelernt: ${selection.skill.name} `, 'success');
-        }
-
-        // Apply Card
-        // Apply Card
-        if (selection.card) {
-            this.hero.gainCardToHand(selection.card);
-            this.addLog(`Karte erhalten(auf die Hand): ${selection.card.name} `, 'success');
-        }
-
-        // Apply Level Up stats
-        this.hero.levelUp();
-
-        // Particle Effect
-        const heroPixel = this.hexGrid.axialToPixel(this.hero.displayPosition.q, this.hero.displayPosition.r);
-        this.particleSystem.levelUpExplosion(heroPixel.x, heroPixel.y);
-
-        this.updateStats();
-        this.render();
-    }
-
-
-
-    getManaEmoji(color) {
-        const emojis = {
-            red: '🔥',
-            blue: '💧',
-            white: '✨',
-            green: '🌿',
-            gold: '💰',
-            black: '🌑'
-        };
-        return emojis[color] || '⬛';
-    }
-
-    updateHeroMana() {
-        this.ui.renderHeroMana(this.hero.getManaInventory());
-    }
-
-    applyHealing() {
-        if (!this.hero) {
-            return false;
-        }
-
-        if (this.hero.healingPoints <= 0) {
-            this.addLog('Keine Heilungspunkte verfügbar.', 'info');
-            return false;
-        }
-
-        if (this.hero.wounds.length === 0) {
-            this.addLog('Keine Verletzungen zum Heilen.', 'info');
-            return false;
-        }
-
-        const success = this.hero.healWound(true);
-        if (success) {
-            this.addLog('Verletzung geheilt!', 'success');
-            this.sound.heal();
-            this.updateStats();
-            this.renderHand();
-            return true;
-        }
-        return false;
-    }
+    gainFame(amount) { this.heroController.gainFame(amount); }
+    triggerLevelUp(newLevel) { this.heroController.triggerLevelUp(newLevel); }
+    handleLevelUpSelection(selection) { this.heroController.handleLevelUpSelection(selection); }
+    getManaEmoji(color) { return this.heroController.getManaEmoji(color); }
+    updateHeroMana() { this.heroController.updateHeroMana(); }
+    applyHealing() { return this.heroController.applyHealing(); }
 
     endTurn() { this.phaseManager.endTurn(); }
     rest() { this.phaseManager.rest(); }

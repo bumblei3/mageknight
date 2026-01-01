@@ -87,10 +87,9 @@ export class Hero {
     // Draw a single card
     drawCard() {
         // If deck is empty, shuffle discard into deck
-        if (this.deck.length === 0 && this.discard.length > 0) {
-            this.deck = shuffleDeck([...this.discard]);
-            this.discard = [];
-        }
+        // In Mage Knight, deck does not auto-refill from discard during a round.
+        // It only refills at the start of a new Round.
+        // if (this.deck.length === 0 && this.discard.length > 0) ... REMOVED
 
         // Draw from deck
         if (this.deck.length > 0) {

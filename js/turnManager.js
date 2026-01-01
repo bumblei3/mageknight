@@ -24,7 +24,8 @@ export class TurnManager {
         this.game.exitMovementMode();
 
         // Check for end of round
-        if (this.game.hero.deck.length === 0) {
+        // Round ends when Deck is empty AND Hand is empty (or player decides, but here we force when empty)
+        if (this.game.hero.deck.length === 0 && this.game.hero.hand.length === 0) {
             this.endRound();
         }
 

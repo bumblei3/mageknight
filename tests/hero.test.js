@@ -42,17 +42,21 @@ describe('Hero', () => {
 
     // === NEW EDGE CASE TESTS ===
 
-    it('should handle empty deck by shuffling discard', () => {
+    it('should NOT shuffle discard into deck automatically during round', () => {
         const hero = new HeroBuilder().build();
         hero.drawCards(); // Draw initial hand (5)
         hero.discard.push(...hero.hand);
         hero.hand = [];
         hero.deck = []; // Empty deck
 
+        // Try to draw 3
         const drawnCards = hero.drawCards(3);
-        expect(drawnCards.length).toBe(3);
-        expect(hero.hand.length).toBe(3);
-        expect(hero.deck.length).toBeLessThan(5); // Some cards drawn
+
+        // Should NOT draw anything because deck is empty and valid discard pile exists but shouldn't be touched
+        expect(drawnCards.length).toBe(0);
+        expect(hero.hand.length).toBe(0);
+        expect(hero.deck.length).toBe(0);
+        expect(hero.discard.length).toBe(5); // Discard pile untouched
     });
 
     it('should not draw from empty deck and discard', () => {

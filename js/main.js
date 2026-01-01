@@ -1,4 +1,8 @@
 import { MageKnightGame } from './game.js';
+import i18n from './i18n/index.js';
+
+// Expose i18n globally for easy access
+window.i18n = i18n;
 
 /**
  * Robust initialization for Mage Knight.

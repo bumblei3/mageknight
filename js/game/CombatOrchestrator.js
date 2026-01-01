@@ -2,6 +2,8 @@
  * Orchestrates combat lifecycle and transitions in game.js.
  */
 import { Combat } from '../combat.js';
+import { eventBus } from '../eventBus.js';
+import { GAME_EVENTS } from '../constants.js';
 
 export class CombatOrchestrator {
     constructor(game) {
@@ -161,6 +163,9 @@ export class CombatOrchestrator {
         // UI Updates
         this.game.ui.showCombatPanel([enemy], this.game.combat.phase, (e) => this.handleEnemyClick(e));
         this.game.updatePhaseIndicator();
+
+        // Emit event for other systems
+        eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemy });
     }
 
     /**
@@ -229,6 +234,9 @@ export class CombatOrchestrator {
         this.game.updatePhaseIndicator();
         this.game.render();
         this.game.checkAndShowAchievements();
+
+        // Emit event for other systems
+        eventBus.emit(GAME_EVENTS.COMBAT_ENDED, { victory: result.victory, enemy });
     }
 
     /**

@@ -2,6 +2,8 @@
  * Manages hero actions: Movement, Exploration, and Site Interactions.
  */
 // ActionManager.js
+import { eventBus } from '../eventBus.js';
+import { GAME_EVENTS } from '../constants.js';
 
 export class ActionManager {
     constructor(game) {
@@ -73,6 +75,9 @@ export class ActionManager {
 
         this.game.statisticsManager.increment('tilesExplored');
         this.game.checkAndShowAchievements();
+
+        // Emit event for other systems
+        eventBus.emit(GAME_EVENTS.HERO_MOVED, { from: oldPos, to: { q, r }, cost });
 
         // Check for enemies at new position
         const enemy = this.game.enemies.find(e => e.position.q === q && e.position.r === r);

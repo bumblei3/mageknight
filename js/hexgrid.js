@@ -409,21 +409,21 @@ export class HexGrid {
         this.ctx.clip();
 
         switch (terrain) {
-        case 'water':
-            this.drawWaterTexture(pos);
-            break;
-        case 'forest':
-            this.drawForestTexture(pos);
-            break;
-        case 'mountains':
-            this.drawMountainTexture(pos);
-            break;
-        case 'desert':
-            this.drawDesertTexture(pos);
-            break;
-        case 'plains':
-            this.drawPlainsTexture(pos);
-            break;
+            case 'water':
+                this.drawWaterTexture(pos);
+                break;
+            case 'forest':
+                this.drawForestTexture(pos);
+                break;
+            case 'mountains':
+                this.drawMountainTexture(pos);
+                break;
+            case 'desert':
+                this.drawDesertTexture(pos);
+                break;
+            case 'plains':
+                this.drawPlainsTexture(pos);
+                break;
         }
 
         this.ctx.restore();
@@ -712,10 +712,29 @@ export class HexGrid {
     }
 
     drawHeroAt(x, y) {
-        this.ctx.font = '30px Arial';
+        // High-end glow effect
+        this.ctx.save();
+        const pulse = Math.sin(Date.now() * 0.003) * 0.5 + 0.5; // 0 to 1 pulse
+
+        // Outer radial glow
+        const gradient = this.ctx.createRadialGradient(x, y, 5, x, y, 40 + pulse * 10);
+        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.4)');
+        gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
+
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 50, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Inner sharp glow
+        this.ctx.shadowBlur = 10 + pulse * 10;
+        this.ctx.shadowColor = '#a855f7';
+
+        this.ctx.font = '34px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText('🧙', x, y);
+        this.ctx.restore();
     }
 
     // Get terrain color

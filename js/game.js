@@ -143,6 +143,23 @@ export class MageKnightGame {
         }
 
         this.setupParticleSystem();
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => this.handleResize());
+        this.handleResize(); // Initial resize
+    }
+
+    /**
+     * Handles window resize for full-screen canvas
+     */
+    handleResize() {
+        const canvas = document.getElementById('game-board');
+        if (canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Re-render
+            this.render();
+        }
     }
 
     /**

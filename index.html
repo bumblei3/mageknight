@@ -16,52 +16,60 @@
 <body>
     <div class="game-container" id="game-container">
         <!-- Header -->
-        <header>
-            <div class="header-left">
-                <h1>Mage Knight</h1>
-                <div class="time-indicator-container">
-                    <span id="time-icon" class="time-icon">☀️</span>
-                    <span class="round-display">Runde <span id="round-number" class="round-number">1</span></span>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="stat-pill">
-                    <span class="stat-label">Ruhm</span>
-                    <span class="stat-value" id="fame-value">0</span>
-                </div>
-                <div class="stat-pill">
-                    <span class="stat-label">Ansehen</span>
-                    <span class="stat-value" id="reputation-value">0</span>
-                </div>
-                <button class="btn-icon" id="new-game-btn" title="Neues Spiel">🔄</button>
-                <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)">💾</button>
-                <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)">📂</button>
-                <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
-                <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen">🏆</button>
-                <button class="btn-icon" id="statistics-btn" title="Statistiken anzeigen">📊</button>
-            </div>
-        </header>
+        <!-- Immersive Background Canvas -->
+        <div class="canvas-layer">
+            <canvas id="game-board" width="1600" height="1200"></canvas>
+        </div>
 
-        <!-- Main Game Area -->
-        <div class="game-main">
-            <!-- Left Sidebar -->
-            <aside class="sidebar sidebar-left">
-                <div class="panel hero-panel">
-                    <h2>Held</h2>
+        <!-- HUD Layer (Overlay) -->
+        <div class="hud-layer">
+            <!-- Top Bar -->
+            <header class="hud-top-bar">
+                <div class="header-left">
+                    <div class="game-logo">Mage Knight</div>
+                    <div class="time-indicator-container">
+                        <span id="time-icon" class="time-icon">☀️</span>
+                        <span class="round-display">Runde <span id="round-number" class="round-number">1</span></span>
+                    </div>
+                </div>
+                <div class="header-center">
+                    <!-- Global Status / Messages could go here -->
+                </div>
+                <div class="header-right">
+                    <div class="stat-pill">
+                        <span class="stat-label">Ruhm</span>
+                        <span class="stat-value" id="fame-value">0</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-label">Ansehen</span>
+                        <span class="stat-value" id="reputation-value">0</span>
+                    </div>
+                    <div class="header-controls">
+                        <button class="btn-icon" id="new-game-btn" title="Neues Spiel">🔄</button>
+                        <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)">💾</button>
+                        <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)">📂</button>
+                        <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
+                        <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen">🏆</button>
+                        <button class="btn-icon" id="statistics-btn" title="Statistiken anzeigen">📊</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Left HUD (Hero & Actions) -->
+            <aside class="hud-sidebar hud-left">
+                <div class="panel hero-panel collapsed-check">
+                    <div class="panel-header">
+                        <h2>Held</h2>
+                        <button class="panel-toggle">_</button>
+                    </div>
                     <div class="hero-info">
-                        <div class="hero-name" id="hero-name">Goldyx</div>
-                        <div class="hero-stats">
-                            <div class="stat-row">
-                                <span class="stat-icon">🛡️</span>
-                                <span class="stat-text">Rüstung: <strong id="hero-armor">2</strong></span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-icon">🎴</span>
-                                <span class="stat-text">Handlimit: <strong id="hero-handlimit">5</strong></span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-icon">💔</span>
-                                <span class="stat-text">Verletzungen: <strong id="hero-wounds">0</strong></span>
+                        <div class="hero-avatar">🧙</div>
+                        <div class="hero-details">
+                            <div class="hero-name" id="hero-name">Goldyx</div>
+                            <div class="hero-stats-grid">
+                                <div class="stat-item" title="Rüstung">🛡️ <span id="hero-armor">2</span></div>
+                                <div class="stat-item" title="Handlimit">🎴 <span id="hero-handlimit">5</span></div>
+                                <div class="stat-item" title="Verletzungen">💔 <span id="hero-wounds">0</span></div>
                             </div>
                         </div>
                     </div>
@@ -69,77 +77,65 @@
 
                 <div class="panel action-panel">
                     <h2>Aktionen</h2>
-                    <button class="btn btn-primary" id="end-turn-btn">Zug beenden</button>
-                    <button class="btn btn-secondary" id="rest-btn">Rasten</button>
-                    <button class="btn btn-success" id="heal-btn" style="display: none;">Heilen</button>
-                    <button class="btn btn-secondary" id="explore-btn" disabled>Erkunden (2)</button>
-                    <button class="btn btn-primary" id="visit-btn" style="display: none;">Besuchen</button>
-                </div>
-
-                <div class="panel movement-panel">
-                    <h2>Bewegung</h2>
-                    <div class="movement-info">
-                        <div class="stat-row">
-                            <span class="stat-icon">👣</span>
-                            <span class="stat-text">Punkte: <strong id="movement-points">0</strong></span>
-                        </div>
+                    <div class="action-grid">
+                        <button class="btn btn-primary" id="end-turn-btn">Zug beenden</button>
+                        <button class="btn btn-secondary" id="rest-btn">Rasten</button>
+                        <button class="btn btn-secondary" id="explore-btn" disabled>Erkunden</button>
+                        <button class="btn btn-success" id="heal-btn" style="display: none;">Heilen</button>
+                        <button class="btn btn-primary" id="visit-btn" style="display: none;">Besuchen</button>
                     </div>
                 </div>
 
-                <div class="panel phase-panel">
-                    <h2>Aktuelle Phase</h2>
-                    <div class="phase-indicator" id="phase-indicator">
-                        <div class="phase-text">Erkundung</div>
-                        <div class="phase-hint" id="phase-hint">Spiele Karten oder bewege dich</div>
+                <div class="panel movement-panel">
+                    <div class="movement-display">
+                        <span class="stat-icon">👣</span>
+                        <span class="stat-value" id="movement-points">0</span>
                     </div>
                 </div>
 
                 <div class="panel units-panel">
-                    <h2>🎖️ Einheiten</h2>
-                    <div class="units-container" id="hero-units">
-                        <!-- Units will be rendered here -->
-                    </div>
+                    <h2>Einheiten</h2>
+                    <div class="units-container" id="hero-units"></div>
                 </div>
             </aside>
 
-            <!-- Game Board -->
-            <main class="game-board-container">
-                <div class="board-wrapper">
-                    <canvas id="game-board" width="800" height="600"></canvas>
+            <!-- Right HUD (Log, Mana, Combat) -->
+            <aside class="hud-sidebar hud-right">
+                <div class="panel phase-panel">
+                    <div class="phase-indicator" id="phase-indicator">
+                        <div class="phase-text">Erkundung</div>
+                        <div class="phase-hint" id="phase-hint">Spiele Karten...</div>
+                    </div>
                 </div>
-            </main>
 
-            <!-- Right Sidebar -->
-            <aside class="sidebar sidebar-right">
                 <div class="panel mana-panel">
                     <h2>Mana-Quelle</h2>
-                    <div class="mana-dice" id="mana-source">
-                        <!-- Mana dice will be added dynamically -->
-                    </div>
+                    <div class="mana-dice" id="mana-source"></div>
                 </div>
 
                 <div class="panel combat-panel" id="combat-panel" style="display: none;">
                     <h2>Kampf</h2>
-                    <div class="combat-info" id="combat-info">
-                        <!-- Combat information will be displayed here -->
-                    </div>
-                    <div class="combat-units" id="combat-units" style="margin-top: 1rem;">
-                        <!-- Units available in combat -->
-                    </div>
-                    <div class="combat-actions"
-                        style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <button class="btn btn-primary" id="execute-attack-btn" style="display: none;">⚔️ Angriff
-                            ausführen</button>
-                    </div>
+                    <div class="combat-info" id="combat-info"></div>
+                    <div class="combat-units" id="combat-units"></div>
+                    <button class="btn btn-primary" id="execute-attack-btn" style="display: none;">⚔️ Angriff</button>
                 </div>
 
-                <div class="panel log-panel">
-                    <h2>Spielprotokoll</h2>
+                <div class="panel log-panel minimized">
+                    <h2>Protokoll</h2>
                     <div class="game-log" id="game-log">
-                        <div class="log-entry">Spiel gestartet</div>
+                        <div class="log-entry">Willkommen bei Mage Knight!</div>
                     </div>
                 </div>
             </aside>
+
+            <!-- Bottom Dock (Cards) -->
+            <div class="bottom-dock">
+                <div id="play-area" class="play-area" style="display: none;">
+                    <h3>Gespielt</h3>
+                    <div id="played-cards" class="played-cards-container"></div>
+                </div>
+                <div id="hand-cards" class="hand-cards-container"></div>
+            </div>
         </div>
 
         <!-- Keyboard Shortcuts Info -->

@@ -99,13 +99,18 @@ export class NotificationManager {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
 
-        let icon = 'ℹ️';
-        if (type === 'success') icon = '✅';
-        if (type === 'error') icon = '❌';
-        if (type === 'warning') icon = '⚠️';
-        if (type === 'combat') icon = '⚔️';
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            combat: '⚔️',
+            info: 'ℹ️',
+            achievement: '🏆',
+            levelup: '⬆️'
+        };
 
-        toast.innerHTML = `<span style="font-size: 1.2em;">${icon}</span> <span>${message}</span>`;
+        const icon = icons[type] || icons.info;
+        toast.innerHTML = `<span class="toast-icon">${icon}</span> <span class="toast-message">${message}</span>`;
         this.toastContainer.appendChild(toast);
 
         setTimeout(() => {

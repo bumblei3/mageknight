@@ -31,7 +31,25 @@ export class UI {
 
         this.setupEventListeners();
         this.setupTooltips();
+        this.setupPanelToggles(); // Setup collapsible panels
         this.setupGlobalListeners();
+    }
+
+    /**
+     * Sets up event listeners for collapsible panels.
+     * @private
+     */
+    setupPanelToggles() {
+        const toggles = document.querySelectorAll('.panel-toggle');
+        toggles.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent bubbling
+                const panel = btn.closest('.panel');
+                if (panel) {
+                    panel.classList.toggle('collapsed');
+                }
+            });
+        });
     }
 
     /**

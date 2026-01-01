@@ -54,6 +54,12 @@ export class PhaseManager {
 
         if (!phaseText || !phaseHint) return;
 
+        // Clear existing highlights
+        const panels = document.querySelectorAll('.panel');
+        panels.forEach(p => {
+            p.classList.remove('phase-highlight-movement', 'phase-highlight-combat');
+        });
+
         if (this.game.combat) {
             const phaseNames = {
                 'ranged': 'Fernkampf-Phase',
@@ -73,9 +79,17 @@ export class PhaseManager {
 
             phaseText.textContent = phaseNames[this.game.combat.phase] || 'Kampf';
             phaseHint.textContent = hints[this.game.combat.phase] || 'Kämpfe!';
+
+            // Apply combat highlight to action and combat panels
+            document.querySelector('.action-panel')?.classList.add('phase-highlight-combat');
+            document.getElementById('combat-panel')?.classList.add('phase-highlight-combat');
         } else if (this.game.movementMode) {
             phaseText.textContent = 'Bewegung';
             phaseHint.textContent = `👣 ${this.game.hero.movementPoints} Punkte - Klicke auf ein Feld`;
+
+            // Apply movement highlight
+            document.querySelector('.movement-panel')?.classList.add('phase-highlight-movement');
+            document.querySelector('.action-panel')?.classList.add('phase-highlight-movement');
         } else {
             const timeIcon = this.game.timeManager.isDay() ? '☀️' : '🌙';
             phaseText.textContent = `Erkundung(${timeIcon})`;

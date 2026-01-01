@@ -216,8 +216,12 @@ export class Hero {
         // Clear temporary mana
         this.clearTempMana();
 
-        // Draw new hand
         this.drawCards();
+
+        // Passive Skill: Noble Manners
+        if (this.hasSkill('noble_manners')) {
+            this.influencePoints = 2;
+        }
     }
 
     // Take a wound
@@ -294,6 +298,10 @@ export class Hero {
         }
     }
 
+    hasSkill(skillId) {
+        return this.skills.some(s => s.id === skillId);
+    }
+
     // Add Skill
     addSkill(skill) {
         this.skills.push(skill);
@@ -365,8 +373,15 @@ export class Hero {
             this.discard = [];
         } else if (this.deck.length > 0) {
             this.deck = shuffleDeck(this.deck);
+        } else if (this.deck.length > 0) {
+            this.deck = shuffleDeck(this.deck);
         }
-        // Note: Hand is already discarded by endTurn before this is called?
+
+        // Passive Skill: Glittering Fortune
+        if (this.hasSkill('glittering_fortune')) {
+            const randomColor = Object.values(MANA_COLORS)[Math.floor(Math.random() * 4)]; // R,G,B,W
+            this.addCrystal(randomColor);
+        }
         // In game.js: hero.endTurn() (discards hand) -> check deck empty -> prepareNewRound
         // So yes, discard contains everything.
     }

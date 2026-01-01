@@ -295,7 +295,7 @@ export class CombatOrchestrator {
         const attackResult = this.game.combat.rangedAttackEnemy(
             enemy,
             this.combatRangedTotal || 0,
-            this.combatSiegeTotal || 0
+            (this.combatSiegeTotal || 0) + (this.game.hero.hasSkill('siege_mastery') ? 2 : 0)
         );
 
         // Visual Polish: Ranged Impact

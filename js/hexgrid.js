@@ -172,7 +172,7 @@ export class HexGrid {
      * @param {boolean} isDay
      * @returns {Array} List of reachable {q, r}
      */
-    getReachableHexes(startPos, movementPoints, isDay) {
+    getReachableHexes(startPos, movementPoints, isDay, hasFlight = false) {
         if (!startPos) return [];
 
         const reachable = [];
@@ -193,7 +193,7 @@ export class HexGrid {
             for (const neighbor of neighbors) {
                 if (!this.hasHex(neighbor.q, neighbor.r)) continue;
 
-                const moveCost = this.getMovementCost(neighbor.q, neighbor.r, !isDay);
+                const moveCost = this.getMovementCost(neighbor.q, neighbor.r, !isDay, hasFlight);
                 const totalCost = current.cost + moveCost;
 
                 if (totalCost <= movementPoints) {
@@ -216,7 +216,9 @@ export class HexGrid {
      * @param {boolean} isNight
      * @returns {number} Cost
      */
-    getMovementCost(q, r, isNight = false) {
+    getMovementCost(q, r, isNight = false, hasFlight = false) {
+        if (hasFlight) return 1;
+
         const hex = this.getHex(q, r);
         if (!hex) return 999;
 

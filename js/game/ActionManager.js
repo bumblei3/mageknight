@@ -132,7 +132,8 @@ export class ActionManager {
         const reachable = this.game.hexGrid.getReachableHexes(
             this.game.hero.position,
             this.game.hero.movementPoints,
-            this.game.timeManager.isDay()
+            this.game.timeManager.isDay(),
+            this.game.hero.hasSkill('flight')
         );
 
         this.game.reachableHexes = reachable;
@@ -158,7 +159,8 @@ export class ActionManager {
 
         const cost = this.game.hexGrid.getMovementCost(
             q, r,
-            !this.game.timeManager.isDay()
+            !this.game.timeManager.isDay(),
+            this.game.hero.hasSkill('flight')
         );
 
         if (this.game.hero.movementPoints < cost) {

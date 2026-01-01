@@ -20,7 +20,8 @@ describe('Combat Ranged Phase Integration', () => {
             getResistanceMultiplier: () => 1, // Normal
             getEffectiveAttack: () => 3,
             currentHealth: 1,
-            maxHealth: 1
+            maxHealth: 1,
+            position: { q: 1, r: 1 }
         };
 
         // Setup UI mocks
@@ -47,7 +48,11 @@ describe('Combat Ranged Phase Integration', () => {
             }
         };
         game.addLog = createSpy();
-        game.particleSystem = { impactEffect: createSpy() };
+        game.particleSystem = {
+            impactEffect: createSpy(),
+            createDamageNumber: createSpy(),
+            triggerShake: createSpy()
+        };
 
         game.initiateCombat(enemy);
     });

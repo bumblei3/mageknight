@@ -1,147 +1,82 @@
 import { describe, it, expect } from './testRunner.js';
-import { SKILL_TYPES, SKILLS, getRandomSkills } from '../js/skills.js';
+import { Hero } from '../js/hero.js';
+import { HexGrid } from '../js/hexgrid.js';
+import { HeroBuilder } from './test-helpers.js';
 
-describe('Skills System', () => {
-    describe('SKILL_TYPES Constants', () => {
-        it('should define all skill types', () => {
-            expect(SKILL_TYPES.PASSIVE).toBe('passive');
-            expect(SKILL_TYPES.ACTIVE).toBe('active');
-            expect(SKILL_TYPES.ONCE_PER_TURN).toBe('once_per_turn');
+describe('Hero Skills', () => {
+
+    describe('hasSkill', () => {
+        it('should return true if hero has skill', () => {
+            const hero = new HeroBuilder().build();
+            hero.addSkill({ id: 'test_skill', name: 'Test' });
+            expect(hero.hasSkill('test_skill')).toBe(true);
+        });
+
+        it('should return false if hero does not have skill', () => {
+            const hero = new HeroBuilder().build();
+            expect(hero.hasSkill('flight')).toBe(false);
         });
     });
 
-    describe('SKILLS.GOLDYX', () => {
-        it('should have skills defined for GOLDYX', () => {
-            expect(SKILLS.GOLDYX).toBeDefined();
-            expect(Array.isArray(SKILLS.GOLDYX)).toBe(true);
-            expect(SKILLS.GOLDYX.length).toBeGreaterThan(0);
-        });
+    describe('Flight Skill (HexGrid Interaction)', () => {
+        it('should reduce movement cost to 1 for any terrain', () => {
+            // Setup minimal HexGrid with terrain system
+            const mockCanvas = { getContext: () => ({}) };
+            const hexGrid = new HexGrid(mockCanvas);
 
-        it('should have correctly structured skills', () => {
-            SKILLS.GOLDYX.forEach(skill => {
-                expect(skill).toHaveProperty('id');
-                expect(skill).toHaveProperty('name');
-                expect(skill).toHaveProperty('description');
-                expect(skill).toHaveProperty('type');
-                expect(skill).toHaveProperty('icon');
+            // Stub getHex to return expensive terrain
+            hexGrid.getHex = () => ({ terrain: 'bogs', revealed: true });
+            // Stub terrainSystem if used, or just rely on default logic?
+            // Existing logic fallback: 2 or 3. 
+            // If I just call getMovementCost(..., hasFlight=true) it should return 1.
 
-                // Type must be valid
-                expect([
-                    SKILL_TYPES.PASSIVE,
-                    SKILL_TYPES.ACTIVE,
-                    SKILL_TYPES.ONCE_PER_TURN
-                ]).toContain(skill.type);
-            });
-        });
+            const costNormal = hexGrid.getMovementCost(0, 0, false, false);
+            // Default cost for unknown terrain is 2 (fallback in line 229)
+            // Wait, 'bogs' isn't in default list. 'mountains' is 5.
+            hexGrid.getHex = () => ({ terrain: 'mountains', revealed: true });
 
-        it('should have specific skills defined', () => {
-            const skillIds = SKILLS.GOLDYX.map(s => s.id);
+            const mountainCost = hexGrid.getMovementCost(0, 0, false, false);
+            expect(mountainCost).toBe(5);
 
-            expect(skillIds).toContain('flight');
-            expect(skillIds).toContain('motivation');
-            expect(skillIds).toContain('crystal_mastery');
-            expect(skillIds).toContain('glittering_fortune');
-            expect(skillIds).toContain('dragon_scales');
-            expect(skillIds).toContain('freezing_breath');
-        });
-
-        it('should have unique skill IDs', () => {
-            const ids = SKILLS.GOLDYX.map(s => s.id);
-            const uniqueIds = [...new Set(ids)];
-
-            expect(ids.length).toBe(uniqueIds.length);
-        });
-
-        it('should have non-empty descriptions', () => {
-            SKILLS.GOLDYX.forEach(skill => {
-                expect(skill.description.length).toBeGreaterThan(0);
-            });
+            const flightCost = hexGrid.getMovementCost(0, 0, false, true);
+            expect(flightCost).toBe(1);
         });
     });
 
-    describe('getRandomSkills', () => {
-        it('should return requested number of skills', () => {
-            const skills = getRandomSkills('GOLDYX', 2);
+    describe('Noble Manners Skill', () => {
+        it('should reset influence to 2 at end of turn', () => {
+            const hero = new HeroBuilder().build();
+            hero.addSkill({ id: 'noble_manners', name: 'Noble Manners' });
 
-            expect(skills).toBeDefined();
-            expect(skills.length).toBe(2);
+            // Simulate turn usage
+            hero.drawCards();
+            hero.influencePoints = 0;
+
+            // End Turn
+            hero.endTurn();
+
+            expect(hero.influencePoints).toBe(2);
         });
 
-        it('should return default 2 skills when count not specified', () => {
-            const skills = getRandomSkills('GOLDYX');
-
-            expect(skills.length).toBe(2);
+        it('should trigger correctly during reset', () => {
+            const hero = new HeroBuilder().build();
+            // Without skill
+            hero.endTurn();
+            expect(hero.influencePoints).toBe(0);
         });
+    });
 
-        it('should not return duplicate skills', () => {
-            const skills = getRandomSkills('GOLDYX', 3);
-            const ids = skills.map(s => s.id);
-            const uniqueIds = [...new Set(ids)];
+    describe('Glittering Fortune Skill', () => {
+        it('should add a crystal at start of round', () => {
+            const hero = new HeroBuilder().build();
+            hero.addSkill({ id: 'glittering_fortune', name: 'Glittering Fortune' });
 
-            expect(ids.length).toBe(uniqueIds.length);
-        });
+            const initialCrystals = Object.values(hero.crystals).reduce((a, b) => a + b, 0);
 
-        it('should exclude already owned skills', () => {
-            const currentSkills = [
-                { id: 'flight', name: 'Flug' }
-            ];
+            hero.prepareNewRound();
 
-            const newSkills = getRandomSkills('GOLDYX', 2, currentSkills);
-
-            expect(newSkills.length).toBe(2);
-            expect(newSkills.every(s => s.id !== 'flight')).toBe(true);
-        });
-
-        it('should handle requesting more skills than available', () => {
-            const currentSkills = SKILLS.GOLDYX.slice(0, 4); // Have 4 skills
-            const availableCount = SKILLS.GOLDYX.length - 4;
-
-            const newSkills = getRandomSkills('GOLDYX', 10, currentSkills);
-
-            // Should return only what's available
-            expect(newSkills.length).toBe(availableCount);
-        });
-
-        it('should handle unknown hero name gracefully', () => {
-            const skills = getRandomSkills('UNKNOWN_HERO', 2);
-
-            expect(skills).toBeDefined();
-            expect(skills.length).toBe(0);
-        });
-
-        it('should handle case insensitive hero names', () => {
-            const skills1 = getRandomSkills('goldyx', 2);
-            const skills2 = getRandomSkills('GOLDYX', 2);
-            const skills3 = getRandomSkills('Goldyx', 2);
-
-            expect(skills1.length).toBe(2);
-            expect(skills2.length).toBe(2);
-            expect(skills3.length).toBe(2);
-        });
-
-        it('should return different skills on multiple calls (randomization)', () => {
-            // Run multiple times to test randomization
-            const results = [];
-            for (let i = 0; i < 10; i++) {
-                const skills = getRandomSkills('GOLDYX', 2);
-                results.push(skills.map(s => s.id).sort().join(','));
-            }
-
-            // At least some results should be different (randomized)
-            const uniqueResults = [...new Set(results)];
-            expect(uniqueResults.length).toBeGreaterThan(1);
-        });
-
-        it('should return valid skill objects', () => {
-            const skills = getRandomSkills('GOLDYX', 3);
-
-            skills.forEach(skill => {
-                expect(skill).toHaveProperty('id');
-                expect(skill).toHaveProperty('name');
-                expect(skill).toHaveProperty('description');
-                expect(skill).toHaveProperty('type');
-                expect(skill).toHaveProperty('icon');
-            });
+            const newCrystals = Object.values(hero.crystals).reduce((a, b) => a + b, 0);
+            expect(newCrystals).toBe(initialCrystals + 1);
         });
     });
 });

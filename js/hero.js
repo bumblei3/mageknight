@@ -373,8 +373,6 @@ export class Hero {
             this.discard = [];
         } else if (this.deck.length > 0) {
             this.deck = shuffleDeck(this.deck);
-        } else if (this.deck.length > 0) {
-            this.deck = shuffleDeck(this.deck);
         }
 
         // Passive Skill: Glittering Fortune

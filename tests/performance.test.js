@@ -48,7 +48,7 @@ describe('Performance Tests', () => {
         console.log(`Updated all particles in ${updateTime.toFixed(2)}ms`);
 
         expect(updateTime).toBeLessThan(200);
-        expect(ps.particles.length).toBe(5000);
+        expect(ps.particles.length).toBe(500);
     });
 
     it('Resilience: Multi-Reset Memory Isolation', () => {

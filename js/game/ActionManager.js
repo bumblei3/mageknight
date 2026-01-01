@@ -51,6 +51,18 @@ export class ActionManager {
     async moveHero(q, r) {
         if (!this.game.movementMode || this.game.gameState !== 'playing') return;
 
+        // Distance check: Hero must move to an ADJACENT hex
+        const distance = this.game.hexGrid.distance(
+            this.game.hero.position.q,
+            this.game.hero.position.r,
+            q, r
+        );
+
+        if (distance !== 1) {
+            this.game.showToast('Du kannst dich nur auf angrenzende Felder bewegen!', 'warning');
+            return;
+        }
+
         const cost = this.game.hexGrid.getMovementCost(
             q, r,
             !this.game.timeManager.isDay()
@@ -73,14 +85,20 @@ export class ActionManager {
             this.game.hexGrid.getScreenPos(q, r)
         );
 
+        // Sync display position (critical for rendering)
+        this.game.hero.displayPosition = { q, r };
+
         this.game.statisticsManager.increment('tilesExplored');
         this.game.checkAndShowAchievements();
 
         // Emit event for other systems
         eventBus.emit(GAME_EVENTS.HERO_MOVED, { from: oldPos, to: { q, r }, cost });
 
+        // Phase Indicator and UI updates
+        this.game.updateStats();
+
         // Check for enemies at new position
-        const enemy = this.game.enemies.find(e => e.position.q === q && e.position.r === r);
+        const enemy = this.game.enemies.find(e => !e.isDefeated() && e.position.q === q && e.position.r === r);
         if (enemy) {
             this.game.initiateCombat(enemy);
             this.exitMovementMode();
@@ -91,9 +109,13 @@ export class ActionManager {
         // Check for interactions at the new position
         this.game.visitSite();
 
-        // Finalize move
-        this.exitMovementMode();
-        this.game.updateStats();
+        // Continue movement mode if hero still has points and not in combat
+        if (this.game.hero.movementPoints > 0 && !this.game.combat) {
+            this.calculateReachableHexes(); // Update highlights for next step
+        } else {
+            this.exitMovementMode();
+        }
+
         this.game.render();
     }
 

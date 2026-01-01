@@ -10,6 +10,7 @@ export class CombatOrchestrator {
         this.game = game;
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
+        this.activeBlocks = []; // Track individual block sources for elemental logic
         this.combatRangedTotal = 0;
         this.combatSiegeTotal = 0;
     }
@@ -31,6 +32,11 @@ export class CombatOrchestrator {
         const phase = this.game.combat.phase;
         if (phase === 'block' && result.effect.block) {
             this.combatBlockTotal += result.effect.block;
+            // Store block source
+            this.activeBlocks.push({
+                value: result.effect.block,
+                element: result.effect.element || 'physical'
+            });
         } else if (phase === 'ranged') {
             if (result.effect.siege) {
                 this.combatSiegeTotal += (result.effect.attack || 0);
@@ -93,6 +99,7 @@ export class CombatOrchestrator {
 
         this.game.addLog(result.message, 'combat');
         this.combatBlockTotal = 0;
+        this.activeBlocks = [];
         this.renderUnitsInCombat();
         this.game.updatePhaseIndicator();
         this.game.updateStats();
@@ -171,13 +178,22 @@ export class CombatOrchestrator {
     /**
      * Handles clicking an enemy in the combat panel
      */
+    /**
+     * Handles clicking an enemy in the combat panel
+     */
     handleEnemyClick(enemy) {
         if (!this.game.combat) return;
 
         if (this.game.combat.phase === 'ranged') {
             this.executeRangedAttack(enemy);
         } else if (this.game.combat.phase === 'block') {
-            this.game.combat.blockEnemy(enemy, this.combatBlockTotal);
+            // Pass the array of block sources for efficiency calculation
+            this.game.combat.blockEnemy(enemy, this.activeBlocks);
+
+            // Reset for next block attempt
+            this.activeBlocks = [];
+            this.combatBlockTotal = 0;
+
             this.updateCombatInfo();
         }
     }
@@ -210,6 +226,7 @@ export class CombatOrchestrator {
         // Reset totals
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
+        this.activeBlocks = [];
         this.combatRangedTotal = 0;
         this.combatSiegeTotal = 0;
 
@@ -219,10 +236,14 @@ export class CombatOrchestrator {
 
             // Gain fame
             const fameGained = enemy.fame || 0;
-            this.game.hero.gainFame(fameGained);
+            const levelResult = this.game.hero.gainFame(fameGained);
             this.game.statisticsManager.increment('enemiesDefeated');
 
             this.game.addLog(`+${fameGained} Ruhm für den Sieg.`, 'info');
+
+            if (levelResult && levelResult.leveledUp) {
+                this.game.levelUpManager.handleLevelUp(levelResult);
+            }
         } else if (result.defeat && enemy) {
             this.game.addLog(`Niederlage gegen ${enemy.name}.`, 'error');
         } else if (enemy) {

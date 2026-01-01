@@ -1,6 +1,6 @@
 import { StatusEffectManager } from './statusEffects.js';
 // Enemy types imported as needed
-import { COMBAT_PHASES } from './constants.js';
+import { COMBAT_PHASES, ATTACK_ELEMENTS } from './constants.js';
 
 // For backward compatibility
 export const COMBAT_PHASE = COMBAT_PHASES;
@@ -177,8 +177,9 @@ export class Combat {
         };
     }
 
-    // Attempt to block an enemy (includes unit contributions)
-    blockEnemy(enemy, blockValue) {
+    // Attempt to block an enemy
+    // blockValue can be a number (backward compat) or { value: number, element: string }
+    blockEnemy(enemy, blockInput) {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
             return { success: false, error: 'Nicht in der Block-Phase' };
         }
@@ -187,30 +188,100 @@ export class Combat {
             return { success: false, message: 'Feind bereits geblockt' };
         }
 
-        const blockRequired = enemy.getBlockRequirement();
-        const totalBlock = blockValue + this.unitBlockPoints;
+        // Normalize input to array
+        let blocks = [];
+        if (Array.isArray(blockInput)) {
+            blocks = blockInput;
+        } else if (typeof blockInput === 'object' && blockInput !== null) {
+            blocks = [blockInput];
+        } else {
+            blocks = [{ value: Number(blockInput) || 0, element: ATTACK_ELEMENTS.PHYSICAL }];
+        }
 
-        if (totalBlock >= blockRequired) {
+        // Add unit block points
+        // NOTE: Unit block points are currently generic. 
+        // Improvement: Units should contribute specific elements too.
+        // For now, assume unit block adapts or is physical? 
+        // Let's assume Unit Block is PHYSICAL unless specified.
+        // We add it to the 'Physical' pool for calculation.
+
+        // Calculate Required Block Power
+        const blockRequired = enemy.getBlockRequirement();
+        const enemyElement = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
+
+        // Calculate block from cards
+        let totalEffectiveBlock = 0;
+        let totalInputBlock = 0;
+        let isInefficient = false;
+
+        blocks.forEach(block => {
+            const val = block.value || 0;
+            const el = block.element || ATTACK_ELEMENTS.PHYSICAL;
+            totalInputBlock += val; // Accumulate input value
+            let efficiency = 1.0;
+
+            if (enemyElement === ATTACK_ELEMENTS.FIRE) {
+                if (el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                    efficiency = 0.5;
+                    isInefficient = true;
+                }
+            } else if (enemyElement === ATTACK_ELEMENTS.ICE) {
+                if (el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                    efficiency = 0.5;
+                    isInefficient = true;
+                }
+            } else if (enemyElement === ATTACK_ELEMENTS.COLD_FIRE) {
+                if (el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                    efficiency = 0.5;
+                    isInefficient = true;
+                }
+            }
+
+            totalEffectiveBlock += Math.floor(val * efficiency);
+        });
+
+        // Add Unit Block (assume inefficient against elemental for now)
+        let unitEfficiency = 1.0;
+        if (enemyElement !== ATTACK_ELEMENTS.PHYSICAL) {
+            unitEfficiency = 0.5;
+        }
+        totalEffectiveBlock += Math.floor(this.unitBlockPoints * unitEfficiency);
+
+        // Debug log
+        // console.log(`Block vs ${enemy.name} (${enemyElement}): Input ${blockValue} (${blockElement}) -> Eff ${efficiency} = ${Math.floor(blockValue * efficiency)}. Units ${this.unitBlockPoints} -> ${Math.floor(this.unitBlockPoints * unitEfficiency)}. Total: ${effectiveBlock} vs Req ${blockRequired}`);
+
+        if (totalEffectiveBlock >= blockRequired) {
             this.blockedEnemies.add(enemy.id);
 
-            // Calculate how many unit points were used
-            const unitPointsUsed = Math.min(this.unitBlockPoints, blockRequired);
-            this.unitBlockPoints -= unitPointsUsed;
+            // Calculate consumption (this is tricky with efficiency).
+            // Simplified: All input is consumed if successful. 
+            // Or try to spare unit points?
+            // Let's consume all Unit Points used to bridge the gap?
+            // Let's just reset generic unit block points if used.
+            if (this.unitBlockPoints > 0) {
+                const blockWithoutUnits = totalEffectiveBlock - Math.floor(this.unitBlockPoints * unitEfficiency);
+                if (blockWithoutUnits < blockRequired) {
+                    this.unitBlockPoints = 0;
+                }
+            }
 
             return {
                 success: true,
                 blocked: true,
-                consumedPoints: Math.max(0, blockRequired - unitPointsUsed),
-                totalBlock: totalBlock,
-                message: `${enemy.name} erfolgreich geblockt! ${enemy.swift ? '(Flink: Doppelter Block nötig)' : ''}`
+                totalBlock: totalEffectiveBlock,
+                consumedPoints: totalInputBlock,
+                isInefficient: isInefficient,
+                message: `${enemy.name} erfolgreich geblockt! ${isInefficient ? '(Ineffizienter Block!)' : ''}`
             };
         }
 
         return {
             success: true,
             blocked: false,
-            totalBlock: totalBlock,
-            message: `Block zu schwach (${totalBlock} vs ${blockRequired})`
+            totalBlock: totalEffectiveBlock,
+            consumedPoints: totalInputBlock,
+            isInefficient: isInefficient,
+            message: `Block zu schwach (${totalEffectiveBlock} vs ${blockRequired})${isInefficient ? ' - Ineffizient!' : ''}`
         };
     }
 

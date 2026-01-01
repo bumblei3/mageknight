@@ -34,6 +34,7 @@ import { CombatOrchestrator } from './game/CombatOrchestrator.js';
 import { InputController } from './game/InputController.js';
 import { RenderController } from './game/RenderController.js';
 import { HeroController } from './game/HeroController.js';
+import { LevelUpManager } from './game/LevelUpManager.js';
 
 /**
  * Main Game Controller Class
@@ -57,6 +58,7 @@ export class MageKnightGame {
         this.statisticsManager = new StatisticsManager();
         this.sound = new SoundManager();
         this.animator = animator; // Initialize animator reference
+        this.levelUpManager = new LevelUpManager(this);
 
         // Core Components
         this.canvas = document.getElementById('game-board');
@@ -588,8 +590,12 @@ export class MageKnightGame {
 
             // Apply rewards
             if (achievement.reward && achievement.reward.fame) {
-                this.hero.gainFame(achievement.reward.fame);
+                const levelResult = this.hero.gainFame(achievement.reward.fame);
                 this.addLog(`Belohnung: +${achievement.reward.fame} Ruhm`, 'info');
+
+                if (levelResult && levelResult.leveledUp) {
+                    this.levelUpManager.handleLevelUp(levelResult);
+                }
             }
         });
 

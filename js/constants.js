@@ -11,6 +11,14 @@ export const MANA_COLORS = {
     BLACK: 'black'
 };
 
+export const ATTACK_ELEMENTS = {
+    PHYSICAL: 'physical',
+    FIRE: 'fire',
+    ICE: 'ice',
+    COLD_FIRE: 'cold_fire',
+    HOLY: 'holy' // Used for specialized attacks maybe?
+};
+
 export const TERRAIN_TYPES = {
     PLAINS: 'plains',
     FOREST: 'forest',

@@ -379,7 +379,6 @@ export const SAMPLE_ADVANCED_ACTIONS = [
         manaCost: 1,
         description: 'Basic: 4 Bewegung | Strong: 8 Bewegung'
     },
-    // New advanced actions
     {
         id: 'adv_flame_blast',
         name: 'Flammenexplosion',
@@ -427,7 +426,7 @@ export const SAMPLE_ADVANCED_ACTIONS = [
         color: CARD_COLORS.WHITE,
         basicEffect: { influence: 3, drawMana: 1 },
         strongEffect: { influence: 6, drawMana: 2 },
-        manaCost: 0, // Free mana generation
+        manaCost: 0,
         description: 'Basic: 3 Einfluss + 1 Mana | Strong: 6 Einfluss + 2 Mana'
     },
     {
@@ -499,5 +498,15 @@ export const SAMPLE_ADVANCED_ACTIONS = [
         strongEffect: { block: 6, movement: 4 },
         manaCost: 1,
         description: 'Basic: 3 Block + 2 Bewegung | Strong: 6 Block + 4 Bewegung'
+    },
+    {
+        id: 'adv_diplomatic_immunity',
+        name: 'Diplomatische Immunität',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.WHITE,
+        basicEffect: { influence: 5, block: 3 },
+        strongEffect: { influence: 10, block: 6 },
+        manaCost: 1,
+        description: 'Basic: 5 Einfluss + 3 Block | Strong: 10 Einfluss + 6 Block'
     }
 ];

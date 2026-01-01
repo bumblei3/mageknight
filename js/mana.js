@@ -134,6 +134,21 @@ export class ManaSource {
     hasColor(color) {
         return this.getDiceByColor(color).length > 0;
     }
+
+    // Get full state for persistence
+    getState() {
+        return {
+            dice: [...this.dice],
+            usedDice: Array.from(this.usedDice)
+        };
+    }
+
+    // Load state from object
+    loadState(state) {
+        if (!state) return;
+        this.dice = [...(state.dice || [])];
+        this.usedDice = new Set(state.usedDice || []);
+    }
 }
 
 // Crystal storage for players

@@ -94,6 +94,7 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 3. **Nutze das Terrain**: Manchmal ist der längere Weg über Ebenen besser als der kurze durch Berge
 4. **Karten seitlich spielen**: Wenn du nur +1 brauchst, spare die starken Effekte für später
 5. **Raste mit Bedacht**: Lege unerwünschte Karten ab, um bessere Karten nachzuziehen
+6. **Fehler machen erlaubt**: Nutze den Undo-Button (↩️) oder Strg+Z, um Bewegungs- oder Manafehler zu korrigieren.
 
 ## 🛠️ Technische Details
 
@@ -141,6 +142,7 @@ Das Spiel ist modular aufgebaut:
 - Interaktives Tutorial und Hilfesystem
 - Robustes Speichern/Laden via LocalStorage
 - Partikeleffekte für alle Aktionen
+- **Undo-System**: Züge rückgängig machen mit Strg+Z oder Button (außer bei neuen Informationen und im Kampf)
 
 ❌ **Nicht in Basis-Version**:
 - Fern-/Belagerungsangriffe (teilweise)

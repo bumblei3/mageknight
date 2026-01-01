@@ -103,21 +103,28 @@ export class Hero {
     }
 
     // Play a card from hand
+    // Play a card from hand
     playCard(cardIndex, useStrong = false, isNight = false) {
         if (cardIndex < 0 || cardIndex >= this.hand.length) {
             return null;
         }
 
-        const card = this.hand.splice(cardIndex, 1)[0];
+        const card = this.hand[cardIndex];
 
         // If using strong effect, check and spend mana
-        if (useStrong && card.manaCost > 0) {
+        if (useStrong) {
+            // For standard action cards, manaCost might not be set on instance, 
+            // but logic implies using mana matching color
             const success = this.spendMana(card.color, isNight);
             if (!success) {
-                // Couldn't spend mana, fallback to basic
-                useStrong = false;
+                // If explicit strong play requested but failed mana, fail the action
+                // This prevents accidental basic plays when user wanted strong
+                return null;
             }
         }
+
+        // Only remove from hand if successful
+        this.hand.splice(cardIndex, 1);
 
         const effect = card.getEffect(useStrong);
 
@@ -274,17 +281,16 @@ export class Hero {
         return { leveledUp: false };
     }
 
-    // Level Up
+    // Level Up - Logic handled by LevelUpManager mostly now
     levelUp() {
         this.level++;
-        // Stat increases based on level could go here
-        // For now, rewards are handled by Game controller
+        // Base stat increases (restored for compatibility and robustness)
         if (this.level % 2 === 1) {
-            // Odd levels (3, 5) give Command Token (Command Limit +1)
+            // Odd levels (3, 5) give Command Token
             this.commandLimit++;
-            this.armor++; // Bonus armor at higher levels
+            this.armor++;
         } else {
-            // Even levels (2, 4) give Hand Limit +1 (simplified)
+            // Even levels (2, 4) give Hand Limit
             this.handLimit++;
         }
     }
@@ -297,6 +303,17 @@ export class Hero {
         if (skill.id === 'dragon_scales') {
             this.armor += 1;
         }
+    }
+
+    addCardToDeck(card) {
+        // Clone to ensure we have a fresh instance
+        const newCard = card.clone();
+
+        // Add to Discard pile (standard deckbuilder rule: new cards go to discard)
+        // Or Top of Deck? Mage Knight rules usually: on top of Deed deck unless specified.
+        // Let's add to TOP of deck for immediate gratification in next draw
+        this.deck.unshift(newCard);
+        // Note: if doing "Deed Deck" style, might need to shuffle. For now, Top Deck is fun.
     }
 
     // Change reputation

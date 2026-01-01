@@ -48,6 +48,7 @@
                         <button class="btn-icon" id="new-game-btn" title="Neues Spiel">🔄</button>
                         <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)">💾</button>
                         <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)">📂</button>
+                        <button class="btn-icon" id="undo-btn" title="Rückgängig (Ctrl+Z)">↩️</button>
                         <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
                         <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen">🏆</button>
                         <button class="btn-icon" id="statistics-btn" title="Statistiken anzeigen">📊</button>
@@ -210,6 +211,7 @@
                         <li><strong>Linksklick auf Karte</strong> - Spielt Basis-Wirkung</li>
                         <li><strong>Rechtsklick auf Karte</strong> - Spielt Karte seitlich (+1)</li>
                         <li><strong>Klick auf Hex</strong> - Bewegt Held oder wählt Feld aus</li>
+                        <li><strong>Strg+Z / ↩️ Button</strong> - Letzte Aktion rückgängig machen</li>
                     </ul>
 
                     <h3>Held Stats</h3>
@@ -462,6 +464,29 @@
 
             <div class="site-options" id="site-options">
                 <!-- Options injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Play Modal (Mana Amplification) -->
+    <div class="modal" id="card-play-modal">
+        <div class="modal-content card-play-content">
+            <span class="modal-close" id="card-play-close">&times;</span>
+            <h2>Wirkung wählen</h2>
+            <div id="card-play-preview" class="card-play-preview"></div>
+
+            <div class="play-options">
+                <button class="play-option-btn basic" id="play-basic-btn">
+                    <div class="option-header">Basis</div>
+                    <div class="option-effect" id="basic-effect-desc">Move 2</div>
+                    <div class="option-cost">Kostenlos</div>
+                </button>
+
+                <button class="play-option-btn strong" id="play-strong-btn">
+                    <div class="option-header">Verstärkt ✨</div>
+                    <div class="option-effect" id="strong-effect-desc">Move 4</div>
+                    <div class="option-cost" id="strong-cost-desc">-1 Blaues Mana</div>
+                </button>
             </div>
         </div>
     </div>

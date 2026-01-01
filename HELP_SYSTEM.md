@@ -18,7 +18,7 @@ Das Modal enthält 5 Tabs mit umfassenden Informationen:
 #### **Tab 1: Grundlagen**
 - Spielziel
 - Spielablauf (4 Schritte)
-- Tastenbelegung
+- Tastenbelegung (inkl. Undo Strg+Z)
 - Held Stats Erklärung
 
 #### **Tab 2: Karten**

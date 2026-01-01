@@ -123,10 +123,30 @@ export class InteractionController {
             return;
         }
 
-        const result = this.game.hero.playCard(index, false, this.game.timeManager.isNight());
+        // --- MANA AMPLIFICATION CHECK ---
+        const isNight = this.game.timeManager.isNight();
+        const canAffordStrong = this.game.hero.canAffordMana(card, isNight);
+        const hasStrongEffect = Object.keys(card.strongEffect || {}).length > 0;
+
+        // If card has strong effect AND player can afford it, SHOW MODAL
+        // Also ensure we are not just auto-playing weak on re-click (could add toggle later)
+        if (hasStrongEffect && canAffordStrong) {
+            this.showCardPlayModal(index, card, isNight);
+            return;
+        }
+
+        // Otherwise play basic effect immediately
+        this.finishCardPlay(index, false, isNight);
+    }
+
+    // New helper to finalize play (Basic or Strong)
+    finishCardPlay(index, useStrong, isNight) {
+        // Use ActionManager for Undo support
+        const result = this.game.actionManager.playCard(index, useStrong, isNight);
+
         if (result) {
             this.game.sound.cardPlay();
-            this.game.addLog(`${result.card.name} gespielt: ${this.game.ui.formatEffect(result.effect)}`, 'info');
+            this.game.addLog(`${result.card.name} gespielt ${useStrong ? '(Verstärkt)' : ''}: ${this.game.ui.formatEffect(result.effect)}`, 'info');
             this.game.ui.addPlayedCard(result.card, result.effect);
             this.game.ui.showPlayArea();
 
@@ -146,6 +166,61 @@ export class InteractionController {
         }
     }
 
+    showCardPlayModal(index, card, isNight) {
+        const modal = document.getElementById('card-play-modal');
+        const basicBtn = document.getElementById('play-basic-btn');
+        const strongBtn = document.getElementById('play-strong-btn');
+        const basicDesc = document.getElementById('basic-effect-desc');
+        const strongDesc = document.getElementById('strong-effect-desc');
+        const strongCost = document.getElementById('strong-cost-desc');
+        const closeBtn = document.getElementById('card-play-close');
+
+        if (!modal) return; // Should not happen
+
+        // Populate Content
+        basicDesc.textContent = this.game.ui.formatEffect(card.basicEffect);
+        strongDesc.textContent = this.game.ui.formatEffect(card.strongEffect);
+        strongCost.textContent = `-1 ${card.color.charAt(0).toUpperCase() + card.color.slice(1)} Mana`;
+
+        // Check affordability again just for UI state
+        const canAfford = this.game.hero.canAffordMana(card, isNight);
+        strongBtn.disabled = !canAfford;
+
+        // Event Handlers
+        const close = () => {
+            modal.style.display = 'none';
+            cleanup();
+        };
+
+        const playBasic = () => {
+            this.finishCardPlay(index, false, isNight);
+            close();
+        };
+
+        const playStrong = () => {
+            this.finishCardPlay(index, true, isNight);
+            close();
+        };
+
+        // Remove previous listeners (not efficient but safe for simple usage)
+        const cleanup = () => {
+            basicBtn.removeEventListener('click', playBasic);
+            strongBtn.removeEventListener('click', playStrong);
+            closeBtn.removeEventListener('click', close);
+            modal.onclick = null;
+        };
+
+        basicBtn.addEventListener('click', playBasic);
+        strongBtn.addEventListener('click', playStrong);
+        closeBtn.addEventListener('click', close);
+
+        modal.onclick = (e) => {
+            if (e.target === modal) close();
+        };
+
+        modal.style.display = 'flex';
+    }
+
     handleCardRightClick(index, card) {
         if (card.isWound() || this.game.combat) {
             return;
@@ -157,7 +232,10 @@ export class InteractionController {
         const chosenNum = parseInt(chosen, 10);
         if (chosenNum >= 1 && chosenNum <= 4) {
             const effectType = options[chosenNum - 1];
-            const result = this.game.hero.playCardSideways(index, effectType);
+
+            // Use ActionManager for Undo support
+            const result = this.game.actionManager.playCardSideways(index, effectType);
+
             if (result) {
                 this.game.sound.cardPlaySideways();
 
@@ -180,11 +258,10 @@ export class InteractionController {
     }
 
     handleManaClick(index, color) {
-        const mana = this.game.manaSource.takeDie(index, this.game.timeManager.isNight());
-        if (mana) {
-            // Add to hero's mana inventory
-            this.game.hero.takeManaFromSource(mana);
+        // Use ActionManager for Undo support
+        const mana = this.game.actionManager.takeMana(index, color);
 
+        if (mana) {
             this.game.addLog(`Mana genommen: ${color}`, 'info');
 
             // Particle Effect
@@ -195,7 +272,6 @@ export class InteractionController {
 
             // Update UI
             this.game.renderMana();
-            // this.game.updateHeroMana(); // Assuming RenderController or UI handles this. game.js had updateHeroMana().
             if (this.game.ui.updateHeroMana) this.game.ui.updateHeroMana(this.game.hero);
         }
     }

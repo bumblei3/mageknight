@@ -39,6 +39,9 @@ export class InputController {
         if (saveBtn) saveBtn.addEventListener('click', () => this.game.openSaveDialog(), { signal });
         if (loadBtn) loadBtn.addEventListener('click', () => this.game.openLoadDialog(), { signal });
 
+        const undoBtn = document.getElementById('undo-btn');
+        if (undoBtn) undoBtn.addEventListener('click', () => this.game.actionManager.undoLastAction(), { signal });
+
         if (this.game.ui.elements.newGameBtn) {
             this.game.ui.elements.newGameBtn.addEventListener('click', () => this.game.reset(), { signal });
         }
@@ -170,44 +173,44 @@ export class InputController {
 
             // Commands
             switch (e.key.toLowerCase()) {
-            case ' ':
-            case 'space':
-                this.game.turnManager.endTurn();
-                e.preventDefault();
-                break;
-            case 'h': {
-                const helpBtn = document.getElementById('help-btn');
-                if (helpBtn) helpBtn.click();
-                e.preventDefault();
-                break;
-            }
-            case 'r':
-                this.game.rest();
-                e.preventDefault();
-                break;
-            case 'e':
-                this.game.explore();
-                e.preventDefault();
-                break;
-            case 't':
-                this.game.showTutorial();
-                e.preventDefault();
-                break;
-            case 'escape':
-                if (this.game.movementMode) {
-                    this.game.exitMovementMode();
-                    this.game.addLog('Bewegungsmodus abgebrochen', 'info');
+                case ' ':
+                case 'space':
+                    this.game.turnManager.endTurn();
+                    e.preventDefault();
+                    break;
+                case 'h': {
+                    const helpBtn = document.getElementById('help-btn');
+                    if (helpBtn) helpBtn.click();
+                    e.preventDefault();
+                    break;
                 }
-                break;
-            case 'm': {
-                const manaPanel = document.querySelector('.mana-panel');
-                if (manaPanel) {
-                    manaPanel.scrollIntoView({ behavior: 'smooth' });
-                    manaPanel.classList.add('highlight-pulse');
-                    setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
+                case 'r':
+                    this.game.rest();
+                    e.preventDefault();
+                    break;
+                case 'e':
+                    this.game.explore();
+                    e.preventDefault();
+                    break;
+                case 't':
+                    this.game.showTutorial();
+                    e.preventDefault();
+                    break;
+                case 'escape':
+                    if (this.game.movementMode) {
+                        this.game.exitMovementMode();
+                        this.game.addLog('Bewegungsmodus abgebrochen', 'info');
+                    }
+                    break;
+                case 'm': {
+                    const manaPanel = document.querySelector('.mana-panel');
+                    if (manaPanel) {
+                        manaPanel.scrollIntoView({ behavior: 'smooth' });
+                        manaPanel.classList.add('highlight-pulse');
+                        setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
+                    }
+                    break;
                 }
-                break;
-            }
             }
 
             // Ctrl combinations
@@ -218,6 +221,9 @@ export class InputController {
                 } else if (e.key === 'l') {
                     e.preventDefault();
                     this.game.openLoadDialog();
+                } else if (e.key === 'z') {
+                    e.preventDefault();
+                    this.game.actionManager.undoLastAction();
                 }
             }
         }, { signal });

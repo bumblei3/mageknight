@@ -95,6 +95,9 @@ export class CombatOrchestrator {
         if (result.woundsReceived > 0) {
             const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
             this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
+            // Visual Polish: Screen Shake and Damage Numbers
+            this.game.particleSystem.triggerShake(result.woundsReceived * 2, 0.4);
+            this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y, result.woundsReceived, true);
         }
 
         this.game.addLog(result.message, 'combat');
@@ -124,6 +127,15 @@ export class CombatOrchestrator {
         this.game.particleSystem.impactEffect(pixelPos.x, pixelPos.y);
 
         const attackResult = this.game.combat.attackEnemies(this.combatAttackTotal, 'physical');
+
+        // Visual Polish: Enemy taking damage
+        if (this.combatAttackTotal > 0) {
+            this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal);
+            if (this.combatAttackTotal >= 4) {
+                this.game.particleSystem.triggerShake(3, 0.3);
+            }
+        }
+
         this.game.addLog(attackResult.message, attackResult.success ? 'success' : 'warning');
 
         if (attackResult.success) {
@@ -285,6 +297,14 @@ export class CombatOrchestrator {
             this.combatRangedTotal || 0,
             this.combatSiegeTotal || 0
         );
+
+        // Visual Polish: Ranged Impact
+        const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+        this.game.particleSystem.impactEffect(pixelPos.x, pixelPos.y, 'blue');
+        const damageDealt = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);
+        if (damageDealt > 0) {
+            this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, damageDealt);
+        }
 
         this.game.addLog(attackResult.message, 'combat');
 

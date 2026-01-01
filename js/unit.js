@@ -194,5 +194,5 @@ export function createUnit(type) {
 export function getUnitsForLocation(locationType) {
     return Object.keys(UNIT_INFO)
         .filter(type => UNIT_INFO[type].location.includes(locationType))
-        .map(type => UNIT_INFO[type]);
+        .map(type => ({ ...UNIT_INFO[type], type })); // Include type key
 }

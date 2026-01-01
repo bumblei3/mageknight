@@ -235,6 +235,12 @@ export class ActionManager {
             this.game.addLog(`${newHexes.length} neue Gebiete entdeckt!`, 'discovery');
             this.game.statisticsManager.increment('tilesExplored', newHexes.length);
 
+            // Visual Feedback
+            newHexes.forEach(hex => {
+                const pixel = this.game.hexGrid.axialToPixel(hex.q, hex.r);
+                this.game.particleSystem.discoveryEffect(pixel.x, pixel.y);
+            });
+
             this.game.entityManager.createEnemies();
 
             this.game.updateStats();

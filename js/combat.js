@@ -50,13 +50,13 @@ export class Combat {
     }
 
     // Attempt to defeat enemies with Ranged/Siege Attack
-    rangedAttackEnemy(enemy, attackValue, isSiege = false, element = 'physical') {
+    rangedAttackEnemy(enemy, rangedValue, siegeValue, element = 'physical') {
         if (this.phase !== COMBAT_PHASES.RANGED) {
             return { success: false, error: 'Nicht in der Fernkampf-Phase' };
         }
 
         // Check immunities
-        if (enemy.fortified && !isSiege) {
+        if (enemy.fortified && siegeValue === 0) {
             return {
                 success: false,
                 message: `${enemy.name} ist befestigt! Nur Belagerungsangriffe wirken.`
@@ -64,23 +64,40 @@ export class Combat {
         }
 
         const multiplier = enemy.getResistanceMultiplier(element);
-        const totalAttack = attackValue; // Use passed value plus unit points
-        const unitPoints = isSiege ? this.unitSiegePoints : this.unitRangedPoints;
-        const combinedAttack = totalAttack + unitPoints;
+
+        // Fortified Rule: If fortified, only Siege contributes. If not, both do.
+        let combinedAttack = 0;
+        if (enemy.fortified) {
+            combinedAttack = siegeValue + this.unitSiegePoints;
+        } else {
+            combinedAttack = rangedValue + siegeValue + this.unitRangedPoints + this.unitSiegePoints;
+        }
 
         // Handle boss enemies (health-based damage)
         if (enemy.isBoss) {
             const effectiveDamage = Math.floor(combinedAttack * multiplier);
             const damageResult = enemy.takeDamage(effectiveDamage);
 
-            // Consume unit points after use
-            if (isSiege) this.unitSiegePoints = 0; else this.unitRangedPoints = 0;
+            // Consume points (Bosses take all available relevant damage)
+            let consumedRanged = 0;
+            let consumedSiege = 0;
+
+            if (enemy.fortified) {
+                consumedSiege = siegeValue;
+                this.unitSiegePoints = 0;
+            } else {
+                consumedRanged = rangedValue;
+                consumedSiege = siegeValue;
+                this.unitRangedPoints = 0;
+                this.unitSiegePoints = 0;
+            }
 
             const result = {
                 success: true,
                 isBoss: true,
                 damage: effectiveDamage,
-                consumedPoints: totalAttack, // Amount of passed attackValue used
+                consumedRanged,
+                consumedSiege,
                 healthPercent: damageResult.healthPercent,
                 bossTransitions: [],
                 message: `${enemy.name} erleidet ${effectiveDamage} Fernkampf-Schaden! (${enemy.currentHealth}/${enemy.maxHealth} HP)`
@@ -119,15 +136,40 @@ export class Combat {
             this.hero.gainFame(enemy.fame);
             this.enemies = this.enemies.filter(e => e.id !== enemy.id);
 
-            // Consume unit points after use
-            if (isSiege) this.unitSiegePoints = 0; else this.unitRangedPoints = 0;
+            // Consume points used
+            let consumedRanged = 0;
+            let consumedSiege = 0;
+
+            if (enemy.fortified) {
+                consumedSiege = Math.max(0, effectiveArmor - this.unitSiegePoints);
+                this.unitSiegePoints = 0;
+            } else {
+                // Greedy consumption: use units first, then siege, then ranged
+                let remaining = effectiveArmor;
+
+                // Units first
+                const unitTotal = this.unitRangedPoints + this.unitSiegePoints;
+                remaining = Math.max(0, remaining - unitTotal);
+                this.unitRangedPoints = 0;
+                this.unitSiegePoints = 0;
+
+                if (remaining > 0) {
+                    const siegeUsed = Math.min(siegeValue, remaining);
+                    consumedSiege = siegeUsed;
+                    remaining -= siegeUsed;
+                }
+                if (remaining > 0) {
+                    consumedRanged = Math.min(rangedValue, remaining);
+                }
+            }
 
             return {
                 success: true,
                 defeated: [enemy],
                 fameGained: enemy.fame,
-                consumedPoints: Math.max(0, effectiveArmor - unitPoints),
-                message: `${enemy.name} im Fernkampf besiegt!`
+                consumedRanged,
+                consumedSiege,
+                message: `${enemy.name} im ${enemy.fortified ? 'Belagerungskampf' : 'Fernkampf'} besiegt!`
             };
         }
 
@@ -394,9 +436,17 @@ export class Combat {
             if (this.phase === COMBAT_PHASES.BLOCK && ability.type === 'block') {
                 this.unitBlockPoints += ability.value;
                 applied.push(`+${ability.value} Block`);
-            } else if (this.phase === COMBAT_PHASES.ATTACK && ability.type === 'attack') {
-                this.unitAttackPoints += ability.value;
-                applied.push(`+${ability.value} Angriff`);
+            } else if (this.phase === COMBAT_PHASES.ATTACK) {
+                if (ability.type === 'attack') {
+                    this.unitAttackPoints += ability.value;
+                    applied.push(`+${ability.value} Angriff`);
+                } else if (ability.type === 'ranged') {
+                    this.unitAttackPoints += ability.value;
+                    applied.push(`+${ability.value} Angriff (aus Fernkampf)`);
+                } else if (ability.type === 'siege') {
+                    this.unitAttackPoints += ability.value;
+                    applied.push(`+${ability.value} Angriff (aus Belagerung)`);
+                }
             } else if (this.phase === COMBAT_PHASES.RANGED) {
                 if (ability.type === 'ranged') {
                     this.unitRangedPoints += ability.value;

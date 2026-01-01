@@ -32,31 +32,31 @@ export class Particle {
         ctx.fillStyle = this.color;
 
         switch (this.type) {
-        case 'circle':
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-            break;
+            case 'circle':
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                break;
 
-        case 'star':
-            this.drawStar(ctx);
-            break;
+            case 'star':
+                this.drawStar(ctx);
+                break;
 
-        case 'spark':
-            this.drawSpark(ctx);
-            break;
+            case 'spark':
+                this.drawSpark(ctx);
+                break;
 
-        case 'heart':
-            this.drawHeart(ctx);
-            break;
+            case 'heart':
+                this.drawHeart(ctx);
+                break;
 
-        case 'skull':
-            this.drawSkull(ctx);
-            break;
+            case 'skull':
+                this.drawSkull(ctx);
+                break;
 
-        case 'cross':
-            this.drawCross(ctx);
-            break;
+            case 'cross':
+                this.drawCross(ctx);
+                break;
         }
 
         ctx.restore();
@@ -635,25 +635,25 @@ export class ParticleSystem {
         let colors, particleCount, effectType;
 
         switch (attackType) {
-        case 'fire':
-            colors = ['#ef4444', '#f97316', '#fbbf24'];
-            particleCount = 35;
-            effectType = 'circle';
-            break;
-        case 'ice':
-            colors = ['#3b82f6', '#60a5fa', '#93c5fd'];
-            particleCount = 30;
-            effectType = 'star';
-            break;
-        case 'lightning':
-            colors = ['#fbbf24', '#fde047', '#e0f2fe'];
-            particleCount = 25;
-            effectType = 'spark';
-            break;
-        default: // physical
-            colors = ['#ef4444', '#dc2626', '#fb923c'];
-            particleCount = 30;
-            effectType = 'circle';
+            case 'fire':
+                colors = ['#ef4444', '#f97316', '#fbbf24'];
+                particleCount = 35;
+                effectType = 'circle';
+                break;
+            case 'ice':
+                colors = ['#3b82f6', '#60a5fa', '#93c5fd'];
+                particleCount = 30;
+                effectType = 'star';
+                break;
+            case 'lightning':
+                colors = ['#fbbf24', '#fde047', '#e0f2fe'];
+                particleCount = 25;
+                effectType = 'spark';
+                break;
+            default: // physical
+                colors = ['#ef4444', '#dc2626', '#fb923c'];
+                particleCount = 30;
+                effectType = 'circle';
         }
 
         // Main impact burst
@@ -786,6 +786,29 @@ export class ParticleSystem {
                 size: 2,
                 decay: 0.02,
                 type: 'circle'
+            });
+        }
+    }
+
+    /**
+     * Discovery effect for new tiles
+     */
+    discoveryEffect(x, y) {
+        const discoveryColors = ['#10b981', '#3b82f6', '#fbbf24', '#ffffff'];
+
+        // Circular expanding rings of stars
+        for (let i = 0; i < 30; i++) {
+            const angle = (Math.PI * 2 * i) / 30;
+            const speed = 2 + Math.random();
+            const color = discoveryColors[i % discoveryColors.length];
+
+            this.addParticle(x, y, {
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                color,
+                size: 3 + Math.random() * 2,
+                decay: 0.015,
+                type: 'star'
             });
         }
     }

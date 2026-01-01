@@ -103,6 +103,7 @@ export class MageKnightGame {
         this.movementMode = false;
         this.combat = null;
 
+        this.ui.setGame(this);
         this.init();
     }
 
@@ -408,7 +409,7 @@ export class MageKnightGame {
 
     initiateCombat(enemy) { this.combatOrchestrator.initiateCombat(enemy); }
 
-    playCardInCombat(index, card) { this.combatOrchestrator.playCardInCombat(index, card); }
+    playCardInCombat(index, card, useStrong = false) { this.combatOrchestrator.playCardInCombat(index, card, useStrong); }
 
     // Render units available for combat
     renderUnitsInCombat() { this.combatOrchestrator.renderUnitsInCombat(); }

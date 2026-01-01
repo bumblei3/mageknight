@@ -22,6 +22,11 @@ export class LevelUpManager {
         const levelDisplay = document.getElementById('new-level-display');
         if (levelDisplay) levelDisplay.textContent = this.currentLevel;
 
+        // Visual Feedback
+        if (this.game.particleSystem) {
+            this.game.particleSystem.levelUpEffect(window.innerWidth / 2, window.innerHeight / 2);
+        }
+
         // Generate Offers
         // 1. Skills (2 random)
         const currentSkillIds = this.game.hero.skills || [];

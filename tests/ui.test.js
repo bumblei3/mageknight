@@ -14,13 +14,13 @@ describe('UI', () => {
     let mockElements;
 
     beforeEach(() => {
-        // Reset DOM mocks if needed (setup.js does some global setup)
-        // UI constructor calls document.getElementById a lot.
-        // We need to make sure those return usable mocks.
-        // The mockDocument in setup.js returns new MockHTMLElement for any getElementById.
-        // So UI constructor should pass.
-
         ui = new UI();
+        const mockGame = {
+            combat: {
+                blockedEnemies: new Set()
+            }
+        };
+        ui.setGame(mockGame);
     });
 
     it('should initialize and get elements', () => {

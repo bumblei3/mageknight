@@ -34,8 +34,9 @@ describe('Site Rewards interactions', () => {
         expect(recruitOption.subItems[0].type).toBe('unit');
     });
 
-    it('should allow buying Spells at Mage Tower with Mana + Influence', () => {
+    it('should allow buying Spells at CONQUERED Mage Tower with Mana + Influence', () => {
         const tower = new Site(SITE_TYPES.MAGE_TOWER);
+        tower.conquered = true; // Must be conquered first
         const options = manager.visitSite({ q: 0, r: 0 }, tower).options;
         const spellOption = options.find(o => o.id === 'spells');
 
@@ -57,8 +58,19 @@ describe('Site Rewards interactions', () => {
         expect(game.hero.removeMana.callCount).toBe(1); // Mana used
     });
 
+    it('should offer attack option at UNCONQUERED Mage Tower', () => {
+        const tower = new Site(SITE_TYPES.MAGE_TOWER);
+        tower.conquered = false;
+        const options = manager.visitSite({ q: 0, r: 0 }, tower).options;
+        const attackOption = options.find(o => o.id === 'attack');
+
+        expect(attackOption).toBeDefined();
+        expect(attackOption.enabled).toBe(true);
+    });
+
     it('should FAIL buying Spells if missing Mana', () => {
         const tower = new Site(SITE_TYPES.MAGE_TOWER);
+        tower.conquered = true; // Must be conquered
         const options = manager.visitSite({ q: 0, r: 0 }, tower).options;
         const spellOption = options.find(o => o.id === 'spells');
 

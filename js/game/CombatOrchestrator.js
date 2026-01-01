@@ -18,10 +18,10 @@ export class CombatOrchestrator {
     /**
      * Handles playing a card during combat
      */
-    playCardInCombat(index, card) {
+    playCardInCombat(index, card, useStrong = false) {
         if (!this.game.combat || card.isWound()) return;
 
-        const result = this.game.hero.playCard(index, false, this.game.timeManager.isNight());
+        const result = this.game.hero.playCard(index, useStrong, this.game.timeManager.isNight());
         if (!result) return;
 
         // Particle Effect
@@ -244,6 +244,20 @@ export class CombatOrchestrator {
             if (levelResult && levelResult.leveledUp) {
                 this.game.levelUpManager.handleLevelUp(levelResult);
             }
+
+            // --- SITE REWARDS ---
+            const currentSite = this.game.siteManager.currentSite;
+            if (currentSite && !currentSite.conquered) {
+                if (currentSite.type === 'dungeon') {
+                    currentSite.conquered = true;
+                    this.game.addLog('Verlies gesäubert! Du findest ein Artefakt.', 'success');
+                    this.game.hero.awardRandomArtifact();
+                } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower') {
+                    currentSite.conquered = true;
+                    this.game.addLog(`${currentSite.getName()} erobert!`, 'success');
+                    this.game.statisticsManager.increment('sitesConquered');
+                }
+            }
         } else if (result.defeat && enemy) {
             this.game.addLog(`Niederlage gegen ${enemy.name}.`, 'error');
         } else if (enemy) {
@@ -266,19 +280,18 @@ export class CombatOrchestrator {
     executeRangedAttack(enemy) {
         if (!this.game.combat) return;
 
-        const attackValue = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);
-        const isSiege = (this.combatSiegeTotal || 0) > 0;
-        const attackResult = this.game.combat.rangedAttackEnemy(enemy, attackValue, isSiege);
+        const attackResult = this.game.combat.rangedAttackEnemy(
+            enemy,
+            this.combatRangedTotal || 0,
+            this.combatSiegeTotal || 0
+        );
 
         this.game.addLog(attackResult.message, 'combat');
 
         if (attackResult.success) {
-            // Update totals if hit consumed points
-            if (isSiege) {
-                this.combatSiegeTotal = Math.max(0, this.combatSiegeTotal - (attackResult.consumedPoints || 0));
-            } else {
-                this.combatRangedTotal = Math.max(0, this.combatRangedTotal - (attackResult.consumedPoints || 0));
-            }
+            // Update totals based on consumption
+            this.combatRangedTotal = Math.max(0, this.combatRangedTotal - (attackResult.consumedRanged || 0));
+            this.combatSiegeTotal = Math.max(0, this.combatSiegeTotal - (attackResult.consumedSiege || 0));
 
             if (this.game.combat.enemies.length === 0) {
                 this.onCombatEnd({ victory: true, enemy: enemy });

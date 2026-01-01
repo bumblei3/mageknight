@@ -1,13 +1,7 @@
-import { TestRunner } from './testRunner.js';
+import { describe, it, expect, beforeEach } from './testRunner.js';
 import { MapManager } from '../js/mapManager.js';
 import { HexGrid } from '../js/hexgrid.js';
 import { TERRAIN_TYPES } from '../js/constants.js';
-
-const runner = new TestRunner();
-const describe = runner.describe.bind(runner);
-const it = runner.it.bind(runner);
-const expect = runner.expect.bind(runner);
-const beforeEach = runner.beforeEach.bind(runner);
 
 // Mock Canvas
 class MockCanvas {
@@ -68,8 +62,8 @@ describe('Map Exploration', () => {
         // Place initial tile
         mapManager.placeTile(0, 0, [TERRAIN_TYPES.PLAINS]);
 
-        // Try to explore from center
-        const result = mapManager.explore(0, 0);
+        // Try to explore from neighbor (edge of first tile)
+        const result = mapManager.explore(1, 0);
 
         expect(result.success).toBe(true);
         expect(result.center).toBeDefined();

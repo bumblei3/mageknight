@@ -82,13 +82,14 @@ describe('Combat System', () => {
         });
 
         it('should allow ranged attacks', () => {
-            const result = combat.rangedAttackEnemy(mockEnemy, 4);
+            // New signature: rangedAttackEnemy(enemy, rangedValue, siegeValue, element)
+            const result = combat.rangedAttackEnemy(mockEnemy, 4, 0);
             expect(result.success).toBe(true);
             expect(result.defeated.length).toBe(1);
         });
 
         it('should fail if attack is too low', () => {
-            const result = combat.rangedAttackEnemy(mockEnemy, 2);
+            const result = combat.rangedAttackEnemy(mockEnemy, 2, 0);
             expect(result.success).toBe(false);
             expect(combat.defeatedEnemies.length).toBe(0);
         });
@@ -110,14 +111,15 @@ describe('Combat System', () => {
 
             mockEnemy.getResistanceMultiplier = (el) => el === 'fire' ? 2.0 : 1.0;
 
-            const result = combat.rangedAttackEnemy(mockEnemy, 2, false, 'fire');
+            // (2 ranged, 0 siege, fire element)
+            const result = combat.rangedAttackEnemy(mockEnemy, 2, 0, 'fire');
             // Effective armor = 4 / 2 = 2. Attack 2 should kill.
             expect(result.success).toBe(true);
         });
 
         it('should fail ranged attack in wrong phase', () => {
             combat.endRangedPhase(); // Now in BLOCK
-            const result = combat.rangedAttackEnemy(mockEnemy, 5);
+            const result = combat.rangedAttackEnemy(mockEnemy, 5, 0);
             expect(result.success).toBe(false);
             expect(result.error).toBeDefined();
         });

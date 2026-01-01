@@ -339,7 +339,7 @@ describe('Coverage Gap Fill', () => {
         });
 
         it('should handle mana interaction', () => {
-            game.manaSource = { takeDie: () => 'red' };
+            game.manaSource = { takeDie: () => 'red', getState: () => ({ dice: [] }) };
             game.hero.takeManaFromSource = createSpy();
             game.renderController = { renderMana: createSpy() }; // usage in handleManaClick
             game.updateHeroMana = createSpy(); // Assuming this is called if it existed, or mock UI update

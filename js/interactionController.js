@@ -112,11 +112,6 @@ export class InteractionController {
     }
 
     handleCardClick(index, card) {
-        if (this.game.combat) {
-            this.game.playCardInCombat(index, card);
-            return;
-        }
-
         if (card.isWound()) {
             this.game.sound.error();
             this.game.addLog('Verletzungen können nicht gespielt werden.', 'warning');
@@ -129,18 +124,27 @@ export class InteractionController {
         const hasStrongEffect = Object.keys(card.strongEffect || {}).length > 0;
 
         // If card has strong effect AND player can afford it, SHOW MODAL
-        // Also ensure we are not just auto-playing weak on re-click (could add toggle later)
         if (hasStrongEffect && canAffordStrong) {
             this.showCardPlayModal(index, card, isNight);
             return;
         }
 
-        // Otherwise play basic effect immediately
-        this.finishCardPlay(index, false, isNight);
+        // Otherwise finish play
+        if (this.game.combat) {
+            this.game.playCardInCombat(index, card, false);
+        } else {
+            this.finishCardPlay(index, false, isNight);
+        }
     }
 
     // New helper to finalize play (Basic or Strong)
     finishCardPlay(index, useStrong, isNight) {
+        if (this.game.combat) {
+            const card = this.game.hero.hand[index];
+            this.game.playCardInCombat(index, card, useStrong);
+            return;
+        }
+
         // Use ActionManager for Undo support
         const result = this.game.actionManager.playCard(index, useStrong, isNight);
 

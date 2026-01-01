@@ -195,7 +195,8 @@ describe('Combat with Bosses', () => {
             // Verify we're in ranged phase
             expect(combat.phase).toBe('ranged');
 
-            const result = combat.rangedAttackEnemy(boss, 10, false, 'physical');
+            // New signature: rangedAttackEnemy(enemy, rangedValue, siegeValue, element)
+            const result = combat.rangedAttackEnemy(boss, 10, 0, 'physical');
             expect(result).toBeDefined();
 
             if (result.success !== false) {
@@ -207,8 +208,8 @@ describe('Combat with Bosses', () => {
         });
 
         it('should defeat boss with enough ranged damage', () => {
-            // Need 60 physical ranged
-            const result = combat.rangedAttackEnemy(boss, 60, false, 'physical');
+            // Need 60 physical ranged (60 * 0.5 = 30 damage = full health)
+            const result = combat.rangedAttackEnemy(boss, 60, 0, 'physical');
             expect(result).toBeDefined();
 
             if (result.defeated) {
@@ -218,8 +219,8 @@ describe('Combat with Bosses', () => {
         });
 
         it('should report boss transitions on ranged damage', () => {
-            // Deal 40 damage -> 20 effective
-            const result = combat.rangedAttackEnemy(boss, 40, false, 'physical');
+            // Deal 40 damage -> 20 effective (40 * 0.5 physical resist)
+            const result = combat.rangedAttackEnemy(boss, 40, 0, 'physical');
             expect(result).toBeDefined();
 
             // bossTransitions should exist on successful boss attacks

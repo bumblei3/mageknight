@@ -28,20 +28,23 @@ export class SiteInteractionManager {
 
         // Generate options based on site type
         switch (site.type) {
-        case SITE_TYPES.VILLAGE:
-            interactionData.options = this.getVillageOptions();
-            break;
-        case SITE_TYPES.MONASTERY:
-            interactionData.options = this.getMonasteryOptions();
-            break;
-        case SITE_TYPES.MAGE_TOWER:
-            interactionData.options = this.getMageTowerOptions();
-            break;
-        case SITE_TYPES.KEEP:
-            interactionData.options = this.getKeepOptions();
-            break;
-        default:
-            interactionData.options = [];
+            case SITE_TYPES.VILLAGE:
+                interactionData.options = this.getVillageOptions();
+                break;
+            case SITE_TYPES.MONASTERY:
+                interactionData.options = this.getMonasteryOptions();
+                break;
+            case SITE_TYPES.MAGE_TOWER:
+                interactionData.options = this.getMageTowerOptions();
+                break;
+            case SITE_TYPES.KEEP:
+                interactionData.options = this.getKeepOptions();
+                break;
+            case SITE_TYPES.DUNGEON:
+                interactionData.options = this.getDungeonOptions();
+                break;
+            default:
+                interactionData.options = [];
         }
 
         return interactionData;
@@ -104,19 +107,28 @@ export class SiteInteractionManager {
     getMageTowerOptions() {
         const options = [];
 
-        // Spells
-        const cards = SAMPLE_SPELLS; // In real game, draw random
-        options.push({
-            id: 'spells',
-            label: 'Zauber lernen (7 Einfluss + Mana)',
-            subItems: cards.map(c => ({
-                type: 'card',
-                data: c,
-                cost: 7, // Simplified cost
-                manaCost: c.color, // Need matching mana to buy spell
-                action: () => this.buyCard(c, 7) // Logic for mana check needed
-            }))
-        });
+        if (!this.currentSite.conquered) {
+            options.push({
+                id: 'attack',
+                label: 'Magierturm angreifen (Erobern)',
+                action: () => this.attackSite(),
+                enabled: true
+            });
+        } else {
+            // Spells
+            const cards = SAMPLE_SPELLS; // In real game, draw random
+            options.push({
+                id: 'spells',
+                label: 'Zauber lernen (7 Einfluss + Mana)',
+                subItems: cards.map(c => ({
+                    type: 'card',
+                    data: c,
+                    cost: 7, // Simplified cost
+                    manaCost: c.color, // Need matching mana to buy spell
+                    action: () => this.buyCard(c, 7) // Logic for mana check needed
+                }))
+            });
+        }
 
         return options;
     }
@@ -146,6 +158,24 @@ export class SiteInteractionManager {
             });
         }
         return options;
+    }
+
+    getDungeonOptions() {
+        if (this.currentSite.conquered) {
+            return [{
+                id: 'looted',
+                label: 'Verlies bereits geplündert',
+                enabled: false,
+                action: () => { }
+            }];
+        }
+
+        return [{
+            id: 'explore_dungeon',
+            label: 'Verlies erkunden (Gefährlicher Kampf)',
+            action: () => this.exploreDungeon(),
+            enabled: true
+        }];
     }
 
     // Actions
@@ -223,19 +253,52 @@ export class SiteInteractionManager {
     }
 
     attackSite() {
+        const isMageTower = this.currentSite.type === 'mage_tower';
         const enemy = {
-            name: 'Festungswache',
-            armor: 6,
-            attack: 4,
-            fame: 5,
-            icon: '🛡️',
-            type: 'keep_guard',
-            color: '#9ca3af'
+            name: isMageTower ? 'Wächter des Turms' : 'Festungswache',
+            armor: isMageTower ? 5 : 6,
+            attack: isMageTower ? 5 : 4,
+            fame: isMageTower ? 6 : 5,
+            icon: isMageTower ? '🧙' : '🛡️',
+            type: isMageTower ? 'tower_guard' : 'keep_guard',
+            color: isMageTower ? '#8b5cf6' : '#9ca3af',
+            fortified: true, // Always fortified in sites
+            attackType: isMageTower ? 'fire' : 'physical'
         };
 
-        const msg = `Kampf gegen ${this.currentSite.name || 'die Festung'} gestartet!`;
+        const msg = `Kampf gegen ${this.currentSite.getName()} gestartet! Du musst die Befestigung überwinden.`;
         this.game.addLog(msg, 'warning');
         this.game.initiateCombat(enemy);
-        return { success: true, message: 'Angriff auf die Festung!' };
+        return { success: true, message: 'Direkter Angriff!' };
+    }
+
+    exploreDungeon() {
+        // Create an elemental or draconum for the dungeon
+        const isElemental = Math.random() > 0.5;
+        const enemy = isElemental ? {
+            name: 'Feuer-Elementar',
+            armor: 4,
+            attack: 5,
+            attackType: 'fire',
+            iceResist: true,
+            fame: 4,
+            icon: '🔥',
+            type: 'elemental',
+            color: '#ef4444'
+        } : {
+            name: 'Drakonier-Elite',
+            armor: 5,
+            attack: 6,
+            attackType: 'fire',
+            fame: 7,
+            icon: '🐲',
+            type: 'draconum',
+            color: '#dc2626'
+        };
+
+        const msg = `Du betrittst das Dunkel... ${enemy.name} greift an!`;
+        this.game.addLog(msg, 'warning');
+        this.game.initiateCombat(enemy);
+        return { success: true, message: 'Verlies betreten!' };
     }
 }

@@ -90,7 +90,7 @@ describe('Unit System', () => {
         const crossbowmen = new Unit(UNIT_TYPES.CROSSBOWMEN);
         const abilities = crossbowmen.getAbilities();
 
-        const rangedAbility = abilities.find(a => a.range === true);
+        const rangedAbility = abilities.find(a => a.type === 'ranged');
         expect(rangedAbility).toBeDefined();
         expect(rangedAbility.value).toBe(3);
     });

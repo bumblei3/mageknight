@@ -87,10 +87,19 @@ export class CombatUIManager {
                 <div style="font-size: 1.5em; font-weight: bold; color: #ff4a4a;">${attackTotal}</div>
             </div>`;
         } else if (phase === COMBAT_PHASE.RANGED) {
-            html += `<div style="text-align: center;">
-                <div style="font-size: 0.9em; opacity: 0.8;">Fernkampf</div>
-                <div style="font-size: 1.5em; font-weight: bold; color: #fbbf24;">${attackTotal}</div>
-            </div>`;
+            const orchestrator = this.ui?.game?.combatOrchestrator;
+            const rangedTotal = orchestrator?.combatRangedTotal ?? attackTotal;
+            const siegeTotal = orchestrator?.combatSiegeTotal ?? 0;
+            html += `
+                <div style="text-align: center;">
+                    <div style="font-size: 0.9em; opacity: 0.8;">Fernkampf</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #fbbf24;">${rangedTotal}</div>
+                </div>
+                <div style="text-align: center; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 1rem;">
+                    <div style="font-size: 0.9em; opacity: 0.8;">Belagerung</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #f59e0b;">${siegeTotal}</div>
+                </div>
+            `;
         }
 
         html += '</div>';
@@ -131,7 +140,7 @@ export class CombatUIManager {
      */
     getPhaseHint(phase) {
         const hints = {
-            'ranged': 'Besiege Feinde mit Fernkampf- oder Belagerungswerten.',
+            'ranged': 'Besiege Feinde mit Fernkampf- oder Belagerungswerten. Befestigte Feinde (🏰) ignorieren normalen Fernkampf!',
             'block': 'Blocke Feind-Angriffe. Ungeblockte Feinde verursachen Schaden.',
             'attack': 'Besiege verbliebene Feinde mit normalen Angriffswerten.'
         };
@@ -145,19 +154,40 @@ export class CombatUIManager {
         const el = document.createElement('div');
         el.className = 'enemy-card';
 
+        // Defensive check for game/combat reference
+        const combat = this.game?.combat;
+        const isBlocked = combat?.blockedEnemies?.has(enemy.id) || false;
+        if (isBlocked) {
+            el.classList.add('blocked-enemy');
+            el.style.opacity = '0.6';
+        }
+
         if (enemy.isBoss) {
             el.classList.add('boss-card');
             el.style.border = '2px solid #fbbf24';
             el.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.3))';
         }
 
-        if (phase === 'ranged' && onClick) {
+        if ((phase === 'ranged' || phase === 'block') && onClick && !isBlocked) {
             el.style.cursor = 'crosshair';
-            el.title = 'Klicken für Fernkampf-Angriff';
+            el.title = phase === 'ranged' ? 'Klicken für Fernkampf-Angriff' : 'Klicken zum Blocken';
             el.addEventListener('click', () => onClick(enemy));
-            el.addEventListener('mouseenter', () => el.style.boxShadow = '0 0 10px red');
+            el.addEventListener('mouseenter', () => el.style.boxShadow = phase === 'ranged' ? '0 0 10px red' : '0 0 10px #3b82f6');
             el.addEventListener('mouseleave', () => el.style.boxShadow = enemy.isBoss ? '0 0 8px rgba(251, 191, 36, 0.5)' : 'none');
         }
+
+        // Get Attack Info
+        const attackValue = typeof enemy.getEffectiveAttack === 'function' ? enemy.getEffectiveAttack() : enemy.attack;
+        const attackType = enemy.attackType || 'physical';
+        const blockReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : attackValue;
+
+        const typeIcons = {
+            'physical': '⚔️',
+            'fire': '🔥',
+            'ice': '❄️',
+            'cold_fire': '🔥❄️'
+        };
+        const typeIcon = typeIcons[attackType] || '⚔️';
 
         let bossHealthHTML = '';
         if (enemy.isBoss) {
@@ -179,23 +209,35 @@ export class CombatUIManager {
             `;
         }
 
+        const blockBadge = (phase === 'block' && !isBlocked) ?
+            `<div class="block-badge" style="position: absolute; bottom: 5px; right: 5px; background: #3b82f6; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">Benötigt: ${blockReq}</div>` : '';
+
+        const fortifiedBadge = (phase === 'ranged' && enemy.fortified && !isBlocked) ?
+            `<div class="fortified-badge" style="position: absolute; top: 5px; right: 5px; background: #92400e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; border: 1px solid #fbbf24;">BEFESTIGT</div>` : '';
+
         el.innerHTML = `
-            <div class="enemy-icon" style="color: ${enemy.color}; ${enemy.isBoss ? 'font-size: 2rem;' : ''}">${enemy.icon}</div>
-            <div class="enemy-name" style="${enemy.isBoss ? 'font-size: 1.1rem; color: #fbbf24;' : ''}">${enemy.name}</div>
+            ${fortifiedBadge}
+            <div class="enemy-icon" style="color: ${enemy.color}; ${enemy.isBoss ? 'font-size: 2rem;' : ''}">
+                ${isBlocked ? '🛡️' : enemy.icon}
+            </div>
+            <div class="enemy-name" style="${enemy.isBoss ? 'font-size: 1.1rem; color: #fbbf24;' : ''}">
+                ${isBlocked ? `<span style="color: #10b981; font-size: 0.8rem;">[GEBLOCKT]</span><br>` : ''}
+                ${enemy.name}
+            </div>
             <div class="enemy-stats">
                 <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
-                <div class="stat" title="Angriff">⚔️ ${typeof enemy.getEffectiveAttack === 'function' ? enemy.getEffectiveAttack() : enemy.attack}</div>
+                <div class="stat" title="Angriff" style="display: flex; align-items: center; gap: 2px;">
+                    ${typeIcon} <span>${attackValue}</span>
+                </div>
             </div>
             ${bossHealthHTML}
             <div class="enemy-traits">
                 ${enemy.fortified ? '<span title="Befestigt">🏰</span>' : ''}
                 ${enemy.swift ? '<span title="Flink">💨</span>' : ''}
-                ${enemy.fireResist ? '<span title="Feuer">🔥</span>' : ''}
-                ${enemy.iceResist ? '<span title="Eis">❄️</span>' : ''}
-                ${enemy.physicalResist ? '<span title="Physisch">🗿</span>' : ''}
-                ${enemy.brutal ? '<span title="Brutal">💪</span>' : ''}
+                ${enemy.poison ? '<span title="Giftig">🤢</span>' : ''}
                 ${enemy.isBoss ? '<span title="Boss">👑</span>' : ''}
             </div>
+            ${blockBadge}
         `;
         return el;
     }

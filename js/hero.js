@@ -1,6 +1,6 @@
 // Hero class for Mage Knight
 
-import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK } from './card.js';
+import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_ARTIFACTS } from './card.js';
 import { MANA_COLORS } from './mana.js';
 // Skills are added via HeroController
 
@@ -608,6 +608,13 @@ export class Hero {
     // Clear temporary mana (called at end of turn)
     clearTempMana() {
         this.tempMana = [];
+    }
+
+    // Award a random artifact to the hero
+    awardRandomArtifact() {
+        const randomArt = SAMPLE_ARTIFACTS[Math.floor(Math.random() * SAMPLE_ARTIFACTS.length)];
+        const card = createDeck([randomArt])[0];
+        this.discard.push(card);
     }
 }
 

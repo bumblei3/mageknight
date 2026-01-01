@@ -369,12 +369,12 @@ describe('Combat', () => {
             const combat = new Combat(hero, fortifiedEnemy);
             combat.start();
 
-            // Regular ranged attack fails
-            const rangedResult = combat.rangedAttackEnemy(fortifiedEnemy, 5, false);
+            // Regular ranged attack fails (5 ranged, 0 siege)
+            const rangedResult = combat.rangedAttackEnemy(fortifiedEnemy, 5, 0);
             expect(rangedResult.success).toBe(false);
 
-            // Siege attack succeeds
-            const siegeResult = combat.rangedAttackEnemy(fortifiedEnemy, 5, true);
+            // Siege attack succeeds (0 ranged, 5 siege)
+            const siegeResult = combat.rangedAttackEnemy(fortifiedEnemy, 0, 5);
             expect(siegeResult.success).toBe(true);
         });
 

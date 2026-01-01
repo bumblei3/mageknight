@@ -36,6 +36,14 @@ export class UI {
     }
 
     /**
+     * Links the game instance to UI and sub-managers.
+     */
+    setGame(game) {
+        this.game = game;
+        this.combatUI.game = game;
+    }
+
+    /**
      * Sets up event listeners for collapsible panels.
      * @private
      */

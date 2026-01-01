@@ -63,12 +63,12 @@ describe('Combat Robustness & Edge Cases', () => {
 
         expect(combat.phase).toBe(COMBAT_PHASES.RANGED);
 
-        // Ranged attack 4 (not siege) vs Fortified (doubles armor against ranged) -> 4 vs 8 -> fail
-        const rangedResult = combat.rangedAttackEnemy(fortifiedEnemy, 4, false); // isSiege = false
+        // Ranged attack 4 (no siege) vs Fortified -> fails
+        const rangedResult = combat.rangedAttackEnemy(fortifiedEnemy, 4, 0);
         expect(rangedResult.success).toBe(false);
 
         // Siege attack 4 vs Fortified (normal armor) -> 4 vs 4 -> success
-        const siegeResult = combat.rangedAttackEnemy(fortifiedEnemy, 4, true); // isSiege = true
+        const siegeResult = combat.rangedAttackEnemy(fortifiedEnemy, 0, 4);
         expect(siegeResult.success).toBe(true);
     });
 
@@ -110,8 +110,8 @@ describe('Combat Robustness & Edge Cases', () => {
         combat = new Combat(hero, [enemy1]);
         combat.start();
 
-        // Immediate Ranged Kill
-        const result = combat.rangedAttackEnemy(enemy1, 3);
+        // Immediate Ranged Kill (3 ranged, 0 siege)
+        const result = combat.rangedAttackEnemy(enemy1, 3, 0);
         expect(result.success).toBe(true);
         expect(combat.enemies.length).toBe(0);
 

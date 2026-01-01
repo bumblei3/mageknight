@@ -7,6 +7,7 @@ export const UNIT_TYPES = {
     SWORDSMEN: 'swordsmen',
     GUARDS: 'guards',
     CROSSBOWMEN: 'crossbowmen',
+    CATAPULT: 'catapult',
     GOLEMS: 'golems',
     MAGES: 'mages'
 };
@@ -79,10 +80,22 @@ export const UNIT_INFO = {
         armor: 3,
         icon: '🏹',
         abilities: [
-            { type: 'attack', value: 3, range: true, text: '3 Fernkampf' },
+            { type: 'ranged', value: 3, text: '3 Fernkampf' },
             { type: 'attack', value: 2, text: '2 Angriff' }
         ],
         location: ['keep', 'city']
+    },
+    [UNIT_TYPES.CATAPULT]: {
+        name: 'Katapult',
+        level: 3,
+        cost: 8,
+        armor: 2,
+        icon: '🎯',
+        abilities: [
+            { type: 'siege', value: 4, text: '4 Belagerung' },
+            { type: 'attack', value: 1, text: '1 Angriff' }
+        ],
+        location: ['keep']
     },
     [UNIT_TYPES.GOLEMS]: {
         name: 'Golems',

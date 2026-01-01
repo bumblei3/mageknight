@@ -42,8 +42,8 @@ describe('Combat Coverage Tests', () => {
             combat = new Combat(hero, [enemy]);
             combat.start();
 
-            // Siege attack of 4 should kill
-            const result = combat.rangedAttackEnemy(enemy, 4, true, 'physical');
+            // Siege attack of 4 (0 ranged, 4 siege)
+            const result = combat.rangedAttackEnemy(enemy, 0, 4, 'physical');
 
             expect(result.success).toBe(true);
             expect(result.defeated).toBeDefined();
@@ -56,7 +56,8 @@ describe('Combat Coverage Tests', () => {
             combat = new Combat(hero, [enemy]);
             combat.start();
 
-            const result = combat.rangedAttackEnemy(enemy, 10, false, 'physical');
+            // Ranged only, no siege (10 ranged, 0 siege)
+            const result = combat.rangedAttackEnemy(enemy, 10, 0, 'physical');
 
             expect(result.success).toBe(false);
             expect(result.message).toContain('befestigt');

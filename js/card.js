@@ -107,13 +107,13 @@ export const GOLDYX_STARTER_DECK = [
         description: 'Basic: +2 Einfluss | Strong: +5 Einfluss'
     },
     {
-        id: 'inf_2',
-        name: 'Diplomatie',
+        id: 'swi_1',
+        name: 'Schnelligkeit',
         color: CARD_COLORS.WHITE,
-        basicEffect: { influence: 2 },
-        strongEffect: { influence: 5 },
+        basicEffect: { movement: 2 },
+        strongEffect: { ranged: true, attack: 3 },
         manaCost: 1,
-        description: 'Basic: +2 Einfluss | Strong: +5 Einfluss'
+        description: 'Basic: +2 Bewegung | Strong: +3 Fernkampf'
     },
     {
         id: 'inf_3',
@@ -508,5 +508,15 @@ export const SAMPLE_ADVANCED_ACTIONS = [
         strongEffect: { influence: 10, block: 6 },
         manaCost: 1,
         description: 'Basic: 5 Einfluss + 3 Block | Strong: 10 Einfluss + 6 Block'
+    },
+    {
+        id: 'adv_siege_mastery',
+        name: 'Belagerungsmeisterschaft',
+        type: CARD_TYPES.ADVANCED_ACTION,
+        color: CARD_COLORS.RED,
+        basicEffect: { siege: true, attack: 3 },
+        strongEffect: { siege: true, attack: 6, element: 'fire' },
+        manaCost: 1,
+        description: 'Basic: 3 Belagerung | Strong: 6 Feuer-Belagerung'
     }
 ];

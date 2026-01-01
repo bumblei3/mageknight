@@ -7,26 +7,30 @@ describe('SoundManager Coverage', () => {
 
     beforeEach(() => {
         soundManager = new SoundManager();
+        // Disable to prevent audio context init in Node.js tests
+        soundManager.enabled = false;
     });
 
     describe('initialization', () => {
-        it('should initialize with sound disabled', () => {
-            expect(soundManager.enabled).toBe(false);
-            expect(soundManager.volume).toBe(0);
+        it('should initialize with sound enabled by default', () => {
+            const sm = new SoundManager();
+            expect(sm.enabled).toBe(true);
+            expect(sm.volume).toBe(0.3);
         });
     });
 
     describe('toggle', () => {
-        it('should return false when toggling', () => {
-            const result = soundManager.toggle();
-            expect(result).toBe(false);
+        it('should toggle and return new state', () => {
+            const sm = new SoundManager();
+            const result = sm.toggle();
+            expect(result).toBe(false); // First toggle disables
         });
     });
 
     describe('setVolume', () => {
         it('should accept volume without error', () => {
             soundManager.setVolume(0.5);
-            // No error means success
+            expect(soundManager.volume).toBe(0.5);
         });
     });
 

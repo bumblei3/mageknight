@@ -1,34 +1,263 @@
-// Simple Sound Manager for Mage Knight
-// Sound system disabled by user request
+/**
+ * Sound Manager for Mage Knight
+ * Uses Web Audio API for procedural sound generation (no audio files needed)
+ */
 
 export class SoundManager {
     constructor() {
-        this.enabled = false;
-        this.volume = 0;
+        this.enabled = true;
+        this.volume = 0.3;
         this.audioContext = null;
+        this.masterGain = null;
+        this.initialized = false;
     }
 
-    toggle() { return false; }
-    setVolume(_vol) { }
-    playTone(_frequency, _duration, _type = 'sine') { }
+    /**
+     * Initialize the audio context (must be called after user interaction)
+     */
+    init() {
+        if (this.initialized) return;
 
-    // Sound effects - all empty
-    cardPlay() { }
-    cardPlayStrong() { }
-    move() { }
-    attack() { }
-    hit() { }
-    block() { }
-    victory() { }
-    defeat() { }
-    levelUp() { }
-    error() { }
-    notification() { }
-    cardDraw() { }
-    cardPlaySideways() { }
-    manaUse() { }
-    explore() { }
-    achievement() { }
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.masterGain = this.audioContext.createGain();
+            this.masterGain.connect(this.audioContext.destination);
+            this.masterGain.gain.value = this.volume;
+            this.initialized = true;
+        } catch (e) {
+            console.warn('Web Audio API not supported:', e);
+            this.enabled = false;
+        }
+    }
+
+    /**
+     * Toggle sound on/off
+     */
+    toggle() {
+        this.enabled = !this.enabled;
+        return this.enabled;
+    }
+
+    /**
+     * Set master volume (0-1)
+     */
+    setVolume(vol) {
+        this.volume = Math.max(0, Math.min(1, vol));
+        if (this.masterGain) {
+            this.masterGain.gain.value = this.volume;
+        }
+    }
+
+    /**
+     * Play a single tone
+     */
+    playTone(frequency, duration, type = 'sine', attack = 0.01, decay = 0.1) {
+        if (!this.enabled || !this.audioContext) {
+            this.init();
+            if (!this.audioContext) return;
+        }
+
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+
+        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + attack);
+        gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + duration);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(this.masterGain);
+
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + duration);
+    }
+
+    /**
+     * Play a chord (multiple frequencies)
+     */
+    playChord(frequencies, duration, type = 'sine') {
+        frequencies.forEach((freq, i) => {
+            setTimeout(() => this.playTone(freq, duration, type), i * 30);
+        });
+    }
+
+    /**
+     * Play noise burst (for impact sounds)
+     */
+    playNoise(duration, filterFreq = 1000) {
+        if (!this.enabled || !this.audioContext) {
+            this.init();
+            if (!this.audioContext) return;
+        }
+
+        const bufferSize = this.audioContext.sampleRate * duration;
+        const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = this.audioContext.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.audioContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = filterFreq;
+
+        const gainNode = this.audioContext.createGain();
+        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+
+        noise.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(this.masterGain);
+
+        noise.start();
+        noise.stop(this.audioContext.currentTime + duration);
+    }
+
+    // ============ SOUND EFFECTS ============
+
+    /** Card drawn from deck */
+    cardDraw() {
+        this.playTone(800, 0.08, 'sine');
+        setTimeout(() => this.playTone(1000, 0.05, 'sine'), 40);
+    }
+
+    /** Card played (basic effect) */
+    cardPlay() {
+        this.playTone(400, 0.1, 'triangle');
+        this.playTone(600, 0.15, 'triangle');
+    }
+
+    /** Card played with strong/powered effect */
+    cardPlayStrong() {
+        this.playChord([400, 500, 600], 0.2, 'sawtooth');
+        setTimeout(() => this.playTone(800, 0.15, 'sine'), 100);
+    }
+
+    /** Card played sideways */
+    cardPlaySideways() {
+        this.playTone(300, 0.15, 'triangle');
+    }
+
+    /** Hero movement */
+    move() {
+        this.playTone(200, 0.08, 'sine');
+        setTimeout(() => this.playTone(250, 0.06, 'sine'), 50);
+    }
+
+    /** Attack sound */
+    attack() {
+        this.playNoise(0.15, 800);
+        this.playTone(150, 0.2, 'sawtooth');
+    }
+
+    /** Hit/damage received */
+    hit() {
+        this.playNoise(0.1, 600);
+        this.playTone(100, 0.15, 'square');
+        setTimeout(() => this.playTone(80, 0.1, 'square'), 80);
+    }
+
+    /** Block successful */
+    block() {
+        this.playTone(300, 0.1, 'triangle');
+        this.playTone(400, 0.1, 'triangle');
+        this.playNoise(0.05, 2000);
+    }
+
+    /** Victory fanfare */
+    victory() {
+        const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+        notes.forEach((freq, i) => {
+            setTimeout(() => this.playTone(freq, 0.3, 'sine'), i * 150);
+        });
+    }
+
+    /** Defeat sound */
+    defeat() {
+        const notes = [300, 250, 200, 150];
+        notes.forEach((freq, i) => {
+            setTimeout(() => this.playTone(freq, 0.4, 'sawtooth'), i * 200);
+        });
+    }
+
+    /** Level up celebration */
+    levelUp() {
+        this.playChord([523, 659, 784], 0.3, 'sine');
+        setTimeout(() => this.playChord([587, 740, 880], 0.4, 'sine'), 200);
+    }
+
+    /** Error/invalid action */
+    error() {
+        this.playTone(200, 0.15, 'square');
+        setTimeout(() => this.playTone(150, 0.2, 'square'), 100);
+    }
+
+    /** Notification sound */
+    notification() {
+        this.playTone(880, 0.1, 'sine');
+        setTimeout(() => this.playTone(1100, 0.15, 'sine'), 80);
+    }
+
+    /** Mana crystal used */
+    manaUse() {
+        this.playTone(600, 0.1, 'sine');
+        this.playTone(900, 0.15, 'sine');
+    }
+
+    /** Exploration/reveal */
+    explore() {
+        this.playTone(400, 0.1, 'triangle');
+        setTimeout(() => this.playTone(500, 0.1, 'triangle'), 60);
+        setTimeout(() => this.playTone(600, 0.15, 'triangle'), 120);
+    }
+
+    /** Achievement unlocked */
+    achievement() {
+        const notes = [659, 784, 880, 1047, 1175];
+        notes.forEach((freq, i) => {
+            setTimeout(() => this.playTone(freq, 0.2, 'sine'), i * 100);
+        });
+    }
+
+    /** UI button click */
+    click() {
+        this.playTone(600, 0.05, 'sine');
+    }
+
+    /** UI hover */
+    hover() {
+        this.playTone(800, 0.03, 'sine');
+    }
+
+    /** Combat start */
+    combatStart() {
+        this.playNoise(0.2, 400);
+        this.playTone(200, 0.3, 'sawtooth');
+        setTimeout(() => this.playTone(250, 0.2, 'sawtooth'), 150);
+    }
+
+    /** Enemy defeated */
+    enemyDefeated() {
+        this.playChord([400, 500, 600], 0.2, 'triangle');
+    }
+
+    /** Heal effect */
+    heal() {
+        this.playChord([523, 659, 784], 0.25, 'sine');
+    }
+
+    /** Skill activation */
+    skillUse() {
+        this.playTone(700, 0.1, 'sine');
+        setTimeout(() => this.playTone(900, 0.15, 'sine'), 50);
+        setTimeout(() => this.playTone(1100, 0.2, 'sine'), 100);
+    }
 }
 
 export default SoundManager;

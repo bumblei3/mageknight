@@ -24,6 +24,7 @@ import SoundManager from './soundManager.js';
 import TouchController from './touchController.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS, TIME_OF_DAY } from './constants.js';
+import { t } from './i18n/index.js';
 import { logger } from './logger.js';
 
 // Refactored Game Managers
@@ -142,6 +143,11 @@ export class MageKnightGame {
         this.renderHand();
         this.renderMana();
 
+        // Initial translation refresh
+        if (this.ui.refreshTranslations) {
+            this.ui.refreshTranslations();
+        }
+
         this.setupTimeListener();
         this.setupVisualEffectsListeners(); // New listener cleanup
         this.inputController.setup();
@@ -230,8 +236,8 @@ export class MageKnightGame {
             setTimeout(() => this.tutorial.start(), 1500);
         }
 
-        this.addLog('Willkommen bei Mage Knight!', 'info');
-        this.addLog('Spiel gestartet. Viel Erfolg!', 'info');
+        this.addLog(t('game.welcome'), 'info');
+        this.addLog(t('game.started'), 'info');
         this.updatePhaseIndicator();
     }
 
@@ -554,7 +560,7 @@ export class MageKnightGame {
                 this.render();
             }
 
-            this.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
+            this.addLog(t('game.round', { round: state.round, time: isNight ? t('game.night') : t('game.day') }), 'info');
 
             // Enemy Turn / World Update
             const enemyLogs = this.enemyAI.updateEnemies(this.enemies, this.hero);

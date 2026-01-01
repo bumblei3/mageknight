@@ -114,4 +114,46 @@ export function initI18n() {
     currentLanguage = 'de';
 }
 
-export default { t, setLanguage, getLanguage, registerLanguage, getAvailableLanguages, initI18n };
+/**
+ * Update a single element with translations based on data-i18n attribute
+ * @param {HTMLElement} element - The element to translate
+ */
+export function updateElement(element) {
+    const key = element.getAttribute('data-i18n');
+    if (!key) return;
+
+    const translation = t(key);
+
+    // Check if it's an input or button with a title attribute that needs translation
+    if (element.hasAttribute('title')) {
+        const titleKey = element.getAttribute('data-i18n-title');
+        if (titleKey) {
+            element.setAttribute('title', t(titleKey));
+        }
+    }
+
+    // Default to setting text content
+    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+        if (element.hasAttribute('placeholder')) {
+            element.setAttribute('placeholder', translation);
+        }
+    } else {
+        element.textContent = translation;
+    }
+}
+
+/**
+ * Automatically translate all elements with data-i18n attributes in the document
+ */
+export function translateDocument() {
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(updateElement);
+
+    // Update document title if applicable
+    const titleKey = document.querySelector('title')?.getAttribute('data-i18n');
+    if (titleKey) {
+        document.title = t(titleKey);
+    }
+}
+
+export default { t, setLanguage, getLanguage, registerLanguage, getAvailableLanguages, initI18n, translateDocument, updateElement };

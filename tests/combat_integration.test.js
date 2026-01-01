@@ -194,7 +194,7 @@ describe('Combat Integration Tests', () => {
         expect(combat).toBeDefined();
         expect(combat.phase).toBe(COMBAT_PHASE.RANGED);
         expect(combat.enemies.length).toBe(1);
-        expect(result.message).toContain('Kampf');
+        expect(result.message.toLowerCase()).toContain('kampf');
 
         console.log('✓ Combat initialization matches game.js pattern');
     });

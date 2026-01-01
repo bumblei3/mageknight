@@ -2,6 +2,7 @@ import { StatusEffectManager } from './statusEffects.js';
 // Enemy types imported as needed
 import { COMBAT_PHASES, ATTACK_ELEMENTS } from './constants.js';
 import { logger } from './logger.js';
+import { t } from './i18n/index.js';
 
 // For backward compatibility
 export const COMBAT_PHASE = COMBAT_PHASES;
@@ -35,33 +36,33 @@ export class Combat {
         return {
             phase: this.phase,
             enemies: this.enemies,
-            message: `Kampf begonnen gegen ${this.enemies.length} Feinde! Fernkampf-Phase.`
+            message: t('combat.message', { count: this.enemies.length }) + ' ' + t('ui.phases.ranged') + '.'
         };
     }
 
     // Ranged phase - player uses ranged/siege attacks
     rangedPhase() {
         if (this.phase !== COMBAT_PHASES.RANGED) {
-            return { error: 'Nicht in der Fernkampf-Phase' };
+            return { error: t('ui.phases.ranged') };
         }
 
         return {
             enemies: this.enemies,
-            message: 'Nutze Fernkampf- oder Belagerungsangriffe!'
+            message: t('combat.phaseRanged') // Or a specific 'how to' key
         };
     }
 
     // Attempt to defeat enemies with Ranged/Siege Attack
     rangedAttackEnemy(enemy, rangedValue, siegeValue, element = 'physical') {
         if (this.phase !== COMBAT_PHASES.RANGED) {
-            return { success: false, error: 'Nicht in der Fernkampf-Phase' };
+            return { success: false, error: t('combat.phaseRanged') };
         }
 
         // Check immunities
         if (enemy.fortified && siegeValue === 0) {
             return {
                 success: false,
-                message: `${enemy.name} ist befestigt! Nur Belagerungsangriffe wirken.`
+                message: t('combat.fortifiedImmunity', { enemy: enemy.name })
             };
         }
 
@@ -102,7 +103,7 @@ export class Combat {
                 consumedSiege,
                 healthPercent: damageResult.healthPercent,
                 bossTransitions: [],
-                message: `${enemy.name} erleidet ${effectiveDamage} Fernkampf-Schaden! (${enemy.currentHealth}/${enemy.maxHealth} HP)`
+                message: t('combat.rangedAttack', { enemy: enemy.name, amount: effectiveDamage, current: enemy.currentHealth, max: enemy.maxHealth })
             };
 
             // Handle phase transitions
@@ -124,7 +125,7 @@ export class Combat {
                 this.enemies = this.enemies.filter(e => e.id !== enemy.id);
                 result.defeated = [enemy];
                 result.fameGained = enemy.fame;
-                result.message = `🏆 ${enemy.name} im Fernkampf besiegt! +${enemy.fame} Ruhm!`;
+                result.message = t('combat.bossDefeated', { enemy: enemy.name, amount: enemy.fame });
             }
 
             return result;
@@ -166,26 +167,27 @@ export class Combat {
                 }
             }
 
+            const nameWithFortified = enemy.fortified ? `${enemy.name} (${t('mana.fortified')})` : enemy.name;
             return {
                 success: true,
                 defeated: [enemy],
                 fameGained: enemy.fame,
                 consumedRanged,
                 consumedSiege,
-                message: `${enemy.name} im ${enemy.fortified ? 'Belagerungskampf' : 'Fernkampf'} besiegt!`
+                message: t('combat.defeatedInCombat', { enemy: nameWithFortified, type: t('ui.phases.ranged') })
             };
         }
 
         return {
             success: false,
-            message: `Fernkampf zu schwach (${combinedAttack} vs ${effectiveArmor})`
+            message: t('combat.rangedWeak', { attack: combinedAttack, armor: effectiveArmor })
         };
     }
 
     // End ranged phase and proceed to block
     endRangedPhase() {
         if (this.phase !== COMBAT_PHASES.RANGED) {
-            return { error: 'Nicht in der Fernkampf-Phase' };
+            return { error: t('ui.phases.ranged') };
         }
 
         // Check if all enemies dead
@@ -196,14 +198,14 @@ export class Combat {
         this.phase = COMBAT_PHASES.BLOCK;
         return {
             phase: this.phase,
-            message: 'Block-Phase begonnen.'
+            message: t('combat.blockStarted')
         };
     }
 
     // Block phase - player plays blocks against enemy attacks
     blockPhase() {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
-            return { error: 'Nicht in der Block-Phase' };
+            return { error: t('ui.phases.block') };
         }
 
         // Calculate total enemy attack (unblocked enemies only)
@@ -218,7 +220,7 @@ export class Combat {
         return {
             totalDamage: this.totalDamage,
             blockedEnemies: Array.from(this.blockedEnemies),
-            message: `Gesamtschaden: ${this.totalDamage}`
+            message: t('combat.totalDamage', { amount: this.totalDamage })
         };
     }
 
@@ -226,11 +228,11 @@ export class Combat {
     // blockValue can be a number (backward compat) or { value: number, element: string }
     blockEnemy(enemy, blockInput) {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
-            return { success: false, error: 'Nicht in der Block-Phase' };
+            return { success: false, error: t('ui.phases.block') };
         }
 
         if (this.blockedEnemies.has(enemy.id)) {
-            return { success: false, message: 'Feind bereits geblockt' };
+            return { success: false, message: t('combat.alreadyBlocked') };
         }
 
         // Normalize input to array
@@ -316,7 +318,7 @@ export class Combat {
                 totalBlock: totalEffectiveBlock,
                 consumedPoints: totalInputBlock,
                 isInefficient: isInefficient,
-                message: `${enemy.name} erfolgreich geblockt! ${isInefficient ? '(Ineffizienter Block!)' : ''}`
+                message: t('combat.blockSuccess', { enemy: enemy.name, note: isInefficient ? t('combat.blockInefficient') : '' })
             };
         }
 
@@ -326,14 +328,14 @@ export class Combat {
             totalBlock: totalEffectiveBlock,
             consumedPoints: totalInputBlock,
             isInefficient: isInefficient,
-            message: `Block zu schwach (${totalEffectiveBlock} vs ${blockRequired})${isInefficient ? ' - Ineffizient!' : ''}`
+            message: t('combat.blockWeak', { attack: totalEffectiveBlock, armor: blockRequired, note: isInefficient ? t('combat.weakInefficient') : '' })
         };
     }
 
     // End block phase and move to damage phase
     endBlockPhase() {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
-            return { error: 'Nicht in der Block-Phase' };
+            return { error: t('ui.phases.block') };
         }
 
         this.phase = COMBAT_PHASES.DAMAGE;
@@ -343,7 +345,7 @@ export class Combat {
     // Damage phase - calculate and assign damage
     damagePhase() {
         if (this.phase !== COMBAT_PHASES.DAMAGE) {
-            return { error: 'Nicht in der Schadens-Phase' };
+            return { error: t('ui.phases.combat') }; // Schadensphase matches combat phase indicator
         }
 
         // Recalculate damage from unblocked enemies
@@ -399,7 +401,7 @@ export class Combat {
             totalDamage: this.totalDamage,
             woundsReceived: this.woundsReceived,
             unblockedEnemies,
-            message: `${this.woundsReceived} Verletzungen erhalten!`,
+            message: t('combat.woundsReceived', { amount: this.woundsReceived }),
             nextPhase: COMBAT_PHASES.ATTACK
         };
     }
@@ -407,25 +409,25 @@ export class Combat {
     // Attack phase - player attacks enemies
     attackPhase() {
         if (this.phase !== COMBAT_PHASES.ATTACK) {
-            return { error: 'Nicht in der Angriffs-Phase' };
+            return { error: t('ui.phases.attack') };
         }
 
         return {
             enemies: this.enemies,
             defeatedEnemies: this.defeatedEnemies,
-            message: 'Greife Feinde an!'
+            message: t('ui.phases.attack') // Or a help message
         };
     }
 
     // Activate a unit to contribute to combat
     activateUnit(unit) {
         if (!unit.isReady()) {
-            return { success: false, message: 'Einheit nicht bereit' };
+            return { success: false, message: t('combat.unitNotReady') };
         }
 
         const unitId = unit.id || unit.getName();
         if (this.activatedUnits.has(unitId)) {
-            return { success: false, message: 'Einheit bereits aktiviert' };
+            return { success: false, message: t('combat.unitAlreadyActivated') };
         }
 
         // Activate the unit
@@ -466,14 +468,14 @@ export class Combat {
             success: true,
             unit: unit,
             applied: applied.join(', '),
-            message: `${unit.getName()} aktiviert: ${applied.join(', ')}`
+            message: t('combat.unitActivated', { unit: unit.getName(), applied: applied.join(', ') })
         };
     }
 
     // Attempt to defeat enemies with attack (includes unit contributions)
     attackEnemies(attackValue, attackElement = 'physical', targetEnemies = null) {
         if (this.phase !== COMBAT_PHASES.ATTACK) {
-            return { error: 'Nicht in der Angriffs-Phase' };
+            return { error: t('ui.phases.attack') };
         }
 
         const targets = targetEnemies || this.enemies;
@@ -509,10 +511,10 @@ export class Combat {
                     result.fameGained += enemy.fame;
                 });
                 this.enemies = this.enemies.filter(e => !regularEnemies.includes(e));
-                result.messages.push(`${regularEnemies.length} Feinde besiegt!`);
+                result.messages.push(t('combat.enemiesDefeated', { count: regularEnemies.length }));
                 result.success = true;
             } else {
-                result.messages.push(`Angriff zu schwach für normale Feinde (${totalAttack} vs ${totalArmor})`);
+                result.messages.push(t('combat.attackWeak', { attack: totalAttack, armor: totalArmor }));
             }
         }
 
@@ -551,7 +553,7 @@ export class Combat {
                 });
             }
 
-            result.messages.push(`${boss.name} erleidet ${effectiveDamage} Schaden! (${boss.currentHealth}/${boss.maxHealth} HP)`);
+            result.messages.push(t('combat.bossDamaged', { enemy: boss.name, amount: effectiveDamage, current: boss.currentHealth, max: boss.maxHealth }));
 
             // Check if boss is defeated
             if (damageResult.defeated) {
@@ -560,7 +562,7 @@ export class Combat {
                 result.defeated.push(boss);
                 result.fameGained += boss.fame;
                 this.enemies = this.enemies.filter(e => e.id !== boss.id);
-                result.messages.push(`🏆 ${boss.name} wurde besiegt! +${boss.fame} Ruhm!`);
+                result.messages.push(t('combat.bossDefeatedAttack', { enemy: boss.name, amount: boss.fame }));
             }
 
             result.success = true;
@@ -640,13 +642,7 @@ export class Combat {
 
     // Get color name for display
     getColorName(color) {
-        const names = {
-            'red': 'Rot',
-            'blue': 'Blau',
-            'green': 'Grün',
-            'white': 'Weiß'
-        };
-        return names[color] || color;
+        return t(`cards.colors.${color}`) || color;
     }
 
     // Calculate critical hit chance
@@ -656,7 +652,7 @@ export class Combat {
                 isCrit: true,
                 damage: Math.floor(baseAttack * 1.5),
                 multiplier: 1.5,
-                message: '💥 KRITISCHER TREFFER!'
+                message: t('combat.critHit')
             };
         }
         return {
@@ -706,7 +702,7 @@ export class Combat {
         const heroResult = this.statusEffects.processHeroPhaseStart(this.hero);
         if (heroResult && heroResult.damage) {
             results.heroDamage = heroResult.damage;
-            results.messages.push(`Held erleidet ${heroResult.damage} Schaden durch Statuseffekte!`);
+            results.messages.push(t('combat.heroStatusDamage', { amount: heroResult.damage }));
         }
 
         // Process enemy effects
@@ -714,7 +710,7 @@ export class Combat {
         for (const result of enemyResults) {
             if (result.damage) {
                 results.enemyDamage.push({ enemy: result.enemy, damage: result.damage });
-                results.messages.push(`${result.enemy.name} erleidet ${result.damage} Schaden!`);
+                results.messages.push(t('combat.enemyStatusDamage', { enemy: result.enemy.name, amount: result.damage }));
             }
         }
 
@@ -745,7 +741,7 @@ export class Combat {
             woundsReceived: this.woundsReceived,
             fameGained: this.defeatedEnemies.reduce((sum, e) => sum + e.fame, 0),
             poisonWounds: endResult.wounds,
-            message: allDefeated ? 'Sieg!' : 'Kampf beendet.'
+            message: allDefeated ? t('game.victory') : t('combat.combatEnded')
         };
 
         return result;

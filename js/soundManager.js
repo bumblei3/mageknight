@@ -103,16 +103,19 @@ export class SoundManager {
         const noise = this.audioContext.createBufferSource();
         noise.buffer = buffer;
 
-        const filter = this.audioContext.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = filterFreq;
-
         const gainNode = this.audioContext.createGain();
         gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
 
-        noise.connect(filter);
-        filter.connect(gainNode);
+        if (this.audioContext.createBiquadFilter) {
+            const filter = this.audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = filterFreq;
+            noise.connect(filter);
+            filter.connect(gainNode);
+        } else {
+            noise.connect(gainNode);
+        }
         gainNode.connect(this.masterGain);
 
         noise.start();

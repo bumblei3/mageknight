@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 
 export class RenderController {
     constructor(game) {
@@ -36,7 +37,7 @@ export class RenderController {
         // Update Progress
         const progress = this.game.achievementManager.getProgress();
         if (progressBar) progressBar.style.width = `${progress.percentage}% `;
-        if (progressText) progressText.textContent = `${progress.unlocked}/${progress.total} Freigeschaltet (${progress.percentage}%)`;
+        if (progressText) progressText.textContent = t('ui.labels.unlocked', { count: progress.unlocked, total: progress.total, percent: progress.percentage });
 
         // Filter and Render
         const allAchievements = Object.values(this.game.achievementManager.achievements);
@@ -82,18 +83,18 @@ export class RenderController {
         };
 
         if (category === 'global') {
-            createStatCard('Spiele gespielt', stats.gamesPlayed || 0);
-            createStatCard('Siege', stats.gamesWon || 0);
-            createStatCard('Niederlagen', stats.gamesLost || 0);
-            createStatCard('Feinde besiegt (Total)', stats.enemiesDefeated || 0);
-            createStatCard('Höchstes Level', stats.highestLevel || 1);
-            createStatCard('Perfekte Kämpfe', stats.perfectCombats || 0);
+            createStatCard(t('ui.stats.gamesPlayed'), stats.gamesPlayed || 0);
+            createStatCard(t('ui.stats.wins'), stats.gamesWon || 0);
+            createStatCard(t('ui.stats.losses'), stats.gamesLost || 0);
+            createStatCard(t('ui.stats.enemiesDefeated'), stats.enemiesDefeated || 0);
+            createStatCard(t('ui.stats.highestLevel'), stats.highestLevel || 1);
+            createStatCard(t('ui.stats.perfectCombats'), stats.perfectCombats || 0);
         } else {
-            createStatCard('Runde', this.game.turnNumber || 1);
-            createStatCard('Ruhm', this.game.hero.fame || 0);
-            createStatCard('Verletzungen', this.game.hero.wounds || 0);
-            createStatCard('Deck Größe', this.game.hero.deck.length + this.game.hero.hand.length + this.game.hero.discard.length);
-            createStatCard('Einheiten', this.game.hero.units.length);
+            createStatCard(t('ui.labels.round'), this.game.turnNumber || 1);
+            createStatCard(t('ui.labels.fame'), this.game.hero.fame || 0);
+            createStatCard(t('ui.labels.wounds'), this.game.hero.wounds || 0);
+            createStatCard(t('ui.labels.deckSize'), this.game.hero.deck.length + this.game.hero.hand.length + this.game.hero.discard.length);
+            createStatCard(t('ui.labels.units'), this.game.hero.units.length);
         }
     }
 
@@ -105,31 +106,31 @@ export class RenderController {
 
         // Hints
         const hints = {
-            block: '🛡️ Wähle Verteidigungskarten',
-            damage: '🩹 Schaden zuweisen',
-            attack: '⚔️ Spiele Angriffskarten',
-            end: '🏁 Kampf endet'
+            block: t('ui.hints.block'),
+            damage: t('ui.hints.damage'),
+            attack: t('ui.hints.attack'),
+            end: t('ui.hints.end')
         };
 
         const phaseNames = {
-            block: 'Block-Phase',
-            damage: 'Schadens-Phase',
-            attack: 'Angriffs-Phase',
-            end: 'Kampf Ende'
+            block: t('ui.phases.block'),
+            damage: t('ui.phases.damage'), // New key might be needed if damage phase != combat
+            attack: t('ui.phases.attack'),
+            end: t('combat.combatEnded')
         };
 
         if (this.game.combat) {
             // Combat Phases
-            phaseText.textContent = phaseNames[this.game.combat.phase] || 'Kampf';
+            phaseText.textContent = phaseNames[this.game.combat.phase] || t('ui.phases.combat');
             phaseHint.textContent = hints[this.game.combat.phase] || '';
         } else if (this.game.movementMode) {
             // Movement Mode
-            phaseText.textContent = 'Bewegung';
-            phaseHint.textContent = `👣 ${this.game.hero.movementPoints} Punkte - Klicke auf ein Feld`;
+            phaseText.textContent = t('ui.labels.movement');
+            phaseHint.textContent = t('ui.hints.movement', { points: this.game.hero.movementPoints });
         } else {
             // Standard
-            phaseText.textContent = 'Erkundung';
-            phaseHint.textContent = '🎴 Spiele Karten oder bewege dich (1-5)';
+            phaseText.textContent = t('ui.phases.exploration');
+            phaseHint.textContent = t('ui.hints.exploration');
         }
     }
 }

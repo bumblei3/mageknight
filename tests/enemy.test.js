@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
 import { Enemy, BossEnemy, ENEMY_TYPES, BOSS_PHASES, createEnemy, createBoss, createEnemies, ENEMY_DEFINITIONS } from '../js/enemy.js';
+import { setLanguage } from '../js/i18n/index.js';
 
 describe('Enemy System', () => {
+    beforeEach(() => {
+        setLanguage('de');
+    });
+
     it('should create an enemy with correct properties', () => {
         const enemy = new Enemy({
             type: ENEMY_TYPES.ORC,
@@ -133,7 +138,8 @@ describe('Enemy System', () => {
             const result = boss.takeDamage(95); // 100 -> 5
             expect(boss.enraged).toBe(true);
 
-            const transition = result.transitions.find(t => t.phase === 'Enraged');
+            const transition = result.transitions.find(t => t.phase === (setLanguage('de') && 'Wütend' || 'Wütend'));
+            // Since we set de in beforeEach, it should be Wütend
             expect(transition).toBeDefined();
         });
 

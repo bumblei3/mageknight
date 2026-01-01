@@ -31,7 +31,8 @@ export default {
             settings: 'Settings',
             newGame: 'New Game',
             save: 'Save',
-            load: 'Load'
+            load: 'Load',
+            explore: 'Explore'
         },
         labels: {
             fame: 'Fame',
@@ -42,33 +43,126 @@ export default {
             wounds: 'Wounds',
             crystals: 'Crystals',
             units: 'Units',
-            skills: 'Skills'
+            skills: 'Skills',
+            round: 'Round',
+            hero: 'Hero',
+            actions: 'Actions',
+            manaSource: 'Mana Source',
+            log: 'Log',
+            deckSize: 'Deck Size',
+            unlocked: '{count}/{total} Unlocked ({percent}%)'
+        },
+        stats: {
+            gamesPlayed: 'Games Played',
+            wins: 'Wins',
+            losses: 'Losses',
+            enemiesDefeated: 'Enemies Defeated (Total)',
+            highestLevel: 'Highest Level',
+            perfectCombats: 'Perfect Combats'
+        },
+        hints: {
+            end: '🏁 Combat ends',
+            movement: '👣 {points} points - Click a hex',
+            exploration: '🎴 Play cards or move (1-5)'
         },
         phases: {
             exploration: 'Exploration',
             combat: 'Combat',
             ranged: 'Ranged',
-            block: 'Block Phase',
-            attack: 'Attack Phase'
+            block: 'Block-Phase',
+            attack: 'Attack-Phase',
+            phase1: 'Phase 1',
+            phase2: 'Phase 2',
+            phase3: 'Phase 3',
+            enraged: 'Enraged'
+        },
+        tooltips: {
+            armor: {
+                title: 'Armor',
+                desc: 'Reduces damage taken in combat.'
+            },
+            handLimit: {
+                title: 'Hand Limit',
+                desc: 'Maximum number of cards you can have at the end of your turn.'
+            },
+            wounds: {
+                title: 'Wounds',
+                desc: 'Wounds block your hand. Rest or heal to remove them.'
+            },
+            fame: {
+                title: 'Fame',
+                desc: 'Experience points. Gain fame through combat and exploration to level up.'
+            },
+            reputation: {
+                title: 'Reputation',
+                desc: 'Affects interactions at sites. High reputation makes recruitment cheaper.'
+            },
+            phase: {
+                title: 'Current Phase',
+                desc: 'Shows what you can do right now.'
+            }
         }
     },
 
     // Combat
     combat: {
-        started: 'Combat begins!',
+        started: 'Combat started!',
         victory: 'Enemy defeated!',
-        wounded: 'You were wounded!',
+        wounded: 'You took wounds!',
         blocked: 'Attack blocked!',
-        damage: '{amount} damage dealt',
-        fameGained: '+{amount} Fame gained',
-        enemyDefeated: '{enemy} was defeated!',
+        damage: 'Dealt {amount} damage',
+        fameGained: 'Gained +{amount} Fame',
+        enemyDefeated: '{enemy} defeated!',
         phaseRanged: 'Ranged Phase',
         phaseBlock: 'Block Phase',
-        phaseAttack: 'Attack Phase'
+        phaseAttack: 'Attack Phase',
+        rangedAttack: '{enemy} takes {amount} ranged damage! ({current}/{max} HP)',
+        bossDefeated: '🏆 {enemy} defeated in ranged! +{amount} Fame!',
+        defeatedInCombat: '{enemy} defeated in {type}!',
+        fortifiedImmunity: '{enemy} is fortified and can only be attacked with siege!',
+        rangedWeak: 'Ranged too weak ({attack} vs {armor})',
+        blockStarted: 'Block phase started.',
+        totalDamage: 'Total damage: {amount}',
+        alreadyBlocked: 'Enemy already blocked',
+        blockSuccess: '{enemy} blocked! {note}',
+        blockInefficient: '(Inefficient block!)',
+        blockWeak: 'Block too weak ({attack} vs {armor}){note}',
+        weakInefficient: ' - Inefficient!',
+        woundsReceived: 'Received {amount} wounds!',
+        unitNotReady: 'Unit not ready',
+        unitAlreadyActivated: 'Unit already activated',
+        unitActivated: '{unit} activated: {applied}',
+        enemiesDefeated: '{count} enemies defeated!',
+        attackWeak: 'Attack too weak for normal enemies ({attack} vs {armor})',
+        bossDamaged: '{enemy} takes {amount} damage! ({current}/{max} HP)',
+        bossDefeatedAttack: '🏆 {enemy} defeated! +{amount} Fame!',
+        critHit: '💥 CRITICAL HIT!',
+        heroStatusDamage: 'Hero takes {amount} damage from status effects!',
+        enemyStatusDamage: '{enemy} takes {amount} damage!',
+        cardPlayed: 'Card played: {card}',
+        message: 'Combat against {count} enemies!',
+        combatEnded: 'Combat ended',
+        boss: {
+            enraged: '{name} gets angry! Attack increased!',
+            summons: '{name} summons {count} {enemy}!',
+            heals: '{name} heals for {amount}!',
+            doubleAttack: '{name} now attacks twice!'
+        },
+        fightAgainst: 'Fight against {enemy}!',
+        victoryOver: 'Victory over {enemy}!',
+        fameReward: '+{amount} Fame for victory.',
+        dungeonCleared: 'Dungeon cleared! You found an artifact.',
+        siteConquered: '{site} conquered!',
+        defeatAgainst: 'Defeat against {enemy}.',
+        retreatFrom: 'Retreat from combat against {enemy}.'
     },
 
     // Cards
     cards: {
+        basicEffect: 'Basic Effect',
+        sideways: 'Play Sideways',
+        sidewaysHint: '+1 Movement/Attack/Block/Influence',
+        manaCost: 'Mana Cost',
         types: {
             action: 'Action',
             spell: 'Spell',
@@ -76,33 +170,95 @@ export default {
             wound: 'Wound'
         },
         colors: {
-            red: 'Attack',
-            blue: 'Block',
-            green: 'Move',
-            white: 'Heal',
-            gold: 'Special'
+            red: 'Red',
+            blue: 'Blue',
+            green: 'Green',
+            white: 'White',
+            gold: 'Gold'
+        },
+        actions: {
+            attack: 'Attack',
+            block: 'Block',
+            movement: 'Movement',
+            influence: 'Influence',
+            healing: 'Healing'
         }
+    },
+
+    // Achievements
+    achievements: {
+        first_blood: { name: 'First Blood', desc: 'Defeat your first enemy' },
+        slayer: { name: 'Slayer', desc: 'Defeat 10 enemies' },
+        perfect_combat: { name: 'Perfect Combat', desc: 'Win a combat without taking wounds' },
+        dragon_slayer: { name: 'Dragon Slayer', desc: 'Defeat a dragon' },
+        explorer: { name: 'Explorer', desc: 'Explore 3 new tiles' },
+        cartographer: { name: 'Cartographer', desc: 'Explore 10 new tiles' },
+        site_visitor: { name: 'Site Visitor', desc: 'Visit 5 different sites' },
+        level_up: { name: 'Level Up', desc: 'Reach level 2' },
+        master: { name: 'Master', desc: 'Reach level 5' },
+        deck_builder: { name: 'Deck Builder', desc: 'Collect 20 cards' },
+        speed_runner: { name: 'Speed Runner', desc: 'Win in under 20 turns' },
+        mana_master: { name: 'Mana Master', desc: 'Use 50 mana dice' },
+        card_master: { name: 'Card Master', desc: 'Play 100 cards' },
+        survivor: { name: 'Survivor', desc: 'Survive with only 1 HP' },
+        pacifist_win: { name: 'Pacifist', desc: 'Win without playing an attack card' }
+    },
+
+    // Skills
+    skills: {
+        flight: { name: 'Flight', desc: 'Ignore movement costs' },
+        motivation: { name: 'Motivation', desc: '+2 cards, +1 White Mana' },
+        dragon_scales: { name: 'Dragon Scales', desc: '+2 Armor, Fire Resistance' },
+        freezing_breath: { name: 'Freezing Breath', desc: 'Freeze enemies' },
+        crystal_mastery: { name: 'Crystal Mastery', desc: 'Wild Mana' },
+        glittering_fortune: { name: 'Glittering Fortune', desc: 'Round Crystal' },
+        siege_mastery: { name: 'Siege Mastery', desc: '+2 Siege' },
+        essence_flow: { name: 'Essence Flow', desc: 'Card + Mana' },
+        natural_healing: { name: 'Natural Healing', desc: 'Heal Wound' },
+        noble_manners: { name: 'Noble Manners', desc: '+2 Influence' },
+        avenging_spirit: { name: 'Avenging Spirit', desc: '+2 Attack' }
     },
 
     // Mana
     mana: {
+        armor: 'Armor',
+        attack: 'Attack',
+        fame: 'Fame',
+        fortified: 'fortified',
+        brutal: 'Brutal',
+        swift: 'Swift',
+        poison: 'Poison',
+        fireResist: 'Fire Resistance',
+        iceResist: 'Ice Resistance',
+        physicalResist: 'Physical Resistance',
         red: 'Red Mana',
         blue: 'Blue Mana',
         green: 'Green Mana',
         white: 'White Mana',
         gold: 'Gold Mana (Wild)',
-        black: 'Black Mana'
+        black: 'Black Mana',
+        none: 'No Mana',
+        collected: 'Collected',
+        tooltips: {
+            red: { title: 'Red Mana', desc: 'Powers up attack and fire spells.' },
+            blue: { title: 'Blue Mana', desc: 'Powers up ice spells and block effects.' },
+            green: { title: 'Green Mana', desc: 'Powers up movement and heal spells.' },
+            white: { title: 'White Mana', desc: 'Powers up influence and spiritual effects.' },
+            gold: { title: 'Gold Mana', desc: 'Wild! Can be used as any color (except black). Day only.' },
+            black: { title: 'Black Mana', desc: 'Powerful but dangerous mana. Powers up dark spells. Night only.' },
+            default: { title: 'Mana', desc: 'Magical energy.' }
+        }
     },
 
     // Terrain
     terrain: {
-        plains: 'Plains',
-        forest: 'Forest',
-        hills: 'Hills',
-        mountains: 'Mountains',
-        desert: 'Desert',
-        wasteland: 'Wasteland',
-        water: 'Water'
+        plains: { name: 'Plains', desc: 'Open grasslands' },
+        forest: { name: 'Forest', desc: 'Dense forest' },
+        hills: { name: 'Hills', desc: 'Hilly terrain' },
+        mountains: { name: 'Mountains', desc: 'High mountains' },
+        desert: { name: 'Desert', desc: 'Arid desert' },
+        wasteland: { name: 'Wasteland', desc: 'Cursed wasteland' },
+        water: { name: 'Water', desc: 'Water (impassable)' }
     },
 
     // Sites
@@ -112,68 +268,37 @@ export default {
         mageTower: 'Mage Tower',
         monastery: 'Monastery',
         dungeon: 'Dungeon',
-        city: 'City'
+        city: 'City',
+        conquered: 'Conquered',
+        visited: 'Visited',
+        actions: {
+            heal: 'Heal',
+            recruit: 'Recruit',
+            attack: 'Attack',
+            train: 'Train',
+            learn: 'Learn',
+            explore: 'Explore'
+        }
     },
 
     // Enemies
     enemies: {
         orc: 'Orc',
-        draconum: 'Draconum',
+        weakling: 'Weakling',
         guard: 'Guard',
+        draconum: 'Draconum',
+        robber: 'Robber',
         mage: 'Mage',
         dragon: 'Dragon',
         phantom: 'Phantom',
         golem: 'Golem',
-        vampire: 'Vampire',
-        darkLord: 'Dark Lord',
-        dragonLord: 'Dragon Lord',
-        lichKing: 'Lich King'
-    },
-
-    // Skills
-    skills: {
-        motivation: 'Motivation',
-        essenceFlow: 'Essence Flow',
-        freezingBreath: 'Freezing Breath',
-        flight: 'Flight',
-        dragonScales: 'Dragon Scales'
-    },
-
-    // Events
-    events: {
-        shrine: 'Abandoned Shrine',
-        ambush: 'Ambush!',
-        cache: 'Hidden Cache',
-        merchant: 'Wandering Merchant',
-        ancientTomb: 'Ancient Tomb',
-        banditCamp: 'Bandit Camp'
-    },
-
-    // Tutorial
-    tutorial: {
-        welcome: 'Welcome to Mage Knight!',
-        movement: 'Click a hex to move there.',
-        combat: 'Fight enemies to gain fame.',
-        mana: 'Use mana to power up your cards.',
-        cards: 'Play cards from your hand.',
-        skip: 'Skip Tutorial',
-        next: 'Next'
-    },
-
-    // Settings
-    settings: {
-        title: 'Settings',
-        language: 'Language',
-        sound: 'Sound',
-        music: 'Music',
-        tutorial: 'Show Tutorial'
-    },
-
-    // Notifications
-    notifications: {
-        saved: 'Game saved!',
-        loaded: 'Game loaded!',
-        error: 'An error occurred.',
-        levelUp: 'Level up!'
+        vampire: 'Vampir',
+        necromancer: 'Necromancer',
+        elemental: 'Fire Elemental',
+        boss: 'Dark Lord',
+        dark_lord: 'Dark Lord',
+        dragon_lord: 'Dragon King',
+        lich_king: 'Lich King',
+        dragonlord: 'Dragon King'
     }
 };

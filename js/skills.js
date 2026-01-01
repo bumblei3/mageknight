@@ -1,4 +1,5 @@
-// Skills definition for Mage Knight
+// Hero Skills for Mage Knight
+import { t } from './i18n/index.js';
 
 export const SKILL_TYPES = {
     PASSIVE: 'passive',
@@ -10,78 +11,78 @@ export const SKILLS = {
     GOLDYX: [
         {
             id: 'flight',
-            name: 'Flug',
-            description: 'Bewegungskosten für alle Gelände sind 1. Ignoriert Feinde beim Bewegen.',
+            get name() { return t('skills.flight.name'); },
+            get description() { return t('skills.flight.desc'); },
             type: SKILL_TYPES.PASSIVE,
-            icon: '🦅'
+            icon: '🕊️'
         },
         {
             id: 'motivation',
-            name: 'Motivation',
-            description: 'Einmal pro Runde: Ziehe 2 Karten und erhalte 1 weißes Mana.',
+            get name() { return t('skills.motivation.name'); },
+            get description() { return t('skills.motivation.desc'); },
             type: SKILL_TYPES.ACTIVE,
-            icon: '⚡'
+            icon: '📣'
         },
         {
             id: 'crystal_mastery',
-            name: 'Kristall-Meisterschaft',
-            description: 'Du kannst Kristalle jeder Farbe als Joker verwenden.',
+            get name() { return t('skills.crystal_mastery.name'); },
+            get description() { return t('skills.crystal_mastery.desc'); },
             type: SKILL_TYPES.PASSIVE,
             icon: '💎'
         },
         {
             id: 'glittering_fortune',
-            name: 'Glitzerndes Glück',
-            description: 'Erhalte zu Beginn jeder Runde 1 Kristall einer zufälligen Farbe.',
+            get name() { return t('skills.glittering_fortune.name'); },
+            get description() { return t('skills.glittering_fortune.desc'); },
             type: SKILL_TYPES.PASSIVE,
             icon: '✨'
         },
         {
             id: 'dragon_scales',
-            name: 'Drachenschuppen',
-            description: '+1 Rüstung. Feuer-Angriffe machen halben Schaden.',
+            get name() { return t('skills.dragon_scales.name'); },
+            get description() { return t('skills.dragon_scales.desc'); },
             type: SKILL_TYPES.PASSIVE,
-            icon: '🐲'
+            icon: '🛡️'
         },
         {
             id: 'freezing_breath',
-            name: 'Eis-Atem',
-            description: 'Einmal pro Runde: Ein Feind erhält -3 Rüstung und verliert alle Angriffe.',
+            get name() { return t('skills.freezing_breath.name'); },
+            get description() { return t('skills.freezing_breath.desc'); },
             type: SKILL_TYPES.ACTIVE,
             icon: '❄️'
         },
         {
             id: 'siege_mastery',
-            name: 'Belagerungs-Meister',
-            description: 'Alle Belagerungs-Angriffe erhalten +2.',
+            get name() { return t('skills.siege_mastery.name'); },
+            get description() { return t('skills.siege_mastery.desc'); },
             type: SKILL_TYPES.PASSIVE,
             icon: '🏰'
         },
         {
             id: 'essence_flow',
-            name: 'Essenz-Fluss',
-            description: 'Einmal pro Runde: Ziehe 1 Karte und erhalte 1 Mana einer beliebigen Farbe.',
+            get name() { return t('skills.essence_flow.name'); },
+            get description() { return t('skills.essence_flow.desc'); },
             type: SKILL_TYPES.ACTIVE,
             icon: '🌀'
         },
         {
             id: 'natural_healing',
-            name: 'Natürliche Heilung',
-            description: 'Heile am Ende deines Zuges 1 Wunde, wenn du keine Karten abgeworfen hast.',
+            get name() { return t('skills.natural_healing.name'); },
+            get description() { return t('skills.natural_healing.desc'); },
             type: SKILL_TYPES.PASSIVE,
             icon: '🌿'
         },
         {
             id: 'noble_manners',
-            name: 'Edle Manieren',
-            description: '+2 Einfluss in Interaktionen.',
+            get name() { return t('skills.noble_manners.name'); },
+            get description() { return t('skills.noble_manners.desc'); },
             type: SKILL_TYPES.PASSIVE,
             icon: '👑'
         },
         {
             id: 'avenging_spirit',
-            name: 'Rächender Geist',
-            description: 'Wenn du eine Wunde nimmst, erhalte +2 Angriff für den nächsten Kampf.',
+            get name() { return t('skills.avenging_spirit.name'); },
+            get description() { return t('skills.avenging_spirit.desc'); },
             type: SKILL_TYPES.PASSIVE,
             icon: '👻'
         }

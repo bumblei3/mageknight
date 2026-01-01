@@ -4,6 +4,7 @@
 import { Combat } from '../combat.js';
 import { eventBus } from '../eventBus.js';
 import { GAME_EVENTS } from '../constants.js';
+import { t } from '../i18n/index.js';
 
 export class CombatOrchestrator {
     constructor(game) {
@@ -47,7 +48,7 @@ export class CombatOrchestrator {
             this.combatAttackTotal += result.effect.attack;
         }
 
-        this.game.addLog(`${result.card.name} gespielt.`, 'combat');
+        this.game.addLog(t('combat.cardPlayed', { card: result.card.name }), 'combat');
         this.game.ui.addPlayedCard(result.card, result.effect);
         this.game.ui.showPlayArea();
 
@@ -179,7 +180,7 @@ export class CombatOrchestrator {
     initiateCombat(enemy) {
         if (this.game.gameState !== 'playing' || this.game.combat) return;
 
-        this.game.addLog(`Kampf gegen ${enemy.name}!`, 'combat');
+        this.game.addLog(t('combat.fightAgainst', { enemy: enemy.name }), 'combat');
 
         // Create combat instance
         this.game.combat = new Combat(this.game.hero, enemy, (result) => this.onCombatEnd(result));
@@ -253,7 +254,7 @@ export class CombatOrchestrator {
         this.combatSiegeTotal = 0;
 
         if (result.victory && enemy) {
-            this.game.addLog(`Sieg über ${enemy.name}!`, 'success');
+            this.game.addLog(t('combat.victoryOver', { enemy: enemy.name }), 'success');
             this.game.entityManager.removeEnemy(enemy);
 
             // Gain fame
@@ -261,7 +262,7 @@ export class CombatOrchestrator {
             const levelResult = this.game.hero.gainFame(fameGained);
             this.game.statisticsManager.increment('enemiesDefeated');
 
-            this.game.addLog(`+${fameGained} Ruhm für den Sieg.`, 'info');
+            this.game.addLog(t('combat.fameReward', { amount: fameGained }), 'info');
 
             if (levelResult && levelResult.leveledUp) {
                 this.game.levelUpManager.handleLevelUp(levelResult);
@@ -272,18 +273,18 @@ export class CombatOrchestrator {
             if (currentSite && !currentSite.conquered) {
                 if (currentSite.type === 'dungeon') {
                     currentSite.conquered = true;
-                    this.game.addLog('Verlies gesäubert! Du findest ein Artefakt.', 'success');
+                    this.game.addLog(t('combat.dungeonCleared'), 'success');
                     this.game.hero.awardRandomArtifact();
                 } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower') {
                     currentSite.conquered = true;
-                    this.game.addLog(`${currentSite.getName()} erobert!`, 'success');
+                    this.game.addLog(t('combat.siteConquered', { site: currentSite.getName() }), 'success');
                     this.game.statisticsManager.increment('sitesConquered');
                 }
             }
         } else if (result.defeat && enemy) {
-            this.game.addLog(`Niederlage gegen ${enemy.name}.`, 'error');
+            this.game.addLog(t('combat.defeatAgainst', { enemy: enemy.name }), 'error');
         } else if (enemy) {
-            this.game.addLog(`Rückzug aus dem Kampf gegen ${enemy.name}.`, 'info');
+            this.game.addLog(t('combat.retreatFrom', { enemy: enemy.name }), 'info');
         }
 
         this.game.ui.hideCombatPanel();

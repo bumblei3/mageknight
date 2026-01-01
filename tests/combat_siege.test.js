@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
+import { setLanguage } from '../js/i18n/index.js';
 import { Hero } from '../js/hero.js';
 import { Combat } from '../js/combat.js';
 import { Enemy } from '../js/enemy.js';
@@ -11,6 +12,7 @@ describe('Combat Siege and Fortified Mechanics', () => {
     let combat;
 
     beforeEach(() => {
+        setLanguage('de');
         hero = new Hero('TestHero');
 
         fortifiedEnemy = new Enemy({

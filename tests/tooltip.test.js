@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
+import { setLanguage } from '../js/i18n/index.js';
 import { TooltipManager } from '../js/ui/TooltipManager.js';
 
 // Mock DOM
@@ -34,6 +35,7 @@ describe('TooltipManager', () => {
     let tooltipManager;
 
     beforeEach(() => {
+        setLanguage('de');
         tooltipManager = new TooltipManager();
     });
 
@@ -104,7 +106,7 @@ describe('TooltipManager', () => {
         const html = tooltipManager.createTerrainTooltipHTML('forest', {});
 
         expect(html).toContain('Wald');
-        expect(html).toContain('Bewegungskosten');
+        expect(html).toContain('Bewegung');
         expect(html).toContain('3');
     });
 
@@ -114,7 +116,7 @@ describe('TooltipManager', () => {
         terrains.forEach(terrain => {
             const html = tooltipManager.createTerrainTooltipHTML(terrain, {});
             expect(html).toContain('tooltip-terrain');
-            expect(html).toContain('Bewegungskosten');
+            expect(html).toContain('Bewegung');
         });
     });
 
@@ -156,7 +158,7 @@ describe('TooltipManager', () => {
 
         const html = tooltipManager.createEnemyTooltipHTML(mockEnemy);
 
-        expect(html).toContain('Befestigt');
+        expect(html.toLowerCase()).toContain('befestigt');
         expect(html).toContain('🏰');
     });
 

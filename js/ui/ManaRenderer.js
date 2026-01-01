@@ -1,3 +1,5 @@
+import { t } from '../i18n/index.js';
+
 export class ManaRenderer {
     constructor(elements, tooltipManager) {
         this.elements = elements;
@@ -36,15 +38,15 @@ export class ManaRenderer {
     }
 
     getManaTooltipInfo(color) {
-        const info = {
-            red: { title: 'Rotes Mana', desc: 'Verstärkt Angriffs- und Feuerzauber.' },
-            blue: { title: 'Blaues Mana', desc: 'Verstärkt Eiszauber und Block-Effekte.' },
-            green: { title: 'Grünes Mana', desc: 'Verstärkt Bewegungs- und Heilzauber.' },
-            white: { title: 'Weißes Mana', desc: 'Verstärkt Einfluss und spirituelle Effekte.' },
-            gold: { title: 'Goldenes Mana', desc: 'Joker! Kann als jede Farbe (außer Schwarz) verwendet werden. Nur tagsüber.' },
-            black: { title: 'Schwarzes Mana', desc: 'Mächtiges, aber gefährliches Mana. Verstärkt dunkle Zauber. Nur nachts.' }
+        const titleKey = `mana.tooltips.${color}.title`;
+        const descKey = `mana.tooltips.${color}.desc`;
+        const title = t(titleKey);
+        const desc = t(descKey);
+
+        return {
+            title: title === titleKey ? (t('mana.tooltips.default.title') || 'Mana') : title,
+            desc: desc === descKey ? (t('mana.tooltips.default.desc') || '') : desc
         };
-        return info[color] || { title: 'Mana', desc: 'Magische Energie.' };
     }
 
     // Get mana icon
@@ -70,7 +72,7 @@ export class ManaRenderer {
             const manaPanel = this.elements.manaSource.parentElement;
             const inventoryDiv = document.createElement('div');
             inventoryDiv.className = 'mana-inventory';
-            inventoryDiv.innerHTML = '<h3 style="font-size: 0.9rem; margin-bottom: 0.5rem;">💎 Gesammelt</h3><div id="hero-mana" class="hero-mana-display"></div>';
+            inventoryDiv.innerHTML = `<h3 style="font-size: 0.9rem; margin-bottom: 0.5rem;">💎 ${t('mana.collected')}</h3><div id="hero-mana" class="hero-mana-display"></div>`;
             manaPanel.appendChild(inventoryDiv);
             heroManaEl = document.getElementById('hero-mana');
         }
@@ -78,7 +80,7 @@ export class ManaRenderer {
         heroManaEl.innerHTML = '';
 
         if (!manaInventory || manaInventory.length === 0) {
-            heroManaEl.innerHTML = '<div style="text-align: center; color: #6b7280; font-size: 0.85rem; padding: 0.5rem;">Kein Mana</div>';
+            heroManaEl.innerHTML = `<div style="text-align: center; color: #6b7280; font-size: 0.85rem; padding: 0.5rem;">${t('mana.none')}</div>`;
             return;
         }
 

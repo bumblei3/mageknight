@@ -1,4 +1,6 @@
 import { TooltipManager } from './ui/TooltipManager.js';
+import i18n from './i18n/index.js';
+const { t } = i18n;
 import { NotificationManager } from './ui/NotificationManager.js';
 import { ModalManager } from './ui/ModalManager.js';
 import { CombatUIManager } from './ui/CombatUIManager.js';
@@ -101,25 +103,25 @@ export class UI {
     setupTooltips() {
         // Hero Stats
         this.tooltipManager.attachToElement(this.elements.heroArmor,
-            this.tooltipManager.createStatTooltipHTML('Rüstung', 'Reduziert den Schaden, den du im Kampf erleidest.'));
+            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.armor.title'), t('ui.tooltips.armor.desc')));
 
         this.tooltipManager.attachToElement(this.elements.heroHandLimit,
-            this.tooltipManager.createStatTooltipHTML('Handlimit', 'Die maximale Anzahl an Karten, die du am Ende deines Zuges auf der Hand haben darfst.'));
+            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.handLimit.title'), t('ui.tooltips.handLimit.desc')));
 
         this.tooltipManager.attachToElement(this.elements.heroWounds,
-            this.tooltipManager.createStatTooltipHTML('Verletzungen', 'Verletzungen blockieren deine Hand. Raste oder heile dich, um sie loszuwerden.'));
+            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.wounds.title'), t('ui.tooltips.wounds.desc')));
 
         this.tooltipManager.attachToElement(this.elements.fameValue.parentElement,
-            this.tooltipManager.createStatTooltipHTML('Ruhm', 'Erfahrungspunkte. Sammle Ruhm durch Kämpfe und Erkundung, um im Level aufzusteigen.'));
+            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.fame.title'), t('ui.tooltips.fame.desc')));
 
         this.tooltipManager.attachToElement(this.elements.reputationValue.parentElement,
-            this.tooltipManager.createStatTooltipHTML('Ansehen', 'Beeinflusst Interaktionen in Dörfern und Klöstern. Hohes Ansehen macht Rekrutierung günstiger.'));
+            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.reputation.title'), t('ui.tooltips.reputation.desc')));
 
         // Phase Indicator
         const phaseEl = document.getElementById('phase-indicator');
         if (phaseEl) {
             this.tooltipManager.attachToElement(phaseEl,
-                this.tooltipManager.createStatTooltipHTML('Aktuelle Phase', 'Zeigt an, was du gerade tun kannst. Beachte den Hinweis darunter.'));
+                this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.phase.title'), t('ui.tooltips.phase.desc')));
         }
     }
 
@@ -146,6 +148,7 @@ export class UI {
             restBtn: document.getElementById('rest-btn'),
             exploreBtn: document.getElementById('explore-btn'),
             newGameBtn: document.getElementById('new-game-btn'),
+            languageBtn: document.getElementById('language-btn'),
 
             // Areas
             handCards: document.getElementById('hand-cards'),
@@ -194,6 +197,36 @@ export class UI {
         }
         if (this.elements.eventClose) {
             this.elements.eventClose.addEventListener('click', () => this.elements.eventModal.classList.remove('active'));
+        }
+        if (this.elements.languageBtn) {
+            this.elements.languageBtn.addEventListener('click', () => this.toggleLanguage());
+        }
+    }
+
+    /**
+     * Toggles between available languages
+     */
+    toggleLanguage() {
+        const current = i18n.getLanguage();
+        const next = current === 'de' ? 'en' : 'de';
+        i18n.setLanguage(next);
+        this.refreshTranslations();
+    }
+
+    /**
+     * Refreshes all translated elements in the UI
+     */
+    refreshTranslations() {
+        if (i18n && typeof i18n.translateDocument === 'function') {
+            i18n.translateDocument();
+        }
+
+        // Refresh dynamic components if needed
+        if (this.game) {
+            this.updateHeroStats(this.game.hero);
+            this.renderHandCards(this.game.hero.hand);
+            this.renderManaSource(this.game.manaSource);
+            this.renderHeroMana(this.game.hero.getManaInventory());
         }
     }
 

@@ -1,14 +1,16 @@
 import { describe, it, expect, beforeEach } from './testRunner.js';
-import { Combat } from '../js/combat.js';
+import { Combat, COMBAT_PHASE } from '../js/combat.js';
 import { COMBAT_PHASES } from '../js/constants.js';
 import { Hero } from '../js/hero.js';
+import { Enemy } from '../js/enemy.js';
+import { setLanguage } from '../js/i18n/index.js';
 import { createEnemy } from '../js/enemy.js';
 
 describe('Combat Coverage Tests', () => {
-    let hero;
-    let combat;
+    let hero, enemy, combat;
 
     beforeEach(() => {
+        setLanguage('de');
         hero = new Hero('TestHero');
         // Simple mock for fame gain
         hero.gainFame = (amount) => { hero.fame += amount; };

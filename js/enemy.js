@@ -1,6 +1,7 @@
 // Enemy system for Mage Knight
 
 import { ENEMY_TYPES, BOSS_PHASES, ENEMY_DEFINITIONS, BOSS_DEFINITIONS } from './constants.js';
+import { t } from './i18n/index.js';
 
 export { ENEMY_TYPES, BOSS_PHASES, ENEMY_DEFINITIONS, BOSS_DEFINITIONS };
 
@@ -8,7 +9,7 @@ export class Enemy {
     constructor(data) {
         this.id = data.id || `enemy_${Date.now()}`;
         this.type = data.type;
-        this.name = data.name;
+        this.name = data.name || (data.type ? t(`enemies.${data.type}`) : 'Enemy');
         this.position = data.position || null;
 
         // Combat stats
@@ -126,9 +127,9 @@ export class BossEnemy extends Enemy {
         this.maxHealth = data.maxHealth || 30;
         this.currentHealth = data.currentHealth || this.maxHealth;
         this.phases = data.phases || [
-            { threshold: 0.66, name: 'Phase 1', triggered: false },
-            { threshold: 0.33, name: 'Phase 2', triggered: false },
-            { threshold: 0, name: 'Enraged', triggered: false }
+            { threshold: 0.66, name: t('ui.phases.phase1') || 'Phase 1', triggered: false },
+            { threshold: 0.33, name: t('ui.phases.phase2') || 'Phase 2', triggered: false },
+            { threshold: 0, name: t('ui.phases.enraged') || 'Enraged', triggered: false }
         ];
         this.currentPhase = BOSS_PHASES.PHASE_1;
 
@@ -174,9 +175,9 @@ export class BossEnemy extends Enemy {
             this.enraged = true;
             this.currentPhase = BOSS_PHASES.ENRAGED;
             transitions.push({
-                phase: 'Enraged',
+                phase: t('ui.phases.enraged') || 'Enraged',
                 ability: 'enrage',
-                message: `${this.name} wird wütend! Angriff erhöht!`
+                message: t('combat.boss.enraged', { name: this.name })
             });
         }
 
@@ -250,40 +251,40 @@ export class BossEnemy extends Enemy {
 
     // Get phase name
     getPhaseName() {
-        if (this.enraged) return 'Wütend';
+        if (this.enraged) return t('ui.phases.enraged') || 'Wütend';
         const healthPercent = this.getHealthPercent();
-        if (healthPercent > 0.66) return 'Phase 1';
-        if (healthPercent > 0.33) return 'Phase 2';
-        return 'Phase 3';
+        if (healthPercent > 0.66) return t('ui.phases.phase1') || 'Phase 1';
+        if (healthPercent > 0.33) return t('ui.phases.phase2') || 'Phase 2';
+        return t('ui.phases.phase3') || 'Phase 3';
     }
 
     // Execute phase ability (returns what should happen)
     executePhaseAbility(abilityName) {
         switch (abilityName) {
-        case 'summon':
-            return {
-                type: 'summon',
-                enemyType: this.summonType,
-                count: this.summonCount,
-                message: `${this.name} beschwört ${this.summonCount} ${this.summonType}!`
-            };
-        case 'heal': {
-            const healAmount = Math.floor(this.maxHealth * 0.1);
-            this.currentHealth = Math.min(this.maxHealth, this.currentHealth + healAmount);
-            return {
-                type: 'heal',
-                amount: healAmount,
-                message: `${this.name} heilt sich um ${healAmount}!`
-            };
-        }
-        case 'enrage':
-        case 'double_attack':
-            return {
-                type: 'buff',
-                message: `${this.name} greift nun doppelt an!`
-            };
-        default:
-            return null;
+            case 'summon':
+                return {
+                    type: 'summon',
+                    enemyType: this.summonType,
+                    count: this.summonCount,
+                    message: t('combat.boss.summons', { name: this.name, count: this.summonCount, enemy: t(`enemies.${this.summonType}`) })
+                };
+            case 'heal': {
+                const healAmount = Math.floor(this.maxHealth * 0.1);
+                this.currentHealth = Math.min(this.maxHealth, this.currentHealth + healAmount);
+                return {
+                    type: 'heal',
+                    amount: healAmount,
+                    message: t('combat.boss.heals', { name: this.name, amount: healAmount })
+                };
+            }
+            case 'enrage':
+            case 'double_attack':
+                return {
+                    type: 'buff',
+                    message: t('combat.boss.doubleAttack', { name: this.name })
+                };
+            default:
+                return null;
         }
     }
 }
@@ -304,6 +305,7 @@ export function createEnemy(enemyKey, position = null) {
 
     return new Enemy({
         ...def,
+        name: t(`enemies.${enemyKey}`) !== `enemies.${enemyKey}` ? t(`enemies.${enemyKey}`) : def.name,
         type: enemyKey,
         position
     });
@@ -324,6 +326,7 @@ export function createBoss(bossKey, position = null) {
 
     return new BossEnemy({
         ...def,
+        name: t(`enemies.${bossKey}`) !== `enemies.${bossKey}` ? t(`enemies.${bossKey}`) : def.name,
         type: bossKey,
         position
     });

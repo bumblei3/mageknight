@@ -1,4 +1,5 @@
 // Achievements System for Mage Knight
+import { t } from './i18n/index.js';
 // Tracks player accomplishments and unlocks
 
 export const ACHIEVEMENT_CATEGORIES = {
@@ -13,8 +14,8 @@ export const ACHIEVEMENTS = {
     // Combat Achievements
     FIRST_BLOOD: {
         id: 'first_blood',
-        name: 'Erste Beute',
-        description: 'Besiege deinen ersten Feind',
+        get name() { return t('achievements.first_blood.name'); },
+        get description() { return t('achievements.first_blood.desc'); },
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         icon: '⚔️',
         condition: (stats) => stats.enemiesDefeated >= 1,
@@ -22,8 +23,8 @@ export const ACHIEVEMENTS = {
     },
     SLAYER: {
         id: 'slayer',
-        name: 'Schlächter',
-        description: 'Besiege 10 Feinde',
+        get name() { return t('achievements.slayer.name'); },
+        get description() { return t('achievements.slayer.desc'); },
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         icon: '💀',
         condition: (stats) => stats.enemiesDefeated >= 10,
@@ -31,8 +32,8 @@ export const ACHIEVEMENTS = {
     },
     PERFECT_COMBAT: {
         id: 'perfect_combat',
-        name: 'Perfekter Kampf',
-        description: 'Gewinne einen Kampf ohne Verletzungen',
+        get name() { return t('achievements.perfect_combat.name'); },
+        get description() { return t('achievements.perfect_combat.desc'); },
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         icon: '🛡️',
         condition: (stats) => stats.perfectCombats >= 1,
@@ -40,8 +41,8 @@ export const ACHIEVEMENTS = {
     },
     DRAGON_SLAYER: {
         id: 'dragon_slayer',
-        name: 'Drachentöter',
-        description: 'Besiege einen Drachen',
+        get name() { return t('achievements.dragon_slayer.name'); },
+        get description() { return t('achievements.dragon_slayer.desc'); },
         category: ACHIEVEMENT_CATEGORIES.COMBAT,
         icon: '🐉',
         condition: (stats) => stats.dragonsDefeated >= 1,
@@ -51,8 +52,8 @@ export const ACHIEVEMENTS = {
     // Exploration Achievements
     EXPLORER: {
         id: 'explorer',
-        name: 'Entdecker',
-        description: 'Erkunde 3 neue Gebiete',
+        get name() { return t('achievements.explorer.name'); },
+        get description() { return t('achievements.explorer.desc'); },
         category: ACHIEVEMENT_CATEGORIES.EXPLORATION,
         icon: '🗺️',
         condition: (stats) => stats.tilesExplored >= 3,
@@ -60,8 +61,8 @@ export const ACHIEVEMENTS = {
     },
     CARTOGRAPHER: {
         id: 'cartographer',
-        name: 'Kartograph',
-        description: 'Erkunde 10 neue Gebiete',
+        get name() { return t('achievements.cartographer.name'); },
+        get description() { return t('achievements.cartographer.desc'); },
         category: ACHIEVEMENT_CATEGORIES.EXPLORATION,
         icon: '🧭',
         condition: (stats) => stats.tilesExplored >= 10,
@@ -69,8 +70,8 @@ export const ACHIEVEMENTS = {
     },
     SITE_VISITOR: {
         id: 'site_visitor',
-        name: 'Reisender',
-        description: 'Besuche 5 verschiedene Orte',
+        get name() { return t('achievements.site_visitor.name'); },
+        get description() { return t('achievements.site_visitor.desc'); },
         category: ACHIEVEMENT_CATEGORIES.EXPLORATION,
         icon: '🏛️',
         condition: (stats) => stats.sitesVisited >= 5,
@@ -80,8 +81,8 @@ export const ACHIEVEMENTS = {
     // Progression Achievements
     LEVEL_UP: {
         id: 'level_up',
-        name: 'Aufsteigend',
-        description: 'Erreiche Level 2',
+        get name() { return t('achievements.level_up.name'); },
+        get description() { return t('achievements.level_up.desc'); },
         category: ACHIEVEMENT_CATEGORIES.PROGRESSION,
         icon: '⭐',
         condition: (stats) => stats.level >= 2,
@@ -89,8 +90,8 @@ export const ACHIEVEMENTS = {
     },
     MASTER: {
         id: 'master',
-        name: 'Meister',
-        description: 'Erreiche Level 5',
+        get name() { return t('achievements.master.name'); },
+        get description() { return t('achievements.master.desc'); },
         category: ACHIEVEMENT_CATEGORIES.PROGRESSION,
         icon: '🌟',
         condition: (stats) => stats.level >= 5,
@@ -98,8 +99,8 @@ export const ACHIEVEMENTS = {
     },
     DECK_BUILDER: {
         id: 'deck_builder',
-        name: 'Deck-Baumeister',
-        description: 'Sammle 20 Karten',
+        get name() { return t('achievements.deck_builder.name'); },
+        get description() { return t('achievements.deck_builder.desc'); },
         category: ACHIEVEMENT_CATEGORIES.PROGRESSION,
         icon: '🎴',
         condition: (stats) => stats.totalCards >= 20,
@@ -109,8 +110,8 @@ export const ACHIEVEMENTS = {
     // Mastery Achievements
     SPEED_RUNNER: {
         id: 'speed_runner',
-        name: 'Schnellläufer',
-        description: 'Gewinne in unter 20 Zügen',
+        get name() { return t('achievements.speed_runner.name'); },
+        get description() { return t('achievements.speed_runner.desc'); },
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         icon: '⚡',
         condition: (stats) => stats.victory && stats.turns <= 20,
@@ -118,8 +119,8 @@ export const ACHIEVEMENTS = {
     },
     MANA_MASTER: {
         id: 'mana_master',
-        name: 'Mana-Meister',
-        description: 'Nutze 50 Mana-Würfel',
+        get name() { return t('achievements.mana_master.name'); },
+        get description() { return t('achievements.mana_master.desc'); },
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         icon: '🔮',
         condition: (stats) => stats.manaUsed >= 50,
@@ -127,8 +128,8 @@ export const ACHIEVEMENTS = {
     },
     CARD_MASTER: {
         id: 'card_master',
-        name: 'Kartenmeister',
-        description: 'Spiele 100 Karten',
+        get name() { return t('achievements.card_master.name'); },
+        get description() { return t('achievements.card_master.desc'); },
         category: ACHIEVEMENT_CATEGORIES.MASTERY,
         icon: '🃏',
         condition: (stats) => stats.cardsPlayed >= 100,
@@ -138,8 +139,8 @@ export const ACHIEVEMENTS = {
     // Special Achievements
     SURVIVOR: {
         id: 'survivor',
-        name: 'Überlebender',
-        description: 'Überlebe mit nur 1 HP',
+        get name() { return t('achievements.survivor.name'); },
+        get description() { return t('achievements.survivor.desc'); },
         category: ACHIEVEMENT_CATEGORIES.SPECIAL,
         icon: '💚',
         condition: (stats) => stats.closeCallSurvival >= 1,
@@ -147,8 +148,8 @@ export const ACHIEVEMENTS = {
     },
     PACIFIST_WIN: {
         id: 'pacifist_win',
-        name: 'Pazifist',
-        description: 'Gewinne ohne eine Angriffskarte zu spielen (WIP)',
+        get name() { return t('achievements.pacifist_win.name'); },
+        get description() { return t('achievements.pacifist_win.desc'); },
         category: ACHIEVEMENT_CATEGORIES.SPECIAL,
         icon: '☮️',
         condition: (stats) => stats.attackCardsPlayed === 0 && stats.victory,

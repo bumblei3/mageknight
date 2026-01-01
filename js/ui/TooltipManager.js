@@ -1,6 +1,8 @@
 // Tooltip Manager for Mage Knight
 // Provides rich, interactive tooltips for cards, terrain, enemies, and stats
 
+import { t } from '../i18n/index.js';
+
 export class TooltipManager {
     constructor() {
         this.tooltip = null;
@@ -173,15 +175,15 @@ export class TooltipManager {
                 <div class="tooltip-divider"></div>
                 <div class="tooltip-effects">
                     <div class="tooltip-section">
-                        <strong>📜 Basis-Effekt:</strong>
+                        <strong>📜 ${t('cards.basicEffect')}:</strong>
         `;
 
         // List basic effects
-        if (effects.movement) html += `<div>🌿 Bewegung: <span class="value">+${effects.movement}</span></div>`;
-        if (effects.attack) html += `<div>⚔️ Angriff: <span class="value">+${effects.attack}</span></div>`;
-        if (effects.block) html += `<div>🛡️ Block: <span class="value">+${effects.block}</span></div>`;
-        if (effects.influence) html += `<div>💬 Einfluss: <span class="value">+${effects.influence}</span></div>`;
-        if (effects.healing) html += `<div>❤️ Heilung: <span class="value">+${effects.healing}</span></div>`;
+        if (effects.movement) html += `<div>🌿 ${t('cards.actions.movement')}: <span class="value">+${effects.movement}</span></div>`;
+        if (effects.attack) html += `<div>⚔️ ${t('cards.actions.attack')}: <span class="value">+${effects.attack}</span></div>`;
+        if (effects.block) html += `<div>🛡️ ${t('cards.actions.block')}: <span class="value">+${effects.block}</span></div>`;
+        if (effects.influence) html += `<div>💬 ${t('cards.actions.influence')}: <span class="value">+${effects.influence}</span></div>`;
+        if (effects.healing) html += `<div>❤️ ${t('cards.actions.healing')}: <span class="value">+${effects.healing}</span></div>`;
 
         html += '</div>';
 
@@ -189,8 +191,8 @@ export class TooltipManager {
         if (sidewaysEffects) {
             html += `
                 <div class="tooltip-section">
-                    <strong>🔄 Seitlich spielen:</strong>
-                    <div class="tooltip-hint">+1 Bewegung/Angriff/Block/Einfluss</div>
+                    <strong>🔄 ${t('cards.sideways')}:</strong>
+                    <div class="tooltip-hint">${t('cards.sidewaysHint')}</div>
                 </div>
             `;
         }
@@ -199,7 +201,7 @@ export class TooltipManager {
         if (card.manaCost && card.manaCost.length > 0) {
             html += `
                 <div class="tooltip-section">
-                    <strong>💎 Mana-Kosten:</strong>
+                    <strong>💎 ${t('cards.manaCost')}:</strong>
                     <div>${card.manaCost.map(m => this.getManaHTML(m)).join(' ')}</div>
                 </div>
             `;
@@ -216,30 +218,37 @@ export class TooltipManager {
      * @returns {string} HTML string
      */
     createTerrainTooltipHTML(terrainType, _terrainData) {
-        const terrainInfo = {
-            'plains': { icon: '🌾', name: 'Ebenen', cost: 2, desc: 'Offenes Grasland' },
-            'forest': { icon: '🌲', name: 'Wald', cost: 3, desc: 'Dichter Wald' },
-            'hills': { icon: '⛰️', name: 'Hügel', cost: 3, desc: 'Hügeliges Gelände' },
-            'mountains': { icon: '🏔️', name: 'Berge', cost: 5, desc: 'Hohe Berge' },
-            'desert': { icon: '🏜️', name: 'Wüste', cost: 3, desc: 'Trockene Wüste' },
-            'wasteland': { icon: '☠️', name: 'Ödland', cost: 3, desc: 'Verfluchtes Land' },
-            'water': { icon: '💧', name: 'Wasser', cost: '∞', desc: 'Unpassierbar' }
+        const info = {
+            icon: t(`terrain.${terrainType}.icon`) || (terrainType === 'water' ? '💧' : '❓'), // Icons can also be keys or fallback
+            name: t(`terrain.${terrainType}.name`),
+            desc: t(`terrain.${terrainType}.desc`),
+            cost: terrainType === 'water' ? '∞' : (t(`terrain.${terrainType}.cost`) || '?') // Costs can also be keys if they change
         };
 
-        const info = terrainInfo[terrainType] || { icon: '❓', name: 'Unbekannt', cost: '?', desc: '' };
+        // For simplicity, we'll keep hardcoded icons/costs in the manager or move them to constants
+        // but the NAMES and DESCRIPTIONS must be localized.
+        const icons = { 'plains': '🌾', 'forest': '🌲', 'hills': '⛰️', 'mountains': '🏔️', 'desert': '🏜️', 'wasteland': '☠️', 'water': '💧' };
+        const costs = { 'plains': 2, 'forest': 3, 'hills': 3, 'mountains': 5, 'desert': 5, 'wasteland': 3, 'water': '∞' };
+
+        const nameKey = `terrain.${terrainType}.name`;
+        const descKey = `terrain.${terrainType}.desc`;
+        const name = t(nameKey) !== nameKey ? t(nameKey) : (terrainType === 'unknown' ? 'Unbekannt' : terrainType);
+        const desc = t(descKey) !== descKey ? t(descKey) : '';
+        const icon = icons[terrainType] || '❓';
+        const cost = costs[terrainType] || '?';
 
         return `
             <div class="tooltip-terrain">
                 <div class="tooltip-header">
-                    <span class="tooltip-icon">${info.icon}</span>
-                    <span class="tooltip-name">${info.name}</span>
+                    <span class="tooltip-icon">${icon}</span>
+                    <span class="tooltip-name">${name}</span>
                 </div>
                 <div class="tooltip-divider"></div>
                 <div class="tooltip-stat-row">
-                    <span>👣 Bewegungskosten:</span>
-                    <span class="value">${info.cost}</span>
+                    <span>👣 ${t('ui.labels.movement')}:</span>
+                    <span class="value">${cost}</span>
                 </div>
-                <div class="tooltip-description">${info.desc}</div>
+                <div class="tooltip-description">${desc}</div>
             </div>
         `;
     }
@@ -258,18 +267,18 @@ export class TooltipManager {
                 <div class="tooltip-divider"></div>
                 <div class="tooltip-stats">
                     <div class="tooltip-stat-row">
-                        <span>🛡️ Rüstung:</span>
+                        <span>🛡️ ${t('mana.armor')}:</span>
                         <span class="value">${enemy.armor}</span>
                     </div>
                     <div class="tooltip-stat-row">
-                        <span>⚔️ Angriff:</span>
+                        <span>⚔️ ${t('mana.attack')}:</span>
                         <span class="value">${enemy.attack}</span>
                     </div>
                     <div class="tooltip-stat-row">
-                        <span>⭐ Ruhm:</span>
+                        <span>⭐ ${t('mana.fame')}:</span>
                         <span class="value">${enemy.fame}</span>
                     </div>
-                    ${enemy.fortified ? '<div class="tooltip-ability">🏰 Befestigt</div>' : ''}
+                    ${enemy.fortified ? `<div class="tooltip-ability">🏰 ${t('mana.fortified')}</div>` : ''}
                 </div>
             </div>
         `;
@@ -323,8 +332,9 @@ export class TooltipManager {
      */
     createSiteTooltipHTML(site) {
         const info = site.getInfo();
-        const status = site.conquered ? '<span class="status-conquered">👑 Erobert</span>' :
-            site.visited ? '<span class="status-visited">✓ Besucht</span>' : '';
+        const localizedName = (site.type && t(`sites.${site.type}`) !== `sites.${site.type}`) ? t(`sites.${site.type}`) : info.name;
+        const status = site.conquered ? `<span class="status-conquered">👑 ${t('sites.conquered')}</span>` :
+            site.visited ? `<span class="status-visited">✓ ${t('sites.visited')}</span>` : '';
 
         let actionsHtml = '';
         if (info.actions) {
@@ -339,7 +349,7 @@ export class TooltipManager {
             <div class="tooltip-site" style="border-left-color: ${info.color}">
                 <div class="tooltip-header">
                     <span class="tooltip-icon">${info.icon}</span>
-                    <span class="tooltip-name">${info.name}</span>
+                    <span class="tooltip-name">${localizedName}</span>
                 </div>
                 ${status ? `<div class="tooltip-status">${status}</div>` : ''}
                 <div class="tooltip-divider"></div>
@@ -362,15 +372,7 @@ export class TooltipManager {
     }
 
     getActionName(action) {
-        const names = {
-            'heal': 'Heilen',
-            'recruit': 'Rekrutieren',
-            'attack': 'Angreifen',
-            'train': 'Trainieren',
-            'learn': 'Lernen',
-            'explore': 'Erkunden'
-        };
-        return names[action] || action;
+        return t(`sites.actions.${action}`) || action;
     }
 }
 

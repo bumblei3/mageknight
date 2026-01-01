@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Mage Knight - Base Game</title>
+    <title data-i18n="game.title">Mage Knight - Base Game</title>
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/hud.css">
@@ -33,10 +33,11 @@
             <!-- Top Bar -->
             <header class="hud-top-bar">
                 <div class="header-left">
-                    <div class="game-logo">Mage Knight</div>
+                    <div class="game-logo" data-i18n="game.title">Mage Knight</div>
                     <div class="time-indicator-container">
                         <span id="time-icon" class="time-icon">☀️</span>
-                        <span class="round-display">Runde <span id="round-number" class="round-number">1</span></span>
+                        <span class="round-display"><span data-i18n="ui.labels.round">Runde</span> <span
+                                id="round-number" class="round-number">1</span></span>
                     </div>
                 </div>
                 <div class="header-center">
@@ -44,17 +45,22 @@
                 </div>
                 <div class="header-right">
                     <div class="stat-pill">
-                        <span class="stat-label">Ruhm</span>
+                        <span class="stat-label" data-i18n="ui.labels.fame">Ruhm</span>
                         <span class="stat-value" id="fame-value">0</span>
                     </div>
                     <div class="stat-pill">
-                        <span class="stat-label">Ansehen</span>
+                        <span class="stat-label" data-i18n="ui.labels.reputation">Ansehen</span>
                         <span class="stat-value" id="reputation-value">0</span>
                     </div>
                     <div class="header-controls">
-                        <button class="btn-icon" id="new-game-btn" title="Neues Spiel">🔄</button>
-                        <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)">💾</button>
-                        <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)">📂</button>
+                        <button class="btn-icon" id="language-btn" title="Sprache wechseln"
+                            data-i18n-title="ui.buttons.settings">🌐</button>
+                        <button class="btn-icon" id="new-game-btn" title="Neues Spiel"
+                            data-i18n-title="ui.buttons.newGame">🔄</button>
+                        <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)"
+                            data-i18n-title="ui.buttons.save">💾</button>
+                        <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)"
+                            data-i18n-title="ui.buttons.load">📂</button>
                         <button class="btn-icon" id="undo-btn" title="Rückgängig (Ctrl+Z)">↩️</button>
                         <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
                         <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen">🏆</button>
@@ -67,7 +73,7 @@
             <aside class="hud-sidebar hud-left">
                 <div class="panel hero-panel collapsed-check">
                     <div class="panel-header">
-                        <h2>Held</h2>
+                        <h2 data-i18n="ui.labels.hero">Held</h2>
                         <button class="panel-toggle">_</button>
                     </div>
                     <div class="hero-info">
@@ -85,12 +91,15 @@
                 </div>
 
                 <div class="panel action-panel">
-                    <h2>Aktionen</h2>
+                    <h2 data-i18n="ui.labels.actions">Aktionen</h2>
                     <div class="action-grid">
-                        <button class="btn btn-primary" id="end-turn-btn">Zug beenden</button>
-                        <button class="btn btn-secondary" id="rest-btn">Rasten</button>
-                        <button class="btn btn-secondary" id="explore-btn" disabled>Erkunden</button>
-                        <button class="btn btn-success" id="heal-btn" style="display: none;">Heilen</button>
+                        <button class="btn btn-primary" id="end-turn-btn" data-i18n="ui.buttons.endTurn">Zug
+                            beenden</button>
+                        <button class="btn btn-secondary" id="rest-btn" data-i18n="ui.buttons.rest">Rasten</button>
+                        <button class="btn btn-secondary" id="explore-btn" disabled
+                            data-i18n="ui.buttons.explore">Erkunden</button>
+                        <button class="btn btn-success" id="heal-btn" style="display: none;"
+                            data-i18n="ui.buttons.heal">Heilen</button>
                         <button class="btn btn-primary" id="visit-btn" style="display: none;">Besuchen</button>
                     </div>
                 </div>
@@ -103,7 +112,7 @@
                 </div>
 
                 <div class="panel units-panel">
-                    <h2>Einheiten</h2>
+                    <h2 data-i18n="ui.labels.units">Einheiten</h2>
                     <div class="units-container" id="hero-units"></div>
                 </div>
             </aside>
@@ -118,19 +127,19 @@
                 </div>
 
                 <div class="panel mana-panel">
-                    <h2>Mana-Quelle</h2>
+                    <h2 data-i18n="ui.labels.manaSource">Mana-Quelle</h2>
                     <div class="mana-dice" id="mana-source"></div>
                 </div>
 
                 <div class="panel combat-panel" id="combat-panel" style="display: none;">
-                    <h2>Kampf</h2>
+                    <h2 data-i18n="ui.phases.combat">Kampf</h2>
                     <div class="combat-info" id="combat-info"></div>
                     <div class="combat-units" id="combat-units"></div>
                     <button class="btn btn-primary" id="execute-attack-btn" style="display: none;">⚔️ Angriff</button>
                 </div>
 
                 <div class="panel log-panel minimized">
-                    <h2>Protokoll</h2>
+                    <h2 data-i18n="ui.labels.log">Protokoll</h2>
                     <div class="game-log" id="game-log">
                         <div class="log-entry">Willkommen bei Mage Knight!</div>
                     </div>

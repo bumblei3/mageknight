@@ -1,3 +1,5 @@
+import { logger } from './logger.js';
+
 export class InteractionController {
     constructor(game) {
         this.game = game;
@@ -12,8 +14,11 @@ export class InteractionController {
 
         // Check if hex exists
         if (!this.game.hexGrid.hasHex(hex.q, hex.r)) {
+            logger.verbose(`Click outside grid at ${hex.q},${hex.r}`);
             return;
         }
+
+        logger.debug(`Grid clicked at ${hex.q},${hex.r}`);
 
         // Debug Teleport
         if (this.game.debugTeleport) {
@@ -26,6 +31,7 @@ export class InteractionController {
         }
 
         if (this.game.movementMode) {
+            logger.debug(`Attempting move to ${hex.q},${hex.r}`);
             this.game.moveHero(hex.q, hex.r);
         } else {
             this.selectHex(hex.q, hex.r);
@@ -139,6 +145,8 @@ export class InteractionController {
 
     // New helper to finalize play (Basic or Strong)
     finishCardPlay(index, useStrong, isNight) {
+        const card = this.game.hero.hand[index];
+        logger.info(`Finalizing card play: ${card.name} (${useStrong ? 'Strong' : 'Basic'})`);
         if (this.game.combat) {
             const card = this.game.hero.hand[index];
             this.game.playCardInCombat(index, card, useStrong);

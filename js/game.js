@@ -24,6 +24,7 @@ import SoundManager from './soundManager.js';
 import TouchController from './touchController.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS, TIME_OF_DAY } from './constants.js';
+import { logger } from './logger.js';
 
 // Refactored Game Managers
 import { PhaseManager } from './game/PhaseManager.js';
@@ -180,6 +181,7 @@ export class MageKnightGame {
      * Resets game state and starts a fresh session.
      */
     startNewGame() {
+        logger.info('Starting new game...');
         // Reset Game State
         this.turnNumber = 0;
         this.gameState = 'playing';
@@ -216,6 +218,7 @@ export class MageKnightGame {
 
         // Initial render
         this.render();
+        logger.debug('Initial game state rendered.');
 
         // Show interactive tutorial on first visit
         if (this.simpleTutorial.shouldStart()) {
@@ -242,6 +245,7 @@ export class MageKnightGame {
      * @param {string} type
      */
     addLog(message, type = 'info') {
+        logger.info(`Game Log: ${message}`);
         eventBus.emit(GAME_EVENTS.LOG_ADDED, { message, type });
     }
 

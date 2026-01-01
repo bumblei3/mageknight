@@ -4,6 +4,7 @@
  */
 import { eventBus } from '../eventBus.js';
 import { GAME_EVENTS } from '../constants.js';
+import { logger } from '../logger.js';
 
 export class ActionManager {
     constructor(game) {
@@ -19,6 +20,8 @@ export class ActionManager {
     saveCheckpoint() {
         // Only allow undo if NOT in combat and NOT dealing with complex interactions
         if (this.game.combat) return;
+
+        logger.debug('Saving checkpoint for undo/redo');
 
         const checkpoint = {
             hero: this.game.hero.getState(),
@@ -60,6 +63,7 @@ export class ActionManager {
 
         // Visual Feedback
         this.game.addLog('Aktion rückgängig gemacht.', 'info');
+        logger.info('Action undone. State restored.');
         this.game.showToast('Rückgängig gemacht', 'info');
 
         // Re-render EVERYTHING
@@ -169,6 +173,7 @@ export class ActionManager {
         const oldPos = { ...this.game.hero.position };
         this.game.hero.position = { q, r };
         this.game.hero.movementPoints -= cost;
+        logger.info(`Hero moved from ${oldPos.q},${oldPos.r} to ${q},${r} (Cost: ${cost}, Points left: ${this.game.hero.movementPoints})`);
 
         // Animation
         await this.game.animator.animateHeroMove(

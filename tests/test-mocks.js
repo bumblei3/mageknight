@@ -267,6 +267,10 @@ export class MockHTMLElement {
         this._classes = new Set(val.split(' ').filter(c => c));
     }
 
+    get firstChild() {
+        return this.children.length > 0 ? this.children[0] : null;
+    }
+
     get firstElementChild() {
         return this.children.length > 0 ? this.children[0] : null;
     }

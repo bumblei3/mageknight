@@ -1,6 +1,8 @@
 // Debug Manager for Mage Knight
 // Handles cheats, state manipulation, and visual debugging
 
+import { logger, LOG_LEVELS } from './logger.js';
+
 export class DebugManager {
     constructor(game) {
         this.game = game;
@@ -14,7 +16,7 @@ export class DebugManager {
     setupConsoleAccess() {
         window.game = this.game;
         window.debug = this;
-        console.log('🔧 Debug Tools initialized. Access via window.game or window.debug');
+        logger.info('🔧 Debug Tools initialized. Access via window.game or window.debug');
     }
 
     createDebugUI() {
@@ -59,11 +61,50 @@ export class DebugManager {
                     <button onclick="debug.spawnEnemy()">Spawn Enemy</button>
                     <button onclick="debug.killEnemies()">Kill All</button>
                 </div>
+                <div class="debug-section debug-log-section">
+                    <div class="debug-log-header">
+                        <h4>Debug Log</h4>
+                        <div class="debug-log-actions">
+                            <button onclick="logger.clear()">Clear</button>
+                        </div>
+                    </div>
+                    <div id="debug-log-container" class="debug-log-container"></div>
+                </div>
             </div>
         `;
 
         this.panel.querySelector('.close-btn').onclick = () => this.togglePanel();
         document.body.appendChild(this.panel);
+
+        this.setupLoggerUI();
+    }
+
+    setupLoggerUI() {
+        const container = document.getElementById('debug-log-container');
+        if (!container) return;
+
+        logger.addListener((entry, allLogs) => {
+            if (!entry) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const item = document.createElement('div');
+            item.className = `log-item log-${entry.levelName.toLowerCase()}`;
+            item.innerHTML = `
+                <span class="log-time">${entry.timestamp.toLocaleTimeString()}</span>
+                <span class="log-level">[${entry.levelName}]</span>
+                <span class="log-message">${entry.message}</span>
+            `;
+
+            container.appendChild(item);
+            container.scrollTop = container.scrollHeight;
+
+            if (container.children && container.children.length > 50) {
+                const first = container.firstElementChild || container.firstChild;
+                if (first) container.removeChild(first);
+            }
+        });
     }
 
     togglePanel() {

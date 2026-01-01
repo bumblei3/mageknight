@@ -1,6 +1,7 @@
 import { runner } from './tests/testRunner.js';
 import { resetMocks } from './tests/test-mocks.js';
 import './tests/setup.js';
+import { logger } from './js/logger.js';
 import path from 'path';
 
 // Get test file from arguments
@@ -17,6 +18,10 @@ if (!testFile) {
 async function runWorker() {
     try {
         if (global.gc) global.gc();
+
+        // Global cleanup
+        logger.clearListeners();
+        resetMocks();
 
         // Dynamically import the test file
         const importPath = testFile.startsWith('./') || testFile.startsWith('/') ? testFile : './' + testFile;

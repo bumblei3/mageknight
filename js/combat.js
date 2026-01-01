@@ -1,6 +1,7 @@
 import { StatusEffectManager } from './statusEffects.js';
 // Enemy types imported as needed
 import { COMBAT_PHASES, ATTACK_ELEMENTS } from './constants.js';
+import { logger } from './logger.js';
 
 // For backward compatibility
 export const COMBAT_PHASE = COMBAT_PHASES;
@@ -29,6 +30,7 @@ export class Combat {
 
     // Start combat
     start() {
+        logger.info(`Combat started against ${this.enemies.length} enemies`);
         this.phase = COMBAT_PHASES.RANGED;
         return {
             phase: this.phase,
@@ -130,6 +132,7 @@ export class Combat {
 
         // Handle regular enemies (armor-based defeat)
         const effectiveArmor = enemy.armor / multiplier;
+        logger.debug(`Ranged attack: ${combinedAttack} vs ${effectiveArmor} (Armor: ${enemy.armor}, Multiplier: ${multiplier})`);
 
         if (combinedAttack >= effectiveArmor) {
             this.defeatedEnemies.push(enemy);
@@ -290,7 +293,7 @@ export class Combat {
         totalEffectiveBlock += Math.floor(this.unitBlockPoints * unitEfficiency);
 
         // Debug log
-        // console.log(`Block vs ${enemy.name} (${enemyElement}): Input ${blockValue} (${blockElement}) -> Eff ${efficiency} = ${Math.floor(blockValue * efficiency)}. Units ${this.unitBlockPoints} -> ${Math.floor(this.unitBlockPoints * unitEfficiency)}. Total: ${effectiveBlock} vs Req ${blockRequired}`);
+        logger.debug(`Block vs ${enemy.name} (${enemyElement}): Input total ${totalInputBlock} -> Effective total ${totalEffectiveBlock}. Required: ${blockRequired}`);
 
         if (totalEffectiveBlock >= blockRequired) {
             this.blockedEnemies.add(enemy.id);
@@ -357,6 +360,7 @@ export class Combat {
         // Calculate wounds (damage / hero armor, rounded up)
         const effectiveArmor = Math.max(1, this.hero.armor || 1);
         this.woundsReceived = Math.ceil(this.totalDamage / effectiveArmor);
+        logger.info(`Damage phase: Total damage ${this.totalDamage} vs Armor ${effectiveArmor} = ${this.woundsReceived} wounds`);
         if (isNaN(this.woundsReceived)) this.woundsReceived = 0;
 
         // Apply wounds to hero

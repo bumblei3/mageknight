@@ -1,0 +1,436 @@
+/* Modal Base Styles (GLOBAL - must be at top level) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #9ca3af;
+    transition: color 0.2s;
+    z-index: 10;
+}
+
+.modal-close:hover {
+    color: #f472b6;
+}
+
+/* Modal Polish */
+.modal-content {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border-highlight);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+    transform: scale(0.9);
+    transition: transform var(--transition-bounce), opacity var(--transition-normal);
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* --- Achievements Modal --- */
+.achievements-modal-content {
+    max-width: 800px;
+    width: 90%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.achievements-summary {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    transition: width 0.5s ease-out;
+}
+
+#achievements-progress-text {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.achievements-tabs,
+.statistics-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #aaa;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.tab-btn.active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #fff;
+}
+
+.achievements-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.achievement-card {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.achievement-card.locked {
+    opacity: 0.6;
+    filter: grayscale(0.8);
+}
+
+.achievement-card.unlocked {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.achievement-icon {
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-info h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.achievement-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.achievement-date {
+    font-size: 0.75rem;
+    color: #10b981;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+/* --- Statistics Modal --- */
+.statistics-modal-content {
+    max-width: 600px;
+    width: 90%;
+}
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-card .value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.stat-card .label {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* --- Reset Modal Styles --- */
+.warning-text {
+    color: #ef4444;
+    font-weight: bold;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* ===================================
+   LEVEL UP MODAL
+   =================================== */
+.level-up-content {
+    max-width: 900px;
+    /* Wider modal */
+    background: linear-gradient(135deg, rgba(20, 20, 40, 0.98), rgba(10, 10, 20, 0.98));
+    border: 1px solid var(--color-accent-gold);
+    box-shadow: 0 0 50px rgba(251, 191, 36, 0.2);
+}
+
+.level-up-message {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-accent-gold);
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+.level-up-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.level-up-section h3 {
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.choices-grid {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+/* Skill Selection */
+.skill-choice {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    width: 200px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.skill-choice:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+}
+
+.skill-choice.selected {
+    border-color: var(--color-accent-gold);
+    background: rgba(251, 191, 36, 0.15);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+    transform: scale(1.05);
+}
+
+.skill-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.skill-name {
+    font-weight: bold;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.skill-description {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+/* Card Choice uses .card styles but adds selection */
+.card-choice {
+    transform: scale(0.9);
+    /* Slightly smaller to fit */
+}
+
+.card-choice.selected {
+    border-color: var(--color-accent-gold);
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+    transform: scale(1) translateY(-10px);
+    z-index: 10;
+}
+
+#confirm-level-up {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 2rem auto 0;
+    font-size: 1.2rem;
+    padding: 1rem;
+}
+
+/* Card Play Modal */
+.card-play-content {
+    max-width: 500px;
+    text-align: center;
+}
+
+.play-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.play-option-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.play-option-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.play-option-btn.basic:hover {
+    border-color: var(--color-text-secondary);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.play-option-btn.strong {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.3);
+}
+
+.play-option-btn.strong:hover {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.play-option-btn.strong:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+    transform: none;
+    box-shadow: none;
+}
+
+.option-header {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.option-effect {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.option-cost {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.play-option-btn.strong .option-cost {
+    color: var(--color-accent-gold);
+}

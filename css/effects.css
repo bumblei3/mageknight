@@ -1,0 +1,402 @@
+/* Buttons Polish */
+.btn {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    margin-bottom: var(--spacing-sm);
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg,
+            var(--color-accent-primary) 0%,
+            var(--color-accent-secondary) 100%);
+    background-size: 200% auto;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 4px 15px rgba(168, 85, 247, 0.4),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+    background-position: right center;
+    transform: translateY(-3px);
+    box-shadow:
+        0 12px 25px rgba(168, 85, 247, 0.5),
+        0 0 30px rgba(244, 72, 182, 0.3),
+        inset 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: var(--backdrop-blur);
+    color: var(--color-text-primary);
+    border: 1px solid var(--glass-border);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--glass-border-highlight);
+    transform: translateY(-2px);
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Magical Glow Animation */
+@keyframes magical-pulse {
+    0% {
+        box-shadow: 0 0 5px rgba(168, 85, 247, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(168, 85, 247, 0.4);
+    }
+}
+
+.btn-magical {
+    animation: magical-pulse 3s infinite;
+}
+
+/* Phase & State Highlighting */
+.panel.phase-highlight-movement {
+    border-color: var(--color-mana-green);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, var(--glass-bg) 100%);
+}
+
+.panel.phase-highlight-combat {
+    border-color: var(--color-mana-red);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, var(--glass-bg) 100%);
+}
+
+.phase-indicator.active {
+    animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+    0% {
+        border-color: var(--glass-border);
+    }
+
+    50% {
+        border-color: var(--color-accent-primary);
+    }
+
+    100% {
+        border-color: var(--glass-border);
+    }
+}
+
+/* Victory Overlay */
+.victory-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: victoryFadeIn 0.5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes victoryFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.victory-content {
+    text-align: center;
+    animation: victoryBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes victoryBounce {
+    0% {
+        transform: scale(0) rotate(-180deg);
+    }
+
+    60% {
+        transform: scale(1.2) rotate(10deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+.victory-icon {
+    font-size: 8rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.8));
+    animation: victoryIconSpin 2s linear infinite;
+}
+
+@keyframes victoryIconSpin {
+    from {
+        transform: rotateY(0deg);
+    }
+
+    to {
+        transform: rotateY(360deg);
+    }
+}
+
+.victory-title {
+    font-size: 4rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 40px rgba(251, 191, 36, 0.6);
+    margin-bottom: 0.5rem;
+}
+
+.victory-subtitle {
+    font-size: 2rem;
+    color: #fbbf24;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+/* Defeat Overlay */
+.defeat-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: defeatFadeIn 0.5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes defeatFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.defeat-content {
+    text-align: center;
+    animation: defeatShake 0.5s ease-in-out;
+}
+
+@keyframes defeatShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-20px);
+    }
+
+    75% {
+        transform: translateX(20px);
+    }
+}
+
+.defeat-icon {
+    font-size: 6rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.8));
+}
+
+.defeat-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ef4444;
+    text-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+    margin-bottom: 0.5rem;
+}
+
+.defeat-subtitle {
+    font-size: 1.5rem;
+    color: #fca5a5;
+}
+
+/* Combat Impact Flash */
+.combat-impact-flash {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    animation: impactFlash 0.5s ease-out forwards;
+}
+
+@keyframes impactFlash {
+    0% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2);
+    }
+}
+
+/* Block Effect */
+.combat-block-effect {
+    position: fixed;
+    font-size: 4rem;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9998;
+    animation: blockEffect 0.8s ease-out forwards;
+    filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.8));
+}
+
+@keyframes blockEffect {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8) rotate(360deg);
+    }
+}
+
+/* Damage Number */
+.damage-number {
+    position: fixed;
+    font-size: 3rem;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9999;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    animation: damageFloat 1s ease-out forwards;
+}
+
+@keyframes damageFloat {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+
+    50% {
+        transform: translate(-50%, -70%) scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100%) scale(0.8);
+    }
+}
+
+/* Health Bar Flash */
+@keyframes healthFlash {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.5);
+    }
+}
+
+/* Element Pulse (for combat UI) */
+@keyframes elementPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px var(--pulse-color, #8b5cf6);
+    }
+
+    50% {
+        box-shadow: 0 0 30px var(--pulse-color, #8b5cf6);
+    }
+}
+
+/* Screen Shake - Applied to .game-container */
+@keyframes screenShake {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translate(-5px, -5px) rotate(-1deg);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translate(5px, 5px) rotate(1deg);
+    }
+}

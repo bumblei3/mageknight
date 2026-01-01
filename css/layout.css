@@ -1,0 +1,131 @@
+/* ===================================
+   LAYOUT
+   =================================== */
+/* --- Immersive Layout --- */
+
+body {
+    overflow: hidden;
+    /* Prevent scrolling */
+    background: #050510;
+}
+
+.canvas-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+#game-board {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: filter 2s ease, transform 0.5s ease;
+}
+
+.night-mode #game-board {
+    filter: brightness(0.6) contrast(1.1) saturate(0.8) hue-rotate(20deg);
+}
+
+.hud-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    pointer-events: none;
+    /* Click through to map */
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 320px 1fr 320px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-md);
+}
+
+/* Make interactable elements clickable */
+.hud-top-bar,
+.hud-sidebar,
+.panel,
+.btn,
+.card,
+.modal,
+.input-overlay {
+    pointer-events: auto;
+}
+
+/* --- Bottom Dock (Card Rail) --- */
+.bottom-dock {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: var(--spacing-sm);
+    z-index: 100;
+    pointer-events: none;
+    /* Container passes clicks */
+}
+
+.game-board-container {
+    background: #050510;
+    /* Darker base */
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    box-shadow:
+        inset 0 0 100px rgba(0, 0, 0, 0.8),
+        /* Deep inner shadow */
+        0 10px 40px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    transition: var(--transition-normal);
+}
+
+.game-board-container:hover {
+    border-color: var(--glass-border-highlight);
+    box-shadow:
+        inset 0 0 80px rgba(0, 0, 0, 0.8),
+        0 15px 50px rgba(0, 0, 0, 0.6);
+}
+
+/* Vignette Overlay */
+.game-board-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center,
+            transparent 50%,
+            rgba(5, 5, 10, 0.6) 90%,
+            rgba(0, 0, 0, 0.8) 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.board-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    /* Shadow around the canvas itself */
+}
+
+/* Main Game Area (Legacy but kept for flexbox layouts if needed) */
+.game-main {
+    display: grid;
+    grid-template-columns: 250px 1fr 300px;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-height: 0;
+}

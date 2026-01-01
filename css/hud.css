@@ -1,0 +1,504 @@
+/* Top Bar */
+.hud-top-bar {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+    z-index: 20;
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.game-logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+/* Header Controls */
+.header-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.hud-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+    padding-right: 4px;
+    /* Space for scrollbar */
+    pointer-events: none;
+    /* Container ignores clicks, children capture them */
+    grid-row: 2;
+    /* Place in middle row */
+}
+
+.hud-left {
+    grid-column: 1;
+}
+
+.hud-right {
+    grid-column: 3;
+}
+
+/* Scrollbar styling for sidebars */
+.hud-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.hud-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+/* Panel Override for Floating Look */
+.panel {
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: 0;
+    pointer-events: auto;
+    overflow: hidden;
+    position: relative;
+    transition: var(--transition-normal);
+}
+
+.panel:hover {
+    border-color: var(--glass-border-highlight);
+    background: var(--glass-bg-hover);
+    transform: translateY(-4px) scale(1.005);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(168, 85, 247, 0.15);
+}
+
+.panel h2 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.panel h3 {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin: var(--spacing-sm) 0;
+}
+
+/* Collapsible Panel Headers */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.panel-toggle {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0;
+    transition: transform 0.3s ease;
+}
+
+/* Hero Avatar in HUD Sidebar */
+.hero-panel .hero-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.hero-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    flex-shrink: 0;
+}
+
+.hero-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.hero-name {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 0.95rem;
+}
+
+.hero-stats-grid {
+    display: flex;
+    gap: 8px;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    color: var(--color-text-secondary);
+}
+
+.hero-stats-grid .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Action Panel */
+.action-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+/* Movement Display */
+.movement-panel .movement-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    font-size: 1.2rem;
+    padding: var(--spacing-xs);
+}
+
+.movement-panel .stat-icon {
+    font-size: 1.5rem;
+}
+
+.movement-panel .stat-value {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--color-accent-gold);
+}
+
+/* Collapsible Panels */
+.panel.collapsed {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.panel.collapsed .hero-info>.hero-details,
+.panel.collapsed .action-grid,
+.panel.collapsed .movement-display,
+.panel.collapsed .units-container,
+.panel.collapsed .mana-dice,
+.panel.collapsed .combat-info,
+.panel.collapsed .combat-units,
+.panel.collapsed .game-log {
+    display: none !important;
+}
+
+.panel.collapsed .panel-header {
+    margin-bottom: 0;
+}
+
+.panel.collapsed .panel-toggle {
+    transform: rotate(180deg);
+}
+
+/* Toast System */
+.toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 9999;
+}
+
+.toast {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    color: white;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 250px;
+    transform: translateX(120%);
+    animation: slide-in-toast 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes slide-in-toast {
+    to {
+        transform: translateX(0);
+    }
+}
+
+.toast.hiding {
+    animation: fade-out-toast 0.4s ease forwards;
+}
+
+@keyframes fade-out-toast {
+    to {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+    }
+}
+
+.toast.success {
+    border-left: 4px solid var(--color-mana-green);
+}
+
+.toast.error {
+    border-left: 4px solid var(--color-mana-red);
+}
+
+.toast.warning {
+    border-left: 4px solid var(--color-mana-gold);
+}
+
+.toast.info {
+    border-left: 4px solid var(--color-accent-primary);
+}
+
+.stat-pill {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.03);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    transition: var(--transition-fast);
+}
+
+.stat-pill:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--glass-border-highlight);
+    transform: translateY(-1px);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--color-accent-gold);
+}
+
+/* Sidebar Animation */
+.sidebar-left {
+    animation: slideInLeft 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sidebar-right {
+    animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* HUD / Time Indicator Polish */
+.time-indicator-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin-left: var(--spacing-lg);
+}
+
+.time-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
+    animation: pulse-glow 3s infinite;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
+        transform: scale(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.9));
+        transform: scale(1.1);
+    }
+}
+
+.round-display {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+}
+
+.round-number {
+    color: var(--color-accent-primary);
+    font-size: 1.1rem;
+    margin-left: 0.2rem;
+}
+
+/* Game Log */
+.game-log {
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding-right: var(--spacing-xs);
+}
+
+.log-entry {
+    padding: var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-accent-primary);
+    color: var(--color-text-secondary);
+    transition: var(--transition-fast);
+    animation: logFadeIn 0.3s ease-out;
+}
+
+.log-entry:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+}
+
+@keyframes logFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.log-entry.combat {
+    border-left-color: var(--color-mana-red);
+}
+
+.log-entry.movement {
+    border-left-color: var(--color-mana-green);
+}
+
+.log-entry.info {
+    border-left-color: var(--color-mana-blue);
+}
+
+.log-entry.warning {
+    border-left-color: #f59e0b;
+}
+
+.log-entry.success {
+    border-left-color: #10b981;
+}
+
+.log-entry.error {
+    border-left-color: #ef4444;
+}
+
+.log-entry.level {
+    border-left-color: #a855f7;
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.log-entry.reward {
+    border-left-color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+}
+
+/* Enhanced log entry layout */
+.log-time {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-right: 0.4rem;
+    opacity: 0.6;
+}
+
+.log-icon {
+    margin-right: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.log-message {
+    flex: 1;
+}
+
+.log-message strong {
+    color: var(--color-accent-gold);
+}
+
+.log-message em {
+    font-style: italic;
+    color: var(--color-accent-primary);
+}
+
+.log-count {
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    color: var(--color-text-muted);
+}

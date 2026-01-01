@@ -260,29 +260,30 @@ export class BossEnemy extends Enemy {
     // Execute phase ability (returns what should happen)
     executePhaseAbility(abilityName) {
         switch (abilityName) {
-        case 'summon':
-            return {
-                type: 'summon',
-                enemyType: this.summonType,
-                count: this.summonCount,
-                message: `${this.name} beschwört ${this.summonCount} ${this.summonType}!`
-            };
-        case 'heal':
-            const healAmount = Math.floor(this.maxHealth * 0.1);
-            this.currentHealth = Math.min(this.maxHealth, this.currentHealth + healAmount);
-            return {
-                type: 'heal',
-                amount: healAmount,
-                message: `${this.name} heilt sich um ${healAmount}!`
-            };
-        case 'enrage':
-        case 'double_attack':
-            return {
-                type: 'buff',
-                message: `${this.name} greift nun doppelt an!`
-            };
-        default:
-            return null;
+            case 'summon':
+                return {
+                    type: 'summon',
+                    enemyType: this.summonType,
+                    count: this.summonCount,
+                    message: `${this.name} beschwört ${this.summonCount} ${this.summonType}!`
+                };
+            case 'heal': {
+                const healAmount = Math.floor(this.maxHealth * 0.1);
+                this.currentHealth = Math.min(this.maxHealth, this.currentHealth + healAmount);
+                return {
+                    type: 'heal',
+                    amount: healAmount,
+                    message: `${this.name} heilt sich um ${healAmount}!`
+                };
+            }
+            case 'enrage':
+            case 'double_attack':
+                return {
+                    type: 'buff',
+                    message: `${this.name} greift nun doppelt an!`
+                };
+            default:
+                return null;
         }
     }
 }

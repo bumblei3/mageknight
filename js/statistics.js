@@ -68,7 +68,7 @@ export class StatisticsManager {
      * Increment a stat
      */
     increment(statName, amount = 1) {
-        if (this.stats.hasOwnProperty(statName)) {
+        if (Object.hasOwn(this.stats, statName)) {
             this.stats[statName] += amount;
             this.save();
         }
@@ -78,7 +78,7 @@ export class StatisticsManager {
      * Set a stat to a specific value
      */
     set(statName, value) {
-        if (this.stats.hasOwnProperty(statName)) {
+        if (Object.hasOwn(this.stats, statName)) {
             this.stats[statName] = value;
             this.save();
         }
@@ -154,7 +154,7 @@ export class StatisticsManager {
     trackManaUsed(color) {
         this.increment('manaUsed');
 
-        if (this.stats.manaByColor.hasOwnProperty(color)) {
+        if (Object.hasOwn(this.stats.manaByColor, color)) {
             this.stats.manaByColor[color]++;
             this.save();
         }

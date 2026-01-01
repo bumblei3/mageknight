@@ -88,19 +88,20 @@ export class EnemyAI {
      */
     applyAbility(ability, target, source) {
         switch (ability) {
-        case ENEMY_ABILITIES.POISON:
-            // Add extra wound to hand
-            return { effect: 'wound', count: 1, message: 'Vergiftet! +1 Verletzung' };
-        case ENEMY_ABILITIES.FIRE:
-            // Double damage calculation handled in combat
-            return { effect: 'damage_boost', message: 'Feuerangriff! Doppelter Schaden' };
-        case ENEMY_ABILITIES.VAMPIRIC:
-            // Heal source
-            const heal = 1;
-            source.currentHealth = Math.min(source.maxHealth, source.currentHealth + heal);
-            return { effect: 'heal', value: heal, message: 'Lebensraub! Feind heilt sich' };
-        default:
-            return null;
+            case ENEMY_ABILITIES.POISON:
+                // Add extra wound to hand
+                return { effect: 'wound', count: 1, message: 'Vergiftet! +1 Verletzung' };
+            case ENEMY_ABILITIES.FIRE:
+                // Double damage calculation handled in combat
+                return { effect: 'damage_boost', message: 'Feuerangriff! Doppelter Schaden' };
+            case ENEMY_ABILITIES.VAMPIRIC: {
+                // Heal source
+                const heal = 1;
+                source.currentHealth = Math.min(source.maxHealth, source.currentHealth + heal);
+                return { effect: 'heal', value: heal, message: 'Lebensraub! Feind heilt sich' };
+            }
+            default:
+                return null;
         }
     }
 

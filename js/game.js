@@ -523,9 +523,7 @@ export class MageKnightGame {
         });
     }
 
-    updatePhaseIndicator() {
-        this.renderController.updatePhaseIndicator();
-    }
+
 
     /**
      * Check for new achievements and display notifications

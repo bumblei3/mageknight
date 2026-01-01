@@ -592,65 +592,6 @@ export class Hero {
     clearTempMana() {
         this.tempMana = [];
     }
-
-
-
-    /**
-     * Gets full state for persistence.
-     */
-    getState() {
-        return {
-            name: this.name,
-            level: this.level,
-            fame: this.fame,
-            reputation: this.reputation,
-            armor: this.armor,
-            movementPoints: this.movementPoints,
-            attackPoints: this.attackPoints,
-            blockPoints: this.blockPoints,
-            influencePoints: this.influencePoints,
-            healingPoints: this.healingPoints,
-            handLimit: this.handLimit,
-            position: { ...this.position },
-            deck: [...this.deck],
-            hand: [...this.hand],
-            discard: [...this.discard],
-            wounds: this.wounds,
-            crystals: { ...this.crystals },
-            skills: [...this.skills],
-            units: this.units.map(u => (typeof u.getState === 'function' ? u.getState() : u))
-        };
-    }
-
-    /**
-     * Loads state from object.
-     */
-    loadState(state) {
-        if (!state) return;
-        this.name = state.name;
-        this.level = state.level;
-        this.fame = state.fame;
-        this.reputation = state.reputation;
-        this.armor = state.armor;
-        this.movementPoints = state.movementPoints;
-        this.attackPoints = state.attackPoints;
-        this.blockPoints = state.blockPoints;
-        this.influencePoints = state.influencePoints;
-        this.healingPoints = state.healingPoints;
-        this.handLimit = state.handLimit;
-        this.position = state.position ? { ...state.position } : this.position;
-        this.displayPosition = { ...this.position };
-        this.deck = state.deck ? [...state.deck] : this.deck;
-        this.hand = state.hand ? [...state.hand] : this.hand;
-        this.discard = state.discard ? [...state.discard] : this.discard;
-        this.wounds = state.wounds !== undefined ? state.wounds : this.wounds;
-        this.crystals = state.crystals ? { ...state.crystals } : this.crystals;
-        this.skills = state.skills ? [...state.skills] : [];
-
-        if (state.units) {
-            this.units = state.units;
-        }
-    }
 }
 
 export default Hero;

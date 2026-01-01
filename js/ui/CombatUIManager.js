@@ -23,8 +23,16 @@ export class CombatUIManager {
     hideCombatPanel() {
         if (this.elements.combatPanel) {
             this.elements.combatPanel.style.display = 'none';
-            this.elements.combatInfo.innerHTML = '';
         }
+        if (this.elements.combatInfo) this.elements.combatInfo.innerHTML = '';
+        if (this.elements.combatUnits) this.elements.combatUnits.innerHTML = '';
+    }
+
+    /**
+     * Reset combat UI
+     */
+    reset() {
+        this.hideCombatPanel();
     }
 
     /**

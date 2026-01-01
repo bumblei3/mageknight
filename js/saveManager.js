@@ -178,7 +178,7 @@ export class SaveManager {
     serializeGameState(gameState) {
         return {
             turn: gameState.turn || 0,
-            hero: {
+            hero: gameState.hero ? {
                 name: gameState.hero.name,
                 position: gameState.hero.position,
                 level: gameState.hero.level,
@@ -196,7 +196,7 @@ export class SaveManager {
                 blockPoints: gameState.hero.blockPoints,
                 influencePoints: gameState.hero.influencePoints,
                 healingPoints: gameState.hero.healingPoints
-            },
+            } : null,
             enemies: (gameState.enemies || []).map(enemy => ({
                 type: enemy.type,
                 position: enemy.position,

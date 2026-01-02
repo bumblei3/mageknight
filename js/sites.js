@@ -6,7 +6,10 @@ export const SITE_TYPES = {
     MONASTERY: 'monastery',
     DUNGEON: 'dungeon',
     CITY: 'city',
-    RUIN: 'ruin'
+    RUIN: 'ruin',
+    TOMB: 'tomb',
+    LABYRINTH: 'labyrinth',
+    SPAWNING_GROUNDS: 'spawning_grounds'
 };
 
 export const SITE_INFO = {
@@ -57,6 +60,27 @@ export const SITE_INFO = {
         icon: '💀',
         color: '#d97706', // Brownish/Amber
         description: 'Eine uralte Ruine. Wer weiß, welche Schätze und Gefahren hier schlummern?',
+        actions: ['explore']
+    },
+    [SITE_TYPES.TOMB]: {
+        name: 'Grabstätte',
+        icon: '⚰️',
+        color: '#1f2937', // Dark
+        description: 'Eine düstere Grabstätte voller Untoten. Artefakte warten auf mutige Plünderer.',
+        actions: ['explore']
+    },
+    [SITE_TYPES.LABYRINTH]: {
+        name: 'Labyrinth',
+        icon: '🌀',
+        color: '#6366f1', // Indigo
+        description: 'Ein verworrenes Labyrinth. Mehrere Kämpfe und mächtige Zauber erwarten dich.',
+        actions: ['explore']
+    },
+    [SITE_TYPES.SPAWNING_GROUNDS]: {
+        name: 'Brutstätte',
+        icon: '🕷️',
+        color: '#059669', // Emerald
+        description: 'Eine Brutstätte voller Monster. Vernichte die Wellen für großen Ruhm!',
         actions: ['explore']
     }
 };

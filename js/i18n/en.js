@@ -289,6 +289,9 @@ export default {
         dungeon: 'Dungeon',
         city: 'City',
         ruin: 'Ruin',
+        tomb: 'Tomb',
+        labyrinth: 'Labyrinth',
+        spawningGrounds: 'Spawning Grounds',
         conquered: 'Conquered',
         visited: 'Visited',
         actions: {

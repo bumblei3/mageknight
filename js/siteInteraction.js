@@ -49,6 +49,15 @@ export class SiteInteractionManager {
             case SITE_TYPES.RUIN:
                 interactionData.options = this.getRuinOptions();
                 break;
+            case SITE_TYPES.TOMB:
+                interactionData.options = this.getTombOptions();
+                break;
+            case SITE_TYPES.LABYRINTH:
+                interactionData.options = this.getLabyrinthOptions();
+                break;
+            case SITE_TYPES.SPAWNING_GROUNDS:
+                interactionData.options = this.getSpawningGroundsOptions();
+                break;
             default:
                 interactionData.options = [];
         }
@@ -198,6 +207,60 @@ export class SiteInteractionManager {
             id: 'explore_ruin',
             label: 'Ruine erkunden (Herausfordernder Kampf)',
             action: () => this.exploreRuin(),
+            enabled: true
+        }];
+    }
+
+    getTombOptions() {
+        if (this.currentSite.conquered) {
+            return [{
+                id: 'looted',
+                label: 'Grabstätte bereits geplündert',
+                enabled: false,
+                action: () => { }
+            }];
+        }
+
+        return [{
+            id: 'explore_tomb',
+            label: 'Grabstätte erkunden (Untote Gegner)',
+            action: () => this.exploreTomb(),
+            enabled: true
+        }];
+    }
+
+    getLabyrinthOptions() {
+        if (this.currentSite.conquered) {
+            return [{
+                id: 'looted',
+                label: 'Labyrinth bereits durchquert',
+                enabled: false,
+                action: () => { }
+            }];
+        }
+
+        return [{
+            id: 'explore_labyrinth',
+            label: 'Labyrinth betreten (Mehrere Kämpfe)',
+            action: () => this.exploreLabyrinth(),
+            enabled: true
+        }];
+    }
+
+    getSpawningGroundsOptions() {
+        if (this.currentSite.conquered) {
+            return [{
+                id: 'looted',
+                label: 'Brutstätte bereits gesäubert',
+                enabled: false,
+                action: () => { }
+            }];
+        }
+
+        return [{
+            id: 'explore_spawning',
+            label: 'Brutstätte angreifen (Monsterwellen)',
+            action: () => this.exploreSpawningGrounds(),
             enabled: true
         }];
     }
@@ -395,5 +458,113 @@ export class SiteInteractionManager {
         this.game.addLog(msg, 'warning');
         this.game.initiateCombat(enemy);
         return { success: true, message: 'Ruine betreten!' };
+    }
+
+    exploreTomb() {
+        // Tombs have undead enemies - vampires, phantoms, or liches
+        const roll = Math.random();
+        let enemy;
+        if (roll > 0.7) {
+            enemy = {
+                name: 'Vampir-Lord',
+                armor: 5,
+                attack: 5,
+                fame: 8,
+                icon: '🧛',
+                type: 'vampire',
+                color: '#7c3aed',
+                vampiric: true
+            };
+        } else if (roll > 0.3) {
+            enemy = {
+                name: 'Phantom',
+                armor: 3,
+                attack: 4,
+                fame: 4,
+                icon: '👻',
+                type: 'phantom',
+                color: '#a855f7',
+                physicalResist: true
+            };
+        } else {
+            enemy = {
+                name: 'Skelett-Krieger',
+                armor: 4,
+                attack: 3,
+                fame: 3,
+                icon: '💀',
+                type: 'skeleton',
+                color: '#d1d5db'
+            };
+        }
+
+        const msg = `Die Krypta öffnet sich... ${enemy.name} erhebt sich!`;
+        this.game.addLog(msg, 'warning');
+        this.game.initiateCombat(enemy);
+        return { success: true, message: 'Grabstätte betreten!' };
+    }
+
+    exploreLabyrinth() {
+        // Labyrinths have magical enemies - golems or mages
+        const isMage = Math.random() > 0.5;
+        const enemy = isMage ? {
+            name: 'Labyrinth-Magier',
+            armor: 3,
+            attack: 5,
+            attackType: 'ice',
+            fame: 6,
+            icon: '🧙',
+            type: 'mage',
+            color: '#3b82f6'
+        } : {
+            name: 'Stein-Golem',
+            armor: 7,
+            attack: 4,
+            fame: 5,
+            icon: '🗿',
+            type: 'golem',
+            color: '#6b7280',
+            physicalResist: true
+        };
+
+        const msg = `Du betrittst das Labyrinth... ${enemy.name} blockiert den Weg!`;
+        this.game.addLog(msg, 'warning');
+        this.game.initiateCombat(enemy);
+        return { success: true, message: 'Labyrinth betreten!' };
+    }
+
+    exploreSpawningGrounds() {
+        // Spawning Grounds have swarms of weaker enemies but with bonus fame
+        const roll = Math.random();
+        let enemy;
+        if (roll > 0.6) {
+            enemy = {
+                name: 'Spinnen-Königin',
+                armor: 4,
+                attack: 4,
+                fame: 7,
+                icon: '🕷️',
+                type: 'spider_queen',
+                color: '#059669',
+                poison: true,
+                summoner: true
+            };
+        } else {
+            enemy = {
+                name: 'Ork-Horde',
+                armor: 3,
+                attack: 5,
+                fame: 5,
+                icon: '👹',
+                type: 'orc_horde',
+                color: '#16a34a',
+                brutal: true
+            };
+        }
+
+        const msg = `Die Brutstätte ist voller Monster... ${enemy.name} greift an!`;
+        this.game.addLog(msg, 'warning');
+        this.game.initiateCombat(enemy);
+        return { success: true, message: 'Brutstätte betreten!' };
     }
 }

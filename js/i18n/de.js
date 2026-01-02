@@ -289,6 +289,9 @@ export default {
         dungeon: 'Verlies',
         city: 'Stadt',
         ruin: 'Ruine',
+        tomb: 'Grabstätte',
+        labyrinth: 'Labyrinth',
+        spawningGrounds: 'Brutstätte',
         conquered: 'Erobert',
         visited: 'Besucht',
         actions: {

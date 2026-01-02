@@ -377,7 +377,7 @@ describe('Integration - Error Recovery', () => {
 
         // Try to get non-existent hex
         const hex = game.hexGrid.getHex(999, 999);
-        expect(hex).toBe(undefined);
+        expect(hex).toBe(null);
 
         // Should not crash when checking
         const hasHex = game.hexGrid.hasHex(999, 999);

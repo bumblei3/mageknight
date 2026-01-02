@@ -1,6 +1,6 @@
 import { StatusEffectManager } from './statusEffects.js';
 // Enemy types imported as needed
-import { COMBAT_PHASES, ATTACK_ELEMENTS } from './constants.js';
+import { COMBAT_PHASES, ATTACK_ELEMENTS, ENEMY_DEFINITIONS } from './constants.js';
 import { logger } from './logger.js';
 import { t } from './i18n/index.js';
 
@@ -27,6 +27,8 @@ export class Combat {
         this.unitRangedPoints = 0;
         this.unitSiegePoints = 0;
         this.activatedUnits = new Set(); // Store unit IDs to allow multiple units of same type
+
+        this.summonedEnemies = new Map(); // Track original summoners: summonedId -> originalEnemy
     }
 
     // Start combat
@@ -197,11 +199,71 @@ export class Combat {
             return this.endCombat();
         }
 
+        // Handle Summoning before entering block phase
+        this.handleSummoning();
+
         this.phase = COMBAT_PHASES.BLOCK;
         return {
             phase: this.phase,
             message: t('combat.blockStarted')
         };
+    }
+
+    // Handle enemies with summoner ability
+    handleSummoning() {
+        const summoners = this.enemies.filter(e => e.summoner && !this.defeatedEnemies.includes(e));
+
+        if (summoners.length === 0) return;
+
+        summoners.forEach(summoner => {
+            // Draw a random brown token (Orcs/Goblins/etc)
+            const brownTokens = Object.keys(ENEMY_DEFINITIONS).filter(key =>
+                key === 'orc' || key === 'weakling' || key === 'robber'
+            );
+
+            const randomType = brownTokens[Math.floor(Math.random() * brownTokens.length)];
+            const definition = ENEMY_DEFINITIONS[randomType];
+
+            // For now, we create a temporary enemy based on this definition
+            // In a real app, this should probably be a new Enemy instance
+            // We'll mock it enough for the logic to work.
+            const summonedId = `summoned_${summoner.id}_${Date.now()}`;
+
+            // We need a way to create an Enemy instance here.
+            // Since we don't have the Enemy class imported directly (it's passed in),
+            // we'll assume the same structure as summoner but with new stats.
+
+            // Create a simple object for local use, but ideally we'd want a full Enemy.
+            // Let's see if we can use the summoner's constructor if it exists.
+            let summoned;
+            if (summoner.constructor) {
+                summoned = new summoner.constructor({
+                    ...definition,
+                    id: summonedId,
+                    summoned: true
+                });
+            } else {
+                summoned = {
+                    ...definition,
+                    id: summonedId,
+                    summoned: true,
+                    getEffectiveAttack: () => definition.attack,
+                    getBlockRequirement: () => definition.attack,
+                    getResistanceMultiplier: () => 1,
+                    getCurrentArmor: () => definition.armor
+                };
+            }
+
+            logger.info(`${summoner.name} beschwört ${summoned.name}!`);
+
+            // Store mapping to restore summoner later if needed (though rules say they are discarded if summoned defeated?)
+            // Actually, if you defeat the summoned enemy, the summoner is discarded. 
+            // If you don't defeat it, the summoner stays (but only if it survived the ranged phase).
+            this.summonedEnemies.set(summoned.id, summoner);
+
+            // Replace summoner with summoned in the active enemies list
+            this.enemies = this.enemies.map(e => e.id === summoner.id ? summoned : e);
+        });
     }
 
     // Block phase - player plays blocks against enemy attacks
@@ -394,6 +456,8 @@ export class Combat {
 
         // Check for Poison (if any unblocked enemy has poison, the whole attack is poisonous)
         const isPoison = unblockedEnemies.some(e => e.poison || (e.abilities && e.abilities.includes('poison')));
+        const isPetrify = unblockedEnemies.some(e => e.petrify || (e.abilities && e.abilities.includes('petrify')));
+        const isAssassin = unblockedEnemies.some(e => e.assassin || (e.abilities && e.abilities.includes('assassin')));
 
         if (isPoison) {
             // Poison deals equal amount of wounds to Discard
@@ -404,18 +468,18 @@ export class Combat {
             this.woundsReceived += poisonWounds; // Track total wounds received
         }
 
+        if (isPetrify && this.woundsReceived > 0) {
+            // Paralyze: Hero must discard all non-wound cards
+            logger.info(t('combat.paralyzeEffect'));
+            this.paralyzeTriggered = true; // Flag for UI to handle discard
+        }
+
         unblockedEnemies.forEach(enemy => {
             // Vampiric: Increases Armor if they deal damage (wound hero)
-            if ((enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'))) && this.woundsReceived > 0) {
+            const isVampiric = enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'));
+            if (isVampiric && this.woundsReceived > 0) {
                 enemy.armorBonus = (enemy.armorBonus || 0) + this.woundsReceived;
                 logger.info(`${enemy.name} gains +${this.woundsReceived} Armor from Vampirism!`);
-            }
-
-            // Paralyze: Destroys units (not impl yet) or forces discard if hero wounded
-            if ((enemy.petrify || (enemy.abilities && enemy.abilities.includes('paralyze'))) && this.woundsReceived > 0) {
-                // Logic to force discard would go here or be flagged in result
-                logger.info(`${enemy.name} Paralyze Triggered: Player should discard non-wound cards.`);
-                // We'll trust the player/UI to enforce this for now, or implement a prompt later.
             }
         });
 
@@ -425,9 +489,46 @@ export class Combat {
             totalDamage: this.totalDamage,
             woundsReceived: this.woundsReceived,
             unblockedEnemies,
+            paralyzeTriggered: this.paralyzeTriggered,
             message: t('combat.woundsReceived', { amount: this.woundsReceived }),
             nextPhase: COMBAT_PHASES.ATTACK
         };
+    }
+
+    // Assign damage to a unit from an enemy
+    assignDamageToUnit(unit, enemy) {
+        if (this.phase !== COMBAT_PHASES.DAMAGE) {
+            return { success: false, message: t('combat.phaseDamageOnly') };
+        }
+
+        // Assassinate Rule: Cannot assign damage to units
+        if (enemy.assassin) {
+            return { success: false, message: t('combat.assassinateRestriction', { enemy: enemy.name }) };
+        }
+
+        const attackValue = enemy.getEffectiveAttack();
+        const unitArmor = unit.getArmor();
+
+        // Simplified damage: if attack >= armor, unit is wounded
+        // Complex rule: damage - unitArmor, if leftover remains, unit wounded and leftover spills.
+        // For now, let's focus on Paralyze/Poison.
+
+        if (enemy.petrify) {
+            // Paralyze: Unit is destroyed instantly if wounded
+            unit.destroyed = true;
+            logger.info(`${unit.getName()} wurde durch Versteinerung zerstört!`);
+        } else {
+            unit.takeWound();
+            logger.info(`${unit.getName()} wurde verwundet.`);
+        }
+
+        if (enemy.poison) {
+            // Poison: Unit takes 2 Wounds (instantly wounded again)
+            unit.takeWound();
+            logger.info(`${unit.getName()} erlitt zusätzlich Gift-Schaden.`);
+        }
+
+        return { success: true, unitDestroyed: unit.destroyed, unitWounded: unit.wounds > 0 };
     }
 
     // Attack phase - player attacks enemies

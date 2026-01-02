@@ -27,6 +27,8 @@ export class Enemy {
         this.vampiric = data.vampiric || false;
         this.assassin = data.assassin || false;
         this.cumbersome = data.cumbersome || false;
+        this.summoner = data.summoner || false;
+        this.summoned = data.summoned || false;
 
         this.lowerArmor = data.lowerArmor || Math.floor((data.armor || 1) / 2); // Default for elusive if not specified
         this.armorBonus = 0; // For vampirism etc.

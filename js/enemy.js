@@ -23,6 +23,13 @@ export class Enemy {
         this.brutal = data.brutal || false;
         this.poison = data.poison || false;
         this.petrify = data.petrify || false;
+        this.elusive = data.elusive || false;
+        this.vampiric = data.vampiric || false;
+        this.assassin = data.assassin || false;
+        this.cumbersome = data.cumbersome || false;
+
+        this.lowerArmor = data.lowerArmor || Math.floor((data.armor || 1) / 2); // Default for elusive if not specified
+        this.armorBonus = 0; // For vampirism etc.
 
         // Resistances
         this.fireResist = data.fireResist || false;
@@ -39,10 +46,30 @@ export class Enemy {
 
     // Calculate damage multiplier based on attack element
     getResistanceMultiplier(attackElement) {
+        if (attackElement === 'fire' && (this.fireResist || this.iceResist)) {
+            // Rule check: Fire Resistance resists Fire.
+            // Cold Fire (Kaltes Feuer) counts as Fire/Ice.
+            // But here we are checking the *Enemy's* resistance against an *Incoming* element.
+            // If incoming is 'cold_fire', it targets Fire/Ice/Physical.
+            // Wait, standard logic:
+            if (this.fireResist) return 0.5;
+        }
+        // ... keeping standard logic for now, Cold Fire logic is complex.
+        // Let's stick to the current implementation for resistance unless specifically asked to change resistance logic.
+        // The plan focused on Abilities.
         if (attackElement === 'fire' && this.fireResist) return 0.5;
         if (attackElement === 'ice' && this.iceResist) return 0.5;
         if (attackElement === 'physical' && this.physicalResist) return 0.5;
         return 1.0;
+    }
+
+    // Get effective armor (dynamic)
+    getCurrentArmor(isBlocked = false, isAttackPhase = false) {
+        let base = this.armor;
+        if (this.elusive && isAttackPhase && isBlocked) {
+            base = this.lowerArmor;
+        }
+        return base + this.armorBonus;
     }
 
     // Get effective attack value (doubled if brutal)
@@ -52,13 +79,18 @@ export class Enemy {
 
     // Get effective block requirement (doubled if swift)
     getBlockRequirement() {
-        return this.swift ? this.attack * 2 : this.attack;
+        // Swift requires double block
+        let req = this.attack;
+        if (this.swift) req *= 2;
+        // Cumbersome reduction is applied EXTERNALLY (in Combat.js) as it depends on spent movement points
+        return req;
     }
 
     // Check if enemy is defeated
-    isDefeated(attackValue) {
+    isDefeated(attackValue, isBlocked = false, isAttackPhase = false) {
         if (attackValue !== undefined) {
-            return attackValue >= this.armor;
+            // Use current armor
+            return attackValue >= this.getCurrentArmor(isBlocked, isAttackPhase);
         }
         return false;
     }

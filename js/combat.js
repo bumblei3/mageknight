@@ -132,7 +132,9 @@ export class Combat {
         }
 
         // Handle regular enemies (armor-based defeat)
-        const effectiveArmor = enemy.armor / multiplier;
+        // Handle regular enemies (armor-based defeat)
+        const currentArmor = typeof enemy.getCurrentArmor === 'function' ? enemy.getCurrentArmor() : enemy.armor;
+        const effectiveArmor = currentArmor / multiplier;
         logger.debug(`Ranged attack: ${combinedAttack} vs ${effectiveArmor} (Armor: ${enemy.armor}, Multiplier: ${multiplier})`);
 
         if (combinedAttack >= effectiveArmor) {
@@ -227,7 +229,10 @@ export class Combat {
     // Attempt to block an enemy
     // blockValue can be a number (backward compat) or { value: number, element: string }
     blockEnemy(enemy, blockInput) {
+        // DEBUG LOGS
+        // console.log('DEBUG: blockEnemy phase:', this.phase, 'Expected:', COMBAT_PHASES.BLOCK);
         if (this.phase !== COMBAT_PHASES.BLOCK) {
+            console.log('DEBUG: blockEnemy Phase Warning. Current:', this.phase, 'Expected:', COMBAT_PHASES.BLOCK);
             return { success: false, error: t('ui.phases.block') };
         }
 
@@ -237,10 +242,18 @@ export class Combat {
 
         // Normalize input to array
         let blocks = [];
+        let movementSpent = 0;
+
         if (Array.isArray(blockInput)) {
             blocks = blockInput;
         } else if (typeof blockInput === 'object' && blockInput !== null) {
-            blocks = [blockInput];
+            if (blockInput.blocks) {
+                blocks = blockInput.blocks;
+                movementSpent = blockInput.movementPoints || 0;
+            } else {
+                blocks = [blockInput];
+                movementSpent = blockInput.movementPoints || 0;
+            }
         } else {
             blocks = [{ value: Number(blockInput) || 0, element: ATTACK_ELEMENTS.PHYSICAL }];
         }
@@ -253,7 +266,13 @@ export class Combat {
         // We add it to the 'Physical' pool for calculation.
 
         // Calculate Required Block Power
-        const blockRequired = enemy.getBlockRequirement();
+        let blockRequired = enemy.getBlockRequirement();
+
+        // Cumbersome (Schwerfällig): Reduce attack by spending movement
+        if (enemy.cumbersome && movementSpent > 0) {
+            blockRequired = Math.max(0, blockRequired - movementSpent);
+            logger.debug(`Cumbersome: Reduced block requirement by ${movementSpent} to ${blockRequired}`);
+        }
         const enemyElement = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
 
         // Calculate block from cards
@@ -386,12 +405,17 @@ export class Combat {
         }
 
         unblockedEnemies.forEach(enemy => {
-            // Vampiric: Heals enemy if they deal damage
-            // Note: Vampiric usually heals if attack is unblocked (damage dealt)
-            if (enemy.abilities && enemy.abilities.includes('vampiric')) {
-                if (enemy.currentHealth < enemy.maxHealth) {
-                    enemy.currentHealth = Math.min(enemy.maxHealth, enemy.currentHealth + 1);
-                }
+            // Vampiric: Increases Armor if they deal damage (wound hero)
+            if ((enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'))) && this.woundsReceived > 0) {
+                enemy.armorBonus = (enemy.armorBonus || 0) + this.woundsReceived;
+                logger.info(`${enemy.name} gains +${this.woundsReceived} Armor from Vampirism!`);
+            }
+
+            // Paralyze: Destroys units (not impl yet) or forces discard if hero wounded
+            if ((enemy.petrify || (enemy.abilities && enemy.abilities.includes('paralyze'))) && this.woundsReceived > 0) {
+                // Logic to force discard would go here or be flagged in result
+                logger.info(`${enemy.name} Paralyze Triggered: Player should discard non-wound cards.`);
+                // We'll trust the player/UI to enforce this for now, or implement a prompt later.
             }
         });
 
@@ -500,7 +524,10 @@ export class Combat {
         if (regularEnemies.length > 0) {
             const totalArmor = regularEnemies.reduce((sum, enemy) => {
                 const multiplier = enemy.getResistanceMultiplier(attackElement);
-                return sum + (enemy.armor / multiplier);
+                // Use getCurrentArmor logic (Elusive checks blocked status + attack phase)
+                const isBlocked = this.blockedEnemies.has(enemy.id);
+                const currentArmor = typeof enemy.getCurrentArmor === 'function' ? enemy.getCurrentArmor(isBlocked, true) : enemy.armor;
+                return sum + (currentArmor / multiplier);
             }, 0);
 
             if (totalAttack >= totalArmor) {

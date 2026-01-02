@@ -128,15 +128,18 @@ describe('Combat', () => {
 
     it('should handle vampiric ability', () => {
         const hero = new Hero('TestHero');
+        hero.armor = 2; // Ensure wounds are taken
         const vampireEnemy = new MockEnemy(5, 4, ['vampiric']);
-        vampireEnemy.currentHealth = 3; // Damaged
+        vampireEnemy.currentHealth = 3; // Initial state
 
         const combat = new Combat(hero, vampireEnemy);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase(); // Deals damage, should heal
+        combat.endBlockPhase(); // Deals damage
 
-        expect(vampireEnemy.currentHealth).toBe(4); // Healed by 1
+        // New Logic: Vampiric increases Armor, does NOT heal
+        expect(vampireEnemy.currentHealth).toBe(3); // Should NOT heal
+        expect(vampireEnemy.armorBonus).toBeGreaterThan(0); // Should gain armor bonus
     });
 
     it('should track unit contributions to block', () => {

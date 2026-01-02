@@ -162,7 +162,18 @@ export default {
         rewardClaimed: '{card} beansprucht!',
         siteConquered: '{site} erobert!',
         defeatAgainst: 'Niederlage gegen {enemy}.',
-        retreatFrom: 'Rückzug aus dem Kampf gegen {enemy}.'
+        retreatFrom: 'Rückzug aus dem Kampf gegen {enemy}.',
+        efficiency: {
+            generic: 'Ineffzienter Block',
+            fire_vs_fire: 'Feuer-Block halbiert gegen Feuer-Angriff',
+            physical_vs_fire: 'Physischer Block halbiert gegen Feuer-Angriff',
+            ice_vs_ice: 'Eis-Block halbiert gegen Eis-Angriff',
+            physical_vs_ice: 'Physischer Block halbiert gegen Eis-Angriff',
+            physical_vs_cold_fire: 'Physischer Block halbiert gegen Kaltes Feuer',
+            fire_vs_cold_fire: 'Feuer-Block halbiert gegen Kaltes Feuer',
+            ice_vs_cold_fire: 'Eis-Block halbiert gegen Kaltes Feuer',
+            unit_vs_elemental: 'Einheiten-Block halbiert gegen Elementar-Angriff'
+        }
     },
 
     // Cards
@@ -308,6 +319,23 @@ export default {
         dark_lord: 'Dunkler Lord',
         dragon_lord: 'Drachen-König',
         lich_king: 'Lich-König',
-        dragonlord: 'Drachen-König' // Handle case differences
+        dragonlord: 'Drachen-König', // Handle case differences
+        abilities: {
+            descriptions: {
+                fortified: 'Befestigt: Immun gegen Fernkampf (außer Belagerung).',
+                vampiric: 'Vampirismus: Erhält Rüstung gleich den zugefügten Wunden.',
+                poison: 'Gift: Wunden kommen auf den Ablagestapel. Fügt Einheiten doppelte Wunden zu.',
+                swift: 'Flink: Benötigt doppelten Blockwert für effizientes Blocken.',
+                brutal: 'Brutal: Verursacht doppelten Schaden, wenn ungeblockt.',
+                paralyze: 'Lähmung: Bei Wunde muss der Held Nicht-Wunden-Karten abwerfen. Zerstört Einheiten.',
+                cumbersome: 'Schwerfällig: Bewegungspunkte reduzieren Block-Anforderung.',
+                assassin: 'Attentäter: Schaden kann nicht auf Einheiten zugewiesen werden.',
+                fire: 'Feuer-Angriff: Ineffizient mit nicht-Eis/Kaltem Feuer zu blocken.',
+                ice: 'Eis-Angriff: Ineffizient mit nicht-Feuer/Kaltem Feuer zu blocken.',
+                cold_fire: 'Kaltes Feuer: Nur effizient mit Kaltem Feuer blockbar.',
+                summoner: 'Beschwörer: Ruft vor der Blockphase einen Gegner herbei.',
+                elusive: 'Ausweichend: Höhere Rüstung gegen Fernkampf.'
+            }
+        }
     }
 };

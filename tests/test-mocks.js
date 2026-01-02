@@ -308,14 +308,24 @@ export class MockHTMLElement {
 
             const el = new MockHTMLElement(tagName);
 
-            const idMatch = attrs.match(/id="([^"]+)"/);
-            if (idMatch) el.id = idMatch[1];
+            // Generic attribute parsing
+            const attrRegex = /([a-zA-Z0-9-]+)="([^"]+)"/g;
+            let attrMatch;
+            while ((attrMatch = attrRegex.exec(attrs)) !== null) {
+                const name = attrMatch[1];
+                const value = attrMatch[2];
+                if (name === 'id') el.id = value;
+                else if (name === 'class') el.className = value;
+                else if (name.startsWith('data-')) {
+                    const prop = name.substring(5).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                    el.dataset[prop] = value;
+                } else {
+                    el.setAttribute(name, value);
+                }
+            }
 
-            const classMatch = attrs.match(/class="([^"]+)"/);
-            if (classMatch) el.className = classMatch[1];
-
-            // Set textContent from content (strip any nested tags for simplicity)
-            el.textContent = content.replace(/<[^>]*>/g, '').trim();
+            // Recursively parse content
+            el.innerHTML = content;
 
             this.appendChild(el);
         }
@@ -495,7 +505,15 @@ export class MockHTMLElement {
     }
 
     setAttribute(name, value) {
-        this[name] = value;
+        if (name === 'style') {
+            // Parse style string and set properties on the style object
+            String(value).split(';').forEach(rule => {
+                const [prop, val] = rule.split(':').map(s => s.trim());
+                if (prop && val) this.style[prop] = val;
+            });
+        } else {
+            this[name] = value;
+        }
     }
 
     getAttribute(name) {

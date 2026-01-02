@@ -259,13 +259,27 @@ export class CombatUIManager {
             </div>
             ${bossHealthHTML}
             <div class="enemy-traits">
-                ${enemy.fortified ? '<span title="Befestigt">🏰</span>' : ''}
-                ${enemy.swift ? '<span title="Flink">💨</span>' : ''}
-                ${enemy.poison ? '<span title="Giftig">🤢</span>' : ''}
-                ${enemy.isBoss ? '<span title="Boss">👑</span>' : ''}
+                ${enemy.fortified ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="fortified">🏰</span>' : ''}
+                ${enemy.swift ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="swift">💨</span>' : ''}
+                ${enemy.poison ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="poison">🤢</span>' : ''}
+                ${enemy.vampiric ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="vampiric">🧛</span>' : ''}
+                ${enemy.brutal ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="brutal">👹</span>' : ''}
+                ${enemy.paralyze ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="paralyze">⚡</span>' : ''}
+                ${enemy.cumbersome ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="cumbersome">🏋️</span>' : ''}
+                ${enemy.assassin ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="assassin">🗡️</span>' : ''}
+                ${enemy.isBoss ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="boss">👑</span>' : ''}
             </div>
             ${blockBadge}
         `;
+
+        // Attach tooltips to ability icons
+        if (this.ui && this.ui.tooltipManager) {
+            const abilityIcons = el.querySelectorAll('.ability-icon');
+            abilityIcons.forEach(icon => {
+                this.ui.tooltipManager.attachToElement(icon);
+            });
+        }
+
         return el;
     }
 

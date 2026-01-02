@@ -162,7 +162,18 @@ export default {
         rewardClaimed: '{card} claimed!',
         siteConquered: '{site} conquered!',
         defeatAgainst: 'Defeat against {enemy}.',
-        retreatFrom: 'Retreat from combat against {enemy}.'
+        retreatFrom: 'Retreat from combat against {enemy}.',
+        efficiency: {
+            generic: 'Inefficient Block',
+            fire_vs_fire: 'Fire Block halved vs Fire Attack',
+            physical_vs_fire: 'Physical Block halved vs Fire Attack',
+            ice_vs_ice: 'Ice Block halved vs Ice Attack',
+            physical_vs_ice: 'Physical Block halved vs Ice Attack',
+            physical_vs_cold_fire: 'Physical Block halved vs Cold Fire Attack',
+            fire_vs_cold_fire: 'Fire Block halved vs Cold Fire Attack',
+            ice_vs_cold_fire: 'Ice Block halved vs Cold Fire Attack',
+            unit_vs_elemental: 'Unit Block halved vs Elemental Attack'
+        }
     },
 
     // Cards
@@ -308,6 +319,23 @@ export default {
         dark_lord: 'Dark Lord',
         dragon_lord: 'Dragon King',
         lich_king: 'Lich King',
-        dragonlord: 'Dragon King'
+        dragonlord: 'Dragon King',
+        abilities: {
+            descriptions: {
+                fortified: 'Fortified: Immune to Ranged Attacks (unless Siege).',
+                vampiric: 'Vampiric: Gains Armor equal to wounds dealt to Hero.',
+                poison: 'Poison: Wounds caused go to Discard pile. Double wounds to Units.',
+                swift: 'Swift: Requires double Block to block efficiently.',
+                brutal: 'Brutal: Deals double damage if not blocked.',
+                paralyze: 'Paralyze: If wounded, Hero must discard non-wound cards. Destroys Units.',
+                cumbersome: 'Cumbersome: Requires Movement points to reduce Block requirement.',
+                assassin: 'Assassin: Damage cannot be assigned to Units.',
+                fire: 'Fire Attack: Inefficient to block with non-Ice/Cold Fire.',
+                ice: 'Ice Attack: Inefficient to block with non-Fire/Cold Fire.',
+                cold_fire: 'Cold Fire Attack: Only efficiently blocked by Cold Fire.',
+                summoner: 'Summoner: Summons a brown enemy token before blocking phase.',
+                elusive: 'Elusive: Higher armor against Ranged attacks.'
+            }
+        }
     }
 };

@@ -114,14 +114,42 @@ export class TooltipManager {
     attachToElement(element, content) {
         if (!element) return;
 
-        element.addEventListener('mouseenter', () => {
-            const html = typeof content === 'function' ? content() : content;
-            this.showTooltip(element, html);
+        element.addEventListener('mouseenter', (e) => {
+            // Check for data attributes if content not provided or generic
+            let html = typeof content === 'function' ? content() : content;
+
+            // Auto-detect ability tooltip from data attributes if no specific content passed or if wrapper logic used
+            if (!html && element.dataset.tooltipType === 'ability') {
+                html = this.createAbilityTooltipHTML(element.dataset.tooltipKey);
+            }
+
+            if (html) this.showTooltip(element, html);
         });
 
         element.addEventListener('mouseleave', () => {
             this.hideTooltip(100);
         });
+    }
+
+    /**
+     * Create HTML for ability tooltip
+     * @param {string} abilityKey - Key of the ability
+     * @returns {string} HTML string
+     */
+    createAbilityTooltipHTML(abilityKey) {
+        const desc = t(`enemies.abilities.descriptions.${abilityKey}`) || abilityKey;
+        // Capitalize first letter of key as title if needed, or just use description which contains name
+        const title = abilityKey.charAt(0).toUpperCase() + abilityKey.slice(1);
+
+        return `
+            <div class="tooltip-ability-desc">
+                <div class="tooltip-header">
+                    <span class="tooltip-name">${title}</span>
+                </div>
+                <div class="tooltip-divider"></div>
+                <div class="tooltip-description">${desc}</div>
+            </div>
+        `;
     }
 
     /**

@@ -46,6 +46,7 @@ export class BlockingEngine {
         let totalEffectiveBlock = 0;
         let totalInputBlock = 0;
         let isInefficient = false;
+        const inefficiencyReasons = new Set();
 
         blocks.forEach(block => {
             const val = block.value || 0;
@@ -57,16 +58,23 @@ export class BlockingEngine {
                 if (el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
                     isInefficient = true;
+                    if (el === ATTACK_ELEMENTS.FIRE) inefficiencyReasons.add('fire_vs_fire');
+                    else inefficiencyReasons.add('physical_vs_fire');
                 }
             } else if (enemyElement === ATTACK_ELEMENTS.ICE) {
                 if (el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
                     isInefficient = true;
+                    if (el === ATTACK_ELEMENTS.ICE) inefficiencyReasons.add('ice_vs_ice');
+                    else inefficiencyReasons.add('physical_vs_ice');
                 }
             } else if (enemyElement === ATTACK_ELEMENTS.COLD_FIRE) {
                 if (el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
                     isInefficient = true;
+                    if (el === ATTACK_ELEMENTS.FIRE) inefficiencyReasons.add('fire_vs_cold_fire');
+                    else if (el === ATTACK_ELEMENTS.ICE) inefficiencyReasons.add('ice_vs_cold_fire');
+                    else inefficiencyReasons.add('physical_vs_cold_fire');
                 }
             }
 
@@ -75,8 +83,9 @@ export class BlockingEngine {
 
         // Add Unit Block (assume inefficient against elemental for now)
         let unitEfficiency = 1.0;
-        if (enemyElement !== ATTACK_ELEMENTS.PHYSICAL) {
+        if (enemyElement !== ATTACK_ELEMENTS.PHYSICAL && unitBlockPoints > 0) {
             unitEfficiency = 0.5;
+            inefficiencyReasons.add('unit_vs_elemental');
         }
 
         // Calculate unit contribution
@@ -85,6 +94,13 @@ export class BlockingEngine {
 
         // Debug log
         logger.debug(`Block vs ${enemy.name} (${enemyElement}): Input total ${totalInputBlock} -> Effective total ${totalEffectiveBlock}. Required: ${blockRequired}`);
+
+        // Format inefficiency reasons
+        let limitNote = '';
+        if (inefficiencyReasons.size > 0) {
+            const reasons = Array.from(inefficiencyReasons).map(r => t(`combat.efficiency.${r}`));
+            limitNote = ` (${reasons.join(', ')})`;
+        }
 
         if (totalEffectiveBlock >= blockRequired) {
             // Determine if unit points were needed
@@ -104,7 +120,7 @@ export class BlockingEngine {
                 consumedPoints: totalInputBlock,
                 unitPointsConsumed: unitPointsUsed,
                 isInefficient: isInefficient,
-                message: t('combat.blockSuccess', { enemy: enemy.name, note: isInefficient ? t('combat.blockInefficient') : '' })
+                message: t('combat.blockSuccess', { enemy: enemy.name, note: limitNote })
             };
         }
 
@@ -115,7 +131,7 @@ export class BlockingEngine {
             consumedPoints: totalInputBlock,
             unitPointsConsumed: 0, // Failed block consumes usage? Usually yes, but here we return false for blocked
             isInefficient: isInefficient,
-            message: t('combat.blockWeak', { attack: totalEffectiveBlock, armor: blockRequired, note: isInefficient ? t('combat.weakInefficient') : '' })
+            message: t('combat.blockWeak', { attack: totalEffectiveBlock, armor: blockRequired, note: limitNote })
         };
     }
 }

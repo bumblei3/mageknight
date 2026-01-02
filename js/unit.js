@@ -1,4 +1,6 @@
 // Unit definitions and logic for Mage Knight
+import { t } from './i18n/index.js';
+import { ACTION_TYPES } from './constants.js';
 
 export const UNIT_TYPES = {
     PEASANTS: 'peasants',
@@ -20,8 +22,8 @@ export const UNIT_INFO = {
         armor: 3,
         icon: '👨‍🌾',
         abilities: [
-            { type: 'influence', value: 2, text: '2 Einfluss' },
-            { type: 'block', value: 2, text: '2 Block' }
+            { type: ACTION_TYPES.INFLUENCE, value: 2, text: '2 Einfluss' },
+            { type: ACTION_TYPES.BLOCK, value: 2, text: '2 Block' }
         ],
         location: ['village']
     },
@@ -32,8 +34,8 @@ export const UNIT_INFO = {
         armor: 2,
         icon: '🌿',
         abilities: [
-            { type: 'healing', value: 1, text: '1 Heilung' },
-            { type: 'influence', value: 3, text: '3 Einfluss' }
+            { type: ACTION_TYPES.HEAL, value: 1, text: '1 Heilung' },
+            { type: ACTION_TYPES.INFLUENCE, value: 3, text: '3 EINFLUSS' }
         ],
         location: ['village', 'monastery']
     },
@@ -44,8 +46,8 @@ export const UNIT_INFO = {
         armor: 3,
         icon: '🔨',
         abilities: [
-            { type: 'attack', value: 2, text: '2 Angriff' },
-            { type: 'influence', value: 1, text: '1 Einfluss' }
+            { type: ACTION_TYPES.ATTACK, value: 2, text: '2 Angriff' },
+            { type: ACTION_TYPES.INFLUENCE, value: 1, text: '1 Einfluss' }
         ],
         location: ['village']
     },
@@ -56,8 +58,8 @@ export const UNIT_INFO = {
         armor: 4,
         icon: '⚔️',
         abilities: [
-            { type: 'attack', value: 3, text: '3 Angriff' },
-            { type: 'block', value: 3, text: '3 Block' }
+            { type: ACTION_TYPES.ATTACK, value: 3, text: '3 Angriff' },
+            { type: ACTION_TYPES.BLOCK, value: 3, text: '3 Block' }
         ],
         location: ['keep', 'city']
     },
@@ -68,8 +70,8 @@ export const UNIT_INFO = {
         armor: 5,
         icon: '🛡️',
         abilities: [
-            { type: 'block', value: 4, text: '4 Block' },
-            { type: 'attack', value: 1, text: '1 Angriff' }
+            { type: ACTION_TYPES.BLOCK, value: 4, text: '4 Block' },
+            { type: ACTION_TYPES.ATTACK, value: 1, text: '1 Angriff' }
         ],
         location: ['keep', 'city']
     },
@@ -80,8 +82,8 @@ export const UNIT_INFO = {
         armor: 3,
         icon: '🏹',
         abilities: [
-            { type: 'ranged', value: 3, text: '3 Fernkampf' },
-            { type: 'attack', value: 2, text: '2 Angriff' }
+            { type: ACTION_TYPES.RANGED, value: 3, text: '3 Fernkampf' },
+            { type: ACTION_TYPES.ATTACK, value: 2, text: '2 Angriff' }
         ],
         location: ['keep', 'city']
     },
@@ -92,8 +94,8 @@ export const UNIT_INFO = {
         armor: 2,
         icon: '🎯',
         abilities: [
-            { type: 'siege', value: 4, text: '4 Belagerung' },
-            { type: 'attack', value: 1, text: '1 Angriff' }
+            { type: ACTION_TYPES.SIEGE, value: 4, text: '4 Belagerung' },
+            { type: ACTION_TYPES.ATTACK, value: 1, text: '1 Angriff' }
         ],
         location: ['keep']
     },
@@ -104,8 +106,8 @@ export const UNIT_INFO = {
         armor: 4, // Physical resistance logic to be added later
         icon: '🗿',
         abilities: [
-            { type: 'attack', value: 4, text: '4 Angriff' },
-            { type: 'block', value: 4, text: '4 Block' }
+            { type: ACTION_TYPES.ATTACK, value: 4, text: '4 Angriff' },
+            { type: ACTION_TYPES.BLOCK, value: 4, text: '4 Block' }
         ],
         location: ['mage_tower']
     },
@@ -116,8 +118,8 @@ export const UNIT_INFO = {
         armor: 3,
         icon: '🧙‍♂️',
         abilities: [
-            { type: 'attack', value: 4, element: 'fire', text: '4 Feuer-Angriff' },
-            { type: 'block', value: 4, element: 'ice', text: '4 Eis-Block' }
+            { type: ACTION_TYPES.ATTACK, value: 4, element: 'fire', text: '4 Feuer-Angriff' },
+            { type: ACTION_TYPES.BLOCK, value: 4, element: 'ice', text: '4 Eis-Block' }
         ],
         location: ['mage_tower']
     }

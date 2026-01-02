@@ -99,16 +99,16 @@ export class DamageSystem {
             logger.info(`${unit.getName()} erlitt zusätzlich Gift-Schaden.`);
         }
 
-        // Vampirism check for Unit damage?
-        // Rules say: "If a Vampiric enemy deals damage..." usually implies wounds.
-        // If unit is wounded, Vampirism triggers?
-        // Implementation in original code checked woundsReceived > 0 in CalculateDamage only.
-        // We should add it here for completeness if required, but let's match original logic first.
-        // Original code: assignDamageToUnit only handled unit state, didn't trigger Vampirism on Enemy?
-        // Checking original Combat.js... Vampirism was inside `damagePhase`.
-        // `assignDamageToUnit` was a separate method called presumably by UI/Orchestrator?
-        // Yes. So if player assigns damage to unit, Vampirism should theoretically trigger if damage dealt.
-        // But original code didn't have it there. I will keep it consistent.
+        // Vampiric: Increases Armor for each wound dealt
+        const isVampiric = enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'));
+        if (isVampiric) {
+            // A unit destroyed by Petrify counts as wound(s)?
+            // Usually in MK, assigning damage to unit means it takes wounds equal to its armor or just 1 if not Petrified.
+            // Simplified: if unit wounded or destroyed, increment armorBonus.
+            const woundsDealt = unit.destroyed ? 2 : 1; // Simplified assumption: destruction is worth more
+            enemy.armorBonus = (enemy.armorBonus || 0) + woundsDealt;
+            logger.info(`${enemy.name} erhält +${woundsDealt} Rüstung durch Vampirismus!`);
+        }
 
         return { success: true, unitDestroyed: unit.destroyed, unitWounded: unit.wounds > 0 };
     }

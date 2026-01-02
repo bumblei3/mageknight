@@ -691,3 +691,53 @@
     border-radius: 10px;
     color: var(--color-text-muted);
 }
+
+/* Combat Phase Progress Indicator */
+.combat-phase-progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.phase-step {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.phase-step.active {
+    opacity: 1;
+    background: var(--color-accent-primary);
+    box-shadow: 0 0 10px var(--color-accent-primary);
+    transform: scale(1.1);
+}
+
+.phase-step.completed {
+    opacity: 0.7;
+    background: rgba(16, 185, 129, 0.3);
+}
+
+.phase-step-icon {
+    font-size: 1rem;
+}
+
+.phase-connector {
+    width: 20px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.phase-connector.completed {
+    background: var(--color-accent-primary);
+}

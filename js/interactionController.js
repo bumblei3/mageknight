@@ -1,4 +1,5 @@
 import { logger } from './logger.js';
+import { ACTION_TYPES } from './constants.js';
 
 export class InteractionController {
     constructor(game) {
@@ -273,7 +274,7 @@ export class InteractionController {
             return;
         }
 
-        const options = ['movement', 'attack', 'block', 'influence'];
+        const options = [ACTION_TYPES.MOVEMENT, ACTION_TYPES.ATTACK, ACTION_TYPES.BLOCK, ACTION_TYPES.INFLUENCE];
         const chosen = prompt(`${card.name} seitlich spielen für: \n1: +1 Bewegung\n2: +1 Angriff\n3: +1 Block\n4: +1 Einfluss\n\nWähle Option (1-4):`);
 
         const chosenNum = parseInt(chosen, 10);

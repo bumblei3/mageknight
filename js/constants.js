@@ -16,7 +16,17 @@ export const ATTACK_ELEMENTS = {
     FIRE: 'fire',
     ICE: 'ice',
     COLD_FIRE: 'cold_fire',
-    HOLY: 'holy' // Used for specialized attacks maybe?
+    HOLY: 'holy'
+};
+
+export const ACTION_TYPES = {
+    MOVEMENT: 'movement',
+    ATTACK: 'attack',
+    BLOCK: 'block',
+    INFLUENCE: 'influence',
+    RANGED: 'ranged',
+    SIEGE: 'siege',
+    HEAL: 'healing'
 };
 
 export const TERRAIN_TYPES = {
@@ -52,7 +62,8 @@ export const COMBAT_PHASES = {
     BLOCK: 'block',
     DAMAGE: 'damage',
     ATTACK: 'attack',
-    COMPLETE: 'complete'
+    COMPLETE: 'complete',
+    REWARD: 'reward'
 };
 
 export const GAME_EVENTS = {
@@ -68,7 +79,9 @@ export const GAME_EVENTS = {
     ACHIEVEMENT_UNLOCKED: 'achievement_unlocked',
     NOTIFICATION_SHOW: 'notification_show',
     HAND_UPDATED: 'hand_updated',
-    UNIT_UPDATED: 'unit_updated'
+    UNIT_UPDATED: 'unit_updated',
+    TURN_STARTED: 'turn_started',
+    TIME_CHANGED: 'time_changed'
 };
 
 export const TIME_OF_DAY = {

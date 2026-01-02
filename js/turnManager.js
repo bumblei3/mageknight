@@ -1,4 +1,5 @@
-import { TIME_OF_DAY, COMBAT_PHASES } from './constants.js';
+import { TIME_OF_DAY, COMBAT_PHASES, GAME_EVENTS } from './constants.js';
+import { eventBus } from './eventBus.js';
 // TurnManager
 
 export class TurnManager {
@@ -42,6 +43,10 @@ export class TurnManager {
 
         // Check victory
         this.checkVictory();
+
+        if (this.game.gameState === 'playing') {
+            eventBus.emit(GAME_EVENTS.TURN_STARTED, { turn: this.turnNumber });
+        }
     }
 
     handleCombatEndTurn() {

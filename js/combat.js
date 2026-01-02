@@ -1,6 +1,6 @@
 import { StatusEffectManager } from './statusEffects.js';
 // Enemy types imported as needed
-import { COMBAT_PHASES, ATTACK_ELEMENTS, ENEMY_DEFINITIONS } from './constants.js';
+import { COMBAT_PHASES, ATTACK_ELEMENTS, ENEMY_DEFINITIONS, ACTION_TYPES } from './constants.js';
 import { logger } from './logger.js';
 import { t } from './i18n/index.js';
 import { BlockingEngine } from './combat/BlockingEngine.js';
@@ -283,7 +283,7 @@ export class Combat {
     }
 
     // Attempt to block an enemy
-    blockEnemy(enemy, blockInput) {
+    blockEnemy(enemy, blockInput, movementPoints = 0) {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
             console.log('DEBUG: blockEnemy Phase Warning. Current:', this.phase, 'Expected:', COMBAT_PHASES.BLOCK);
             return { success: false, error: t('ui.phases.block') };
@@ -293,7 +293,7 @@ export class Combat {
             return { success: false, message: t('combat.alreadyBlocked') };
         }
 
-        const result = this.blockingEngine.calculateBlock(enemy, blockInput, this.unitBlockPoints);
+        const result = this.blockingEngine.calculateBlock(enemy, blockInput, this.unitBlockPoints, movementPoints);
 
         if (result.success && result.blocked) {
             this.blockedEnemies.add(enemy.id);
@@ -353,6 +353,19 @@ export class Combat {
         return this.damageSystem.assignDamageToUnit(unit, enemy);
     }
 
+    /**
+     * Handles the discard effect for Paralyze.
+     * Should be called when paralyzeTriggered is true.
+     */
+    handleParalyzeEffect() {
+        if (!this.paralyzeTriggered) return 0;
+
+        // Count wounds received to determine how many cards to discard
+        const discarded = this.hero.discardNonWoundCards(this.woundsReceived);
+        this.paralyzeTriggered = false; // Reset after handling
+        return discarded;
+    }
+
     // Attack phase - player attacks enemies
     attackPhase() {
         if (this.phase !== COMBAT_PHASES.ATTACK) {
@@ -386,25 +399,25 @@ export class Combat {
         let applied = [];
 
         abilities.forEach(ability => {
-            if (this.phase === COMBAT_PHASES.BLOCK && ability.type === 'block') {
+            if (this.phase === COMBAT_PHASES.BLOCK && ability.type === ACTION_TYPES.BLOCK) {
                 this.unitBlockPoints += ability.value;
                 applied.push(`+${ability.value} Block`);
             } else if (this.phase === COMBAT_PHASES.ATTACK) {
-                if (ability.type === 'attack') {
+                if (ability.type === ACTION_TYPES.ATTACK) {
                     this.unitAttackPoints += ability.value;
                     applied.push(`+${ability.value} Angriff`);
-                } else if (ability.type === 'ranged') {
+                } else if (ability.type === ACTION_TYPES.RANGED) {
                     this.unitAttackPoints += ability.value;
                     applied.push(`+${ability.value} Angriff (aus Fernkampf)`);
-                } else if (ability.type === 'siege') {
+                } else if (ability.type === ACTION_TYPES.SIEGE) {
                     this.unitAttackPoints += ability.value;
                     applied.push(`+${ability.value} Angriff (aus Belagerung)`);
                 }
             } else if (this.phase === COMBAT_PHASES.RANGED) {
-                if (ability.type === 'ranged') {
+                if (ability.type === ACTION_TYPES.RANGED) {
                     this.unitRangedPoints += ability.value;
                     applied.push(`+${ability.value} Fernkampf`);
-                } else if (ability.type === 'siege') {
+                } else if (ability.type === ACTION_TYPES.SIEGE) {
                     this.unitSiegePoints += ability.value;
                     applied.push(`+${ability.value} Belagerung`);
                 }

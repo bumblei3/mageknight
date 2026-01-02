@@ -181,6 +181,21 @@ export class Hero {
         return null;
     }
 
+    // Discard a specific number of non-wound cards (used for Paralyze effect)
+    discardNonWoundCards(count) {
+        let discardedCount = 0;
+        for (let i = 0; i < count; i++) {
+            const index = this.hand.findIndex(card => !card.isWound());
+            if (index !== -1) {
+                this.discardCard(index);
+                discardedCount++;
+            } else {
+                break;
+            }
+        }
+        return discardedCount;
+    }
+
     // Rest - discard selected cards and draw new ones (no mana refresh)
     rest(cardIndices = []) {
         // Sort indices in descending order to avoid shifting issues

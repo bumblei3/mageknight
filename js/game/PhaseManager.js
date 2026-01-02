@@ -26,6 +26,8 @@ export class PhaseManager {
 
         this.game.addLog('Zug beendet.', 'info');
 
+        eventBus.emit(GAME_EVENTS.TURN_ENDED, { turn: this.game.turnNumber });
+
         // Auto-save
         this.game.saveGame();
     }

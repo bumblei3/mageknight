@@ -1,9 +1,6 @@
-/**
- * Orchestrates combat lifecycle and transitions in game.js.
- */
 import { Combat } from '../combat.js';
 import { eventBus } from '../eventBus.js';
-import { GAME_EVENTS } from '../constants.js';
+import { GAME_EVENTS, COMBAT_PHASES } from '../constants.js';
 import { t } from '../i18n/index.js';
 
 export class CombatOrchestrator {
@@ -31,20 +28,20 @@ export class CombatOrchestrator {
 
         // Accumulate values based on phase
         const phase = this.game.combat.phase;
-        if (phase === 'block' && result.effect.block) {
+        if (phase === COMBAT_PHASES.BLOCK && result.effect.block) {
             this.combatBlockTotal += result.effect.block;
             // Store block source
             this.activeBlocks.push({
                 value: result.effect.block,
                 element: result.effect.element || 'physical'
             });
-        } else if (phase === 'ranged') {
+        } else if (phase === COMBAT_PHASES.RANGED) {
             if (result.effect.siege) {
                 this.combatSiegeTotal += (result.effect.attack || 0);
             } else if (result.card.type === 'spell' || result.effect.ranged) {
                 this.combatRangedTotal += (result.effect.attack || 0);
             }
-        } else if (phase === 'attack' && result.effect.attack) {
+        } else if (phase === COMBAT_PHASES.ATTACK && result.effect.attack) {
             this.combatAttackTotal += result.effect.attack;
         }
 
@@ -111,6 +108,21 @@ export class CombatOrchestrator {
             }
         }
 
+        // Handle Paralyze discard effect
+        if (result.paralyzeTriggered) {
+            const discarded = this.game.combat.handleParalyzeEffect();
+            if (discarded > 0) {
+                this.game.addLog(t('combat.paralyzeDiscard', { count: discarded }), 'warning');
+                const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+                this.game.particleSystem.createFloatingText(
+                    heroPixel.x,
+                    heroPixel.y,
+                    `-${discarded} Karten (Versteinert)`,
+                    '#ef4444'
+                );
+            }
+        }
+
         this.game.addLog(result.message, 'combat');
         this.combatBlockTotal = 0;
         this.activeBlocks = [];
@@ -126,17 +138,17 @@ export class CombatOrchestrator {
     executeAttackAction() {
         if (!this.game.combat) return;
 
-        if (this.game.combat.phase === 'ranged') {
+        if (this.game.combat.phase === COMBAT_PHASES.RANGED) {
             this.endRangedPhase();
             return;
         }
 
-        if (this.game.combat.phase === 'block') {
+        if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
             this.endBlockPhase();
             return;
         }
 
-        if (this.game.combat.phase !== 'attack') return;
+        if (this.game.combat.phase !== COMBAT_PHASES.ATTACK) return;
 
         // Visual Impact
         const pixelPos = this.game.hexGrid.axialToPixel(this.game.combat.enemy.position.q, this.game.combat.enemy.position.r);
@@ -169,7 +181,7 @@ export class CombatOrchestrator {
         const result = this.game.combat.endRangedPhase();
         this.game.addLog(result.message, 'combat');
 
-        if (result.phase === 'block') {
+        if (result.phase === COMBAT_PHASES.BLOCK) {
             this.renderUnitsInCombat();
             this.game.updatePhaseIndicator();
             this.game.updateStats();
@@ -206,23 +218,34 @@ export class CombatOrchestrator {
     /**
      * Handles clicking an enemy in the combat panel
      */
-    /**
-     * Handles clicking an enemy in the combat panel
-     */
     handleEnemyClick(enemy) {
         if (!this.game.combat) return;
 
-        if (this.game.combat.phase === 'ranged') {
+        if (this.game.combat.phase === COMBAT_PHASES.RANGED) {
             this.executeRangedAttack(enemy);
-        } else if (this.game.combat.phase === 'block') {
-            // Pass the array of block sources for efficiency calculation
-            this.game.combat.blockEnemy(enemy, this.activeBlocks);
+        } else if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
+            // Support spending movement points for Cumbersome enemies
+            const movementPoints = this.game.hero.movementPoints;
+            const result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementPoints);
+
+            if (result.success && result.blocked) {
+                // If cumbersome was utilized, spend the movement points
+                if (enemy.cumbersome && movementPoints > 0) {
+                    this.game.hero.movementPoints = 0;
+                    this.game.addLog(t('combat.cumbersomeUsed', { enemy: enemy.name }), 'info');
+                }
+
+                // Particle Effect for successful block
+                const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+                this.game.particleSystem.shieldEffect(pixelPos.x, pixelPos.y);
+            }
 
             // Reset for next block attempt
             this.activeBlocks = [];
             this.combatBlockTotal = 0;
 
             this.updateCombatInfo();
+            this.game.updateStats();
         }
     }
 
@@ -356,4 +379,3 @@ export class CombatOrchestrator {
         }
     }
 }
-

@@ -1,4 +1,5 @@
-import { TIME_OF_DAY } from './constants.js';
+import { TIME_OF_DAY, GAME_EVENTS } from './constants.js';
+import { eventBus } from './eventBus.js';
 
 export { TIME_OF_DAY };
 
@@ -43,10 +44,12 @@ export class TimeManager {
     }
 
     notifyListeners() {
-        this.listeners.forEach(callback => callback({
+        const state = {
             round: this.round,
             timeOfDay: this.timeOfDay
-        }));
+        };
+        this.listeners.forEach(callback => callback(state));
+        eventBus.emit(GAME_EVENTS.TIME_CHANGED, state);
     }
 
     getState() {

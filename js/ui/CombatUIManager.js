@@ -1,6 +1,6 @@
-/**
- * Manages combat-related UI components.
- */
+import { t } from '../i18n/index.js';
+import { COMBAT_PHASES, ACTION_TYPES } from '../constants.js';
+
 export class CombatUIManager {
     constructor(elements, ui) {
         this.elements = elements;
@@ -43,7 +43,7 @@ export class CombatUIManager {
         if (!info) return;
 
         const phaseLabel = this.getCombatPhaseName(phase);
-        const statusColor = phase === 'attack' ? '#ef4444' : (phase === 'ranged' ? '#10b981' : '#3b82f6');
+        const statusColor = phase === COMBAT_PHASES.ATTACK ? '#ef4444' : (phase === COMBAT_PHASES.RANGED ? '#10b981' : '#3b82f6');
 
         info.innerHTML = `
             <div class="combat-status" style="border-left: 4px solid ${statusColor}; padding: 0.5rem; background: rgba(0,0,0,0.2); margin-bottom: 0.5rem;">
@@ -73,20 +73,19 @@ export class CombatUIManager {
             info.insertBefore(totalsDiv, info.firstChild);
         }
 
-        const COMBAT_PHASE = { BLOCK: 'block', ATTACK: 'attack', RANGED: 'ranged' };
         let html = '<div style="display: flex; gap: 1rem; justify-content: space-around;">';
 
-        if (phase === COMBAT_PHASE.BLOCK) {
+        if (phase === COMBAT_PHASES.BLOCK) {
             html += `<div style="text-align: center;">
                 <div style="font-size: 0.9em; opacity: 0.8;">Total Block</div>
                 <div style="font-size: 1.5em; font-weight: bold; color: #4a9eff;">${blockTotal}</div>
             </div>`;
-        } else if (phase === COMBAT_PHASE.ATTACK) {
+        } else if (phase === COMBAT_PHASES.ATTACK) {
             html += `<div style="text-align: center;">
                 <div style="font-size: 0.9em; opacity: 0.8;">Total Attack</div>
                 <div style="font-size: 1.5em; font-weight: bold; color: #ff4a4a;">${attackTotal}</div>
             </div>`;
-        } else if (phase === COMBAT_PHASE.RANGED) {
+        } else if (phase === COMBAT_PHASES.RANGED) {
             const orchestrator = this.ui?.game?.combatOrchestrator;
             const rangedTotal = orchestrator?.combatRangedTotal ?? attackTotal;
             const siegeTotal = orchestrator?.combatSiegeTotal ?? 0;
@@ -132,13 +131,13 @@ export class CombatUIManager {
         // Execute Attack Button logic
         const executeAttackBtn = document.getElementById('execute-attack-btn');
         if (executeAttackBtn) {
-            if (phase === COMBAT_PHASE.RANGED) {
+            if (phase === COMBAT_PHASES.RANGED) {
                 executeAttackBtn.textContent = 'Fernkampf beenden -> Blocken';
                 executeAttackBtn.style.display = 'block';
-            } else if (phase === COMBAT_PHASE.BLOCK) {
+            } else if (phase === COMBAT_PHASES.BLOCK) {
                 executeAttackBtn.textContent = 'Blocken beenden -> Schaden';
                 executeAttackBtn.style.display = 'block';
-            } else if (phase === COMBAT_PHASE.ATTACK) {
+            } else if (phase === COMBAT_PHASES.ATTACK) {
                 executeAttackBtn.textContent = 'Angriff ausführen';
                 executeAttackBtn.style.display = 'block';
             } else {
@@ -152,12 +151,12 @@ export class CombatUIManager {
      */
     getCombatPhaseName(phase) {
         const names = {
-            not_in_combat: 'Kein Kampf',
-            ranged: 'Fernkampf-Phase',
-            block: 'Block-Phase',
-            damage: 'Schadens-Phase',
-            attack: 'Angriffs-Phase',
-            complete: 'Abgeschlossen'
+            [COMBAT_PHASES.NOT_IN_COMBAT]: 'Kein Kampf',
+            [COMBAT_PHASES.RANGED]: 'Fernkampf-Phase',
+            [COMBAT_PHASES.BLOCK]: 'Block-Phase',
+            [COMBAT_PHASES.DAMAGE]: 'Schadens-Phase',
+            [COMBAT_PHASES.ATTACK]: 'Angriffs-Phase',
+            [COMBAT_PHASES.COMPLETE]: 'Abgeschlossen'
         };
         return names[phase] || phase;
     }
@@ -167,9 +166,9 @@ export class CombatUIManager {
      */
     getPhaseHint(phase) {
         const hints = {
-            'ranged': 'Besiege Feinde mit Fernkampf- oder Belagerungswerten. Befestigte Feinde (🏰) ignorieren normalen Fernkampf!',
-            'block': 'Blocke Feind-Angriffe. Ungeblockte Feinde verursachen Schaden.',
-            'attack': 'Besiege verbliebene Feinde mit normalen Angriffswerten.'
+            [COMBAT_PHASES.RANGED]: 'Besiege Feinde mit Fernkampf- oder Belagerungswerten. Befestigte Feinde (🏰) ignorieren normalen Fernkampf!',
+            [COMBAT_PHASES.BLOCK]: 'Blocke Feind-Angriffe. Ungeblockte Feinde verursachen Schaden.',
+            [COMBAT_PHASES.ATTACK]: 'Besiege verbliebene Feinde mit normalen Angriffswerten.'
         };
         return hints[phase] || '';
     }
@@ -195,11 +194,11 @@ export class CombatUIManager {
             el.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.3))';
         }
 
-        if ((phase === 'ranged' || phase === 'block') && onClick && !isBlocked) {
+        if ((phase === COMBAT_PHASES.RANGED || phase === COMBAT_PHASES.BLOCK) && onClick && !isBlocked) {
             el.style.cursor = 'crosshair';
-            el.title = phase === 'ranged' ? 'Klicken für Fernkampf-Angriff' : 'Klicken zum Blocken';
+            el.title = phase === COMBAT_PHASES.RANGED ? 'Klicken für Fernkampf-Angriff' : 'Klicken zum Blocken';
             el.addEventListener('click', () => onClick(enemy));
-            el.addEventListener('mouseenter', () => el.style.boxShadow = phase === 'ranged' ? '0 0 10px red' : '0 0 10px #3b82f6');
+            el.addEventListener('mouseenter', () => el.style.boxShadow = phase === COMBAT_PHASES.RANGED ? '0 0 10px red' : '0 0 10px #3b82f6');
             el.addEventListener('mouseleave', () => el.style.boxShadow = enemy.isBoss ? '0 0 8px rgba(251, 191, 36, 0.5)' : 'none');
         }
 
@@ -236,10 +235,10 @@ export class CombatUIManager {
             `;
         }
 
-        const blockBadge = (phase === 'block' && !isBlocked) ?
+        const blockBadge = (phase === COMBAT_PHASES.BLOCK && !isBlocked) ?
             `<div class="block-badge" style="position: absolute; bottom: 5px; right: 5px; background: #3b82f6; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">Benötigt: ${blockReq}</div>` : '';
 
-        const fortifiedBadge = (phase === 'ranged' && enemy.fortified && !isBlocked) ?
+        const fortifiedBadge = (phase === COMBAT_PHASES.RANGED && enemy.fortified && !isBlocked) ?
             `<div class="fortified-badge" style="position: absolute; top: 5px; right: 5px; background: #92400e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; border: 1px solid #fbbf24;">BEFESTIGT</div>` : '';
 
         el.innerHTML = `
@@ -316,8 +315,9 @@ export class CombatUIManager {
             `;
 
             const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(a => {
-                if (phase === 'block') return a.type === 'block';
-                if (phase === 'attack') return a.type === 'attack';
+                if (phase === COMBAT_PHASES.BLOCK) return a.type === ACTION_TYPES.BLOCK;
+                if (phase === COMBAT_PHASES.ATTACK) return a.type === ACTION_TYPES.ATTACK;
+                if (phase === COMBAT_PHASES.RANGED) return a.type === ACTION_TYPES.RANGED || a.type === ACTION_TYPES.SIEGE;
                 return false;
             });
 

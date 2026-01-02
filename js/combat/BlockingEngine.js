@@ -13,20 +13,27 @@ export class BlockingEngine {
      * @param {number} unitBlockPoints Generic block points from units.
      * @returns {Object} Result object containing success, totalBlock, etc.
      */
-    calculateBlock(enemy, blockInput, unitBlockPoints = 0) {
+    calculateBlock(enemy, blockInput, unitBlockPoints = 0, movementSpent = 0) {
         // Normalize input to array
         let blocks = [];
-        let movementSpent = 0;
+        let internalMovementSpent = movementSpent;
 
         if (Array.isArray(blockInput)) {
             blocks = blockInput;
         } else if (typeof blockInput === 'object' && blockInput !== null) {
             if (blockInput.blocks) {
                 blocks = blockInput.blocks;
-                movementSpent = blockInput.movementPoints || 0;
-            } else {
+                if (blockInput.movementPoints && !movementSpent) {
+                    internalMovementSpent = blockInput.movementPoints;
+                }
+            } else if (blockInput.value !== undefined) {
                 blocks = [blockInput];
-                movementSpent = blockInput.movementPoints || 0;
+                if (blockInput.movementPoints && !movementSpent) {
+                    internalMovementSpent = blockInput.movementPoints;
+                }
+            } else {
+                // Fallback for objects that might just be a block source
+                blocks = [blockInput];
             }
         } else {
             blocks = [{ value: Number(blockInput) || 0, element: ATTACK_ELEMENTS.PHYSICAL }];
@@ -36,9 +43,9 @@ export class BlockingEngine {
         let blockRequired = enemy.getBlockRequirement();
 
         // Cumbersome (Schwerfällig): Reduce attack by spending movement
-        if (enemy.cumbersome && movementSpent > 0) {
-            blockRequired = Math.max(0, blockRequired - movementSpent);
-            logger.debug(`Cumbersome: Reduced block requirement by ${movementSpent} to ${blockRequired}`);
+        if (enemy.cumbersome && internalMovementSpent > 0) {
+            blockRequired = Math.max(0, blockRequired - internalMovementSpent);
+            logger.debug(`Cumbersome: Reduced block requirement by ${internalMovementSpent} to ${blockRequired}`);
         }
         const enemyElement = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
 

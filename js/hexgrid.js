@@ -59,7 +59,25 @@ export class HexGrid {
     }
 
     getMovementCost(q, r, isNight = false, hasFlight = false) {
-        return this.logic.getMovementCost(q, r, isNight, hasFlight);
+        // Implement here to allow test mocking of this.getHex
+        if (hasFlight) return 1;
+
+        const hex = this.getHex(q, r);
+        if (!hex) return 999;
+
+        if (this.logic.terrainSystem) {
+            return this.logic.terrainSystem.getMovementCost(hex.terrain, isNight);
+        }
+
+        const costs = { plains: 2, forest: 3, hills: 3, mountains: 5, desert: 5, wasteland: 3, water: 999 };
+        const cost = costs[hex.terrain] || 2;
+
+        if (isNight) {
+            if (hex.terrain === 'forest') return 5;
+            if (hex.terrain === 'desert') return 3;
+        }
+
+        return cost;
     }
 
     getHexKey(q, r) {

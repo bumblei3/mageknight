@@ -137,13 +137,40 @@ export class TooltipManager {
      * @returns {string} HTML string
      */
     createAbilityTooltipHTML(abilityKey) {
-        const desc = t(`enemies.abilities.descriptions.${abilityKey}`) || abilityKey;
-        // Capitalize first letter of key as title if needed, or just use description which contains name
-        const title = abilityKey.charAt(0).toUpperCase() + abilityKey.slice(1);
+        let desc = t(`enemies.abilities.descriptions.${abilityKey}`) || abilityKey;
+        let title = abilityKey.charAt(0).toUpperCase() + abilityKey.slice(1);
+
+        // If description contains a colon, split it into title and description
+        if (desc.includes(':')) {
+            const parts = desc.split(':');
+            title = parts[0].trim();
+            desc = parts.slice(1).join(':').trim();
+        }
+
+        const icons = {
+            'fire': '🔥',
+            'ice': '❄️',
+            'cold_fire': '🔥❄️',
+            'physical': '⚔️',
+            'fortified': '🏰',
+            'swift': '💨',
+            'poison': '🤢',
+            'vampiric': '🧛',
+            'brutal': '👹',
+            'paralyze': '⚡',
+            'cumbersome': '🏋️',
+            'assassin': '🗡️',
+            'boss': '👑',
+            'summoner': '🦇',
+            'elusive': '👤'
+        };
+
+        const icon = icons[abilityKey] || '';
 
         return `
             <div class="tooltip-ability-desc">
                 <div class="tooltip-header">
+                    ${icon ? `<span class="tooltip-icon">${icon}</span>` : ''}
                     <span class="tooltip-name">${title}</span>
                 </div>
                 <div class="tooltip-divider"></div>

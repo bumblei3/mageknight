@@ -336,8 +336,10 @@ export default {
                 fire: 'Feuer-Angriff: Ineffizient mit nicht-Eis/Kaltem Feuer zu blocken.',
                 ice: 'Eis-Angriff: Ineffizient mit nicht-Feuer/Kaltem Feuer zu blocken.',
                 cold_fire: 'Kaltes Feuer: Nur effizient mit Kaltem Feuer blockbar.',
+                physical: 'Physischer Angriff: Ein Standardangriff ohne besondere elementare Eigenschaften.',
                 summoner: 'Beschwörer: Ruft vor der Blockphase einen Gegner herbei.',
-                elusive: 'Ausweichend: Höhere Rüstung gegen Fernkampf.'
+                elusive: 'Ausweichend: Höhere Rüstung gegen Fernkampf.',
+                boss: 'Boss: Ein mächtiger Gegner mit mehreren Phasen und einzigartigen Mechaniken.'
             }
         }
     }

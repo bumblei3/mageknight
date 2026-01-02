@@ -252,7 +252,7 @@ export class CombatUIManager {
                 <div class="enemy-stats">
                     <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
                     <div class="stat" title="Angriff">
-                        ${typeIcon} <span>${attackValue}</span>
+                        <span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="${attackType}">${typeIcon}</span> <span>${attackValue}</span>
                     </div>
                 </div>
                 ${bossHealthHTML}
@@ -265,6 +265,8 @@ export class CombatUIManager {
                     ${enemy.paralyze ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="paralyze">⚡</span>' : ''}
                     ${enemy.cumbersome ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="cumbersome">🏋️</span>' : ''}
                     ${enemy.assassin ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="assassin">🗡️</span>' : ''}
+                    ${enemy.summoner ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="summoner">🦇</span>' : ''}
+                    ${enemy.elusive ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="elusive">👤</span>' : ''}
                     ${enemy.isBoss ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="boss">👑</span>' : ''}
                 </div>
             </div>

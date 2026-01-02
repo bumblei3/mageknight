@@ -1060,3 +1060,88 @@
     font-size: 0.9rem;
     font-weight: bold;
 }
+/* Game Tooltip - Premium Fantasy Mesh */
+.game-tooltip {
+    position: fixed;
+    z-index: 10000;
+    pointer-events: none;
+    max-width: 320px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--glass-shadow);
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform-origin: bottom center;
+}
+
+.game-tooltip.below {
+    transform-origin: top center;
+}
+
+.tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.tooltip-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-accent-gold);
+    letter-spacing: 0.05em;
+}
+
+.tooltip-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-border-highlight), transparent);
+    margin: var(--spacing-sm) 0;
+}
+
+.tooltip-description {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.tooltip-ability-desc {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tooltip Stat Rows */
+.tooltip-stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+.tooltip-stat-row .value {
+    font-weight: 700;
+    color: var(--color-accent-gold);
+}
+
+/* Tooltip Mana & Colors */
+.mana-icon {
+    display: inline-block;
+    margin: 0 2px;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+}
+
+.tooltip-card-color {
+    font-size: 1.2rem;
+}
+
+/* Elemental Tooltip Styling */
+.tooltip-header .tooltip-icon {
+    font-size: 1.5rem;
+    margin-right: var(--spacing-sm);
+}

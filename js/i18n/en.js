@@ -336,8 +336,10 @@ export default {
                 fire: 'Fire Attack: Inefficient to block with non-Ice/Cold Fire.',
                 ice: 'Ice Attack: Inefficient to block with non-Fire/Cold Fire.',
                 cold_fire: 'Cold Fire Attack: Only efficiently blocked by Cold Fire.',
+                physical: 'Physical Attack: A standard attack with no special elemental properties.',
                 summoner: 'Summoner: Summons a brown enemy token before blocking phase.',
-                elusive: 'Elusive: Higher armor against Ranged attacks.'
+                elusive: 'Elusive: Higher armor against Ranged attacks.',
+                boss: 'Boss: A powerful enemy with multiple phases and unique mechanics.'
             }
         }
     }

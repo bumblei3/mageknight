@@ -63,8 +63,11 @@ export class TurnManager {
         // Re-roll mana source
         this.game.manaSource.initialize();
 
-        // Prepare hero deck
+        // Prepare hero deck (shuffle discard into deck)
         this.game.hero.prepareNewRound();
+
+        // Draw new cards from refilled deck
+        this.game.hero.drawCards();
     }
 
     checkVictory() {

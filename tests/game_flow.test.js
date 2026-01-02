@@ -214,6 +214,7 @@ describe('Game Flow Coverage Boost', () => {
             // Setup end of round conditions
             game.hero.deck = [];
             game.hero.prepareNewRound = createSpy('prepareNewRound');
+            game.hero.drawCards = createSpy('drawCards');
             game.hero.position = { q: 0, r: 0 };
 
             game.timeManager = {

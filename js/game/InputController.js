@@ -237,7 +237,7 @@ export class InputController {
         const helpModal = document.getElementById('help-modal');
         if (helpModal && helpModal.classList.contains('active')) return true;
 
-        if (this.game.gameState !== 'playing') return true;
+        if (this.game.gameState !== 'playing' && this.game.gameState !== 'combat') return true;
 
         return false;
     }

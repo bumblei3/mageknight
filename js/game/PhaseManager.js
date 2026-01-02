@@ -13,7 +13,7 @@ export class PhaseManager {
      * Ends the current player turn
      */
     endTurn() {
-        if (this.game.gameState !== 'playing') return;
+        if (this.game.gameState !== 'playing' && this.game.gameState !== 'combat') return;
 
         // Delegate to game's turnManager
         this.game.turnManager.endTurn();

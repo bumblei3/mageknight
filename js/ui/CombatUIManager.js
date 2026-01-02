@@ -103,6 +103,30 @@ export class CombatUIManager {
         }
 
         html += '</div>';
+
+        // --- ADDTION: Prediction Summary ---
+        const prediction = this.ui?.game?.combat?.getPredictedOutcome(attackTotal, blockTotal);
+        if (prediction) {
+            html += `
+                <div class="combat-prediction" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                        ${prediction.expectedWounds > 0 ?
+                    `<div style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem;">
+                                💔 <span><strong>${prediction.expectedWounds}</strong> Wunden erwartet</span>
+                                ${prediction.isPoisoned ? `<span style="color: #10b981; font-size: 0.7rem; background: rgba(16,185,129,0.1); padding: 0 4px; border-radius: 4px;">+ GIFT!</span>` : ''}
+                             </div>` :
+                    `<div style="color: #10b981;">✅ Kein Schaden erwartet</div>`
+                }
+                        ${prediction.enemiesDefeated.length > 0 ?
+                    `<div style="color: #fbbf24; margin-top: 0.25rem;">
+                                ⚔️ <strong>Besiegbar:</strong> ${prediction.enemiesDefeated.join(', ')}
+                             </div>` : ''
+                }
+                    </div>
+                </div>
+            `;
+        }
+
         totalsDiv.innerHTML = html;
 
         // Execute Attack Button logic
@@ -110,6 +134,9 @@ export class CombatUIManager {
         if (executeAttackBtn) {
             if (phase === COMBAT_PHASE.RANGED) {
                 executeAttackBtn.textContent = 'Fernkampf beenden -> Blocken';
+                executeAttackBtn.style.display = 'block';
+            } else if (phase === COMBAT_PHASE.BLOCK) {
+                executeAttackBtn.textContent = 'Blocken beenden -> Schaden';
                 executeAttackBtn.style.display = 'block';
             } else if (phase === COMBAT_PHASE.ATTACK) {
                 executeAttackBtn.textContent = 'Angriff ausführen';

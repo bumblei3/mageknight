@@ -747,6 +747,71 @@ export class Combat {
         return result;
     }
 
+    /**
+     * Calculates the predicted outcome based on current actions
+     * @param {number} currentAttack - Player's accumulated attack points
+     * @param {number} currentBlock - Player's accumulated block points (not yet assigned)
+     * @returns {Object} Prediction details
+     */
+    getPredictedOutcome(currentAttack = 0, currentBlock = 0) {
+        if (this.phase === COMBAT_PHASES.COMPLETE) return null;
+
+        const prediction = {
+            expectedWounds: 0,
+            poisonWounds: 0,
+            isPoisoned: false,
+            enemiesDefeated: [],
+            totalEnemyAttack: 0
+        };
+
+        // 1. BLOCK PHASE PREDICTION
+        if (this.phase === COMBAT_PHASES.BLOCK || this.phase === COMBAT_PHASES.RANGED) {
+            let predDamage = 0;
+            let predIsPoison = false;
+
+            this.enemies.forEach(enemy => {
+                // If it's already blocked, it contributes nothing
+                if (this.blockedEnemies.has(enemy.id)) return;
+
+                predDamage += enemy.getEffectiveAttack();
+                if (enemy.poison || (enemy.abilities && enemy.abilities.includes('poison'))) {
+                    predIsPoison = true;
+                }
+            });
+
+            prediction.totalEnemyAttack = predDamage;
+
+            // If we have "floating" block points, we could try to 'auto-assign' them for prediction
+            // but for simplicity, let's just show the damage from unblocked enemies.
+
+            const effectiveArmor = Math.max(1, this.hero.armor || 1);
+            prediction.expectedWounds = Math.ceil(predDamage / effectiveArmor);
+            prediction.isPoisoned = predIsPoison;
+            prediction.poisonWounds = predIsPoison ? prediction.expectedWounds : 0;
+        }
+
+        // 2. ATTACK PHASE PREDICTION
+        if (this.phase === COMBAT_PHASES.ATTACK || this.phase === COMBAT_PHASES.BLOCK || this.phase === COMBAT_PHASES.RANGED) {
+            const combinedAttack = currentAttack + this.unitAttackPoints;
+
+            // For now, only predict against the first enemy (main target) or all if simple
+            // In MK, you can distribute attack. 
+            // Simplified prediction: can we defeat the first non-blocked enemy?
+            const targetableEnemies = this.enemies.filter(e => !this.defeatedEnemies.includes(e));
+
+            targetableEnemies.forEach(enemy => {
+                const multiplier = enemy.getResistanceMultiplier('physical');
+                const req = enemy.isBoss ? enemy.currentHealth : (enemy.armor / multiplier);
+
+                if (combinedAttack >= req) {
+                    prediction.enemiesDefeated.push(enemy.name);
+                }
+            });
+        }
+
+        return prediction;
+    }
+
     // Check if combat is complete
     isComplete() {
         return this.phase === COMBAT_PHASES.COMPLETE;

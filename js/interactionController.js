@@ -92,6 +92,41 @@ export class InteractionController {
         } else {
             this.game.ui.tooltipManager.hideTooltip();
         }
+
+        // --- NEW: Movement Preview Logic ---
+        const previewEl = document.getElementById('movement-preview');
+        const previewValueEl = document.getElementById('movement-preview-value');
+
+        if (this.game.movementMode && hex && hex.revealed) {
+            const distance = this.game.hexGrid.distance(
+                this.game.hero.position.q,
+                this.game.hero.position.r,
+                axial.q, axial.r
+            );
+
+            // In Mage Knight, movement is only predicted for ADJACENT steps or 
+            // the current step. Let's show cost for the hex under cursor.
+            if (distance === 1) {
+                const isNight = this.game.timeManager.isNight();
+                const cost = this.game.hexGrid.getMovementCost(axial.q, axial.r, isNight, this.game.hero.hasSkill('flight'));
+
+                if (previewEl && previewValueEl) {
+                    previewValueEl.textContent = cost;
+                    previewEl.style.display = 'flex';
+
+                    // Add warning color if not enough points
+                    if (this.game.hero.movementPoints < cost) {
+                        previewValueEl.style.color = '#ef4444';
+                    } else {
+                        previewValueEl.style.color = 'var(--color-accent-secondary)';
+                    }
+                }
+            } else if (previewEl) {
+                previewEl.style.display = 'none';
+            }
+        } else if (previewEl) {
+            previewEl.style.display = 'none';
+        }
     }
 
     selectHex(q, r) {

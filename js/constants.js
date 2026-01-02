@@ -41,6 +41,7 @@ export const TERRAIN_COSTS = {
 
 export const GAME_STATES = {
     PLAYING: 'playing',
+    COMBAT: 'combat',
     VICTORY: 'victory',
     DEFEAT: 'defeat'
 };

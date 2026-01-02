@@ -243,6 +243,29 @@
     margin-bottom: 4px;
 }
 
+/* Movement Preview */
+.movement-preview {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.preview-label {
+    color: var(--color-text-secondary);
+}
+
+.preview-value {
+    color: var(--color-accent-secondary);
+    font-weight: bold;
+    font-size: 1rem;
+    text-shadow: 0 0 8px rgba(236, 72, 153, 0.5);
+}
+
 .skill-item {
     display: flex;
     align-items: center;

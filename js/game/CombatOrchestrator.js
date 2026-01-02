@@ -131,6 +131,11 @@ export class CombatOrchestrator {
             return;
         }
 
+        if (this.game.combat.phase === 'block') {
+            this.endBlockPhase();
+            return;
+        }
+
         if (this.game.combat.phase !== 'attack') return;
 
         // Visual Impact

@@ -121,7 +121,7 @@ describe('UI', () => {
         const enemies = [{ name: 'Orc', armor: 3, attack: 4, fame: 2, icon: 'O' }];
         ui.showCombatPanel(enemies, 'attack');
 
-        expect(ui.elements.combatPanel.style.display).toBe('block');
+        expect(ui.elements.combatPanel.style.display).toBe('flex');
         expect(ui.elements.combatInfo.children.length).toBeGreaterThan(0);
     });
 

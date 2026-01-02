@@ -12,7 +12,8 @@ export class CombatUIManager {
      */
     showCombatPanel(enemies, phase, onEnemyClick) {
         if (this.elements.combatPanel) {
-            this.elements.combatPanel.style.display = 'block';
+            this.elements.combatPanel.style.display = 'flex';
+            this.elements.combatPanel.classList.add('active-combat');
             this.updateCombatInfo(enemies, phase, onEnemyClick);
         }
     }
@@ -23,6 +24,7 @@ export class CombatUIManager {
     hideCombatPanel() {
         if (this.elements.combatPanel) {
             this.elements.combatPanel.style.display = 'none';
+            this.elements.combatPanel.classList.remove('active-combat');
         }
         if (this.elements.combatInfo) this.elements.combatInfo.innerHTML = '';
         if (this.elements.combatUnits) this.elements.combatUnits.innerHTML = '';
@@ -43,11 +45,11 @@ export class CombatUIManager {
         if (!info) return;
 
         const phaseLabel = this.getCombatPhaseName(phase);
-        const statusColor = phase === COMBAT_PHASES.ATTACK ? '#ef4444' : (phase === COMBAT_PHASES.RANGED ? '#10b981' : '#3b82f6');
+        const colorClass = phase === COMBAT_PHASES.ATTACK ? 'attack-phase' : (phase === COMBAT_PHASES.RANGED ? 'ranged-phase' : 'block-phase');
 
         info.innerHTML = `
-            <div class="combat-status" style="border-left: 4px solid ${statusColor}; padding: 0.5rem; background: rgba(0,0,0,0.2); margin-bottom: 0.5rem;">
-                <strong>${phaseLabel}</strong><br>
+            <div class="combat-status ${colorClass}">
+                <strong>${phaseLabel}</strong>
                 <small>${this.getPhaseHint(phase)}</small>
             </div>
         `;
@@ -69,34 +71,33 @@ export class CombatUIManager {
         if (!totalsDiv) {
             totalsDiv = document.createElement('div');
             totalsDiv.id = 'combat-totals';
-            totalsDiv.style.cssText = 'margin: 1rem 0; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;';
             info.insertBefore(totalsDiv, info.firstChild);
         }
 
-        let html = '<div style="display: flex; gap: 1rem; justify-content: space-around;">';
+        let html = '<div class="combat-totals-row">';
 
         if (phase === COMBAT_PHASES.BLOCK) {
-            html += `<div style="text-align: center;">
-                <div style="font-size: 0.9em; opacity: 0.8;">Total Block</div>
-                <div style="font-size: 1.5em; font-weight: bold; color: #4a9eff;">${blockTotal}</div>
+            html += `<div class="total-stat block-stat">
+                <div class="total-label">Total Block</div>
+                <div class="total-value">${blockTotal}</div>
             </div>`;
         } else if (phase === COMBAT_PHASES.ATTACK) {
-            html += `<div style="text-align: center;">
-                <div style="font-size: 0.9em; opacity: 0.8;">Total Attack</div>
-                <div style="font-size: 1.5em; font-weight: bold; color: #ff4a4a;">${attackTotal}</div>
+            html += `<div class="total-stat attack-stat">
+                <div class="total-label">Total Attack</div>
+                <div class="total-value">${attackTotal}</div>
             </div>`;
         } else if (phase === COMBAT_PHASES.RANGED) {
             const orchestrator = this.ui?.game?.combatOrchestrator;
             const rangedTotal = orchestrator?.combatRangedTotal ?? attackTotal;
             const siegeTotal = orchestrator?.combatSiegeTotal ?? 0;
             html += `
-                <div style="text-align: center;">
-                    <div style="font-size: 0.9em; opacity: 0.8;">Fernkampf</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #fbbf24;">${rangedTotal}</div>
+                <div class="total-stat ranged-stat">
+                    <div class="total-label">Fernkampf</div>
+                    <div class="total-value">${rangedTotal}</div>
                 </div>
-                <div style="text-align: center; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 1rem;">
-                    <div style="font-size: 0.9em; opacity: 0.8;">Belagerung</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #f59e0b;">${siegeTotal}</div>
+                <div class="total-stat siege-stat">
+                    <div class="total-label">Belagerung</div>
+                    <div class="total-value">${siegeTotal}</div>
                 </div>
             `;
         }
@@ -107,17 +108,17 @@ export class CombatUIManager {
         const prediction = this.ui?.game?.combat?.getPredictedOutcome(attackTotal, blockTotal);
         if (prediction) {
             html += `
-                <div class="combat-prediction" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem;">
-                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                <div class="combat-prediction">
+                    <div class="prediction-details">
                         ${prediction.expectedWounds > 0 ?
-                    `<div style="color: #ef4444; display: flex; align-items: center; gap: 0.5rem;">
+                    `<div class="prediction-danger">
                                 💔 <span><strong>${prediction.expectedWounds}</strong> Wunden erwartet</span>
-                                ${prediction.isPoisoned ? `<span style="color: #10b981; font-size: 0.7rem; background: rgba(16,185,129,0.1); padding: 0 4px; border-radius: 4px;">+ GIFT!</span>` : ''}
+                                ${prediction.isPoisoned ? `<span class="poison-warning">+ GIFT!</span>` : ''}
                              </div>` :
-                    `<div style="color: #10b981;">✅ Kein Schaden erwartet</div>`
+                    `<div class="prediction-safe">✅ Kein Schaden erwartet</div>`
                 }
                         ${prediction.enemiesDefeated.length > 0 ?
-                    `<div style="color: #fbbf24; margin-top: 0.25rem;">
+                    `<div class="prediction-success">
                                 ⚔️ <strong>Besiegbar:</strong> ${prediction.enemiesDefeated.join(', ')}
                              </div>` : ''
                 }
@@ -190,8 +191,6 @@ export class CombatUIManager {
 
         if (enemy.isBoss) {
             el.classList.add('boss-card');
-            el.style.border = '2px solid #fbbf24';
-            el.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0,0,0,0.3))';
         }
 
         if ((phase === COMBAT_PHASES.RANGED || phase === COMBAT_PHASES.BLOCK) && onClick && !isBlocked) {
@@ -222,51 +221,52 @@ export class CombatUIManager {
             const phaseName = typeof enemy.getPhaseName === 'function' ? enemy.getPhaseName() : 'Boss';
 
             bossHealthHTML = `
-                <div class="boss-health-section" style="margin-top: 0.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
-                        <span style="color: #fbbf24;">👿 ${phaseName}</span>
-                        <span style="color: ${healthColor}">${enemy.currentHealth}/${enemy.maxHealth} HP</span>
+                <div class="boss-health-section">
+                    <div class="boss-health-info">
+                        <span class="boss-phase-name">👿 ${phaseName}</span>
+                        <span class="boss-hp-value" style="color: ${healthColor}">${enemy.currentHealth}/${enemy.maxHealth} HP</span>
                     </div>
-                    <div class="boss-health-bar" style="width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden;">
-                        <div class="boss-health-fill" style="width: ${healthPercent}%; height: 100%; background: linear-gradient(90deg, ${healthColor}, ${healthColor}aa); transition: width 0.3s ease;"></div>
+                    <div class="boss-health-bar">
+                        <div class="boss-health-fill" style="width: ${healthPercent}%; background: linear-gradient(90deg, ${healthColor}, ${healthColor}aa);"></div>
                     </div>
-                    ${enemy.enraged ? '<div style="color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem;">🔥 WÜTEND!</div>' : ''}
+                    ${enemy.enraged ? '<div class="boss-enraged-label">🔥 WÜTEND!</div>' : ''}
                 </div>
             `;
         }
 
         const blockBadge = (phase === COMBAT_PHASES.BLOCK && !isBlocked) ?
-            `<div class="block-badge" style="position: absolute; bottom: 5px; right: 5px; background: #3b82f6; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">Benötigt: ${blockReq}</div>` : '';
+            `<div class="block-badge">Benötigt: ${blockReq}</div>` : '';
 
         const fortifiedBadge = (phase === COMBAT_PHASES.RANGED && enemy.fortified && !isBlocked) ?
-            `<div class="fortified-badge" style="position: absolute; top: 5px; right: 5px; background: #92400e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; border: 1px solid #fbbf24;">BEFESTIGT</div>` : '';
+            `<div class="fortified-badge">BEFESTIGT</div>` : '';
 
         el.innerHTML = `
-            ${fortifiedBadge}
-            <div class="enemy-icon" style="color: ${enemy.color}; ${enemy.isBoss ? 'font-size: 2rem;' : ''}">
+            <div class="enemy-icon" style="color: ${enemy.color}">
                 ${isBlocked ? '🛡️' : enemy.icon}
             </div>
-            <div class="enemy-name" style="${enemy.isBoss ? 'font-size: 1.1rem; color: #fbbf24;' : ''}">
-                ${isBlocked ? `<span style="color: #10b981; font-size: 0.8rem;">[GEBLOCKT]</span><br>` : ''}
-                ${enemy.name}
-            </div>
-            <div class="enemy-stats">
-                <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
-                <div class="stat" title="Angriff" style="display: flex; align-items: center; gap: 2px;">
-                    ${typeIcon} <span>${attackValue}</span>
+            <div class="enemy-details">
+                <div class="enemy-name">
+                    ${isBlocked ? `<span class="blocked-label">[GEBLOCKT]</span><br>` : ''}
+                    ${enemy.name}
                 </div>
-            </div>
-            ${bossHealthHTML}
-            <div class="enemy-traits">
-                ${enemy.fortified ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="fortified">🏰</span>' : ''}
-                ${enemy.swift ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="swift">💨</span>' : ''}
-                ${enemy.poison ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="poison">🤢</span>' : ''}
-                ${enemy.vampiric ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="vampiric">🧛</span>' : ''}
-                ${enemy.brutal ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="brutal">👹</span>' : ''}
-                ${enemy.paralyze ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="paralyze">⚡</span>' : ''}
-                ${enemy.cumbersome ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="cumbersome">🏋️</span>' : ''}
-                ${enemy.assassin ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="assassin">🗡️</span>' : ''}
-                ${enemy.isBoss ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="boss">👑</span>' : ''}
+                <div class="enemy-stats">
+                    <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
+                    <div class="stat" title="Angriff">
+                        ${typeIcon} <span>${attackValue}</span>
+                    </div>
+                </div>
+                ${bossHealthHTML}
+                <div class="enemy-traits">
+                    ${enemy.fortified ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="fortified">🏰</span>' : ''}
+                    ${enemy.swift ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="swift">💨</span>' : ''}
+                    ${enemy.poison ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="poison">🤢</span>' : ''}
+                    ${enemy.vampiric ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="vampiric">🧛</span>' : ''}
+                    ${enemy.brutal ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="brutal">👹</span>' : ''}
+                    ${enemy.paralyze ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="paralyze">⚡</span>' : ''}
+                    ${enemy.cumbersome ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="cumbersome">🏋️</span>' : ''}
+                    ${enemy.assassin ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="assassin">🗡️</span>' : ''}
+                    ${enemy.isBoss ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="boss">👑</span>' : ''}
+                </div>
             </div>
             ${blockBadge}
         `;
@@ -294,25 +294,15 @@ export class CombatUIManager {
 
         const title = document.createElement('h3');
         title.textContent = '🎖️ Deine Einheiten';
-        title.style.cssText = 'font-size: 0.9rem; margin-bottom: 0.5rem;';
         container.appendChild(title);
 
         const grid = document.createElement('div');
-        grid.style.cssText = 'display: grid; grid-template-columns: 1fr; gap: 0.5rem;';
+        grid.className = 'combat-units-grid';
 
         units.forEach(unit => {
             const isReady = typeof unit.isReady === 'function' ? unit.isReady() : true;
             const unitCard = document.createElement('div');
-            unitCard.className = 'unit-combat-card';
-            unitCard.style.cssText = `
-                padding: 0.5rem;
-                background: rgba(139, 92, 246, 0.1);
-                border: 1px solid rgba(139, 92, 246, 0.3);
-                border-radius: 4px;
-                cursor: ${isReady ? 'pointer' : 'not-allowed'};
-                opacity: ${isReady ? '1' : '0.5'};
-                filter: ${isReady ? 'none' : 'grayscale(0.5)'};
-            `;
+            unitCard.className = `unit-combat-card ${isReady ? '' : 'not-ready'}`;
 
             const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(a => {
                 if (phase === COMBAT_PHASES.BLOCK) return a.type === ACTION_TYPES.BLOCK;

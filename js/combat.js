@@ -3,6 +3,8 @@ import { StatusEffectManager } from './statusEffects.js';
 import { COMBAT_PHASES, ATTACK_ELEMENTS, ENEMY_DEFINITIONS } from './constants.js';
 import { logger } from './logger.js';
 import { t } from './i18n/index.js';
+import { BlockingEngine } from './combat/BlockingEngine.js';
+import { DamageSystem } from './combat/DamageSystem.js';
 
 // For backward compatibility
 export const COMBAT_PHASE = COMBAT_PHASES;
@@ -21,6 +23,10 @@ export class Combat {
         // Status Effects
         this.statusEffects = new StatusEffectManager();
 
+        // Sub-Systems
+        this.blockingEngine = new BlockingEngine();
+        this.damageSystem = new DamageSystem();
+
         // Unit contribution tracking
         this.unitAttackPoints = 0;
         this.unitBlockPoints = 0;
@@ -34,6 +40,7 @@ export class Combat {
     // Start combat
     start() {
         logger.info(`Combat started against ${this.enemies.length} enemies`);
+        this.damageSystem.reset();
         this.phase = COMBAT_PHASES.RANGED;
         return {
             phase: this.phase,
@@ -134,7 +141,6 @@ export class Combat {
         }
 
         // Handle regular enemies (armor-based defeat)
-        // Handle regular enemies (armor-based defeat)
         const currentArmor = typeof enemy.getCurrentArmor === 'function' ? enemy.getCurrentArmor() : enemy.armor;
         const effectiveArmor = currentArmor / multiplier;
         logger.debug(`Ranged attack: ${combinedAttack} vs ${effectiveArmor} (Armor: ${enemy.armor}, Multiplier: ${multiplier})`);
@@ -224,17 +230,8 @@ export class Combat {
             const randomType = brownTokens[Math.floor(Math.random() * brownTokens.length)];
             const definition = ENEMY_DEFINITIONS[randomType];
 
-            // For now, we create a temporary enemy based on this definition
-            // In a real app, this should probably be a new Enemy instance
-            // We'll mock it enough for the logic to work.
             const summonedId = `summoned_${summoner.id}_${Date.now()}`;
 
-            // We need a way to create an Enemy instance here.
-            // Since we don't have the Enemy class imported directly (it's passed in),
-            // we'll assume the same structure as summoner but with new stats.
-
-            // Create a simple object for local use, but ideally we'd want a full Enemy.
-            // Let's see if we can use the summoner's constructor if it exists.
             let summoned;
             if (summoner.constructor) {
                 summoned = new summoner.constructor({
@@ -256,9 +253,6 @@ export class Combat {
 
             logger.info(`${summoner.name} beschwört ${summoned.name}!`);
 
-            // Store mapping to restore summoner later if needed (though rules say they are discarded if summoned defeated?)
-            // Actually, if you defeat the summoned enemy, the summoner is discarded. 
-            // If you don't defeat it, the summoner stays (but only if it survived the ranged phase).
             this.summonedEnemies.set(summoned.id, summoner);
 
             // Replace summoner with summoned in the active enemies list
@@ -289,10 +283,7 @@ export class Combat {
     }
 
     // Attempt to block an enemy
-    // blockValue can be a number (backward compat) or { value: number, element: string }
     blockEnemy(enemy, blockInput) {
-        // DEBUG LOGS
-        // console.log('DEBUG: blockEnemy phase:', this.phase, 'Expected:', COMBAT_PHASES.BLOCK);
         if (this.phase !== COMBAT_PHASES.BLOCK) {
             console.log('DEBUG: blockEnemy Phase Warning. Current:', this.phase, 'Expected:', COMBAT_PHASES.BLOCK);
             return { success: false, error: t('ui.phases.block') };
@@ -302,115 +293,17 @@ export class Combat {
             return { success: false, message: t('combat.alreadyBlocked') };
         }
 
-        // Normalize input to array
-        let blocks = [];
-        let movementSpent = 0;
+        const result = this.blockingEngine.calculateBlock(enemy, blockInput, this.unitBlockPoints);
 
-        if (Array.isArray(blockInput)) {
-            blocks = blockInput;
-        } else if (typeof blockInput === 'object' && blockInput !== null) {
-            if (blockInput.blocks) {
-                blocks = blockInput.blocks;
-                movementSpent = blockInput.movementPoints || 0;
-            } else {
-                blocks = [blockInput];
-                movementSpent = blockInput.movementPoints || 0;
-            }
-        } else {
-            blocks = [{ value: Number(blockInput) || 0, element: ATTACK_ELEMENTS.PHYSICAL }];
-        }
-
-        // Add unit block points
-        // NOTE: Unit block points are currently generic. 
-        // Improvement: Units should contribute specific elements too.
-        // For now, assume unit block adapts or is physical? 
-        // Let's assume Unit Block is PHYSICAL unless specified.
-        // We add it to the 'Physical' pool for calculation.
-
-        // Calculate Required Block Power
-        let blockRequired = enemy.getBlockRequirement();
-
-        // Cumbersome (Schwerfällig): Reduce attack by spending movement
-        if (enemy.cumbersome && movementSpent > 0) {
-            blockRequired = Math.max(0, blockRequired - movementSpent);
-            logger.debug(`Cumbersome: Reduced block requirement by ${movementSpent} to ${blockRequired}`);
-        }
-        const enemyElement = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
-
-        // Calculate block from cards
-        let totalEffectiveBlock = 0;
-        let totalInputBlock = 0;
-        let isInefficient = false;
-
-        blocks.forEach(block => {
-            const val = block.value || 0;
-            const el = block.element || ATTACK_ELEMENTS.PHYSICAL;
-            totalInputBlock += val; // Accumulate input value
-            let efficiency = 1.0;
-
-            if (enemyElement === ATTACK_ELEMENTS.FIRE) {
-                if (el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
-                    efficiency = 0.5;
-                    isInefficient = true;
-                }
-            } else if (enemyElement === ATTACK_ELEMENTS.ICE) {
-                if (el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
-                    efficiency = 0.5;
-                    isInefficient = true;
-                }
-            } else if (enemyElement === ATTACK_ELEMENTS.COLD_FIRE) {
-                if (el !== ATTACK_ELEMENTS.COLD_FIRE) {
-                    efficiency = 0.5;
-                    isInefficient = true;
-                }
-            }
-
-            totalEffectiveBlock += Math.floor(val * efficiency);
-        });
-
-        // Add Unit Block (assume inefficient against elemental for now)
-        let unitEfficiency = 1.0;
-        if (enemyElement !== ATTACK_ELEMENTS.PHYSICAL) {
-            unitEfficiency = 0.5;
-        }
-        totalEffectiveBlock += Math.floor(this.unitBlockPoints * unitEfficiency);
-
-        // Debug log
-        logger.debug(`Block vs ${enemy.name} (${enemyElement}): Input total ${totalInputBlock} -> Effective total ${totalEffectiveBlock}. Required: ${blockRequired}`);
-
-        if (totalEffectiveBlock >= blockRequired) {
+        if (result.success && result.blocked) {
             this.blockedEnemies.add(enemy.id);
-
-            // Calculate consumption (this is tricky with efficiency).
-            // Simplified: All input is consumed if successful. 
-            // Or try to spare unit points?
-            // Let's consume all Unit Points used to bridge the gap?
-            // Let's just reset generic unit block points if used.
-            if (this.unitBlockPoints > 0) {
-                const blockWithoutUnits = totalEffectiveBlock - Math.floor(this.unitBlockPoints * unitEfficiency);
-                if (blockWithoutUnits < blockRequired) {
-                    this.unitBlockPoints = 0;
-                }
+            // Deduct unit points if used
+            if (result.unitPointsConsumed > 0) {
+                this.unitBlockPoints = 0; // consumed
             }
-
-            return {
-                success: true,
-                blocked: true,
-                totalBlock: totalEffectiveBlock,
-                consumedPoints: totalInputBlock,
-                isInefficient: isInefficient,
-                message: t('combat.blockSuccess', { enemy: enemy.name, note: isInefficient ? t('combat.blockInefficient') : '' })
-            };
         }
 
-        return {
-            success: true,
-            blocked: false,
-            totalBlock: totalEffectiveBlock,
-            consumedPoints: totalInputBlock,
-            isInefficient: isInefficient,
-            message: t('combat.blockWeak', { attack: totalEffectiveBlock, armor: blockRequired, note: isInefficient ? t('combat.weakInefficient') : '' })
-        };
+        return result;
     }
 
     // End block phase and move to damage phase
@@ -426,62 +319,18 @@ export class Combat {
     // Damage phase - calculate and assign damage
     damagePhase() {
         if (this.phase !== COMBAT_PHASES.DAMAGE) {
-            return { error: t('ui.phases.combat') }; // Schadensphase matches combat phase indicator
+            return { error: t('ui.phases.combat') };
         }
 
-        // Recalculate damage from unblocked enemies
-        this.totalDamage = 0;
-        const unblockedEnemies = [];
+        // Identify unblocked enemies
+        const unblockedEnemies = this.enemies.filter(e => !this.blockedEnemies.has(e.id));
 
-        this.enemies.forEach(enemy => {
-            if (!this.blockedEnemies.has(enemy.id)) {
-                this.totalDamage += enemy.getEffectiveAttack();
-                unblockedEnemies.push(enemy);
-            }
-        });
+        // Calculate wounds
+        const result = this.damageSystem.calculateDamage(this.hero, unblockedEnemies);
 
-        // Calculate wounds (damage / hero armor, rounded up)
-        const effectiveArmor = Math.max(1, this.hero.armor || 1);
-        this.woundsReceived = Math.ceil(this.totalDamage / effectiveArmor);
-        logger.info(`Damage phase: Total damage ${this.totalDamage} vs Armor ${effectiveArmor} = ${this.woundsReceived} wounds`);
-        if (isNaN(this.woundsReceived)) this.woundsReceived = 0;
-
-        // Apply wounds to hero
-        for (let i = 0; i < this.woundsReceived; i++) {
-            this.hero.takeWound();
-        }
-
-        // Apply Special Abilities
-        // Apply Special Abilities Logic
-
-        // Check for Poison (if any unblocked enemy has poison, the whole attack is poisonous)
-        const isPoison = unblockedEnemies.some(e => e.poison || (e.abilities && e.abilities.includes('poison')));
-        const isPetrify = unblockedEnemies.some(e => e.petrify || (e.abilities && e.abilities.includes('petrify')));
-        const isAssassin = unblockedEnemies.some(e => e.assassin || (e.abilities && e.abilities.includes('assassin')));
-
-        if (isPoison) {
-            // Poison deals equal amount of wounds to Discard
-            const poisonWounds = this.woundsReceived;
-            for (let i = 0; i < poisonWounds; i++) {
-                this.hero.takeWoundToDiscard();
-            }
-            this.woundsReceived += poisonWounds; // Track total wounds received
-        }
-
-        if (isPetrify && this.woundsReceived > 0) {
-            // Paralyze: Hero must discard all non-wound cards
-            logger.info(t('combat.paralyzeEffect'));
-            this.paralyzeTriggered = true; // Flag for UI to handle discard
-        }
-
-        unblockedEnemies.forEach(enemy => {
-            // Vampiric: Increases Armor if they deal damage (wound hero)
-            const isVampiric = enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'));
-            if (isVampiric && this.woundsReceived > 0) {
-                enemy.armorBonus = (enemy.armorBonus || 0) + this.woundsReceived;
-                logger.info(`${enemy.name} gains +${this.woundsReceived} Armor from Vampirism!`);
-            }
-        });
+        this.totalDamage = result.totalDamage;
+        this.woundsReceived = result.woundsReceived;
+        this.paralyzeTriggered = result.paralyzeTriggered;
 
         this.phase = COMBAT_PHASES.ATTACK;
 
@@ -490,7 +339,7 @@ export class Combat {
             woundsReceived: this.woundsReceived,
             unblockedEnemies,
             paralyzeTriggered: this.paralyzeTriggered,
-            message: t('combat.woundsReceived', { amount: this.woundsReceived }),
+            message: result.message,
             nextPhase: COMBAT_PHASES.ATTACK
         };
     }
@@ -501,34 +350,7 @@ export class Combat {
             return { success: false, message: t('combat.phaseDamageOnly') };
         }
 
-        // Assassinate Rule: Cannot assign damage to units
-        if (enemy.assassin) {
-            return { success: false, message: t('combat.assassinateRestriction', { enemy: enemy.name }) };
-        }
-
-        const attackValue = enemy.getEffectiveAttack();
-        const unitArmor = unit.getArmor();
-
-        // Simplified damage: if attack >= armor, unit is wounded
-        // Complex rule: damage - unitArmor, if leftover remains, unit wounded and leftover spills.
-        // For now, let's focus on Paralyze/Poison.
-
-        if (enemy.petrify) {
-            // Paralyze: Unit is destroyed instantly if wounded
-            unit.destroyed = true;
-            logger.info(`${unit.getName()} wurde durch Versteinerung zerstört!`);
-        } else {
-            unit.takeWound();
-            logger.info(`${unit.getName()} wurde verwundet.`);
-        }
-
-        if (enemy.poison) {
-            // Poison: Unit takes 2 Wounds (instantly wounded again)
-            unit.takeWound();
-            logger.info(`${unit.getName()} erlitt zusätzlich Gift-Schaden.`);
-        }
-
-        return { success: true, unitDestroyed: unit.destroyed, unitWounded: unit.wounds > 0 };
+        return this.damageSystem.assignDamageToUnit(unit, enemy);
     }
 
     // Attack phase - player attacks enemies

@@ -216,7 +216,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
             playCard: createSpy(() => ({ card: { color: 'red' }, effect: { block: 3 } })),
             position: { q: 0, r: 0 }
         };
-        game.combat = { phase: 'block', enemies: [] };
+        game.combat = { phase: 'block', enemies: [], getPredictedOutcome: () => null };
         game.combatBlockTotal = 0; // Initialize manual
         game.combatAttackTotal = 0;
         game.particleSystem = { playCardEffect: createSpy() };

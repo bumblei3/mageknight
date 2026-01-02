@@ -44,7 +44,8 @@ describe('Advanced Combat Coverage', () => {
                 phase: 'block',
                 enemies: [enemy],
                 blockEnemy: (e, total) => ({ blocked: true }),
-                endBlockPhase: () => ({ woundsReceived: 1, message: 'Took damage' })
+                endBlockPhase: () => ({ woundsReceived: 1, message: 'Took damage' }),
+                getPredictedOutcome: () => null // Added for UI compatibility
             };
             game.combatBlockTotal = 10;
 

@@ -12,17 +12,11 @@ const args = process.argv.slice(2);
 let shardIndex = 0;
 let totalShards = 1;
 const workerArgs = [];
+const specificFiles = [];
 
 for (let i = 0; i < args.length; i++) {
     if (args[i] === '--grep' && i + 1 < args.length) {
-        // We don't implement grep support in the worker yet for file filtering
-        // but we could pass it down if needed.
-        // For now, grep filters files.
         const pattern = args[i + 1];
-        // Simple filter if grep is used
-        // Note: Ideally grep should run inside the test runner too.
-        // But the previous implementation filtered FILES? No, testRunner filtered inside.
-        // We should pass grep to the worker.
         workerArgs.push('--grep', pattern);
         i++;
     } else if (args[i].startsWith('--shard=')) {
@@ -34,16 +28,29 @@ for (let i = 0; i < args.length; i++) {
         shardIndex = parseInt(parts[0], 10) - 1;
         totalShards = parseInt(parts[1], 10);
         i++;
+    } else if (!args[i].startsWith('-')) {
+        // Assume positional arg is a file path
+        specificFiles.push(args[i]);
     }
 }
 
-// Filter files by shard
-let filesToRun = allTestFiles;
+// Determine files to run
+let filesToRun = [];
+
+if (specificFiles.length > 0) {
+    // Run only requested files
+    filesToRun = specificFiles;
+} else {
+    // Run all found test files
+    filesToRun = allTestFiles;
+}
+
+// Apply sharding
 if (totalShards > 1) {
-    const chunkStats = Math.ceil(allTestFiles.length / totalShards);
+    const chunkStats = Math.ceil(filesToRun.length / totalShards);
     const start = shardIndex * chunkStats;
-    const end = Math.min(start + chunkStats, allTestFiles.length);
-    filesToRun = allTestFiles.slice(start, end);
+    const end = Math.min(start + chunkStats, filesToRun.length);
+    filesToRun = filesToRun.slice(start, end);
 }
 
 console.log(`Arguments: ${JSON.stringify(args)}`);

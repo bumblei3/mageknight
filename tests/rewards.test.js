@@ -43,6 +43,14 @@ describe('Reward System & Ruins', () => {
         game.particleSystem = { buffEffect: createSpy() };
         game.initiateCombat = createSpy();
 
+        // Mock managers called in onCombatEnd to prevent crashes and ensure isolation
+        game.entityManager = { removeEnemy: createSpy() };
+        game.statisticsManager = {
+            increment: createSpy(),
+            getAll: createSpy(() => ({}))
+        };
+        game.levelUpManager = { handleLevelUp: createSpy() };
+
         game.rewardManager = new RewardManager(game);
         // Mock showArtifactChoice to avoid UI dependency issues during test if called
         game.rewardManager.showArtifactChoice = createSpy();
@@ -67,7 +75,6 @@ describe('Reward System & Ruins', () => {
 
         expect(game.initiateCombat.called).toBe(true);
         const enemy = game.initiateCombat.calls[0][0];
-        // Check if enemy name is one of the allowed types
         const allowedNames = ['Ruinen-Beschwörer', 'Ruinen-Wächter'];
         expect(allowedNames.includes(enemy.name)).toBe(true);
     });
@@ -76,8 +83,11 @@ describe('Reward System & Ruins', () => {
         const dungeonSite = new Site(SITE_TYPES.DUNGEON);
         siteInteraction.currentSite = dungeonSite;
 
-        // Mock a successful combat end
-        combatOrchestrator.onCombatEnd(true);
+        // Use proper result object with dummy enemy data
+        combatOrchestrator.onCombatEnd({
+            victory: true,
+            enemy: { name: 'Dungeon Boss', fame: 5 }
+        });
 
         expect(dungeonSite.conquered).toBe(true);
         expect(game.rewardManager.showArtifactChoice.called).toBe(true);
@@ -87,22 +97,23 @@ describe('Reward System & Ruins', () => {
         const ruinSite = new Site(SITE_TYPES.RUIN);
         siteInteraction.currentSite = ruinSite;
 
-        combatOrchestrator.onCombatEnd(true);
+        // Use proper result object with dummy enemy data
+        combatOrchestrator.onCombatEnd({
+            victory: true,
+            enemy: { name: 'Ruin Guard', fame: 3 }
+        });
 
         expect(ruinSite.conquered).toBe(true);
         expect(game.rewardManager.showArtifactChoice.called).toBe(true);
     });
 
     it('Selecting artifact adds it to deck', () => {
-        // We need a fresh RewardManager for this test OR restore the spied method?
-        // Actually we are testing selectArtifact, which is NOT spied on.
-        // But we need to make sure we don't need UI interaction that fails.
         const initialDeckSize = hero.deck.length;
         const mockArtifact = { id: 'test_art', name: 'Test Artifact', description: 'desc', color: 'gold', type: 'artifact' };
 
         game.rewardManager.artifactsOffer = [mockArtifact];
 
-        // Mock document.getElementById to return something for modal close
+        // Ensure modal exists in mock DOM from beforeEach
         const modal = document.getElementById('reward-modal');
         modal.style.display = 'block';
 

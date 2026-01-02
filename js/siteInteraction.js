@@ -46,6 +46,9 @@ export class SiteInteractionManager {
             case SITE_TYPES.CITY:
                 interactionData.options = this.getCityOptions();
                 break;
+            case SITE_TYPES.RUIN:
+                interactionData.options = this.getRuinOptions();
+                break;
             default:
                 interactionData.options = [];
         }
@@ -177,6 +180,24 @@ export class SiteInteractionManager {
             id: 'explore_dungeon',
             label: 'Verlies erkunden (Gefährlicher Kampf)',
             action: () => this.exploreDungeon(),
+            enabled: true
+        }];
+    }
+
+    getRuinOptions() {
+        if (this.currentSite.conquered) {
+            return [{
+                id: 'looted',
+                label: 'Ruine bereits geplündert',
+                enabled: false,
+                action: () => { }
+            }];
+        }
+
+        return [{
+            id: 'explore_ruin',
+            label: 'Ruine erkunden (Herausfordernder Kampf)',
+            action: () => this.exploreRuin(),
             enabled: true
         }];
     }
@@ -344,5 +365,35 @@ export class SiteInteractionManager {
         this.game.addLog(msg, 'warning');
         this.game.initiateCombat(enemy);
         return { success: true, message: 'Verlies betreten!' };
+    }
+
+    exploreRuin() {
+        // Ruins often have regular enemies but they are fortified
+        // Or sometimes they have summoners
+        const isSummoner = Math.random() > 0.4;
+        const enemy = isSummoner ? {
+            name: 'Ruinen-Beschwörer',
+            armor: 4,
+            attack: 3,
+            fame: 5,
+            icon: '💀',
+            type: 'necromancer', // This will trigger summoner logic
+            summoner: true,
+            color: '#7c3aed'
+        } : {
+            name: 'Ruinen-Wächter',
+            armor: 6,
+            attack: 4,
+            fame: 4,
+            icon: '🛡️',
+            type: 'ruin_guard',
+            color: '#d97706',
+            fortified: true
+        };
+
+        const msg = `Du untersuchst die Trümmer... ${enemy.name} erscheint!`;
+        this.game.addLog(msg, 'warning');
+        this.game.initiateCombat(enemy);
+        return { success: true, message: 'Ruine betreten!' };
     }
 }

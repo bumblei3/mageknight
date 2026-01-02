@@ -276,10 +276,18 @@ export class CombatOrchestrator {
             // --- SITE REWARDS ---
             const currentSite = this.game.siteManager.currentSite;
             if (currentSite && !currentSite.conquered) {
-                if (currentSite.type === 'dungeon') {
+                if (currentSite.type === 'dungeon' || currentSite.type === 'ruin') {
                     currentSite.conquered = true;
-                    this.game.addLog(t('combat.dungeonCleared'), 'success');
-                    this.game.hero.awardRandomArtifact();
+                    const logKey = currentSite.type === 'dungeon' ? 'combat.dungeonCleared' : 'combat.ruinCleared';
+                    this.game.addLog(t(logKey), 'success');
+
+                    // Trigger reward selection instead of random award
+                    if (this.game.rewardManager) {
+                        this.game.rewardManager.showArtifactChoice();
+                    } else {
+                        // Fallback
+                        this.game.hero.awardRandomArtifact();
+                    }
                 } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower') {
                     currentSite.conquered = true;
                     this.game.addLog(t('combat.siteConquered', { site: currentSite.getName() }), 'success');

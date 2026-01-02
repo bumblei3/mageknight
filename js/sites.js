@@ -5,7 +5,8 @@ export const SITE_TYPES = {
     MAGE_TOWER: 'mage_tower',
     MONASTERY: 'monastery',
     DUNGEON: 'dungeon',
-    CITY: 'city'
+    CITY: 'city',
+    RUIN: 'ruin'
 };
 
 export const SITE_INFO = {
@@ -50,6 +51,13 @@ export const SITE_INFO = {
         color: '#60a5fa', // Blue
         description: 'Eine große Stadt. Rekrutiere Elite-Einheiten, lerne Zauber und heile dich.',
         actions: ['heal', 'recruit_elite', 'learn']
+    },
+    [SITE_TYPES.RUIN]: {
+        name: 'Ruine',
+        icon: '💀',
+        color: '#d97706', // Brownish/Amber
+        description: 'Eine uralte Ruine. Wer weiß, welche Schätze und Gefahren hier schlummern?',
+        actions: ['explore']
     }
 };
 

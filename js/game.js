@@ -37,6 +37,7 @@ import { InputController } from './game/InputController.js';
 import { RenderController } from './game/RenderController.js';
 import { HeroController } from './game/HeroController.js';
 import { LevelUpManager } from './game/LevelUpManager.js';
+import { RewardManager } from './game/RewardManager.js';
 
 /**
  * Main Game Controller Class
@@ -63,6 +64,7 @@ export class MageKnightGame {
         this.sound = new SoundManager();
         this.animator = animator; // Initialize animator reference
         this.levelUpManager = new LevelUpManager(this);
+        this.rewardManager = new RewardManager(this);
 
         // Core Components
         this.canvas = document.getElementById('game-board');

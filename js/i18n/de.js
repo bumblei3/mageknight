@@ -50,7 +50,10 @@ export default {
             manaSource: 'Mana-Quelle',
             log: 'Protokoll',
             deckSize: 'Deck Größe',
-            unlocked: '{count}/{total} Freigeschaltet ({percent}%)'
+            unlocked: '{count}/{total} Freigeschaltet ({percent}%)',
+            victoryReward: 'Belohnung wählen!',
+            artifactFound: 'Du hast einen uralten Schatz gefunden! Wähle ein Artefakt:',
+            artifact: 'Artefakt'
         },
         stats: {
             gamesPlayed: 'Spiele gespielt',
@@ -155,6 +158,8 @@ export default {
         victoryOver: 'Sieg über {enemy}!',
         fameReward: '+{amount} Ruhm für den Sieg.',
         dungeonCleared: 'Verlies gesäubert! Du findest ein Artefakt.',
+        ruinCleared: 'Ruine gesäubert! Du findest einen Schatz.',
+        rewardClaimed: '{card} beansprucht!',
         siteConquered: '{site} erobert!',
         defeatAgainst: 'Niederlage gegen {enemy}.',
         retreatFrom: 'Rückzug aus dem Kampf gegen {enemy}.'
@@ -272,6 +277,7 @@ export default {
         monastery: 'Kloster',
         dungeon: 'Verlies',
         city: 'Stadt',
+        ruin: 'Ruine',
         conquered: 'Erobert',
         visited: 'Besucht',
         actions: {

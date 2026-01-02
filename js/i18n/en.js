@@ -50,7 +50,10 @@ export default {
             manaSource: 'Mana Source',
             log: 'Log',
             deckSize: 'Deck Size',
-            unlocked: '{count}/{total} Unlocked ({percent}%)'
+            unlocked: '{count}/{total} Unlocked ({percent}%)',
+            victoryReward: 'Select Reward!',
+            artifactFound: 'You found an ancient treasure! Choose an artifact:',
+            artifact: 'Artifact'
         },
         stats: {
             gamesPlayed: 'Games Played',
@@ -155,6 +158,8 @@ export default {
         victoryOver: 'Victory over {enemy}!',
         fameReward: '+{amount} Fame for victory.',
         dungeonCleared: 'Dungeon cleared! You found an artifact.',
+        ruinCleared: 'Ruin cleared! You found a treasure.',
+        rewardClaimed: '{card} claimed!',
         siteConquered: '{site} conquered!',
         defeatAgainst: 'Defeat against {enemy}.',
         retreatFrom: 'Retreat from combat against {enemy}.'
@@ -272,6 +277,7 @@ export default {
         monastery: 'Monastery',
         dungeon: 'Dungeon',
         city: 'City',
+        ruin: 'Ruin',
         conquered: 'Conquered',
         visited: 'Visited',
         actions: {

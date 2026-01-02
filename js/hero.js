@@ -2,7 +2,8 @@
 
 import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_ARTIFACTS } from './card.js';
 import { MANA_COLORS } from './mana.js';
-// Skills are added via HeroController
+import { HeroInventory } from './hero/HeroInventory.js';
+import { HeroSkills } from './hero/HeroSkills.js';
 
 // Fame thresholds for levels
 // Level 1 starts at 0
@@ -30,9 +31,17 @@ export class Hero {
         this.handLimit = 5;
         this.fame = 0;
         this.reputation = 0;
-        this.commandLimit = 1; // Start with 1 unit slot
-        this.skills = [];
-        this.usedSkills = new Set(); // Track active skills used this round
+        this.commandLimit = 1;
+
+        // Compose modules
+        this._inventory = new HeroInventory();
+        this._skills = new HeroSkills(this);
+
+        // Backward-compatible property access
+        this.skills = this._skills.skills;
+        this.usedSkills = this._skills.usedSkills;
+        this.crystals = this._inventory.crystals;
+        this.tempMana = this._inventory.tempMana;
 
         // Cards
         this.deck = [];
@@ -42,15 +51,6 @@ export class Hero {
 
         // Units
         this.units = [];
-
-        // Resources
-        this.crystals = {
-            red: 0,
-            blue: 0,
-            white: 0,
-            green: 0
-        };
-        this.tempMana = []; // Temporary mana for this turn (from dice)
 
         // Turn state
         this.movementPoints = 0;

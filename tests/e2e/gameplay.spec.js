@@ -5,6 +5,18 @@ test.describe('Mage Knight Gameplay', () => {
         await page.goto('/');
         // Wait for game to load
         await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 15000 });
+
+        // Skip tutorial if active
+        // The tutorial overlay blocks interactions, so we must dismiss it.
+        const skipBtn = page.locator('#tutorial-skip-btn');
+        try {
+            await skipBtn.waitFor({ state: 'visible', timeout: 5000 });
+            await skipBtn.click();
+            await expect(page.locator('#tutorial-overlay-custom')).toBeHidden();
+        } catch (e) {
+            // Tutorial might not appear or was already skipped
+            console.log('Tutorial skip button not found or not needed.');
+        }
     });
 
     test('should allow toggling debug panel', async ({ page }) => {

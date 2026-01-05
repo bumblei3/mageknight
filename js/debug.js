@@ -25,9 +25,13 @@ export class DebugManager {
         const toggleBtn = document.createElement('button');
         toggleBtn.textContent = '🔧';
         toggleBtn.className = 'debug-toggle';
+        toggleBtn.style.zIndex = '100000'; // Higher than loading screen (99999)
+        toggleBtn.style.position = 'fixed';
+        toggleBtn.style.top = '10px';
+        toggleBtn.style.left = '10px';
         toggleBtn.onclick = () => this.togglePanel();
-        const sidebar = document.querySelector('.hud-sidebar.hud-left');
-        const target = sidebar || document.body;
+        // Always append to body to avoid stacking context issues with HUD
+        const target = document.body;
         target.appendChild(toggleBtn);
 
         // Create panel

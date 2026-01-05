@@ -144,6 +144,24 @@ export const ENEMY_DEFINITIONS = {
     golem: { name: 'Golem', armor: 8, attack: 2, fame: 5, fortified: true, iceResist: true, physicalResist: true, attackType: 'physical', icon: '🗿', color: '#78716c' },
     vampire: { name: 'Vampir', armor: 4, attack: 4, fame: 5, brutal: true, poison: true, assassin: true, attackType: 'physical', icon: '🦇', color: '#7c2d12' },
     [ENEMY_TYPES.NECROMANCER]: { name: 'Nekromant', armor: 4, attack: 3, fame: 5, poison: true, summoner: true, icon: '💀', color: '#7c3aed' },
+    summoner_orc: {
+        attack: 4, armor: 4, fame: 4,
+        summoner: true,
+        summonType: 'orc',
+        icon: '🧙‍♂️', color: '#16a34a' // Green
+    },
+    deep_orc: {
+        name: 'Deep Orc',
+        attack: 4, armor: 4, fame: 4,
+        fortified: true, // Cave Fighter simulation
+        icon: '👺', color: '#115e59' // Dark Teal
+    },
+    crystal_golem: {
+        name: 'Crystal Golem',
+        attack: 6, armor: 6, fame: 6,
+        physicalResist: true,
+        icon: '💎', color: '#22d3ee' // Cyan
+    },
     [ENEMY_TYPES.ELEMENTAL]: { name: 'Feuer-Elementar', armor: 6, attack: 5, fame: 6, fireResist: true, attackType: 'fire', icon: '🔥', color: '#f97316' },
     [ENEMY_TYPES.BOSS]: { name: 'Dunkler Lord', armor: 10, attack: 8, fame: 20, fortified: true, brutal: true, fireResist: true, iceResist: true, physicalResist: true, icon: '👿', color: '#000000' }
 };

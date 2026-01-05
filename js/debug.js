@@ -2,6 +2,7 @@
 // Handles cheats, state manipulation, and visual debugging
 
 import { logger } from './logger.js';
+import { performanceMonitor } from './performanceMonitor.js';
 
 export class DebugManager {
     constructor(game) {
@@ -62,6 +63,10 @@ export class DebugManager {
                     <h4>Combat</h4>
                     <button onclick="debug.spawnEnemy()">Spawn Enemy</button>
                     <button onclick="debug.killEnemies()">Kill All</button>
+                </div>
+                <div class="debug-section">
+                    <h4>Performance</h4>
+                    <button onclick="debug.toggleFPS()">Toggle FPS</button>
                 </div>
                 <div class="debug-section debug-log-section">
                     <div class="debug-log-header">
@@ -228,5 +233,11 @@ export class DebugManager {
         this.game.enemies = [];
         this.game.render();
         this.game.addLog('Debug: Killed all enemies', 'info');
+    }
+
+    toggleFPS() {
+        performanceMonitor.toggleOverlay();
+        const state = performanceMonitor.showOverlay ? 'ON' : 'OFF';
+        this.game.addLog(`Debug: FPS Overlay ${state}`, 'info');
     }
 }

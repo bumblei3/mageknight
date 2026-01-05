@@ -1,8 +1,12 @@
 import { MageKnightGame } from './game.js';
 import i18n from './i18n/index.js';
+import { ErrorHandler } from './errorHandler.js';
 
 // Expose i18n globally for easy access
 window.i18n = i18n;
+
+// Initialize global error handler early
+let errorHandler = null;
 
 /**
  * Update loading screen progress
@@ -63,6 +67,10 @@ const startMageKnight = async () => {
         if (window.game.debugManager) {
             window.debug = window.game.debugManager;
         }
+
+        // Initialize error handler with game reference
+        errorHandler = new ErrorHandler(window.game);
+        window.errorHandler = errorHandler;
 
         updateLoading(100, 'Fertig!');
         await new Promise(r => setTimeout(r, 300));

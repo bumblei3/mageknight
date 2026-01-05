@@ -63,7 +63,12 @@ export class MageKnightGame {
         // Managers
         this.ui = new UI();
         this.terrain = new Terrain();
-        this.saveManager = new SaveManager();
+        // Legacy compatibility for tests
+        this.saveManager = {
+            saveGame: (slotId, state) => this.stateManager.saveGame(slotId),
+            loadGame: (slotId) => this.stateManager.loadGame(slotId),
+            autoSave: () => this.stateManager.saveGame('auto')
+        };
         this.timeManager = new TimeManager();
         this.achievementManager = new AchievementManager();
         this.statisticsManager = new StatisticsManager();
@@ -537,6 +542,7 @@ export class MageKnightGame {
 
     // Save/Load functionality
     saveGame(slotId) { this.stateManager.saveGame(slotId); }
+    loadGame(slotId) { return this.stateManager.loadGame(slotId); }
 
     getGameState() { return this.stateManager.getGameState(); }
 

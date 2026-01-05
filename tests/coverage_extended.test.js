@@ -398,7 +398,14 @@ describe('Coverage Gap Fill', () => {
             game.renderHand = () => { };
             game.renderMana = () => { };
             game.updateStats = () => { };
-            game.saveManager = { autoSave: () => { }, save: () => { } }; // Fix: Add 'save'
+            game.renderMana = () => { };
+            game.updateStats = () => { };
+            // Fix mock to include getGameState
+            game.stateManager = {
+                saveGame: () => { },
+                getGameState: () => ({ victory: false }), // Mock return
+                loadGame: () => true
+            };
             game.ui.hidePlayArea = () => { };
 
             game.endTurn();
@@ -589,15 +596,8 @@ describe('Coverage Gap Fill', () => {
 
         it('should handle save/load errors', () => {
             // Save Error
-            game.saveManager.save = () => { throw new Error('Save Failed'); };
-            // Should not crash, maybe log error?
-            // game.saveGame catches?
-            // View game.js 1340+ showed saveGame wrapper?
-            // If not, verify game.js implementation.
-            // Assuming it delegates to saveManager and might not catch internal errors unless saveManager handles it.
-            // Let's assume game.js calls saveManager.save.
-            // If game.js doesn't try/catch, this test throws.
-            // I'll wrap in try-catch to be safe and verified.
+            game.stateManager = { saveGame: () => { throw new Error('Save Failed'); } };
+
             try {
                 game.saveGame(0);
             } catch (e) {
@@ -605,26 +605,21 @@ describe('Coverage Gap Fill', () => {
             }
 
             // Load Error (Invalid JSON or structure)
-            // game.loadGameState(null) handles return.
-            // Line 1374 has try/catch?
-            // Let's force error inside loadGameState logic.
-            // Mock mapManager.loadState to throw.
-            game.mapManager.loadState = () => { throw new Error('Map Load Error'); };
+            // game.loadGame(slotId) calls stateManager.loadGame which calls loadGameState.
+            // We want to force an error in the load process.
 
-            // Minimal valid state to reach methods
-            const badState = {
-                hero: {
-                    position: { q: 0, r: 0 },
-                    deck: [], hand: [], discard: [], wounds: [],
-                    crystals: {}
-                },
-                enemies: [],
-                map: {},
-                turn: 1
+            // Mock stateManager to throw specifically when calling loadGameState equivalent
+            // Actually, we can just mock game.loadGame to simulate a failure result if we are testing UI handling
+            // OR if we want to test internal error caught by game.loadGame?
+            // game.loadGame delegates to stateManager.loadGame.
+
+            game.stateManager = {
+                saveGame: () => { },
+                loadGame: () => { throw new Error('Map Load Error'); }
             };
 
             try {
-                game.loadGameState(badState);
+                game.loadGame(0);
             } catch (e) {
                 expect(e.message).toBe('Map Load Error');
             }

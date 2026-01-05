@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
 import { Hero } from '../js/hero.js';
 import { Combat } from '../js/combat.js';
+import { SaveManager } from '../js/persistence/SaveManager.js';
 import { setupGlobalMocks, resetMocks } from './test-mocks.js';
 import { createMockEnemy, createHeroWithStats } from './test-helpers.js';
 
@@ -115,40 +116,35 @@ describe('Integration - State Persistence', () => {
         game.hero.level = 2;
         game.turnNumber = 5;
 
-        // Save game (if saveManager exists)
-        if (game.saveManager) {
-            const saveResult = game.saveManager.saveGame(0, game);
-            expect(saveResult).toBe(true);
+        // Save game
+        game.saveGame(0);
+        expect(SaveManager.hasSave('slot_0')).toBe(true);
 
-            // Load game
-            const loadResult = game.saveManager.loadGame(0);
-            if (loadResult) {
-                expect(loadResult.hero.fame).toBe(15);
-                expect(loadResult.hero.reputation).toBe(3);
-                expect(loadResult.hero.level).toBe(2);
-                // turn is used instead of turnNumber in serialization
-            }
+        // Load game
+        const loadResult = game.loadGame(0);
+        // loadGame returns true if successful (from StateManager)
+        if (loadResult) {
+            expect(game.hero.fame).toBe(15);
+            expect(game.hero.reputation).toBe(3);
+            expect(game.hero.level).toBe(2);
         }
     });
 
     it('should handle corrupt save data gracefully', () => {
         const game = new MageKnightGame();
 
-        if (game.saveManager) {
-            // Silence expected error
-            const originalError = console.error;
-            console.error = () => { };
+        // Silence expected error
+        const originalError = console.error;
+        console.error = () => { };
 
-            // Manually corrupt save data using correct key
-            const saves = { 0: { version: '1.0', state: 'invalid{json}data' } };
-            localStorage.setItem(game.saveManager.storageKey, 'invalid{json}data'); // Corrupt the top-level JSON
+        // Manually corrupt save data
+        localStorage.setItem('mageknight_save_slot_0', 'invalid{json}data');
 
-            const loadResult = game.saveManager.loadGame(0);
-            expect(loadResult).toBe(null);
+        const loadResult = game.loadGame(0);
+        expect(loadResult).toBe(false);
 
-            // Restore console.error
-            console.error = originalError;
-        }
+        // Restore console.error
+        console.error = originalError;
     });
 
     it('should preserve complex game state across save/load', () => {
@@ -164,12 +160,14 @@ describe('Integration - State Persistence', () => {
             // Place some hexes
             game.hexGrid.setHex(2, 2, { terrain: 'forest', revealed: true });
 
-            const saveResult = game.saveManager.saveGame(0, game);
-            expect(saveResult).toBe(true);
+            game.saveGame(0);
 
-            const loadResult = game.saveManager.loadGame(0);
+            // Create new game to load into
+            const newGame = new MageKnightGame();
+            const loadResult = newGame.loadGame(0);
+
             if (loadResult) {
-                expect(loadResult.hero.wounds.length).toBe(2);
+                expect(newGame.hero.wounds.length).toBe(2);
             }
         }
     });

@@ -34,6 +34,19 @@ export class GameStateManager {
     }
 
     /**
+     * Loads game state from a specific slot
+     * @param {number|string} slotId 
+     * @returns {boolean} Success
+     */
+    loadGame(slotId) {
+        const state = SaveManager.loadGame(`slot_${slotId}`);
+        if (state) {
+            return this.loadGameState(state);
+        }
+        return false;
+    }
+
+    /**
      * Compiles the full game state object
      * @returns {Object}
      */

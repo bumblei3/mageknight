@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
-import { SaveManager } from '../js/saveManager.js';
+import { SaveManager } from '../js/persistence/SaveManager.js';
 import { StatisticsManager } from '../js/statistics.js';
 import { createMockLocalStorage, createSpy } from './test-mocks.js';
 
@@ -16,9 +16,8 @@ describe('Chaos Testing - Resilience', () => {
     });
 
     it('should handle corrupted JSON in saves', () => {
-        localStorage.setItem('mageKnight_save_0', '{invalid json}');
-        const sm = new SaveManager();
-        const result = sm.loadGame(0);
+        localStorage.setItem('mageknight_save_0', '{invalid json}');
+        const result = SaveManager.loadGame(0);
         expect(result).toBe(null);
     });
 
@@ -30,7 +29,6 @@ describe('Chaos Testing - Resilience', () => {
     });
 
     it('should handle localStorage quota exceeded', () => {
-        const sm = new SaveManager();
         // Mock setItem to throw
         const originalSet = localStorage.setItem;
         localStorage.setItem = () => { throw new Error('QuotaExceededError'); };
@@ -40,7 +38,7 @@ describe('Chaos Testing - Resilience', () => {
         const originalError = console.error;
         console.error = consoleSpy;
 
-        sm.saveGame(0, { test: 1 });
+        SaveManager.saveGame(0, { test: 1 });
         expect(consoleSpy.called).toBe(true);
 
         console.error = originalError;

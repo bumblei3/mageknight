@@ -158,13 +158,14 @@ describe('Game Flow Coverage Boost', () => {
 
     describe('Save/Load Flows', () => {
         it('should save game state', () => {
-            game.saveManager = {
+            // Mock stateManager since game.saveGame now delegates to it
+            game.stateManager = {
                 saveGame: createSpy('saveGame'),
-                autoSave: createSpy('autoSave')
+                loadGame: createSpy('loadGame')
             };
 
             game.saveGame(0);
-            expect(game.saveManager.saveGame.calls.length).toBe(1);
+            expect(game.stateManager.saveGame.calls.length).toBe(1);
         });
 
         it('should load game state', () => {

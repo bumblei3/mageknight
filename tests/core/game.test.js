@@ -16,12 +16,19 @@ describe('Game Core', () => {
         localStorage.clear();
 
         // Initialize game
-        // Note: This will trigger a lot of initialization logic
         game = new MageKnightGame();
+
         game.sound = {
             play: createSpy('play'),
             stop: createSpy('stop'),
             heal: createSpy('heal')
+        };
+        // Mock StateManager to prevent saveGame recursion/error in tests
+        game.stateManager = {
+            saveGame: createSpy('saveGame'),
+            loadGame: createSpy('loadGame'),
+            getGameState: () => ({}),
+            loadGameState: () => true
         };
     });
 

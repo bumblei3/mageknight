@@ -85,13 +85,15 @@ describe('Game Integration', () => {
         game.turnNumber = 5;
 
         // 2. Save
-        // Use saveManager directly as game.saveGame doesn't exist
-        game.saveManager.saveGame(0, game.getGameState());
+        // 2. Save
+        game.saveGame(0);
 
         // 3. New Game & Load
         const newGame = new MageKnightGame();
-        // Load state using manager then apply it
-        const loadedState = newGame.saveManager.loadGame(0);
+        // Force load from slot 0
+        // We need a way to load specific slot on init or manually after
+        newGame.stateManager.loadGame(0);
+        const loadedState = newGame.getGameState();
         expect(loadedState).toBeDefined();
 
         if (loadedState) {

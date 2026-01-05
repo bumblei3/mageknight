@@ -40,7 +40,7 @@ describe('UI Coverage Final', () => {
             combat: null,
             addLog: createSpy('addLog'),
             render: createSpy('render'),
-            saveManager: { saveGame: createSpy('saveGame'), loadGame: createSpy('loadGame') },
+            render: createSpy('render'),
             tutorialManager: { start: createSpy('start') }
         };
 

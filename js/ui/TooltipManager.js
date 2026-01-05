@@ -129,6 +129,28 @@ export class TooltipManager {
         element.addEventListener('mouseleave', () => {
             this.hideTooltip(100);
         });
+
+        // Event delegation for injected glossary terms within this element
+        element.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('glossary-term')) {
+                const term = e.target.dataset.term;
+                if (term) {
+                    this.currentTarget = e.target;
+                    // We need to pass the term key to showGlossaryTooltip
+                    // But attachToElement usually expects fixed content.
+                    // Here we hijack the generic tooltip system for the child.
+                    this.showGlossaryTooltip(e.target, term);
+                    e.stopPropagation();
+                }
+            }
+        });
+
+        element.addEventListener('mouseout', (e) => {
+            if (e.target.classList.contains('glossary-term')) {
+                this.hideTooltip(100);
+                e.stopPropagation();
+            }
+        });
     }
 
     /**
@@ -428,6 +450,89 @@ export class TooltipManager {
 
     getActionName(action) {
         return t(`sites.actions.${action}`) || action;
+    }
+
+    /**
+     * Inject HTML spans for key game terms in text
+     * @param {string} text - Raw text
+     * @returns {string} Text with glossary terms wrapped
+     */
+    injectKeywords(text) {
+        if (!text) return '';
+        let processed = text;
+
+        // This is a simplified regex approach. 
+        // Ideally we iterate over keys in i18n.glossary.
+        // We need access to the raw glossary object, assume t returning object works or we load it.
+        // Accessing i18n directly might be cleaner if we import default export fully, but we have 't'.
+        // Let's assume we can get the keys. 
+
+        // Hardcoded list from implementation plan + de.js for now to ensure reliability
+        const terms = [
+            'Vampirismus', 'Befestigt', 'Lähmung', 'Flink', 'Brutal', 'Gift',
+            'Schwerfällig', 'Attentäter', 'Beschwörer', 'Ausweichend',
+            'Resistenz', 'Block', 'Wunde', 'Rüstung', 'Fernkampf', 'Belagerung',
+            'Tag', 'Nacht'
+        ];
+
+        // Map display name back to key? Or just use display name for lookup?
+        // Using display name for lookup is easier for the regex but we need the key for the tooltip content.
+        // We can create a reverse map.
+
+        // Reverse mapping strategy:
+        const map = {
+            'Vampirismus': 'vampirism',
+            'Befestigt': 'fortified',
+            'Lähmung': 'paralyze',
+            'Flink': 'swift',
+            'Brutal': 'brutal',
+            'Gift': 'poison',
+            'Schwerfällig': 'cumbersome',
+            'Attentäter': 'assassin',
+            'Beschwörer': 'summoner',
+            'Ausweichend': 'elusive',
+            'Resistenz': 'resistance',
+            'Block': 'block',
+            'Wunde': 'wound',
+            'Rüstung': 'armor',
+            'Fernkampf': 'ranged',
+            'Belagerung': 'siege',
+            'Tag': 'day',
+            'Nacht': 'night'
+            // Add 'Angriff' but handle collisions carefully? 
+        };
+
+        terms.forEach(term => {
+            // Case insensitive replace, preserving original case
+            // Use word boundary \b to avoid partial matches
+            const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+            const key = map[term];
+            if (key) {
+                processed = processed.replace(regex, `<span class="glossary-term" data-term="${key}">$1</span>`);
+            }
+        });
+
+        return processed;
+    }
+
+    /**
+     * Show tooltip for glossary term
+     */
+    showGlossaryTooltip(element, termKey) {
+        const name = t(`glossary.${termKey}.name`) || termKey;
+        const desc = t(`glossary.${termKey}.desc`) || 'Keine Beschreibung verfügbar.';
+
+        const content = `
+            <div class="tooltip-glossary">
+                <div class="tooltip-header">
+                    <span class="tooltip-name">${name}</span>
+                </div>
+                <div class="tooltip-divider"></div>
+                <div class="tooltip-description">${desc}</div>
+            </div>
+        `;
+
+        this.showTooltip(element, content);
     }
 }
 

@@ -253,11 +253,12 @@ export class MageKnightGame {
      * Helper to add a log entry via event bus
      * @param {string} message
      * @param {string} type
+     * @param {Object} [details=null] Optional structured details
      */
-    addLog(message, type = 'info') {
+    addLog(message, type = 'info', details = null) {
         if (!message) return;
         logger.info(`Game Log: ${message}`);
-        eventBus.emit(GAME_EVENTS.LOG_ADDED, { message, type });
+        eventBus.emit(GAME_EVENTS.LOG_ADDED, { message, type, details, timestamp: Date.now() });
     }
 
     /**

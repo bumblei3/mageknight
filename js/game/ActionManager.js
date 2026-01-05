@@ -18,8 +18,8 @@ export class ActionManager {
      * Should be called BEFORE an action is executed.
      */
     saveCheckpoint() {
-        // Only allow undo if NOT in combat and NOT dealing with complex interactions
-        if (this.game.combat) return;
+        // Allow undo in combat but ONLY for safe phases/actions
+        // If in combat, we must save combat state too
 
         logger.debug('Saving checkpoint for undo/redo');
 
@@ -28,6 +28,19 @@ export class ActionManager {
             mana: this.game.manaSource.getState(),
             timestamp: Date.now()
         };
+
+        if (this.game.combat) {
+            checkpoint.combat = this.game.combat.getState();
+            if (this.game.combatOrchestrator) {
+                checkpoint.orchestrator = {
+                    attackTotal: this.game.combatOrchestrator.combatAttackTotal,
+                    blockTotal: this.game.combatOrchestrator.combatBlockTotal,
+                    activeBlocks: [...this.game.combatOrchestrator.activeBlocks],
+                    rangedTotal: this.game.combatOrchestrator.combatRangedTotal,
+                    siegeTotal: this.game.combatOrchestrator.combatSiegeTotal
+                };
+            }
+        }
 
         this.history.push(checkpoint);
 
@@ -48,18 +61,41 @@ export class ActionManager {
             return;
         }
 
-        // Cannot undo if in combat (state is too volatile)
-        if (this.game.combat) {
-            this.game.showToast('Kann während des Kampfes nicht rückgängig gemacht werden.', 'error');
+        const checkpoint = this.history[this.history.length - 1]; // Peek first to check validity
+
+        // Check if we are trying to undo a non-combat state while in combat, or vice versa
+        // Actually, simpler: if checkpoint has combat data, we must be in combat (or restore it?).
+        // In Mage Knight, if we leave combat (End Combat), that's usually irreversible (dice rolled etc).
+        // So we probably only Undo WITHIN combat or WITHIN exploration.
+
+        if (this.game.combat && !checkpoint.combat) {
+            this.game.showToast('Kann nicht über Kampf-Grenzen hinweg rückgängig machen.', 'error');
             this.clearHistory();
             return;
         }
 
-        const checkpoint = this.history.pop();
+        this.history.pop(); // Remove it now
 
         // Restore State
         this.game.hero.loadState(checkpoint.hero);
         this.game.manaSource.loadState(checkpoint.mana);
+
+        if (checkpoint.combat && this.game.combat) {
+            this.game.combat.loadState(checkpoint.combat);
+
+            if (this.game.combatOrchestrator && checkpoint.orchestrator) {
+                const orch = this.game.combatOrchestrator;
+                orch.combatAttackTotal = checkpoint.orchestrator.attackTotal;
+                orch.combatBlockTotal = checkpoint.orchestrator.blockTotal;
+                orch.activeBlocks = [...checkpoint.orchestrator.activeBlocks];
+                orch.combatRangedTotal = checkpoint.orchestrator.rangedTotal;
+                orch.combatSiegeTotal = checkpoint.orchestrator.siegeTotal;
+
+                // Force UI Update
+                orch.updateCombatInfo();
+                orch.renderUnitsInCombat();
+            }
+        }
 
         // Visual Feedback
         this.game.addLog('Aktion rückgängig gemacht.', 'info');
@@ -74,9 +110,9 @@ export class ActionManager {
 
         // If we were in movement mode, we might need to recalculate/exit
         // Best approach: If we have movement points, enter mode. Else exit.
-        if (this.game.hero.movementPoints > 0) {
+        if (this.game.hero.movementPoints > 0 && !this.game.combat) {
             this.enterMovementMode();
-        } else {
+        } else if (!this.game.combat) {
             this.exitMovementMode();
         }
 

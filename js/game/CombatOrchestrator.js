@@ -19,6 +19,11 @@ export class CombatOrchestrator {
     playCardInCombat(index, card, useStrong = false) {
         if (!this.game.combat || card.isWound()) return;
 
+        // SAVE STATE before playing card in combat
+        if (this.game.actionManager) {
+            this.game.actionManager.saveCheckpoint();
+        }
+
         const result = this.game.hero.playCard(index, useStrong, this.game.timeManager.isNight());
         if (!result) return;
 
@@ -89,6 +94,9 @@ export class CombatOrchestrator {
         // Apply block points
         this.game.combat.blockEnemy(this.game.combat.enemy, this.combatBlockTotal);
 
+        // End Block Phase is irreversible (reveals damage/wounds)
+        if (this.game.actionManager) this.game.actionManager.clearHistory();
+
         const result = this.game.combat.endBlockPhase();
         if (result.woundsReceived > 0) {
             const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
@@ -149,6 +157,9 @@ export class CombatOrchestrator {
         }
 
         if (this.game.combat.phase !== COMBAT_PHASES.ATTACK) return;
+
+        // Execute Attack is irreversible (reveals info, deals damage)
+        if (this.game.actionManager) this.game.actionManager.clearHistory();
 
         // Visual Impact
         const pixelPos = this.game.hexGrid.axialToPixel(this.game.combat.enemy.position.q, this.game.combat.enemy.position.r);
@@ -226,13 +237,71 @@ export class CombatOrchestrator {
         } else if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
             // Support spending movement points for Cumbersome enemies
             const movementPoints = this.game.hero.movementPoints;
-            const result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementPoints);
+
+            // Smart Consumption Calculation for Cumbersome
+            // Only spend what is needed appropriately
+            let movementToSpend = movementPoints;
+
+            if (enemy.cumbersome && movementPoints > 0) {
+                // Calculate how much block we have from cards
+                // We need to peek at the requirement
+                const blockReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
+                const cardBlock = this.activeBlocks.reduce((sum, b) => {
+                    // Simplified check: assume efficiency for now or use BlockingEngine logic if possible?
+                    // BlockingEngine handles efficiency internally. 
+                    // Ideally we would ask BlockingEngine "how much short are we?"
+                    // But BlockingEngine doesn't return that directly if we just pass everything.
+
+                    // Let's do an iterative approach or a pre-check?
+                    // Pre-check:
+                    // 1. Calculate block with 0 movement.
+                    // 2. Check shortage.
+                    // 3. Spend min(available, shortage).
+                    return sum + b.value; // Approximate, doesn't account for elemental inefficiency here but this logic is in Controller
+                }, 0);
+
+                // Better: Run a "simulation" with 0 movement first to see the gap?
+                // But BlockingEngine is a bit complex to simulate here without duplicating logic.
+                // However, handleEnemyClick calls blockEnemy which calls BlockingEngine.
+
+                // Strategy: Pass ALL movement first (as we do now) to see IF it blocks.
+                // If it blocks, then decide how much to actually consume.
+            }
+
+            const result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementToSpend);
 
             if (result.success && result.blocked) {
-                // If cumbersome was utilized, spend the movement points
+                // If cumbersome was utilized, determine actual needed points
                 if (enemy.cumbersome && movementPoints > 0) {
-                    this.game.hero.movementPoints = 0;
-                    this.game.addLog(t('combat.cumbersomeUsed', { enemy: enemy.name }), 'info');
+                    // Current system: consumes 'movementToSpend' (all).
+                    // We want to retroactively adjust or calculate precisely BEFORE.
+
+                    // Optimized:
+                    // 1. Get raw block requirement (without move reduction)
+                    const rawReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
+
+                    // 2. Calculate effective block provided by cards/units
+                    // This is returned in result.totalBlock!
+                    const totalBlock = result.totalBlock;
+
+                    // 3. Gap = rawReq - totalBlock (but totalBlock might ALREADY include move reduction? No, wait.)
+                    // BlockingEngine: 
+                    // blockRequired = Math.max(0, blockRequired - internalMovementSpent);
+                    // totalEffectiveBlock = cards + units
+                    // Check: totalEffectiveBlock >= blockRequired
+
+                    // So: totalEffectiveBlock >= (rawReq - moveSpent)
+                    // => moveSpent >= rawReq - totalEffectiveBlock
+
+                    const effectiveFromCardsAndUnits = result.totalBlock; // This is purely cards + units
+
+                    const neededMove = Math.max(0, rawReq - effectiveFromCardsAndUnits);
+                    const actualSpent = Math.min(movementPoints, neededMove);
+
+                    if (actualSpent > 0) {
+                        this.game.hero.movementPoints = Math.max(0, this.game.hero.movementPoints - actualSpent);
+                        this.game.addLog(t('combat.cumbersomeUsed', { enemy: enemy.name, amount: actualSpent }), 'info');
+                    }
                 }
 
                 // Particle Effect for successful block

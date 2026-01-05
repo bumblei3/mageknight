@@ -658,11 +658,27 @@
 }
 
 /* Enhanced log entry layout */
+.log-entry.has-details {
+    cursor: pointer;
+}
+
+.log-entry.has-details:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.log-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
 .log-time {
     font-size: 0.7rem;
     color: var(--color-text-muted);
     margin-right: 0.4rem;
     opacity: 0.6;
+    min-width: 45px;
+    /* Ensure alignment */
 }
 
 .log-icon {
@@ -672,6 +688,7 @@
 
 .log-message {
     flex: 1;
+    word-break: break-word;
 }
 
 .log-message strong {
@@ -680,7 +697,22 @@
 
 .log-message em {
     font-style: italic;
+
     color: var(--color-accent-primary);
+}
+
+.glossary-term {
+    border-bottom: 1px dotted rgba(168, 85, 247, 0.6);
+    cursor: help;
+    color: var(--color-accent-secondary);
+    transition: all 0.2s;
+}
+
+.glossary-term:hover {
+    color: var(--color-accent-primary);
+    border-bottom-color: var(--color-accent-primary);
+    background: rgba(168, 85, 247, 0.1);
+    border-radius: 2px;
 }
 
 .log-count {
@@ -690,6 +722,75 @@
     padding: 0.1rem 0.4rem;
     border-radius: 10px;
     color: var(--color-text-muted);
+}
+
+.log-expander {
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    transition: transform 0.3s ease;
+}
+
+.log-entry.expanded .log-expander {
+    transform: rotate(180deg);
+}
+
+.log-details {
+    display: none;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.log-entry.expanded .log-details {
+    display: block;
+    animation: slideDown 0.2s ease-out;
+}
+
+.log-details ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.log-details li {
+    margin-bottom: 0.2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.detail-key {
+    color: var(--color-text-muted);
+    margin-right: 0.5rem;
+}
+
+.detail-value {
+    color: var(--color-text-primary);
+    text-align: right;
+}
+
+.details-title {
+    font-weight: bold;
+    color: var(--color-accent-primary);
+    margin-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 2px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Combat Phase Progress Indicator */
@@ -1060,6 +1161,7 @@
     font-size: 0.9rem;
     font-weight: bold;
 }
+
 /* Game Tooltip - Premium Fantasy Mesh */
 .game-tooltip {
     position: fixed;
@@ -1133,7 +1235,7 @@
 .mana-icon {
     display: inline-block;
     margin: 0 2px;
-    filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
 }
 
 .tooltip-card-color {

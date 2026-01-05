@@ -22,7 +22,7 @@ export class UI {
 
         // Initialize specialized managers
         this.tooltipManager = new TooltipManager();
-        this.notifications = new NotificationManager(this.elements);
+        this.notifications = new NotificationManager(this.elements, this.tooltipManager);
         this.modals = new ModalManager(this.elements, this);
         this.combatUI = new CombatUIManager(this.elements, this);
 
@@ -73,7 +73,7 @@ export class UI {
      * @private
      */
     setupGlobalListeners() {
-        this._logAddedHandler = ({ message, type }) => this.notifications.addLog(message, type);
+        this._logAddedHandler = ({ message, type, details }) => this.notifications.addLog(message, type, details);
         this._toastShowHandler = ({ message, type }) => this.notifications.showToast(message, type);
         this._notificationHandler = ({ message, type }) => this.notifications.showNotification(message, type);
         this._statsHandler = (hero) => {
@@ -267,8 +267,8 @@ export class UI {
     }
 
     // Log configuration
-    addLog(message, type = 'info') {
-        this.notifications.addLog(message, type);
+    addLog(message, type = 'info', details = null) {
+        this.notifications.addLog(message, type, details);
     }
 
     clearLog() {

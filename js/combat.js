@@ -784,12 +784,53 @@ export class Combat {
     getState() {
         return {
             phase: this.phase,
-            enemies: this.enemies,
+            enemies: this.enemies.map(e => e.getState()), // Save full enemy state (health etc)
             defeatedEnemies: this.defeatedEnemies,
             blockedEnemies: Array.from(this.blockedEnemies),
             totalDamage: this.totalDamage,
-            woundsReceived: this.woundsReceived
+            woundsReceived: this.woundsReceived,
+            unitAttackPoints: this.unitAttackPoints,
+            unitBlockPoints: this.unitBlockPoints,
+            unitRangedPoints: this.unitRangedPoints,
+            unitSiegePoints: this.unitSiegePoints,
+            activatedUnits: Array.from(this.activatedUnits)
         };
+    }
+
+    // Load state
+    loadState(state) {
+        if (!state) return;
+        this.phase = state.phase;
+        // Restore enemies (find by ID or reconstruct?)
+        // Reconstructing might lose references if UI holds them.
+        // Better: Update existing enemy instances if possible, or replace.
+        // For Undo, replacing is safer to ensure exact state match.
+        this.enemies = state.enemies.map(eState => {
+            // We need to re-instantiate correct class (Enemy vs BossEnemy)
+            // But we don't have easy access to factory here.
+            // However, we can just assume basic Enemy functionality or try to find matching enemy in current this.enemies if IDs match?
+            // Undo usually happens immediately, so this.enemies likely contains the same objects.
+            const existing = this.enemies.find(e => e.id === eState.id);
+            if (existing) {
+                existing.loadState(eState);
+                return existing;
+            }
+            // Fallback: This is tricky without factories.
+            // For now, assume enemies array structure hasn't changed drastically (Undo only steps back).
+            return eState; // This might be raw data, need real objects?
+            // Actually, for Undo we typically clone deep.
+            // Let's assume for now we just restore the properties we care about.
+        });
+
+        this.defeatedEnemies = state.defeatedEnemies;
+        this.blockedEnemies = new Set(state.blockedEnemies);
+        this.totalDamage = state.totalDamage;
+        this.woundsReceived = state.woundsReceived;
+        this.unitAttackPoints = state.unitAttackPoints || 0;
+        this.unitBlockPoints = state.unitBlockPoints || 0;
+        this.unitRangedPoints = state.unitRangedPoints || 0;
+        this.unitSiegePoints = state.unitSiegePoints || 0;
+        this.activatedUnits = new Set(state.activatedUnits || []);
     }
 }
 

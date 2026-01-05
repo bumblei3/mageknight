@@ -342,5 +342,28 @@ export default {
                 boss: 'Boss: Ein mächtiger Gegner mit mehreren Phasen und einzigartigen Mechaniken.'
             }
         }
+    },
+
+    // Glossary (Game Terms)
+    glossary: {
+        vampirism: { name: 'Vampirismus', desc: 'Wenn dieser Feind Wunden zufügt, erhält er Rüstung in gleicher Höhe.' },
+        fortified: { name: 'Befestigt', desc: 'Immun gegen Fernkampf-Angriffe (außer Belagerung).' },
+        paralyze: { name: 'Lähmung', desc: 'Zerstört Einheiten sofort, wenn sie verwundet werden. Zwingt den Helden, Karten abzuwerfen.' },
+        swift: { name: 'Flink', desc: 'Benötigt die doppelte Menge an Block, um effizient geblockt zu werden.' },
+        brutal: { name: 'Brutal', desc: 'Verursacht doppelten Schaden, wenn er nicht geblockt wird.' },
+        poison: { name: 'Gift', desc: 'Wunden kommen direkt auf den Ablagestapel (statt Hand). Fügt Einheiten 2 Wunden zu.' },
+        cumbersome: { name: 'Schwerfällig', desc: 'Du kannst Bewegungspunkte ausgeben, um den Angriff dieses Feindes zu reduzieren. Jeder Punkt reduziert Angriff um 1.' },
+        assassin: { name: 'Attentäter', desc: 'Schaden von diesem Feind kann nicht Einheiten zugewiesen werden. Muss vom Helden genommen werden.' },
+        summoner: { name: 'Beschwörer', desc: 'Beschwört vor der Block-Phase einen zusätzlichen Gegner.' },
+        elusive: { name: 'Ausweichend', desc: 'Hat höhere Rüstung gegen Fernkampf-Angriffe.' },
+        resistance: { name: 'Resistenz', desc: 'Halbiert Schaden/Block von nicht-passenden Elementen (z.B. Feuer gegen Feuer).' },
+        block: { name: 'Block', desc: 'Verhindert den Angriff des Feindes. Muss gleich oder höher als der Angriffswert sein.' },
+        wound: { name: 'Wunde', desc: 'Negative Karte, die die Hand verstopft. Kann nicht gespielt werden (außer zum Rasten).' },
+        armor: { name: 'Rüstung', desc: 'Wert, der überwunden werden muss, um Schaden zu nehmen oder den Feind zu besiegen.' },
+        attack: { name: 'Angriff', desc: 'Offensiver Wert. Wird gegen Rüstung gerechnet.' },
+        ranged: { name: 'Fernkampf', desc: 'Phase vor dem Blocken. Erlaubt Angriffe ohne Gegenwehr, aber viele Feinde sind immun.' },
+        siege: { name: 'Belagerung', desc: 'Starker Angriff, der befestigte Feinde ignorieren kann.' },
+        day: { name: 'Tag', desc: 'Goldenes Mana ist nutzbar. Bewegungskosten normal.' },
+        night: { name: 'Nacht', desc: 'Schwarzes Mana ist nutzbar. Zauberkarten sind stärker. Sichtweite im Dungeon reduziert.' }
     }
 };

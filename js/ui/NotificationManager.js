@@ -14,9 +14,15 @@ export class NotificationManager {
         levelup: '⬆️'
     };
 
-    constructor(elements) {
+    constructor(elements, tooltipManager) {
         this.elements = elements;
+        this.tooltipManager = tooltipManager;
         this.setupToastContainer();
+
+        // Allow tooltips on log container
+        if (this.elements.gameLog && this.tooltipManager) {
+            this.tooltipManager.attachToElement(this.elements.gameLog, null);
+        }
     }
 
     setupToastContainer() {
@@ -36,16 +42,17 @@ export class NotificationManager {
     /**
      * Add log entry
      */
-    addLog(message, type = 'info') {
+    addLog(message, type = 'info', details = null) {
         const logContainer = this.elements.gameLog;
         if (!logContainer) return;
 
         if (message === null || message === undefined) return;
-        message = String(message);
+        const msgStr = String(message);
 
         // Check for grouping (duplicate consecutive messages)
+        // Only group if NO details are present (details make each entry unique usually)
         const lastEntry = logContainer.lastElementChild;
-        if (lastEntry && lastEntry.dataset.message === message) {
+        if (!details && lastEntry && lastEntry.dataset.message === msgStr && !lastEntry.dataset.hasDetails) {
             let count = parseInt(lastEntry.dataset.count || '1', 10) + 1;
             lastEntry.dataset.count = count;
             const countBadge = lastEntry.querySelector('.log-count');
@@ -60,25 +67,70 @@ export class NotificationManager {
         // Create new entry
         const entry = document.createElement('div');
         entry.className = `log-entry ${type}`;
-        entry.dataset.message = message;
+        entry.dataset.message = msgStr;
         entry.dataset.count = '1';
+        if (details) entry.dataset.hasDetails = 'true';
 
         const now = new Date();
-        const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         const icon = NotificationManager.LOG_ICONS[type] || NotificationManager.LOG_ICONS.info;
-
-        if (message === null || message === undefined) return;
-        const msgStr = String(message);
 
         let formattedMessage = msgStr
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.+?)\*/g, '<em>$1</em>');
 
+        if (this.tooltipManager) {
+            formattedMessage = this.tooltipManager.injectKeywords(formattedMessage);
+        }
+
+        let detailsHTML = '';
+        if (details) {
+            detailsHTML = '<div class="log-details">';
+
+            // If details is an array (e.g. list of sub-events)
+            if (Array.isArray(details)) {
+                detailsHTML += '<ul>';
+                details.forEach(item => detailsHTML += `<li>${item}</li>`);
+                detailsHTML += '</ul>';
+            }
+            // If object, render key-values or specific formatting
+            else if (typeof details === 'object') {
+                // Check if it has a 'title' or 'items' structure
+                if (details.items && Array.isArray(details.items)) {
+                    if (details.title) detailsHTML += `<div class="details-title">${details.title}</div>`;
+                    detailsHTML += '<ul>';
+                    details.items.forEach(item => detailsHTML += `<li>${item}</li>`);
+                    detailsHTML += '</ul>';
+                } else {
+                    // Generic object renderer
+                    detailsHTML += '<ul>';
+                    for (const [key, value] of Object.entries(details)) {
+                        // Skip specific keys if needed
+                        detailsHTML += `<li><span class="detail-key">${key}:</span> <span class="detail-value">${value}</span></li>`;
+                    }
+                    detailsHTML += '</ul>';
+                }
+            } else {
+                detailsHTML += String(details);
+            }
+            detailsHTML += '</div>';
+
+            // Make message clickable to toggle details if details present
+            entry.classList.add('has-details');
+            entry.addEventListener('click', (e) => {
+                entry.classList.toggle('expanded');
+            });
+        }
+
         entry.innerHTML = `
-            <span class="log-time">${timeStr}</span>
-            <span class="log-icon">${icon}</span>
-            <span class="log-message">${formattedMessage}</span>
-            <span class="log-count" style="display: none;">×1</span>
+            <div class="log-header">
+                <span class="log-time" title="${now.toLocaleTimeString()}">${timeStr}</span>
+                <span class="log-icon">${icon}</span>
+                <span class="log-message">${formattedMessage}</span>
+                <span class="log-count" style="display: none;">×1</span>
+                ${details ? '<span class="log-expander">▼</span>' : ''}
+            </div>
+            ${detailsHTML}
         `;
 
         logContainer.appendChild(entry);

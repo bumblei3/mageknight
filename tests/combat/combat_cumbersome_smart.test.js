@@ -22,7 +22,10 @@ class MockGame {
             axialToPixel: () => ({ x: 0, y: 0 })
         };
         this.particleSystem = {
-            shieldEffect: () => { }
+            shieldEffect: () => { },
+            shieldBlockEffect: () => { },
+            combatClashEffect: () => { },
+            impactEffect: () => { }
         };
         this.addLog = () => { };
         this.updateStats = () => { };

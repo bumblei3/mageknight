@@ -58,6 +58,7 @@ export class MageKnightGame {
 
         this.abortController = new AbortController();
         this.gameState = 'playing';
+        this.isTestEnvironment = !!(typeof window !== 'undefined' && (window.isTest || window.__playwright__));
 
         // Managers
         this.ui = new UI();

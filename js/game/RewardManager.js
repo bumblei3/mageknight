@@ -1,4 +1,4 @@
-import { SAMPLE_ARTIFACTS, SAMPLE_SPELLS, Card } from '../card.js';
+import { SAMPLE_ARTIFACTS, SAMPLE_SPELLS, SAMPLE_ADVANCED_ACTIONS, Card } from '../card.js';
 import { logger } from '../logger.js';
 import { t } from '../i18n/index.js';
 
@@ -103,5 +103,15 @@ export class RewardManager {
     // Deprecated selectArtifact, mapped to selectReward
     selectArtifact(card) {
         this.selectReward(card, false);
+    }
+
+    /**
+     * Returns a random selection of Advanced Actions.
+     * @param {number} count 
+     * @returns {Array} Array of card data objects
+     */
+    getAdvancedActionOffer(count = 3) {
+        const shuffled = [...SAMPLE_ADVANCED_ACTIONS].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
     }
 }

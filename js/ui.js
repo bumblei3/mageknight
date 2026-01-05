@@ -28,10 +28,10 @@ export class UI {
         this.combatUI = new CombatUIManager(this.elements, this);
 
         // Initialize renderers
-        this.statsRenderer = new StatsRenderer(this.elements);
-        this.manaRenderer = new ManaRenderer(this.elements, this.tooltipManager);
-        this.unitRenderer = new UnitRenderer(this.elements);
-        this.handRenderer = new HandRenderer(this.elements, this.tooltipManager);
+        this.statsRenderer = new StatsRenderer(this.elements, this);
+        this.manaRenderer = new ManaRenderer(this.elements, this.tooltipManager, this);
+        this.unitRenderer = new UnitRenderer(this.elements, this);
+        this.handRenderer = new HandRenderer(this.elements, this.tooltipManager, this);
         this.skillRenderer = new SkillRenderer(this);
 
         this.setupEventListeners();
@@ -76,6 +76,9 @@ export class UI {
                 const panel = btn.closest('.panel');
                 if (panel) {
                     panel.classList.toggle('collapsed');
+                    if (this.game && this.game.sound) {
+                        this.game.sound.click();
+                    }
                 }
             });
         });
@@ -207,13 +210,22 @@ export class UI {
     setupEventListeners() {
         // Event listeners will be set from game.js
         if (this.elements.siteClose) {
-            this.elements.siteClose.addEventListener('click', () => this.hideSiteModal());
+            this.elements.siteClose.addEventListener('click', () => {
+                this.hideSiteModal();
+                if (this.game && this.game.sound) this.game.sound.click();
+            });
         }
         if (this.elements.eventClose) {
-            this.elements.eventClose.addEventListener('click', () => this.elements.eventModal.classList.remove('active'));
+            this.elements.eventClose.addEventListener('click', () => {
+                this.elements.eventModal.classList.remove('active');
+                if (this.game && this.game.sound) this.game.sound.click();
+            });
         }
         if (this.elements.languageBtn) {
-            this.elements.languageBtn.addEventListener('click', () => this.toggleLanguage());
+            this.elements.languageBtn.addEventListener('click', () => {
+                this.toggleLanguage();
+                if (this.game && this.game.sound) this.game.sound.click();
+            });
         }
     }
 

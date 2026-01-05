@@ -73,6 +73,7 @@ export class SkillRenderer {
     handleSkillClick(skillId, _hero) {
         // Trigger skill effect via game controller
         if (this.ui.game && this.ui.game.heroController) {
+            if (this.ui.game.sound) this.ui.game.sound.click();
             const result = this.ui.game.heroController.useActiveSkill(skillId);
             if (result.success) {
                 this.ui.game.updateStats();

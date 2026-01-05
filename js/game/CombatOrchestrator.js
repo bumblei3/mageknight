@@ -163,7 +163,7 @@ export class CombatOrchestrator {
 
         // Visual Impact
         const pixelPos = this.game.hexGrid.axialToPixel(this.game.combat.enemy.position.q, this.game.combat.enemy.position.r);
-        this.game.particleSystem.impactEffect(pixelPos.x, pixelPos.y);
+        this.game.particleSystem.combatClashEffect(pixelPos.x, pixelPos.y, 'physical');
 
         const attackResult = this.game.combat.attackEnemies(this.combatAttackTotal, 'physical');
 
@@ -310,7 +310,7 @@ export class CombatOrchestrator {
 
                 // Particle Effect for successful block
                 const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
-                this.game.particleSystem.shieldEffect(pixelPos.x, pixelPos.y);
+                this.game.particleSystem.shieldBlockEffect(pixelPos.x, pixelPos.y);
             }
 
             // Reset for next block attempt

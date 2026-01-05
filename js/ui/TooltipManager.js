@@ -136,9 +136,6 @@ export class TooltipManager {
                 const term = e.target.dataset.term;
                 if (term) {
                     this.currentTarget = e.target;
-                    // We need to pass the term key to showGlossaryTooltip
-                    // But attachToElement usually expects fixed content.
-                    // Here we hijack the generic tooltip system for the child.
                     this.showGlossaryTooltip(e.target, term);
                     e.stopPropagation();
                 }
@@ -151,6 +148,23 @@ export class TooltipManager {
                 e.stopPropagation();
             }
         });
+    }
+
+    /**
+     * Register a simple text tooltip with title
+     * @param {HTMLElement} element - Target element
+     * @param {string} description - Tooltip description
+     * @param {string} title - Optional title
+     */
+    register(element, description, title = '') {
+        if (!element) return;
+        const html = `
+            <div class="tooltip-generic">
+                ${title ? `<div class="tooltip-header"><span class="tooltip-name">${title}</span></div><div class="tooltip-divider"></div>` : ''}
+                <div class="tooltip-description">${description}</div>
+            </div>
+        `;
+        this.attachToElement(element, html);
     }
 
     /**

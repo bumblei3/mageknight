@@ -2,8 +2,9 @@ import { animator, animateCounter } from '../animator.js';
 import { store, ACTIONS } from '../game/Store.js';
 
 export class StatsRenderer {
-    constructor(elements) {
+    constructor(elements, ui) {
         this.elements = elements;
+        this.ui = ui;
         this.setupSubscriptions();
     }
 
@@ -115,6 +116,16 @@ export class StatsRenderer {
             const hasHealing = hero.healingPoints > 0;
             this.elements.healBtn.style.display = (hasWounds && hasHealing) ? 'block' : 'none';
             this.elements.healBtn.textContent = `Heilen (${hero.healingPoints})`;
+
+            // Add click sound if not already added
+            if (!this.elements.healBtn._soundAdded) {
+                this.elements.healBtn.addEventListener('click', () => {
+                    if (this.ui && this.ui.game && this.ui.game.sound) {
+                        this.ui.game.sound.click();
+                    }
+                });
+                this.elements.healBtn._soundAdded = true;
+            }
         }
 
         // Render Skills

@@ -3,13 +3,15 @@ import { t } from '../i18n/index.js';
 import * as CardAnimations from '../cardAnimations.js';
 
 export class HandRenderer {
-    constructor(elements, tooltipManager) {
+    constructor(elements, tooltipManager, ui) {
         this.elements = elements;
         this.tooltipManager = tooltipManager;
+        this.ui = ui;
         this.callbacks = {
             onCardClick: null,
             onCardRightClick: null
         };
+        this.animatedCards = new WeakMap(); // Track if a card instance has been animated
         this.setupSubscriptions();
     }
 
@@ -35,12 +37,23 @@ export class HandRenderer {
             const isWound = typeof card.isWound === 'function' ? card.isWound() : !!card.isWound;
             const cardEl = this.createCardElement(card, index);
 
-            // Animate card draw with stagger
-            CardAnimations.animateCardDraw(cardEl, index);
+            // Animate card draw only if it's new
+            if (!this.animatedCards.has(card)) {
+                CardAnimations.animateCardDraw(cardEl, index);
+                this.animatedCards.set(card, true);
+            }
 
-            cardEl.addEventListener('click', () => onCardClick(index, card));
+            cardEl.addEventListener('click', () => {
+                if (this.ui && this.ui.game && this.ui.game.sound) {
+                    this.ui.game.sound.cardPlay();
+                }
+                onCardClick(index, card);
+            });
             cardEl.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
+                if (this.ui && this.ui.game && this.ui.game.sound) {
+                    this.ui.game.sound.cardPlaySideways();
+                }
                 if (onCardRightClick) onCardRightClick(index, card);
             });
 
@@ -48,6 +61,9 @@ export class HandRenderer {
             let isHovering = false;
             cardEl.addEventListener('mouseenter', () => {
                 isHovering = true;
+                if (this.ui && this.ui.game && this.ui.game.sound) {
+                    this.ui.game.sound.hover();
+                }
             });
 
             cardEl.addEventListener('mousemove', (e) => {
@@ -117,11 +133,10 @@ export class HandRenderer {
             <div class="card-effects">
                 <div class="card-effect"><strong>${t('cards.basic')}:</strong> ${basicEffect}</div>
                 ${strongEffect && strongEffect !== t('cards.none') ?
-        `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
+                `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
             </div>
             <div class="card-hint">${t('cards.sidewaysAction')}</div>
         `;
-
         return cardDiv;
     }
 

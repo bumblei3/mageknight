@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
 import { createMockElement, createMockCanvas, createSpy, createMockContext } from './test-mocks.js';
+import { SKILLS } from '../js/skills.js';
+import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
 
 describe('Long Session - Integration', () => {
     let game;
@@ -40,12 +42,13 @@ describe('Long Session - Integration', () => {
         expect(game.turnNumber).toBe(1);
 
         // Turn 1: Gain Fame (combat result simulation)
-        game.ui.showLevelUpModal = createSpy((level, data, callback) => {
-            // Simulate selecting first skill and card
-            callback({ skill: data.skills[0], card: data.cards[0] });
-        });
+        game.gainFame(15); // Level up triggers at 10
 
-        game.gainFame(15); // Level up happens at 10
+        // Simulate player selection via LevelUpManager
+        game.levelUpManager.selectedSkill = SKILLS.GOLDYX[0];
+        game.levelUpManager.selectedCard = SAMPLE_ADVANCED_ACTIONS[0];
+        game.levelUpManager.confirmSelection();
+
         expect(game.hero.level).toBe(2);
         expect(game.hero.skills.length).toBeGreaterThan(0);
 

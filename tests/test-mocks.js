@@ -188,7 +188,8 @@ export function createMockUI() {
             hideTooltip: createSpy(),
             showEnemyTooltip: createSpy(),
             showTerrainTooltip: createSpy(),
-            createStatTooltipHTML: createSpy(() => '<div>Tooltip</div>')
+            createStatTooltipHTML: createSpy(() => '<div>Tooltip</div>'),
+            register: createSpy()
         }
     };
 }
@@ -852,6 +853,9 @@ export function setupGlobalMocks() {
 
     // Default seed for deterministic tests
     setRandomSeed(42);
+
+    // Global test flag for game detection
+    if (global.window) global.window.isTest = true;
 }
 
 /**

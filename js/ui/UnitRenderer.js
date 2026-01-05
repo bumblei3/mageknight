@@ -2,8 +2,9 @@ import { t } from '../i18n/index.js';
 import { store, ACTIONS } from '../game/Store.js';
 
 export class UnitRenderer {
-    constructor(elements) {
+    constructor(elements, ui) {
         this.elements = elements;
+        this.ui = ui;
         this.setupSubscriptions();
     }
 
@@ -93,6 +94,9 @@ export class UnitRenderer {
             unitCard.addEventListener('mouseenter', () => {
                 unitCard.style.transform = 'translateY(-2px)';
                 unitCard.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                if (this.ui && this.ui.game && this.ui.game.sound) {
+                    this.ui.game.sound.hover();
+                }
             });
             unitCard.addEventListener('mouseleave', () => {
                 unitCard.style.transform = 'translateY(0)';

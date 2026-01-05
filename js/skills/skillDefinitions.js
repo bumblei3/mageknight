@@ -32,8 +32,8 @@ export const HERO_SKILLS = {
                 cooldown: 'round'
             },
             {
-                id: 'scales_of_steel',
-                name: 'Stahl-Schuppen',
+                id: 'dragon_scales',
+                name: 'Drachenschuppen',
                 type: 'passive',
                 description: '+1 Rüstung.',
                 icon: '🛡️'

@@ -61,24 +61,29 @@ export class Animator {
 
     /**
      * Animate hero movement between hexes
+     * @param {Object} hero - The hero object with displayPosition
      * @param {Object} oldPos - Starting axial pos {q, r}
      * @param {Object} newPos - Ending axial pos {q, r}
-     * @param {Object} screenPos - Target screen position {x, y}
      * @returns {Promise} Resolves when animation complete
      */
-    async animateHeroMove(_oldPos, _newPos, _screenPos) {
+    async animateHeroMove(hero, oldPos, newPos) {
+        if (!hero || !hero.displayPosition) return;
+
         return new Promise(resolve => {
-            // Simplified animation: just a small delay or dummy Tween
-            // In a real implementation we might tween a displayPosition property on the hero
-            // For now, assume we just wait a bit to simulate travel
             this.animate({
                 from: 0,
                 to: 1,
-                duration: 300,
-                onUpdate: (_progress) => {
-                    // Could update a visual marker here
+                duration: 400,
+                easing: 'easeInOutCubic',
+                onUpdate: (progress) => {
+                    hero.displayPosition.q = oldPos.q + (newPos.q - oldPos.q) * progress;
+                    hero.displayPosition.r = oldPos.r + (newPos.r - oldPos.r) * progress;
                 },
-                onComplete: resolve
+                onComplete: () => {
+                    hero.displayPosition.q = newPos.q;
+                    hero.displayPosition.r = newPos.r;
+                    resolve();
+                }
             });
         });
     }

@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
 import { MageKnightGame } from '../js/game.js';
 import { createMockEnemy, createMockHexGrid } from './test-helpers.js';
+import { SKILLS } from '../js/skills.js';
+import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
 
 describe('Game Integration', () => {
     let game;
@@ -103,24 +105,22 @@ describe('Game Integration', () => {
     it('should handle level up rewards', () => {
         // 1. Gain enough fame
         const initialLevel = game.hero.level;
+        const initialDeckSize = game.hero.deck.length;
 
-        // Mock UI showLevelUpModal to immediately trigger callback
-        game.ui.showLevelUpModal = (level, options, callback) => {
-            // Simulate selecting first skill and card
-            callback({
-                skill: options.skills[0],
-                card: options.cards[0]
-            });
-        };
+        // Manually trigger level up reward
+        game.gainFame(15); // Trigger level 2
 
-        game.gainFame(100); // Should trigger multiple level ups
+        // Simulate player selecting skill and card via LevelUpManager
+        game.levelUpManager.selectedSkill = SKILLS.GOLDYX[0];
+        game.levelUpManager.selectedCard = SAMPLE_ADVANCED_ACTIONS[0];
+        game.levelUpManager.confirmSelection();
 
-        // 2. Check level
+        // 2. Check level (should be 2 now after confirmSelection calls levelUp)
         expect(game.hero.level).toBeGreaterThan(initialLevel);
 
         // 3. Check for rewards
         expect(game.hero.skills.length).toBeGreaterThan(0);
-        // Check if card was added to hand (Level Up reward goes to hand)
-        expect(game.hero.hand.length).toBeGreaterThan(5); // Default hand is 5, +1 reward
+        // Check if card was added to deck
+        expect(game.hero.deck.length).toBeGreaterThan(initialDeckSize);
     });
 });

@@ -215,9 +215,9 @@ export class ActionManager {
 
         // Animation
         await this.game.animator.animateHeroMove(
+            this.game.hero,
             oldPos,
-            { q, r },
-            this.game.hexGrid.getScreenPos(q, r)
+            { q, r }
         );
 
         // Sync display position

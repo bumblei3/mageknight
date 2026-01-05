@@ -80,6 +80,7 @@ export class ModalManager {
                     }
 
                     itemEl.addEventListener('click', () => {
+                        if (this.ui.game && this.ui.game.sound) this.ui.game.sound.click();
                         const result = item.action();
                         if (result.success) {
                             this.ui.showNotification(result.message, 'success');
@@ -100,6 +101,7 @@ export class ModalManager {
                 btn.disabled = !opt.enabled;
 
                 btn.addEventListener('click', () => {
+                    if (this.ui.game && this.ui.game.sound) this.ui.game.sound.click();
                     const result = opt.action();
                     if (result.success) {
                         this.ui.showNotification(result.message, 'success');
@@ -148,6 +150,7 @@ export class ModalManager {
             `;
 
             skillEl.addEventListener('click', () => {
+                if (this.ui.game && this.ui.game.sound) this.ui.game.sound.click();
                 Array.from(el.skillChoices.children).forEach(c => c.classList.remove('selected'));
                 skillEl.classList.add('selected');
                 selectedSkill = skill;
@@ -164,6 +167,7 @@ export class ModalManager {
             cardEl.classList.add('card-choice');
 
             cardEl.addEventListener('click', () => {
+                if (this.ui.game && this.ui.game.sound) this.ui.game.sound.click();
                 Array.from(el.cardChoices.children).forEach(c => c.classList.remove('selected'));
                 cardEl.classList.add('selected');
                 selectedCard = card;
@@ -180,6 +184,7 @@ export class ModalManager {
 
         el.confirmLevelUpBtn.disabled = true;
         el.confirmLevelUpBtn.addEventListener('click', () => {
+            if (this.ui.game && this.ui.game.sound) this.ui.game.sound.levelUp();
             el.levelUpModal.style.display = 'none';
             if (onConfirm) {
                 onConfirm({ skill: selectedSkill, card: selectedCard });
@@ -209,10 +214,11 @@ export class ModalManager {
             btn.innerHTML = `<span class="option-label">${option.label}</span>`;
 
             btn.addEventListener('click', () => {
+                if (this.ui.game && this.ui.game.sound) this.ui.game.sound.click();
                 el.eventModal.classList.remove('active');
-
                 // Execute resolution logic
                 const result = game.mapManager.worldEvents.resolveEventOption(eventData, index);
+                // ... (rest as before)
 
                 if (result) {
                     if (result.success) {

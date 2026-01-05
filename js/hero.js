@@ -398,7 +398,7 @@ export class Hero {
 
     addCardToDeck(card) {
         // Clone to ensure we have a fresh instance
-        const newCard = card.clone();
+        const newCard = (card && typeof card.clone === 'function') ? card.clone() : card;
 
         // Add to Discard pile (standard deckbuilder rule: new cards go to discard)
         // Or Top of Deck? Mage Knight rules usually: on top of Deed deck unless specified.

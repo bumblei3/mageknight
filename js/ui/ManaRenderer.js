@@ -2,9 +2,10 @@ import { t } from '../i18n/index.js';
 import { store, ACTIONS } from '../game/Store.js';
 
 export class ManaRenderer {
-    constructor(elements, tooltipManager) {
+    constructor(elements, tooltipManager, ui) {
         this.elements = elements;
         this.tooltipManager = tooltipManager;
+        this.ui = ui;
         this.setupSubscriptions();
     }
 
@@ -55,7 +56,12 @@ export class ManaRenderer {
             dieEl.textContent = icon;
 
             if (die.available && onDieClick) {
-                dieEl.addEventListener('click', () => onDieClick(index, die.color));
+                dieEl.addEventListener('click', () => {
+                    if (this.ui && this.ui.game && this.ui.game.sound) {
+                        this.ui.game.sound.click();
+                    }
+                    onDieClick(index, die.color);
+                });
             }
 
             // Add tooltip

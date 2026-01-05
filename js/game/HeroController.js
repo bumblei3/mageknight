@@ -2,7 +2,7 @@
  * HeroController - Manages hero-related game logic
  * Extracted from MageKnightGame to improve separation of concerns.
  */
-import { getRandomSkills } from '../skills.js';
+import { getRandomSkills } from '../skills/skillDefinitions.js';
 import { SAMPLE_ADVANCED_ACTIONS, createDeck } from '../card.js';
 
 export class HeroController {
@@ -128,50 +128,50 @@ export class HeroController {
         const skill = this.game.hero.skills.find(s => s.id === skillId);
 
         switch (skillId) {
-        case 'motivation':
-            this.game.hero.drawCards(2);
-            this.game.hero.takeManaFromSource('white');
-            this.game.hero.useSkill(skillId);
-            this.game.addLog('Fähigkeit "Motivation" genutzt: +2 Karten, +1 Weißes Mana.', 'success');
-            this.game.renderHand();
-            this.game.renderMana();
-            return { success: true, message: 'Motivation aktiviert!' };
+            case 'motivation':
+                this.game.hero.drawCards(2);
+                this.game.hero.takeManaFromSource('white');
+                this.game.hero.useSkill(skillId);
+                this.game.addLog('Fähigkeit "Motivation" genutzt: +2 Karten, +1 Weißes Mana.', 'success');
+                this.game.renderHand();
+                this.game.renderMana();
+                return { success: true, message: 'Motivation aktiviert!' };
 
-        case 'essence_flow': {
-            this.game.hero.drawCards(1);
-            // For simplified essence flow: give a random mana from source or let player pick?
-            // Picking is better. Let's show a toast and give a random for now to keep it simple,
-            // OR trigger a choice.
-            // Simplified: Give a random standard color
-            const colors = ['red', 'blue', 'green', 'white'];
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            this.game.hero.takeManaFromSource(color);
-            this.game.hero.useSkill(skillId);
-            this.game.addLog(`Fähigkeit "Essenz-Fluss" genutzt: +1 Karte, +1 ${color}-Mana.`, 'success');
-            this.game.renderHand();
-            this.game.renderMana();
-            return { success: true, message: `Essenz-Fluss aktiviert (${color})!` };
-        }
-
-        case 'freezing_breath': {
-            if (!this.game.combat) {
-                return { success: false, message: 'Eis-Atem kann nur im Kampf eingesetzt werden.' };
+            case 'essence_flow': {
+                this.game.hero.drawCards(1);
+                // For simplified essence flow: give a random mana from source or let player pick?
+                // Picking is better. Let's show a toast and give a random for now to keep it simple,
+                // OR trigger a choice.
+                // Simplified: Give a random standard color
+                const colors = ['red', 'blue', 'green', 'white'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                this.game.hero.takeManaFromSource(color);
+                this.game.hero.useSkill(skillId);
+                this.game.addLog(`Fähigkeit "Essenz-Fluss" genutzt: +1 Karte, +1 ${color}-Mana.`, 'success');
+                this.game.renderHand();
+                this.game.renderMana();
+                return { success: true, message: `Essenz-Fluss aktiviert (${color})!` };
             }
-            // Apply to all enemies for simplicity or first one?
-            // Let's apply as a status effect if we have that system, or just debuff current combat
-            const enemies = this.game.combat.enemies;
-            enemies.forEach(enemy => {
-                enemy.armor = Math.max(1, enemy.armor - 3);
-                enemy.attack = 0; // Lost all attacks
-            });
-            this.game.hero.useSkill(skillId);
-            this.game.addLog('Fähigkeit "Eis-Atem" genutzt: Feinde eingefroren (-3 Rüstung, 0 Angriff).', 'success');
-            this.game.updateCombatUI();
-            return { success: true, message: 'Eis-Atem aktiviert!' };
-        }
 
-        default:
-            return { success: false, message: 'Fähigkeitseffekt nicht implementiert.' };
+            case 'freezing_breath': {
+                if (!this.game.combat) {
+                    return { success: false, message: 'Eis-Atem kann nur im Kampf eingesetzt werden.' };
+                }
+                // Apply to all enemies for simplicity or first one?
+                // Let's apply as a status effect if we have that system, or just debuff current combat
+                const enemies = this.game.combat.enemies;
+                enemies.forEach(enemy => {
+                    enemy.armor = Math.max(1, enemy.armor - 3);
+                    enemy.attack = 0; // Lost all attacks
+                });
+                this.game.hero.useSkill(skillId);
+                this.game.addLog('Fähigkeit "Eis-Atem" genutzt: Feinde eingefroren (-3 Rüstung, 0 Angriff).', 'success');
+                this.game.updateCombatUI();
+                return { success: true, message: 'Eis-Atem aktiviert!' };
+            }
+
+            default:
+                return { success: false, message: 'Fähigkeitseffekt nicht implementiert.' };
         }
     }
 }

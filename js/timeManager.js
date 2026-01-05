@@ -1,5 +1,6 @@
 import { TIME_OF_DAY, GAME_EVENTS } from './constants.js';
 import { eventBus } from './eventBus.js';
+import { store, ACTIONS } from './game/Store.js';
 
 export { TIME_OF_DAY };
 
@@ -50,6 +51,11 @@ export class TimeManager {
         };
         this.listeners.forEach(callback => callback(state));
         eventBus.emit(GAME_EVENTS.TIME_CHANGED, state);
+
+        if (store) {
+            store.dispatch(ACTIONS.SET_GAME_ROUND, this.round);
+            store.dispatch(ACTIONS.SET_DAY_NIGHT, this.isNight());
+        }
     }
 
     getState() {

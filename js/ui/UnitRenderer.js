@@ -1,6 +1,18 @@
+import { store, ACTIONS } from '../game/Store.js';
+
 export class UnitRenderer {
     constructor(elements) {
         this.elements = elements;
+        this.setupSubscriptions();
+    }
+
+    setupSubscriptions() {
+        if (!store) return;
+        store.subscribe((state, action) => {
+            if (action === ACTIONS.SET_HERO_STATS) {
+                this.renderUnits(state.hero.units);
+            }
+        });
     }
 
     // Render units in hero panel

@@ -3,6 +3,7 @@
  */
 import { eventBus } from '../eventBus.js';
 import { GAME_EVENTS } from '../constants.js';
+import { store, ACTIONS } from './Store.js';
 
 export class PhaseManager {
     constructor(game) {
@@ -104,5 +105,21 @@ export class PhaseManager {
             movementMode: !!this.game.movementMode,
             isDay: this.game.timeManager.isDay()
         });
+
+        if (store) {
+            let phase = 'EXPLORATION';
+            if (this.game.combat) phase = 'COMBAT';
+            else if (this.game.movementMode) phase = 'MOVEMENT';
+            store.dispatch(ACTIONS.SET_GAME_PHASE, phase);
+
+            if (this.game.combat) {
+                store.dispatch(ACTIONS.SET_COMBAT_STATE, {
+                    active: true,
+                    phase: this.game.combat.phase
+                });
+            } else {
+                store.dispatch(ACTIONS.SET_COMBAT_STATE, { active: false });
+            }
+        }
     }
 }

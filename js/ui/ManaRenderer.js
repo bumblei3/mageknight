@@ -1,9 +1,37 @@
 import { t } from '../i18n/index.js';
+import { store, ACTIONS } from '../game/Store.js';
 
 export class ManaRenderer {
     constructor(elements, tooltipManager) {
         this.elements = elements;
         this.tooltipManager = tooltipManager;
+        this.setupSubscriptions();
+    }
+
+    setupSubscriptions() {
+        if (!store) return;
+        store.subscribe((state, action) => {
+            if (action === ACTIONS.SET_HERO_RESOURCES ||
+                action === ACTIONS.SET_HERO_INVENTORY ||
+                action === ACTIONS.SET_DAY_NIGHT) {
+
+                const inventory = this.getInventoryFromState(state.hero);
+                this.renderHeroMana(inventory);
+            }
+        });
+    }
+
+    getInventoryFromState(heroState) {
+        // Reconstruct inventory from crystals and tempMana
+        const inventory = [...(heroState.tempMana || [])];
+        if (heroState.crystals) {
+            for (const [color, count] of Object.entries(heroState.crystals)) {
+                for (let i = 0; i < count; i++) {
+                    inventory.push(color);
+                }
+            }
+        }
+        return inventory;
     }
 
     // Render mana source

@@ -4,6 +4,7 @@ import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_A
 import { MANA_COLORS } from './mana.js';
 import { HeroInventory } from './hero/HeroInventory.js';
 import { HeroSkills } from './hero/HeroSkills.js';
+import { store, ACTIONS } from './game/Store.js';
 
 // Fame thresholds for levels
 // Level 1 starts at 0
@@ -61,6 +62,42 @@ export class Hero {
 
         // Initialize deck
         this.initializeDeck();
+        this.syncStore();
+    }
+
+    /**
+     * Synchronizes hero state with the central store.
+     */
+    syncStore() {
+        if (!store) return;
+
+        store.dispatch(ACTIONS.SET_HERO_STATS, {
+            name: this.name,
+            level: this.level,
+            fame: this.fame,
+            reputation: this.reputation,
+            armor: this.armor,
+            handLimit: this.handLimit,
+            commandLimit: this.commandLimit,
+            wounds: this.wounds.length,
+            deckSize: this.deck.length,
+            handSize: this.hand.length,
+            discardSize: this.discard.length,
+            units: this.units.length
+        });
+
+        store.dispatch(ACTIONS.SET_HERO_RESOURCES, {
+            movementPoints: this.movementPoints,
+            attackPoints: this.attackPoints,
+            blockPoints: this.blockPoints,
+            influencePoints: this.influencePoints,
+            healingPoints: this.healingPoints,
+            tempMana: [...this.tempMana]
+        });
+
+        store.dispatch(ACTIONS.SET_HERO_INVENTORY, {
+            crystals: { ...this.crystals }
+        });
     }
 
     initializeDeck() {
@@ -82,6 +119,7 @@ export class Hero {
             }
         }
 
+        this.syncStore();
         return drawnCards;
     }
 
@@ -138,6 +176,7 @@ export class Hero {
         // Add card to discard pile
         this.discard.push(card);
 
+        this.syncStore();
         return { card, effect, usedStrong: useStrong };
     }
 
@@ -168,6 +207,7 @@ export class Hero {
         // Add card to discard pile
         this.discard.push(card);
 
+        this.syncStore();
         return { card, effect: { [effectType]: 1 } };
     }
 
@@ -238,6 +278,7 @@ export class Hero {
         if (this.hasSkill('noble_manners')) {
             this.influencePoints = 2;
         }
+        this.syncStore();
     }
 
     // Take a wound
@@ -245,6 +286,7 @@ export class Hero {
         const wound = createWoundCard();
         this.hand.push(wound);
         this.wounds.push(wound);
+        this.syncStore();
     }
 
     // Take a wound to discard pile (Poison effect)
@@ -252,6 +294,7 @@ export class Hero {
         const wound = createWoundCard();
         this.discard.push(wound);
         this.wounds.push(wound);
+        this.syncStore();
     }
 
     // Heal a wound
@@ -272,9 +315,11 @@ export class Hero {
             if (useHealingPoints) {
                 this.healingPoints--;
             }
+            this.syncStore();
             return true;
         }
 
+        this.syncStore();
         return false;
     }
 
@@ -283,8 +328,10 @@ export class Hero {
         if (this.movementPoints >= cost) {
             this.position = { q, r };
             this.movementPoints -= cost;
+            this.syncStore();
             return true;
         }
+        this.syncStore();
         return false;
     }
 
@@ -297,6 +344,7 @@ export class Hero {
         if (nextLevel && this.fame >= nextLevel.fame) {
             return { leveledUp: true, newLevel: nextLevel.level, reward: nextLevel.reward };
         }
+        this.syncStore();
         return { leveledUp: false };
     }
 
@@ -312,6 +360,7 @@ export class Hero {
             // Even levels (2, 4) give Hand Limit
             this.handLimit++;
         }
+        this.syncStore();
     }
 
     hasSkill(skillId) {
@@ -341,6 +390,7 @@ export class Hero {
         if (skill.id === 'dragon_scales') {
             this.armor += 1;
         }
+        this.syncStore();
     }
 
     addCardToDeck(card) {
@@ -352,6 +402,7 @@ export class Hero {
         // Let's add to TOP of deck for immediate gratification in next draw
         this.deck.unshift(newCard);
         // Note: if doing "Deed Deck" style, might need to shuffle. For now, Top Deck is fun.
+        this.syncStore();
     }
 
     // Change reputation
@@ -359,6 +410,7 @@ export class Hero {
         this.reputation += amount;
         // Clamp between -7 and +7
         this.reputation = Math.max(-7, Math.min(7, this.reputation));
+        this.syncStore();
     }
 
     // Get reputation modifier for influence
@@ -395,6 +447,7 @@ export class Hero {
 
         this.initializeDeck();
         this.drawCards();
+        this.syncStore();
     }
 
     // Prepare for new round (shuffle discard into deck)
@@ -607,10 +660,8 @@ export class Hero {
 
     // Take mana from source (dice)
     takeManaFromSource(color) {
-        if (!Object.values(MANA_COLORS).includes(color)) {
-            return false;
-        }
         this.tempMana.push(color);
+        this.syncStore();
         return true;
     }
 
@@ -645,6 +696,7 @@ export class Hero {
 
         if (index !== -1) {
             this.tempMana.splice(index, 1);
+            this.syncStore();
             return true;
         }
 
@@ -654,6 +706,7 @@ export class Hero {
     // Clear temporary mana (called at end of turn)
     clearTempMana() {
         this.tempMana = [];
+        this.syncStore();
     }
 
     // Award a random artifact to the hero

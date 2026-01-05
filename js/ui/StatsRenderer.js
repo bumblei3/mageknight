@@ -1,8 +1,28 @@
 import { animator, animateCounter } from '../animator.js';
+import { store, ACTIONS } from '../game/Store.js';
 
 export class StatsRenderer {
     constructor(elements) {
         this.elements = elements;
+        this.setupSubscriptions();
+    }
+
+    setupSubscriptions() {
+        if (!store) return;
+        store.subscribe((state, action) => {
+            if (action === ACTIONS.SET_HERO_STATS || action === ACTIONS.SET_HERO_RESOURCES) {
+                this.updateFromStore(state.hero);
+            }
+        });
+    }
+
+    updateFromStore(heroState) {
+        // Compatibility wrapper for existing updateHeroStats logic
+        const mockHero = {
+            getStats: () => heroState,
+            healingPoints: heroState.healingPoints
+        };
+        this.updateHeroStats(mockHero);
     }
 
     // Show floating text animation

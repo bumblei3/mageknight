@@ -85,7 +85,7 @@ export class ScenarioManager {
 
         // Iterate all hexes
         if (this.game.hexGrid) {
-            for (const [key, hex] of this.game.hexGrid.hexes) {
+            for (const hex of this.game.hexGrid.hexes.values()) {
                 if (hex.site && hex.site.conquered) {
                     if (hex.site.type === SITE_TYPES.MINE) conqueredMines++;
                     if (hex.site.type === SITE_TYPES.KEEP) conqueredKeeps++;

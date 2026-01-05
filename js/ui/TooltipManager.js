@@ -309,12 +309,14 @@ export class TooltipManager {
      * @returns {string} HTML string
      */
     createTerrainTooltipHTML(terrainType, _terrainData) {
+        /*
         const info = {
-            icon: t(`terrain.${terrainType}.icon`) || (terrainType === 'water' ? '💧' : '❓'), // Icons can also be keys or fallback
+            icon: t(`terrain.${terrainType}.icon`) || (terrainType === 'water' ? '💧' : '❓'),
             name: t(`terrain.${terrainType}.name`),
             desc: t(`terrain.${terrainType}.desc`),
-            cost: terrainType === 'water' ? '∞' : (t(`terrain.${terrainType}.cost`) || '?') // Costs can also be keys if they change
+            cost: terrainType === 'water' ? '∞' : (t(`terrain.${terrainType}.cost`) || '?')
         };
+        */
 
         // For simplicity, we'll keep hardcoded icons/costs in the manager or move them to constants
         // but the NAMES and DESCRIPTIONS must be localized.

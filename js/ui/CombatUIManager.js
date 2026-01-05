@@ -236,8 +236,8 @@ export class CombatUIManager {
         const blockBadge = (phase === COMBAT_PHASES.BLOCK && !isBlocked) ?
             `<div class="block-badge">Benötigt: ${blockReq}</div>` : '';
 
-        const fortifiedBadge = (phase === COMBAT_PHASES.RANGED && enemy.fortified && !isBlocked) ?
-            '<div class="fortified-badge">BEFESTIGT</div>' : '';
+        // const fortifiedBadge = (phase === COMBAT_PHASES.RANGED && enemy.fortified && !isBlocked) ?
+        //     '<div class="fortified-badge">BEFESTIGT</div>' : '';
 
         el.innerHTML = `
             <div class="enemy-icon" style="color: ${enemy.color}">

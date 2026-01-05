@@ -32,7 +32,7 @@ export class WorldEventManager {
     }
 
     generateEvent(terrainType) {
-        const types = Object.values(EVENT_TYPES);
+        // const types = Object.values(EVENT_TYPES);
 
         // Weight events based on terrain
         let possibleEvents = [];

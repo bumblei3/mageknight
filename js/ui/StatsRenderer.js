@@ -130,7 +130,7 @@ export class StatsRenderer {
 
         // Render Skills
         // Note: StatsRenderer shouldn't necessarily do this if SkillRenderer exists.
-        // But the data comes from 'hero'. 
+        // But the data comes from 'hero'.
         // We will emit an event or accessing UI.skill_renderer if possible, OR
         // allow UI to handle the signal.
     }

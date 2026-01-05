@@ -296,7 +296,7 @@ export class StatusEffectManager {
     processCombatEnd(hero) {
         let totalWounds = 0;
 
-        for (const [_type, effect] of this.heroEffects) {
+        for (const effect of this.heroEffects.values()) {
             if (effect.onCombatEnd) {
                 const result = effect.onCombatEnd(hero, effect.stacks);
                 if (result && result.wounds) {
@@ -332,7 +332,7 @@ export class StatusEffectManager {
     // Clear all effects (for new combat)
     clear() {
         // Trigger onRemove for all hero effects
-        for (const [_type, effect] of this.heroEffects) {
+        for (const effect of this.heroEffects.values()) {
             if (effect.onRemove) {
                 effect.onRemove(effect.target);
             }

@@ -107,7 +107,7 @@ export class RewardManager {
 
     /**
      * Returns a random selection of Advanced Actions.
-     * @param {number} count 
+     * @param {number} count
      * @returns {Array} Array of card data objects
      */
     getAdvancedActionOffer(count = 3) {

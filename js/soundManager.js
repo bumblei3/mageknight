@@ -51,7 +51,7 @@ export class SoundManager {
     /**
      * Play a single tone
      */
-    playTone(frequency, duration, type = 'sine', attack = 0.01, decay = 0.1) {
+    playTone(frequency, duration, type = 'sine', attack = 0.01) {
         if (!this.enabled || !this.audioContext) {
             this.init();
             if (!this.audioContext) return;

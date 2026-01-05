@@ -258,7 +258,7 @@ export class UI {
 
     /**
      * Updates the hero stats display.
-     * @param {Hero} hero 
+     * @param {Hero} hero
      */
     updateHeroStats(hero) {
         this.statsRenderer.updateHeroStats(hero);

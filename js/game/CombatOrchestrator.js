@@ -247,29 +247,8 @@ export class CombatOrchestrator {
             let movementToSpend = movementPoints;
 
             if (enemy.cumbersome && movementPoints > 0) {
-                // Calculate how much block we have from cards
-                // We need to peek at the requirement
-                const blockReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
-                const cardBlock = this.activeBlocks.reduce((sum, b) => {
-                    // Simplified check: assume efficiency for now or use BlockingEngine logic if possible?
-                    // BlockingEngine handles efficiency internally.
-                    // Ideally we would ask BlockingEngine "how much short are we?"
-                    // But BlockingEngine doesn't return that directly if we just pass everything.
-
-                    // Let's do an iterative approach or a pre-check?
-                    // Pre-check:
-                    // 1. Calculate block with 0 movement.
-                    // 2. Check shortage.
-                    // 3. Spend min(available, shortage).
-                    return sum + b.value; // Approximate, doesn't account for elemental inefficiency here but this logic is in Controller
-                }, 0);
-
-                // Better: Run a "simulation" with 0 movement first to see the gap?
-                // But BlockingEngine is a bit complex to simulate here without duplicating logic.
-                // However, handleEnemyClick calls blockEnemy which calls BlockingEngine.
-
-                // Strategy: Pass ALL movement first (as we do now) to see IF it blocks.
-                // If it blocks, then decide how much to actually consume.
+                // Logic preserved for cumbersome movement point spending usage, if we need it later.
+                // Currently simplified to spending logic in blockEnemy.
             }
 
             const result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementToSpend);

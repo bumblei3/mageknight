@@ -194,6 +194,26 @@ export class Unit {
     refresh() {
         this.ready = true;
     }
+
+    // State persistence
+    getState() {
+        return {
+            type: this.type,
+            name: this.info.name, // Ensure we save name/level if dynamic
+            level: this.info.level,
+            wounds: this.wounds,
+            ready: this.ready
+        };
+    }
+
+    static fromState(state) {
+        // Re-create unit from type
+        const unit = new Unit(state.type);
+        // Restore mutable state
+        unit.wounds = state.wounds || 0;
+        unit.ready = state.ready !== undefined ? state.ready : true;
+        return unit;
+    }
 }
 
 export function createUnit(type) {

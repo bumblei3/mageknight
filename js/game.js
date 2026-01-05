@@ -9,7 +9,7 @@ import { ManaSource } from './mana.js';
 import { EnemyAI } from './enemyAI.js';
 import { UI } from './ui.js';
 import Terrain from './terrain.js';
-import SaveManager from './saveManager.js';
+import { SaveManager } from './persistence/SaveManager.js';
 import TutorialManager from './tutorialManager.js';
 import { TimeManager } from './timeManager.js';
 import { MapManager } from './mapManager.js';

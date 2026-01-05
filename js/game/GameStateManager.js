@@ -1,6 +1,8 @@
 /**
  * Manages game state persistence: Saving and Loading.
  */
+import { SaveManager } from '../persistence/SaveManager.js';
+
 export class GameStateManager {
     constructor(game) {
         this.game = game;
@@ -16,12 +18,14 @@ export class GameStateManager {
     saveGame(slotId) {
         try {
             const state = this.getGameState();
-            if (slotId !== undefined) {
-                this.game.saveManager.saveGame(slotId, state);
+            // Slot ID logic: 0-4 for manual usage?
+            // The new SaveManager treats slotId as string suffix effectively.
+            // Let's assume UI passes 0-based index.
+            const success = SaveManager.saveGame(`slot_${slotId}`, state);
+            if (success) {
                 this.game.showToast(`Spiel in Slot ${slotId + 1} gespeichert`, 'success');
             } else {
-                this.game.saveManager.save(state);
-                this.game.showToast('Spiel gespeichert', 'success');
+                this.game.showToast('Speichern fehlgeschlagen', 'error');
             }
         } catch (e) {
             console.error('Save failed', e);
@@ -91,24 +95,20 @@ export class GameStateManager {
      * Opens the save file dialog (Slot-based)
      */
     openSaveDialog() {
-        const saves = this.game.saveManager.listSaves();
         let message = '💾 SPIEL SPEICHERN\n\nWähle einen Slot (1-5):\n';
 
-        saves.forEach(save => {
-            if (save.empty) {
-                message += `Slot ${save.slotId + 1}: [Leer]\n`;
+        for (let i = 0; i < 5; i++) {
+            const meta = SaveManager.getSaveMeta(`slot_${i}`);
+            if (meta) {
+                message += `Slot ${i + 1}: ${new Date(meta.timestamp).toLocaleString()}\n`;
             } else {
-                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date}\n`;
+                message += `Slot ${i + 1}: [Leer]\n`;
             }
-        });
+        }
 
         const slot = prompt(message);
         if (slot && slot >= 1 && slot <= 5) {
-            const state = this.getGameState();
-            // Fix: calls saveGame(slotId, state) on SaveManager which expects (slotId, state)
-            // Previous code: saveGame(state, slotId) -> Wrong!
-            this.game.saveManager.saveGame(parseInt(slot) - 1, state);
-            this.game.showToast(`Spiel in Slot ${slot} gespeichert!`, 'success');
+            this.saveGame(parseInt(slot) - 1);
         }
     }
 
@@ -116,22 +116,22 @@ export class GameStateManager {
      * Opens the load file dialog (Slot-based)
      */
     openLoadDialog() {
-        const saves = this.game.saveManager.listSaves();
         let message = '📂 SPIELSTAND LADEN\n\n';
 
-        saves.forEach(save => {
-            if (save.empty) {
-                message += `Slot ${save.slotId + 1}: [Leer]\n`;
+        for (let i = 0; i < 5; i++) {
+            const meta = SaveManager.getSaveMeta(`slot_${i}`);
+            if (meta) {
+                message += `Slot ${i + 1}: ${new Date(meta.timestamp).toLocaleString()}\n`;
             } else {
-                message += `Slot ${save.slotId + 1}: ${save.heroName} - Zug ${save.turn} - ${save.date} \n`;
+                message += `Slot ${i + 1}: [Leer]\n`;
             }
-        });
+        }
 
         message += '\nWähle Slot (1-5) oder Abbrechen:';
         const slot = prompt(message);
 
         if (slot && slot >= 1 && slot <= 5) {
-            const state = this.game.saveManager.loadGame(parseInt(slot) - 1);
+            const state = SaveManager.loadGame(`slot_${parseInt(slot) - 1}`);
             if (state) {
                 this.loadGameState(state);
                 this.game.showToast('Spiel geladen!', 'success');

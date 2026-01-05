@@ -30,7 +30,7 @@ export class PhaseManager {
         eventBus.emit(GAME_EVENTS.TURN_ENDED, { turn: this.game.turnNumber });
 
         // Auto-save
-        this.game.saveGame();
+        this.game.saveGame('auto');
     }
 
     /**

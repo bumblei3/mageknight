@@ -9,10 +9,23 @@ export class Terrain {
         return this.terrainData[terrainType] || null;
     }
 
-    getMovementCost(terrainType, isNight = false) {
+    getMovementCost(terrainType, isNight = false, hero = null) {
         const costs = TERRAIN_COSTS[terrainType];
         if (!costs) return 2;
-        return isNight ? costs.night : costs.day;
+
+        let cost = isNight ? costs.night : costs.day;
+
+        // Flight skill: all terrain costs 2
+        if (hero && hero.hasSkill && hero.hasSkill('flight')) {
+            cost = Math.min(cost, 2);
+        }
+
+        // Forward March skill: movement costs -1 (min 1)
+        if (hero && hero.hasSkill && hero.hasSkill('forward_march') && cost > 1) {
+            cost -= 1;
+        }
+
+        return cost;
     }
 
     isPassable(terrainType) {

@@ -68,6 +68,14 @@ export class TurnManager {
         // Re-roll mana source
         this.game.manaSource.initialize();
 
+        // Apply round-start skill effects
+        if (this.game.hero.hasSkill && this.game.hero.hasSkill('crystal_mastery')) {
+            const success = this.game.hero.addCrystal('green');
+            if (success) {
+                this.game.addLog('💎 Crystal Mastery: +1 Grüner Kristall', 'success');
+            }
+        }
+
         // Prepare hero deck (shuffle discard into deck)
         this.game.hero.prepareNewRound();
 

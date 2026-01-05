@@ -18,9 +18,41 @@
     <link rel="stylesheet" href="combat-effects.css">
     <link rel="stylesheet" href="time-effects.css">
     <link rel="stylesheet" href="mobile.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="css/loading.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#a855f7">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 
 <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-particles">
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+            <div class="loading-particle"></div>
+        </div>
+        <div class="loading-logo">Mage Knight</div>
+        <div class="loading-spinner-container">
+            <div class="loading-ring"></div>
+            <div class="loading-ring"></div>
+            <div class="loading-ring"></div>
+            <div class="loading-icon">⚔️</div>
+        </div>
+        <div class="loading-progress-container">
+            <div id="loading-progress" class="loading-progress-bar"></div>
+        </div>
+        <div id="loading-status" class="loading-status">Initialisiere...</div>
+        <div class="loading-tip"><strong>Tipp:</strong> Rechtsklick auf Karten spielt sie seitlich für +1 Effekt.</div>
+    </div>
+
     <div class="game-container" id="game-container">
         <!-- Persistent Background Ambiance -->
         <div class="background-aura"></div>
@@ -641,6 +673,20 @@
     </div>
 
     <script type="module" src="js/main.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('[PWA] Service Worker registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.warn('[PWA] Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 
 </html>

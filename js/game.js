@@ -27,17 +27,17 @@ import { GAME_EVENTS, TIME_OF_DAY } from './constants.js';
 import { t } from './i18n/index.js';
 import { logger } from './logger.js';
 
-// Refactored Game Managers
+import { ScenarioManager } from './game/ScenarioManager.js';
+import { LevelUpManager } from './game/LevelUpManager.js';
+import { RewardManager } from './game/RewardManager.js';
 import { PhaseManager } from './game/PhaseManager.js';
 import { EntityManager } from './game/EntityManager.js';
 import { ActionManager } from './game/ActionManager.js';
 import { GameStateManager } from './game/GameStateManager.js';
 import { CombatOrchestrator } from './game/CombatOrchestrator.js';
+import { HeroController } from './game/HeroController.js';
 import { InputController } from './game/InputController.js';
 import { RenderController } from './game/RenderController.js';
-import { HeroController } from './game/HeroController.js';
-import { LevelUpManager } from './game/LevelUpManager.js';
-import { RewardManager } from './game/RewardManager.js';
 
 /**
  * Main Game Controller Class
@@ -65,6 +65,7 @@ export class MageKnightGame {
         this.animator = animator; // Initialize animator reference
         this.levelUpManager = new LevelUpManager(this);
         this.rewardManager = new RewardManager(this);
+        this.scenarioManager = new ScenarioManager(this); // New Scenario Manager
 
         // Core Components
         this.canvas = document.getElementById('game-board');
@@ -192,9 +193,10 @@ export class MageKnightGame {
 
     /**
      * Resets game state and starts a fresh session.
+     * @param {string} [scenarioId=null] Optional scenario ID to load
      */
-    startNewGame() {
-        logger.info('Starting new game...');
+    startNewGame(scenarioId = null) {
+        logger.info(`Starting new game... Scenario: ${scenarioId || 'default'}`);
         // Reset Game State
         this.turnNumber = 0;
         this.gameState = 'playing';
@@ -213,7 +215,21 @@ export class MageKnightGame {
 
         // Create initial game board
         this.mapManager = new MapManager(this.hexGrid); // Re-init map manager to clear map
-        this.createGameBoard();
+        this.mapManager.setWorldEventManager(this.worldEventManager);
+
+        // Load specific scenario if requested
+        if (scenarioId) {
+            this.scenarioManager.loadScenario(scenarioId);
+        }
+
+        const currentScenario = this.scenarioManager.getCurrentScenario();
+        this.mapManager.createStartingMap(currentScenario);
+
+        if (currentScenario) {
+            this.addLog(`Szenario gestartet: ${currentScenario.name}`, 'info');
+            this.showNotification(currentScenario.name, 'info');
+        }
+
         // this.setupParticleSystem(); // Moved to initializeSystem
 
         // Init Debug
@@ -239,7 +255,7 @@ export class MageKnightGame {
         }
 
         this.addLog(t('game.welcome'), 'info');
-        this.addLog(t('game.started'), 'info');
+        this.addLog(currentScenario ? this.scenarioManager.getObjectivesText() : t('game.started'), 'info');
         this.updatePhaseIndicator();
     }
 
@@ -285,6 +301,7 @@ export class MageKnightGame {
         const confirmBtn = document.getElementById('confirm-reset-btn');
         const cancelBtn = document.getElementById('cancel-reset-btn');
         const closeBtn = document.getElementById('close-reset-modal');
+        const scenarioSelect = document.getElementById('scenario-select');
 
         const closeModal = () => {
             modal.classList.remove('active');
@@ -295,9 +312,10 @@ export class MageKnightGame {
         };
 
         const onConfirm = () => {
+            const selectedScenario = scenarioSelect ? scenarioSelect.value : null;
             closeModal();
             this.ui.reset();
-            this.startNewGame();
+            this.startNewGame(selectedScenario);
         };
 
         // Wire up new listeners
@@ -608,8 +626,8 @@ export class MageKnightGame {
         // Checking constants.js for events.
 
         // Actually, let's subscribe to generic game events that imply impact
-        // But for now, let's look at where damage happens. 
-        // CombatOrchestrator emits logs. 
+        // But for now, let's look at where damage happens.
+        // CombatOrchestrator emits logs.
 
         // Let's add specific logic for dedicated effects
         eventBus.on(GAME_EVENTS.LOG_ADDED, (data) => {
@@ -628,7 +646,7 @@ export class MageKnightGame {
      */
     triggerDamageFeedback(x, y, amount) {
         // Calculate screen coordinates from hex/world if needed
-        // For simplicity, center screen or specific UI element? 
+        // For simplicity, center screen or specific UI element?
         // Ideally we want world coordinates mapped to screen.
         // HexGrid has hexToPixel(q, r).
 

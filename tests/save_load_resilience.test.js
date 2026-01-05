@@ -77,7 +77,12 @@ describe('MageKnightGame Coverage Boost v3', () => {
     });
 
     it('should handle card play with various effects in combat', () => {
-        game.combat = new Combat(game.hero, [{ id: 'enemy1', position: { q: 1, r: 0 }, isDefeated: () => false }]);
+        game.combat = new Combat(game.hero, [{
+            id: 'enemy1',
+            position: { q: 1, r: 0 },
+            isDefeated: () => false,
+            getState: () => ({ id: 'enemy1' }) // Added getState
+        }]);
         game.combat.phase = 'ranged';
 
         const card1 = { name: 'Fireball', type: 'spell', isWound: () => false, color: 'red' };
@@ -97,7 +102,8 @@ describe('MageKnightGame Coverage Boost v3', () => {
     it('should handle endBlockPhase with wounds', () => {
         const enemy = {
             id: 'orc1', name: 'Orc', attack: 4, position: { q: 1, r: 0 },
-            isDefeated: () => false, getEffectiveAttack: () => 4, getBlockRequirement: () => 4
+            isDefeated: () => false, getEffectiveAttack: () => 4, getBlockRequirement: () => 4,
+            getState: () => ({ id: 'orc1' }) // Added getState
         };
         game.combat = new Combat(game.hero, [enemy]);
         game.combat.phase = 'block';

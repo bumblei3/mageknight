@@ -3,9 +3,23 @@ import path from 'path';
 import fs from 'fs';
 
 // Dynamically find all test files
-const allTestFiles = fs.readdirSync('./tests')
-    .filter(f => f.endsWith('.test.js'))
-    .map(f => './tests/' + f);
+// Dynamically find all test files recursively
+function getTestFiles(dir) {
+    let results = [];
+    const list = fs.readdirSync(dir);
+    list.forEach(file => {
+        file = path.join(dir, file);
+        const stat = fs.statSync(file);
+        if (stat && stat.isDirectory()) {
+            results = results.concat(getTestFiles(file));
+        } else if (file.endsWith('.test.js')) {
+            results.push('./' + file); // Ensure relative path format
+        }
+    });
+    return results;
+}
+
+const allTestFiles = getTestFiles('./tests');
 
 // Parse args
 const args = process.argv.slice(2);
@@ -57,40 +71,79 @@ console.log(`Arguments: ${JSON.stringify(args)}`);
 console.log(`Sharding Config: Shard ${shardIndex + 1} of ${totalShards}`);
 console.log(`Running ${filesToRun.length} files out of ${allTestFiles.length}`);
 
-console.log('Starting execution with process isolation...');
+// Parallel Execution Config
+const MAX_CONCURRENCY = process.env.MAX_CONCURRENCY ? parseInt(process.env.MAX_CONCURRENCY) : Math.max(1, (await import('os')).cpus().length - 1);
+
+console.log(`Starting execution with process isolation... (Concurrency: ${MAX_CONCURRENCY})`);
 
 let totalPassedFiles = 0;
 let totalFailedFiles = 0;
+let completedFiles = 0;
+const failedFilesList = [];
 
 async function runFile(file) {
     return new Promise((resolve) => {
-        // console.log(`\n🚀 Spawning worker for ${file}...`);
-
         const child = spawn('node', ['--expose-gc', 'run_tests_worker.js', file, ...workerArgs], {
-            stdio: 'inherit', // Stream output directly to parent console
-            env: process.env
+            stdio: 'inherit',
+            env: { ...process.env, FORCE_COLOR: '1' }
         });
 
         child.on('close', (code) => {
+            completedFiles++;
+            const progress = `[${completedFiles}/${filesToRun.length}]`;
             if (code === 0) {
                 totalPassedFiles++;
                 resolve(true);
             } else {
-                console.error(`❌ Test failed: ${file}`);
+                console.error(`${progress} ❌ Test failed: ${file}`);
                 totalFailedFiles++;
+                failedFilesList.push(file);
                 resolve(false);
             }
         });
     });
 }
 
-// Run sequentially to keep memory low and output readable
-for (const file of filesToRun) {
-    await runFile(file);
+// Worker Pool Implementation
+async function runTestsInParallel(files) {
+    const queue = [...files];
+    const activeWorkers = new Set();
+    const results = [];
+
+    return new Promise((resolve) => {
+        const next = () => {
+            // Check if done
+            if (queue.length === 0 && activeWorkers.size === 0) {
+                resolve();
+                return;
+            }
+
+            // Fill pool
+            while (queue.length > 0 && activeWorkers.size < MAX_CONCURRENCY) {
+                const file = queue.shift();
+                const promise = runFile(file).then(() => {
+                    activeWorkers.delete(promise);
+                    next();
+                });
+                activeWorkers.add(promise);
+            }
+        };
+
+        next();
+    });
 }
+
+const startTime = Date.now();
+await runTestsInParallel(filesToRun);
+const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
 console.log('\n=============================================');
 console.log(`Global Results: Files Passed: ${totalPassedFiles} | Files Failed: ${totalFailedFiles}`);
+if (totalFailedFiles > 0) {
+    console.log('Failed Files:');
+    failedFilesList.forEach(f => console.log(` - ${f}`));
+}
+console.log(`Time Taken: ${duration}s`);
 console.log('=============================================');
 
 if (totalFailedFiles > 0) {

@@ -624,6 +624,13 @@
             </div>
             <div class="reset-modal-body">
                 <p>Möchtest du wirklich ein neues Spiel starten?</p>
+                <div class="scenario-selection">
+                    <label for="scenario-select">Szenario wählen:</label>
+                    <select id="scenario-select" class="scenario-dropdown">
+                        <option value="mines_freedom" selected>Freiheit für die Minen</option>
+                        <option value="druid_nights">Nächte der Druiden</option>
+                    </select>
+                </div>
                 <p class="warning-text">Der aktuelle Fortschritt geht unwiderruflich verloren!</p>
                 <div class="modal-actions">
                     <button class="btn btn-secondary" id="cancel-reset-btn">Abbrechen</button>

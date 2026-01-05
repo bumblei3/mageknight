@@ -203,27 +203,31 @@ export class CombatOrchestrator {
     }
 
     /**
-     * Starts combat with an enemy
+     * Starts combat with an enemy or group of enemies
+     * @param {Object|Array} enemyOrEnemies Single enemy object or array of enemies
      */
-    initiateCombat(enemy) {
+    initiateCombat(enemyOrEnemies) {
         if (this.game.gameState !== 'playing' || this.game.combat) return;
 
-        this.game.addLog(t('combat.fightAgainst', { enemy: enemy.name }), 'combat');
+        const enemies = Array.isArray(enemyOrEnemies) ? enemyOrEnemies : [enemyOrEnemies];
+        const names = enemies.map(e => e.name).join(' & ');
 
-        // Create combat instance
-        this.game.combat = new Combat(this.game.hero, enemy, (result) => this.onCombatEnd(result));
-        this.game.combat.start(); // Ensure combat starts (sets phase to RANGED)
+        this.game.addLog(t('combat.fightAgainst', { enemy: names }), 'combat');
+
+        // Create combat instance - Combat constructor handles array
+        this.game.combat = new Combat(this.game.hero, enemies, (result) => this.onCombatEnd(result));
+        this.game.combat.start();
         this.game.gameState = 'combat';
 
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
 
-        // UI Updates
-        this.game.ui.showCombatPanel([enemy], this.game.combat.phase, (e) => this.handleEnemyClick(e));
+        // UI Updates - Pass array
+        this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e) => this.handleEnemyClick(e));
         this.game.updatePhaseIndicator();
 
         // Emit event for other systems
-        eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemy });
+        eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemies });
     }
 
     /**
@@ -248,7 +252,7 @@ export class CombatOrchestrator {
                 const blockReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
                 const cardBlock = this.activeBlocks.reduce((sum, b) => {
                     // Simplified check: assume efficiency for now or use BlockingEngine logic if possible?
-                    // BlockingEngine handles efficiency internally. 
+                    // BlockingEngine handles efficiency internally.
                     // Ideally we would ask BlockingEngine "how much short are we?"
                     // But BlockingEngine doesn't return that directly if we just pass everything.
 
@@ -285,7 +289,7 @@ export class CombatOrchestrator {
                     const totalBlock = result.totalBlock;
 
                     // 3. Gap = rawReq - totalBlock (but totalBlock might ALREADY include move reduction? No, wait.)
-                    // BlockingEngine: 
+                    // BlockingEngine:
                     // blockRequired = Math.max(0, blockRequired - internalMovementSpent);
                     // totalEffectiveBlock = cards + units
                     // Check: totalEffectiveBlock >= blockRequired
@@ -373,17 +377,53 @@ export class CombatOrchestrator {
                     const logKey = currentSite.type === 'dungeon' ? 'combat.dungeonCleared' : 'combat.ruinCleared';
                     this.game.addLog(t(logKey), 'success');
 
-                    // Trigger reward selection instead of random award
+                    // Trigger reward selection
                     if (this.game.rewardManager) {
                         this.game.rewardManager.showArtifactChoice();
-                    } else {
-                        // Fallback
-                        this.game.hero.awardRandomArtifact();
                     }
-                } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower') {
+                } else if (currentSite.type === 'tomb') {
+                    currentSite.conquered = true;
+                    this.game.addLog(t('combat.tombCleared'), 'success');
+                    if (this.game.rewardManager) {
+                        this.game.rewardManager.showSpellChoice();
+                    }
+                } else if (currentSite.type === 'labyrinth') {
+                    currentSite.conquered = true;
+                    this.game.addLog(t('combat.labyrinthCleared'), 'success');
+                    if (this.game.rewardManager) {
+                        this.game.rewardManager.showArtifactChoice();
+                    }
+                } else if (currentSite.type === 'spawning_grounds') {
+                    currentSite.conquered = true;
+                    this.game.addLog(t('combat.spawningCleared'), 'success');
+
+                    // Reward: Small Heal
+                    const healed = this.game.hero.healWound(false); // No cost
+                    if (healed) {
+                        this.game.addLog('Die reinigende Energie heilt eine Wunde!', 'success');
+                        this.game.particleSystem.buffEffect(
+                            this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r).x,
+                            this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r).y,
+                            'green'
+                        );
+                    }
+                } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower' || currentSite.type === 'mine') {
                     currentSite.conquered = true;
                     this.game.addLog(t('combat.siteConquered', { site: currentSite.getName() }), 'success');
                     this.game.statisticsManager.increment('sitesConquered');
+
+                    // Check Victory Condition after every conquest
+                    if (this.game.scenarioManager) {
+                        const win = this.game.scenarioManager.checkVictory();
+                        if (win && win.victory) {
+                            // Delay slightly for dramatic effect
+                            setTimeout(() => {
+                                this.game.showNotification('🎉 ' + win.message, 'success', 10000);
+                                this.game.addLog(win.message, 'success');
+                                // Could trigger a victory modal here
+                            }, 1000);
+                        }
+                    }
                 }
             }
         } else if (result.defeat && enemy) {

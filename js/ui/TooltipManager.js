@@ -461,11 +461,11 @@ export class TooltipManager {
         if (!text) return '';
         let processed = text;
 
-        // This is a simplified regex approach. 
+        // This is a simplified regex approach.
         // Ideally we iterate over keys in i18n.glossary.
         // We need access to the raw glossary object, assume t returning object works or we load it.
         // Accessing i18n directly might be cleaner if we import default export fully, but we have 't'.
-        // Let's assume we can get the keys. 
+        // Let's assume we can get the keys.
 
         // Hardcoded list from implementation plan + de.js for now to ensure reliability
         const terms = [
@@ -499,7 +499,7 @@ export class TooltipManager {
             'Belagerung': 'siege',
             'Tag': 'day',
             'Nacht': 'night'
-            // Add 'Angriff' but handle collisions carefully? 
+            // Add 'Angriff' but handle collisions carefully?
         };
 
         terms.forEach(term => {

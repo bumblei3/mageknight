@@ -137,10 +137,10 @@ export class HeroController {
                 this.game.renderMana();
                 return { success: true, message: 'Motivation aktiviert!' };
 
-            case 'essence_flow':
+            case 'essence_flow': {
                 this.game.hero.drawCards(1);
                 // For simplified essence flow: give a random mana from source or let player pick?
-                // Picking is better. Let's show a toast and give a random for now to keep it simple, 
+                // Picking is better. Let's show a toast and give a random for now to keep it simple,
                 // OR trigger a choice.
                 // Simplified: Give a random standard color
                 const colors = ['red', 'blue', 'green', 'white'];
@@ -151,8 +151,9 @@ export class HeroController {
                 this.game.renderHand();
                 this.game.renderMana();
                 return { success: true, message: `Essenz-Fluss aktiviert (${color})!` };
+            }
 
-            case 'freezing_breath':
+            case 'freezing_breath': {
                 if (!this.game.combat) {
                     return { success: false, message: 'Eis-Atem kann nur im Kampf eingesetzt werden.' };
                 }
@@ -167,6 +168,7 @@ export class HeroController {
                 this.game.addLog('Fähigkeit "Eis-Atem" genutzt: Feinde eingefroren (-3 Rüstung, 0 Angriff).', 'success');
                 this.game.updateCombatUI();
                 return { success: true, message: 'Eis-Atem aktiviert!' };
+            }
 
             default:
                 return { success: false, message: 'Fähigkeitseffekt nicht implementiert.' };

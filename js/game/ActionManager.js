@@ -285,7 +285,7 @@ export class ActionManager {
             this.game.hero.movementPoints -= cost;
             const count = (result.success ? 7 : 0) + newHexes.length; // Approx 7 for a new tile
 
-            this.game.addLog(`Neues Gebiet entdeckt!`, 'discovery');
+            this.game.addLog('Neues Gebiet entdeckt!', 'discovery');
             this.game.statisticsManager.increment('tilesExplored', count);
 
             // Visual Feedback

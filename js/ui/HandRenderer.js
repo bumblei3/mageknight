@@ -93,7 +93,7 @@ export class HandRenderer {
             <div class="card-effects">
                 <div class="card-effect"><strong>Basic:</strong> ${basicEffect}</div>
                 ${strongEffect && strongEffect !== 'Keine' ?
-                `<div class="card-effect"><strong>Strong:</strong> ${strongEffect}</div>` : ''}
+        `<div class="card-effect"><strong>Strong:</strong> ${strongEffect}</div>` : ''}
             </div>
             <div class="card-hint">Rechtsklick: Seitlich (+1)</div>
         `;

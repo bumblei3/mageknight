@@ -16,7 +16,7 @@ export class WorldEventManager {
 
     /**
      * Check if an event should occur upon exploration
-     * @param {string} terrainType 
+     * @param {string} terrainType
      */
     checkForEvent(terrainType) {
         // Base chance 20%
@@ -65,7 +65,7 @@ export class WorldEventManager {
                         { label: 'Zum Kampf!', action: 'fight', text: 'Der Kampf beginnt!' }
                     ]
                 };
-            case EVENT_TYPES.CACHE:
+            case EVENT_TYPES.CACHE: {
                 const randomColor = Object.values(MANA_COLORS)[Math.floor(Math.random() * 6)];
                 return {
                     type,
@@ -75,6 +75,7 @@ export class WorldEventManager {
                         { label: 'Nehmen', action: 'mana', value: randomColor, text: `Du findest einen ${randomColor}-Kristall.` }
                     ]
                 };
+            }
             case EVENT_TYPES.MERCHANT:
                 return {
                     type,

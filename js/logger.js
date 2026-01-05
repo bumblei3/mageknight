@@ -82,12 +82,12 @@ class Logger {
 
     getConsoleStyle(level) {
         switch (level) {
-            case LOG_LEVELS.VERBOSE: return 'color: #888';
-            case LOG_LEVELS.DEBUG: return 'color: #3498db';
-            case LOG_LEVELS.INFO: return 'color: #2ecc71';
-            case LOG_LEVELS.WARN: return 'color: #f1c40f';
-            case LOG_LEVELS.ERROR: return 'color: #e74c3c; font-weight: bold';
-            default: return 'color: #fff';
+        case LOG_LEVELS.VERBOSE: return 'color: #888';
+        case LOG_LEVELS.DEBUG: return 'color: #3498db';
+        case LOG_LEVELS.INFO: return 'color: #2ecc71';
+        case LOG_LEVELS.WARN: return 'color: #f1c40f';
+        case LOG_LEVELS.ERROR: return 'color: #e74c3c; font-weight: bold';
+        default: return 'color: #fff';
         }
     }
 

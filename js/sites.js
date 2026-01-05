@@ -9,7 +9,8 @@ export const SITE_TYPES = {
     RUIN: 'ruin',
     TOMB: 'tomb',
     LABYRINTH: 'labyrinth',
-    SPAWNING_GROUNDS: 'spawning_grounds'
+    SPAWNING_GROUNDS: 'spawning_grounds',
+    MINE: 'mine'
 };
 
 export const SITE_INFO = {
@@ -17,8 +18,15 @@ export const SITE_INFO = {
         name: 'Dorf',
         icon: '🏠',
         color: '#fbbf24', // Amber
-        description: 'Ein friedliches Dorf. Hier kannst du heilen und Einheiten rekrutieren.',
+        description: 'Ein friedliches Dorf. Du kannst hier Einheiten rekrutieren oder Verletzungen heilen.',
         actions: ['heal', 'recruit']
+    },
+    [SITE_TYPES.MINE]: {
+        name: 'Kristall-Mine',
+        icon: '💎',
+        color: '#22d3ee', // Cyan
+        description: 'Eine Mine voller magischer Kristalle. Besiege die Wächter, um die Produktion zu kontrollieren.',
+        actions: ['attack']
     },
     [SITE_TYPES.KEEP]: {
         name: 'Festung',

@@ -472,7 +472,11 @@ describe('Coverage Gap Fill', () => {
 
         it('should handle complex combat card effects', () => {
             // Setup Combat
-            game.combat = { phase: 'ranged', enemies: [] };
+            game.combat = {
+                phase: 'ranged',
+                enemies: [],
+                getState: () => ({ phase: 'ranged' }) // Needed for ActionManager
+            };
             game.timeManager.isNight = () => false;
             game.ui.addPlayedCard = () => { };
             game.ui.showPlayArea = () => { };

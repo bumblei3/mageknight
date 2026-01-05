@@ -31,9 +31,9 @@ export class MapManager {
     }
 
     // Create the standard starting map layout
-    createStartingMap() {
-        // Create starting map (multiple tiles for enemy spawning) (0,0)
-        this.placeTile(0, 0, [
+    createStartingMap(scenario = null) {
+        // Default layout if no scenario
+        let centerTile = [
             TERRAIN_TYPES.PLAINS,
             TERRAIN_TYPES.FOREST,
             TERRAIN_TYPES.HILLS,
@@ -41,9 +41,27 @@ export class MapManager {
             TERRAIN_TYPES.FOREST,
             TERRAIN_TYPES.DESERT,
             TERRAIN_TYPES.WATER
-        ]);
+        ];
 
-        // Add adjacent tiles for enemy spawning areas
+        if (scenario && scenario.mapConfig && scenario.mapConfig.startTile) {
+            centerTile = scenario.mapConfig.startTile;
+        }
+
+        // Apply Scenario Deck if provided
+        if (scenario && scenario.mapConfig && scenario.mapConfig.deck) {
+            this.tilesDeck = [...scenario.mapConfig.deck]; // Copy array
+        } else {
+            // Reset to defaults if no scenario deck is present
+            this.initializeDeck();
+        }
+
+        // Create starting map (multiple tiles for enemy spawning) (0,0)
+        this.placeTile(0, 0, centerTile);
+
+        // Add adjacent tiles for enemy spawning areas or scenario specifics
+        // If Mines scenario, maybe ensure nearby tiles have mines?
+        // For now, keep standard adjacent but inject Mine potential via getRandomSiteForTerrain logic update
+
         // East (3,0)
         this.placeTile(3, 0, [
             TERRAIN_TYPES.FOREST,
@@ -57,7 +75,7 @@ export class MapManager {
 
         // South-West (0,3)
         this.placeTile(0, 3, [
-            TERRAIN_TYPES.HILLS,
+            TERRAIN_TYPES.HILLS, // Hill often gets Keep or Mine
             TERRAIN_TYPES.FOREST,
             TERRAIN_TYPES.PLAINS,
             TERRAIN_TYPES.HILLS,
@@ -72,7 +90,7 @@ export class MapManager {
             TERRAIN_TYPES.PLAINS,
             TERRAIN_TYPES.FOREST,
             TERRAIN_TYPES.HILLS,
-            TERRAIN_TYPES.MOUNTAINS,
+            TERRAIN_TYPES.MOUNTAINS, // Mountain often gets Mine
             TERRAIN_TYPES.FOREST,
             TERRAIN_TYPES.PLAINS
         ]);
@@ -163,14 +181,30 @@ export class MapManager {
         switch (terrain) {
             case TERRAIN_TYPES.PLAINS:
                 return Math.random() < 0.7 ? SITE_TYPES.VILLAGE : null;
-            case TERRAIN_TYPES.HILLS:
-                return Math.random() < 0.5 ? SITE_TYPES.KEEP : SITE_TYPES.MONASTERY;
+            case TERRAIN_TYPES.HILLS: {
+                // Hills can have Keeps, Monasteries, or Mines
+                const roll = Math.random();
+                if (roll < 0.3) return SITE_TYPES.KEEP;
+                if (roll < 0.6) return SITE_TYPES.MONASTERY;
+                if (roll < 0.8) return SITE_TYPES.MINE;
+                return null;
+            }
             case TERRAIN_TYPES.FOREST:
                 return Math.random() < 0.3 ? SITE_TYPES.KEEP : null;
-            case TERRAIN_TYPES.WASTELAND:
-                return Math.random() < 0.6 ? SITE_TYPES.MAGE_TOWER : SITE_TYPES.DUNGEON;
+            case TERRAIN_TYPES.WASTELAND: {
+                // Wastelands usually Mage Towers, Dungeons, or Ruins
+                const wRoll = Math.random();
+                if (wRoll < 0.4) return SITE_TYPES.MAGE_TOWER;
+                if (wRoll < 0.7) return SITE_TYPES.DUNGEON;
+                return SITE_TYPES.RUIN;
+            }
             case TERRAIN_TYPES.DESERT:
                 return Math.random() < 0.4 ? SITE_TYPES.MAGE_TOWER : null;
+            case TERRAIN_TYPES.MOUNTAINS:
+                // Mountains are prime for Mines
+                return Math.random() < 0.7 ? SITE_TYPES.MINE : SITE_TYPES.DUNGEON;
+            case TERRAIN_TYPES.WATER:
+                return null;
             default:
                 return null;
         }

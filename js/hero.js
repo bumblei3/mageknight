@@ -113,7 +113,7 @@ export class Hero {
 
         // If using strong effect, check and spend mana
         if (useStrong) {
-            // For standard action cards, manaCost might not be set on instance, 
+            // For standard action cards, manaCost might not be set on instance,
             // but logic implies using mana matching color
             const success = this.spendMana(card.color, isNight);
             if (!success) {

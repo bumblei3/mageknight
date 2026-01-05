@@ -111,17 +111,17 @@ export class CombatUIManager {
                 <div class="combat-prediction">
                     <div class="prediction-details">
                         ${prediction.expectedWounds > 0 ?
-                    `<div class="prediction-danger">
+        `<div class="prediction-danger">
                                 💔 <span><strong>${prediction.expectedWounds}</strong> Wunden erwartet</span>
-                                ${prediction.isPoisoned ? `<span class="poison-warning">+ GIFT!</span>` : ''}
+                                ${prediction.isPoisoned ? '<span class="poison-warning">+ GIFT!</span>' : ''}
                              </div>` :
-                    `<div class="prediction-safe">✅ Kein Schaden erwartet</div>`
-                }
+        '<div class="prediction-safe">✅ Kein Schaden erwartet</div>'
+}
                         ${prediction.enemiesDefeated.length > 0 ?
-                    `<div class="prediction-success">
+        `<div class="prediction-success">
                                 ⚔️ <strong>Besiegbar:</strong> ${prediction.enemiesDefeated.join(', ')}
                              </div>` : ''
-                }
+}
                     </div>
                 </div>
             `;
@@ -238,7 +238,7 @@ export class CombatUIManager {
             `<div class="block-badge">Benötigt: ${blockReq}</div>` : '';
 
         const fortifiedBadge = (phase === COMBAT_PHASES.RANGED && enemy.fortified && !isBlocked) ?
-            `<div class="fortified-badge">BEFESTIGT</div>` : '';
+            '<div class="fortified-badge">BEFESTIGT</div>' : '';
 
         el.innerHTML = `
             <div class="enemy-icon" style="color: ${enemy.color}">
@@ -246,7 +246,7 @@ export class CombatUIManager {
             </div>
             <div class="enemy-details">
                 <div class="enemy-name">
-                    ${isBlocked ? `<span class="blocked-label">[GEBLOCKT]</span><br>` : ''}
+                    ${isBlocked ? '<span class="blocked-label">[GEBLOCKT]</span><br>' : ''}
                     ${enemy.name}
                 </div>
                 <div class="enemy-stats">

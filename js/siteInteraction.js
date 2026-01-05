@@ -28,38 +28,41 @@ export class SiteInteractionManager {
 
         // Generate options based on site type
         switch (site.type) {
-            case SITE_TYPES.VILLAGE:
-                interactionData.options = this.getVillageOptions();
-                break;
-            case SITE_TYPES.MONASTERY:
-                interactionData.options = this.getMonasteryOptions();
-                break;
-            case SITE_TYPES.MAGE_TOWER:
-                interactionData.options = this.getMageTowerOptions();
-                break;
-            case SITE_TYPES.KEEP:
-                interactionData.options = this.getKeepOptions();
-                break;
-            case SITE_TYPES.DUNGEON:
-                interactionData.options = this.getDungeonOptions();
-                break;
-            case SITE_TYPES.CITY:
-                interactionData.options = this.getCityOptions();
-                break;
-            case SITE_TYPES.RUIN:
-                interactionData.options = this.getRuinOptions();
-                break;
-            case SITE_TYPES.TOMB:
-                interactionData.options = this.getTombOptions();
-                break;
-            case SITE_TYPES.LABYRINTH:
-                interactionData.options = this.getLabyrinthOptions();
-                break;
-            case SITE_TYPES.SPAWNING_GROUNDS:
-                interactionData.options = this.getSpawningGroundsOptions();
-                break;
-            default:
-                interactionData.options = [];
+        case SITE_TYPES.VILLAGE:
+            interactionData.options = this.getVillageOptions();
+            break;
+        case SITE_TYPES.MONASTERY:
+            interactionData.options = this.getMonasteryOptions();
+            break;
+        case SITE_TYPES.MAGE_TOWER:
+            interactionData.options = this.getMageTowerOptions();
+            break;
+        case SITE_TYPES.KEEP:
+            interactionData.options = this.getKeepOptions();
+            break;
+        case SITE_TYPES.DUNGEON:
+            interactionData.options = this.getDungeonOptions();
+            break;
+        case SITE_TYPES.CITY:
+            interactionData.options = this.getCityOptions();
+            break;
+        case SITE_TYPES.RUIN:
+            interactionData.options = this.getRuinOptions();
+            break;
+        case SITE_TYPES.TOMB:
+            interactionData.options = this.getTombOptions();
+            break;
+        case SITE_TYPES.LABYRINTH:
+            interactionData.options = this.getLabyrinthOptions();
+            break;
+        case SITE_TYPES.SPAWNING_GROUNDS:
+            interactionData.options = this.getSpawningGroundsOptions();
+            break;
+        case SITE_TYPES.MINE:
+            interactionData.options = this.getMineOptions();
+            break;
+        default:
+            interactionData.options = [];
         }
 
         return interactionData;
@@ -306,6 +309,82 @@ export class SiteInteractionManager {
         return options;
     }
 
+    getMineOptions() {
+        if (this.currentSite.conquered) {
+            // Production: Collect Crystal (Once per turn? Or passive?)
+            // Rules: You own it. Usually passive +1 Crystal income. Or visit to collect.
+            // Impl: Visit to collect 1 Crystal of mine color.
+            return [{
+                id: 'collect_crystal',
+                label: 'Kristall abbauen (1 Bewegung)',
+                action: () => this.collectMineCrystal(),
+                enabled: this.game.hero.movementPoints >= 1
+            }];
+        }
+
+        return [{
+            id: 'conquer_mine',
+            label: 'Mine erobern (Wächter besiegen)',
+            action: () => this.attackMine(),
+            enabled: true
+        }];
+    }
+
+    // Actions
+    attackMine() {
+        // Mines are guarded by Orcs or Draconum depending on depth/color
+        const isDeep = Math.random() > 0.6;
+        const enemy = isDeep ? {
+            name: 'Minen-Aufseher',
+            armor: 5,
+            attack: 5,
+            fame: 5,
+            icon: '👺', // Goblin/Orc
+            type: 'orc_summoner', // Why not?
+            color: '#b91c1c'
+        } : {
+            name: 'Kristall-Wächter',
+            armor: 4,
+            attack: 3,
+            fame: 3,
+            icon: '💎',
+            type: 'golem_small',
+            color: '#0891b2',
+            physicalResist: true
+        };
+
+        const msg = `Du willst die Mine erobern... ${enemy.name} stellt sich dir in den Weg!`;
+        this.game.addLog(msg, 'warning');
+        this.game.initiateCombat(enemy);
+        return { success: true, message: 'Angriff auf Mine!' };
+    }
+
+    collectMineCrystal() {
+        if (this.game.hero.movementPoints < 1) return { success: false, message: 'Zu wenig Bewegung.' };
+
+        // Random color or site color? Sites usually have fixed color.
+        // We defined site.getBlockRequirement or logic for color elsewhere?
+        // Abstract site doesn't store color unless we set it.
+        // Let's assume random for now or based on terrain.
+        // Simplification: Random basic color.
+
+        const colors = ['red', 'green', 'blue', 'white'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        this.game.hero.gainCrystal(color);
+        this.game.hero.movementPoints -= 1;
+
+        const msg = `Du hast einen ${color.toUpperCase()}-Kristall abgebaut!`;
+        this.game.addLog(msg, 'success');
+        this.game.particleSystem.buffEffect(
+            this.game.hexGrid.axialToPixel(this.currentHex.q, this.currentHex.r).x,
+            this.game.hexGrid.axialToPixel(this.currentHex.q, this.currentHex.r).y,
+            color
+        );
+
+        return { success: true, message: msg };
+    }
+
     // Actions
     healWounds(costPerWound) {
         // Simplified: Heal 1 wound for cost
@@ -505,9 +584,14 @@ export class SiteInteractionManager {
     }
 
     exploreLabyrinth() {
-        // Labyrinths have magical enemies - golems or mages
+        // Labyrinths have multiple enemies (2x)
+        // Mix of Magic (Mage/Golem) and Dungeon (Draconum/Elemental)
+        const enemies = [];
+
+        // Enemy 1: Magic Theme
         const isMage = Math.random() > 0.5;
-        const enemy = isMage ? {
+        enemies.push(isMage ? {
+            id: `labyrinth_mage_${Date.now()}`,
             name: 'Labyrinth-Magier',
             armor: 3,
             attack: 5,
@@ -517,6 +601,7 @@ export class SiteInteractionManager {
             type: 'mage',
             color: '#3b82f6'
         } : {
+            id: `labyrinth_golem_${Date.now()}`,
             name: 'Stein-Golem',
             armor: 7,
             attack: 4,
@@ -525,46 +610,84 @@ export class SiteInteractionManager {
             type: 'golem',
             color: '#6b7280',
             physicalResist: true
-        };
+        });
 
-        const msg = `Du betrittst das Labyrinth... ${enemy.name} blockiert den Weg!`;
+        // Enemy 2: Dungeon Theme
+        const isDragon = Math.random() > 0.6;
+        enemies.push(isDragon ? {
+            id: `labyrinth_dragon_${Date.now()}`,
+            name: 'Drakonier',
+            armor: 6,
+            attack: 5,
+            attackType: 'fire',
+            fame: 7,
+            icon: '🐲',
+            type: 'draconum',
+            color: '#dc2626'
+        } : {
+            id: `labyrinth_orc_${Date.now()}`,
+            name: 'Minotaurus', // Flavor text for Orc
+            armor: 5,
+            attack: 6,
+            fame: 4,
+            icon: '🐮',
+            type: 'orc_khan',
+            color: '#16a34a'
+        });
+
+        const msg = `Du betrittst das Labyrinth... ${enemies.length} Feinde blockieren den Weg!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemy);
+
+        // Pass array instead of single object
+        this.game.initiateCombat(enemies);
         return { success: true, message: 'Labyrinth betreten!' };
     }
 
     exploreSpawningGrounds() {
-        // Spawning Grounds have swarms of weaker enemies but with bonus fame
-        const roll = Math.random();
-        let enemy;
-        if (roll > 0.6) {
-            enemy = {
-                name: 'Spinnen-Königin',
-                armor: 4,
-                attack: 4,
-                fame: 7,
-                icon: '🕷️',
-                type: 'spider_queen',
-                color: '#059669',
-                poison: true,
-                summoner: true
-            };
-        } else {
-            enemy = {
-                name: 'Ork-Horde',
-                armor: 3,
-                attack: 5,
-                fame: 5,
-                icon: '👹',
-                type: 'orc_horde',
-                color: '#16a34a',
-                brutal: true
-            };
-        }
+        // Spawning Grounds have swarms (2x)
+        const enemies = [];
 
-        const msg = `Die Brutstätte ist voller Monster... ${enemy.name} greift an!`;
+        // Enemy 1: Summoner or Queen
+        const isQueen = Math.random() > 0.5;
+        enemies.push(isQueen ? {
+            id: `spawn_queen_${Date.now()}`,
+            name: 'Spinnen-Königin',
+            armor: 4,
+            attack: 4,
+            fame: 7,
+            icon: '🕷️',
+            type: 'spider_queen',
+            color: '#059669',
+            poison: true,
+            summoner: true
+        } : {
+            id: `spawn_horde_${Date.now()}`,
+            name: 'Ork-Horde',
+            armor: 3,
+            attack: 5,
+            fame: 5,
+            icon: '👹',
+            type: 'orc_horde',
+            color: '#16a34a',
+            brutal: true
+        });
+
+        // Enemy 2: Minion
+        enemies.push({
+            id: `spawn_minion_${Date.now()}`,
+            name: 'Sumpf-Ratte',
+            armor: 3,
+            attack: 3,
+            fame: 2,
+            icon: '🐀',
+            type: 'rat',
+            color: '#a16207',
+            swift: true
+        });
+
+        const msg = `Die Brutstätte ist voller Monster... Eine Welle von ${enemies.length} Gegnern greift an!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemy);
+        this.game.initiateCombat(enemies);
         return { success: true, message: 'Brutstätte betreten!' };
     }
 }

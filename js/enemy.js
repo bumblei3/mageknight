@@ -295,30 +295,30 @@ export class BossEnemy extends Enemy {
     // Execute phase ability (returns what should happen)
     executePhaseAbility(abilityName) {
         switch (abilityName) {
-            case 'summon':
-                return {
-                    type: 'summon',
-                    enemyType: this.summonType,
-                    count: this.summonCount,
-                    message: t('combat.boss.summons', { name: this.name, count: this.summonCount, enemy: t(`enemies.${this.summonType}`) })
-                };
-            case 'heal': {
-                const healAmount = Math.floor(this.maxHealth * 0.1);
-                this.currentHealth = Math.min(this.maxHealth, this.currentHealth + healAmount);
-                return {
-                    type: 'heal',
-                    amount: healAmount,
-                    message: t('combat.boss.heals', { name: this.name, amount: healAmount })
-                };
-            }
-            case 'enrage':
-            case 'double_attack':
-                return {
-                    type: 'buff',
-                    message: t('combat.boss.doubleAttack', { name: this.name })
-                };
-            default:
-                return null;
+        case 'summon':
+            return {
+                type: 'summon',
+                enemyType: this.summonType,
+                count: this.summonCount,
+                message: t('combat.boss.summons', { name: this.name, count: this.summonCount, enemy: t(`enemies.${this.summonType}`) })
+            };
+        case 'heal': {
+            const healAmount = Math.floor(this.maxHealth * 0.1);
+            this.currentHealth = Math.min(this.maxHealth, this.currentHealth + healAmount);
+            return {
+                type: 'heal',
+                amount: healAmount,
+                message: t('combat.boss.heals', { name: this.name, amount: healAmount })
+            };
+        }
+        case 'enrage':
+        case 'double_attack':
+            return {
+                type: 'buff',
+                message: t('combat.boss.doubleAttack', { name: this.name })
+            };
+        default:
+            return null;
         }
     }
 }

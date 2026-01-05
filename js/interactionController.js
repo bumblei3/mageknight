@@ -105,7 +105,7 @@ export class InteractionController {
                 axial.q, axial.r
             );
 
-            // In Mage Knight, movement is only predicted for ADJACENT steps or 
+            // In Mage Knight, movement is only predicted for ADJACENT steps or
             // the current step. Let's show cost for the hex under cursor.
             if (distance === 1) {
                 const isNight = this.game.timeManager.isNight();

@@ -313,11 +313,11 @@ export class HexGridRenderer {
         this.ctx.clip();
 
         switch (terrain) {
-            case 'water': this.drawWaterTexture(pos); break;
-            case 'forest': this.drawForestTexture(pos); break;
-            case 'mountains': this.drawMountainTexture(pos); break;
-            case 'desert': this.drawDesertTexture(pos); break;
-            case 'plains': this.drawPlainsTexture(pos); break;
+        case 'water': this.drawWaterTexture(pos); break;
+        case 'forest': this.drawForestTexture(pos); break;
+        case 'mountains': this.drawMountainTexture(pos); break;
+        case 'desert': this.drawDesertTexture(pos); break;
+        case 'plains': this.drawPlainsTexture(pos); break;
         }
         this.ctx.restore();
     }

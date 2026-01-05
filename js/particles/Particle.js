@@ -31,26 +31,26 @@ export class Particle {
         ctx.fillStyle = this.color;
 
         switch (this.type) {
-            case 'circle':
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                break;
-            case 'star':
-                this.drawStar(ctx);
-                break;
-            case 'spark':
-                this.drawSpark(ctx);
-                break;
-            case 'heart':
-                this.drawHeart(ctx);
-                break;
-            case 'skull':
-                this.drawSkull(ctx);
-                break;
-            case 'cross':
-                this.drawCross(ctx);
-                break;
+        case 'circle':
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+        case 'star':
+            this.drawStar(ctx);
+            break;
+        case 'spark':
+            this.drawSpark(ctx);
+            break;
+        case 'heart':
+            this.drawHeart(ctx);
+            break;
+        case 'skull':
+            this.drawSkull(ctx);
+            break;
+        case 'cross':
+            this.drawCross(ctx);
+            break;
         }
         ctx.restore();
     }

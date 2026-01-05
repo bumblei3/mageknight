@@ -235,7 +235,7 @@ export class UI {
             i18n.translateDocument();
         }
 
-        // Specialized renderers (Stats, Mana, Unit, Hand, Skill) 
+        // Specialized renderers (Stats, Mana, Unit, Hand, Skill)
         // handle their own refresh via store subscriptions.
     }
 

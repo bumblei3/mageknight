@@ -2,7 +2,6 @@
 import { SITE_TYPES } from '../sites.js';
 import { TERRAIN_TYPES } from '../constants.js';
 import { logger } from '../logger.js';
-import { t } from '../i18n/index.js';
 
 export class ScenarioManager {
     constructor(game) {

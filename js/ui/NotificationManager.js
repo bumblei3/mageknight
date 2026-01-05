@@ -117,7 +117,7 @@ export class NotificationManager {
 
             // Make message clickable to toggle details if details present
             entry.classList.add('has-details');
-            entry.addEventListener('click', (e) => {
+            entry.addEventListener('click', (_e) => {
                 entry.classList.toggle('expanded');
             });
         }

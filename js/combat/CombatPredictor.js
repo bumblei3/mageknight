@@ -9,7 +9,7 @@ export class CombatPredictor {
      * @param {number} currentBlock - Player's accumulated block points (not yet assigned)
      * @returns {Object} Prediction details
      */
-    static getPredictedOutcome(combat, currentAttack = 0, currentBlock = 0) {
+    static getPredictedOutcome(combat, currentAttack = 0, _currentBlock = 0) {
         if (combat.phase === COMBAT_PHASES.COMPLETE) return null;
 
         const prediction = {

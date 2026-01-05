@@ -1,7 +1,7 @@
 // Debug Manager for Mage Knight
 // Handles cheats, state manipulation, and visual debugging
 
-import { logger, LOG_LEVELS } from './logger.js';
+import { logger } from './logger.js';
 
 export class DebugManager {
     constructor(game) {
@@ -85,7 +85,7 @@ export class DebugManager {
         const container = document.getElementById('debug-log-container');
         if (!container) return;
 
-        logger.addListener((entry, allLogs) => {
+        logger.addListener((entry, _allLogs) => {
             if (!entry) {
                 container.innerHTML = '';
                 return;

@@ -1,6 +1,6 @@
 import { StatusEffectManager } from './statusEffects.js';
 // Enemy types imported as needed
-import { COMBAT_PHASES, ATTACK_ELEMENTS, ENEMY_DEFINITIONS, ACTION_TYPES } from './constants.js';
+import { COMBAT_PHASES, ENEMY_DEFINITIONS, ACTION_TYPES } from './constants.js';
 import { logger } from './logger.js';
 import { t } from './i18n/index.js';
 import { BlockingEngine } from './combat/BlockingEngine.js';

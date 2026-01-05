@@ -1,4 +1,3 @@
-import { t } from '../i18n/index.js';
 import { COMBAT_PHASES, ACTION_TYPES } from '../constants.js';
 
 export class CombatUIManager {

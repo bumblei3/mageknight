@@ -86,15 +86,58 @@
     }
 }
 
-/* Card Hover - Fantasy Glow */
+/* Card Hover - Fantasy Glow with Color-Based Effects */
 .card:hover {
-    transform: translateY(-15px) scale(1.1) rotateZ(1deg);
+    transform: translateY(-20px) scale(1.12) rotateX(5deg) rotateY(-2deg);
     z-index: 100;
     box-shadow:
-        0 25px 50px rgba(0, 0, 0, 0.8),
-        0 0 30px hsla(var(--h-gold), 80%, 50%, 0.3),
-        inset 0 1px 0 rgba(255, 220, 150, 0.2);
+        0 30px 60px rgba(0, 0, 0, 0.8),
+        0 0 40px hsla(var(--h-gold), 80%, 50%, 0.4),
+        inset 0 1px 0 rgba(255, 220, 150, 0.3);
     border-color: var(--glass-border-highlight);
+    filter: brightness(1.1);
+}
+
+/* Color-specific glow on hover */
+.card[data-color="red"]:hover {
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.8),
+        0 0 50px rgba(239, 68, 68, 0.5),
+        0 0 100px rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+.card[data-color="blue"]:hover {
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.8),
+        0 0 50px rgba(59, 130, 246, 0.5),
+        0 0 100px rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+}
+
+.card[data-color="green"]:hover {
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.8),
+        0 0 50px rgba(16, 185, 129, 0.5),
+        0 0 100px rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+}
+
+.card[data-color="white"]:hover {
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.8),
+        0 0 50px rgba(249, 250, 251, 0.5),
+        0 0 100px rgba(249, 250, 251, 0.2);
+    border-color: #f9fafb;
+}
+
+/* Wound cards have muted hover */
+.card.wound-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(100, 100, 100, 0.3);
+    filter: brightness(0.9);
 }
 
 /* Card Header Typography */

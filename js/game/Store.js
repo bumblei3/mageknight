@@ -103,44 +103,44 @@ class Store {
         let stateChanged = false;
 
         switch (action) {
-            case ACTIONS.SET_HERO_STATS:
-                this.state.hero = { ...this.state.hero, ...payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_HERO_RESOURCES:
-                this.state.hero = { ...this.state.hero, ...payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_HERO_INVENTORY:
-                this.state.hero = { ...this.state.hero, ...payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_GAME_PHASE:
-                this.state.game = { ...this.state.game, phase: payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_GAME_ROUND:
-                this.state.game = { ...this.state.game, round: payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_DAY_NIGHT:
-                this.state.game = { ...this.state.game, isNight: !!payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_COMBAT_STATE:
-                this.state.combat = { ...this.state.combat, ...payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_LOADING:
-                this.state.ui = { ...this.state.ui, loading: !!payload };
-                stateChanged = true;
-                break;
-            case ACTIONS.SET_LANGUAGE:
-                this.state.ui = { ...this.state.ui, language: payload };
-                stateChanged = true;
-                break;
-            default:
-                console.warn(`Unknown action dispatched: ${action}`);
+        case ACTIONS.SET_HERO_STATS:
+            this.state.hero = { ...this.state.hero, ...payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_HERO_RESOURCES:
+            this.state.hero = { ...this.state.hero, ...payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_HERO_INVENTORY:
+            this.state.hero = { ...this.state.hero, ...payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_GAME_PHASE:
+            this.state.game = { ...this.state.game, phase: payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_GAME_ROUND:
+            this.state.game = { ...this.state.game, round: payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_DAY_NIGHT:
+            this.state.game = { ...this.state.game, isNight: !!payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_COMBAT_STATE:
+            this.state.combat = { ...this.state.combat, ...payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_LOADING:
+            this.state.ui = { ...this.state.ui, loading: !!payload };
+            stateChanged = true;
+            break;
+        case ACTIONS.SET_LANGUAGE:
+            this.state.ui = { ...this.state.ui, language: payload };
+            stateChanged = true;
+            break;
+        default:
+            console.warn(`Unknown action dispatched: ${action}`);
         }
 
         if (stateChanged) {

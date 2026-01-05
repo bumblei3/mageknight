@@ -351,7 +351,7 @@ export class ActionManager {
         }
     }
 
-    takeMana(index, color) {
+    takeMana(index, _color) {
         this.saveCheckpoint();
 
         const mana = this.game.manaSource.takeDie(index, this.game.timeManager.isNight());

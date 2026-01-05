@@ -1,5 +1,4 @@
 // Unit definitions and logic for Mage Knight
-import { t } from './i18n/index.js';
 import { ACTION_TYPES } from './constants.js';
 
 export const UNIT_TYPES = {

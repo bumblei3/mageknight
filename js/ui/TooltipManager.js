@@ -114,7 +114,7 @@ export class TooltipManager {
     attachToElement(element, content) {
         if (!element) return;
 
-        element.addEventListener('mouseenter', (e) => {
+        element.addEventListener('mouseenter', (_e) => {
             // Check for data attributes if content not provided or generic
             let html = typeof content === 'function' ? content() : content;
 

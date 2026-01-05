@@ -126,8 +126,20 @@ export const UNIT_INFO = {
 
 export class Unit {
     constructor(type) {
-        this.type = type;
-        this.info = UNIT_INFO[type];
+        // Support both type string and object-based initialization
+        if (typeof type === 'object') {
+            this.type = type.type || type.id;
+            this.info = {
+                name: type.name || 'Unknown',
+                icon: type.icon || '🎖️',
+                armor: type.armor || 3,
+                cost: type.cost || 5,
+                abilities: type.abilities || []
+            };
+        } else {
+            this.type = type;
+            this.info = UNIT_INFO[type];
+        }
         this.ready = true;
         this.wounds = 0;
     }

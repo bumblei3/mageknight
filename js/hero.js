@@ -53,6 +53,9 @@ export class Hero {
         // Units
         this.units = [];
 
+        // Statuses for ephemeral effects like 'flight'
+        this.statuses = new Set();
+
         // Turn state
         this.movementPoints = 0;
         this.attackPoints = 0;
@@ -545,6 +548,23 @@ export class Hero {
             // Need to handle unit reconstitution if they are classes
             this.units = state.units; // This might need deeper cloning/reconstitution if units are complex objects/classes
         }
+        // Assuming statuses are not persisted directly in state, but derived or reset per round/turn.
+        // If they need to be persisted, they should be added to getState/loadState.
+        // For now, we'll assume they are ephemeral and reset/managed by game logic.
+        // If `this.statuses` is not initialized in the constructor, it should be.
+        // For this change, we'll add the methods and assume `this.statuses` exists (e.g., initialized in constructor).
+    }
+
+    addStatus(status) {
+        this.statuses.add(status);
+    }
+
+    removeStatus(status) {
+        this.statuses.delete(status);
+    }
+
+    hasStatus(status) {
+        return this.statuses.has(status);
     }
 
     // Get current stats

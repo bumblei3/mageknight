@@ -128,21 +128,74 @@ export class HeroController {
         const skill = this.game.hero.skills.find(s => s.id === skillId);
 
         switch (skillId) {
-            case 'motivation':
-                this.game.hero.drawCards(2);
-                this.game.hero.takeManaFromSource('white');
+            case 'flight':
                 this.game.hero.useSkill(skillId);
-                this.game.addLog('Fähigkeit "Motivation" genutzt: +2 Karten, +1 Weißes Mana.', 'success');
-                this.game.renderHand();
-                this.game.renderMana();
-                return { success: true, message: 'Motivation aktiviert!' };
+                // Apply flight status (ephemeral or status effect system)
+                // For MVP: add movement points AND flag
+                this.game.hero.movementPoints += 2;
+                this.game.hero.addStatus('flight'); // Assume hero has addStatus or we set property
+                this.game.addLog('Fähigkeit "Flug" genutzt: +2 Bewegung, Gelände ignoriert.', 'success');
+                this.game.updateStats(); // Update UI
+                return { success: true, message: 'Flug aktiviert!' };
+
+            case 'healing_touch':
+                // Heal 2 wounds. 
+                // Prioritize unit if we had selection, but here we just heal hero wounds for now as per test
+                // Logic: remove up to 2 wounds
+                let woundsHealed = 0;
+                while (woundsHealed < 2 && this.game.hero.wounds.length > 0) {
+                    this.game.hero.wounds.pop();
+                    woundsHealed++;
+                }
+
+                if (woundsHealed > 0) {
+                    this.game.hero.useSkill(skillId);
+                    this.game.addLog(`Fähigkeit "Heilende Hände" genutzt: ${woundsHealed} Wunden geheilt.`, 'success');
+                    this.game.sound.heal();
+                    this.game.updateStats();
+                    return { success: true, message: `${woundsHealed} Wunden geheilt!` };
+                }
+                return { success: false, message: 'Keine Wunden zum Heilen.' };
+
+            case 'motivation':
+                // Check if Norowas
+                // Goldyx also has Motivation? 
+                // skillDefinitions.js says:
+                // Goldyx: +2 Cards, +1 White Mana
+                // Norowas: Make a spent unit ready
+                // We need to differentiate based on Hero or checks.
+
+                // Goldyx Motivation check
+                if (this.game.hero.name === 'Goldyx' || !this.game.hero.units.some(u => u.spent)) {
+                    // Fallback to Goldyx behavior OR if no units spent??
+                    // No, strictly by hero name or skill definition? logic is hardcoded here currently.
+                    // Better: check logic.
+                    if (this.game.hero.name === 'Goldyx') {
+                        this.game.hero.drawCards(2);
+                        this.game.hero.takeManaFromSource('white');
+                        this.game.hero.useSkill(skillId);
+                        this.game.addLog('Fähigkeit "Motivation" genutzt: +2 Karten, +1 Weißes Mana.', 'success');
+                        this.game.renderHand();
+                        this.game.renderMana();
+                        return { success: true, message: 'Motivation aktiviert!' };
+                    }
+                }
+
+                // Norowas Motivation logic
+                // Find first spent unit
+                const spentUnit = this.game.hero.units.find(u => u.spent);
+                if (spentUnit) {
+                    spentUnit.spent = false;
+                    this.game.hero.useSkill(skillId);
+                    this.game.addLog(`Fähigkeit "Motivation" genutzt: Einheit ${spentUnit.name} bereit gemacht.`, 'success');
+                    this.game.updateStats(); // Redraw units
+                    return { success: true, message: 'Einheit bereit!' };
+                }
+
+                return { success: false, message: 'Keine erschöpfte Einheit verfügbar.' };
 
             case 'essence_flow': {
                 this.game.hero.drawCards(1);
-                // For simplified essence flow: give a random mana from source or let player pick?
-                // Picking is better. Let's show a toast and give a random for now to keep it simple,
-                // OR trigger a choice.
-                // Simplified: Give a random standard color
                 const colors = ['red', 'blue', 'green', 'white'];
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 this.game.hero.takeManaFromSource(color);
@@ -157,8 +210,6 @@ export class HeroController {
                 if (!this.game.combat) {
                     return { success: false, message: 'Eis-Atem kann nur im Kampf eingesetzt werden.' };
                 }
-                // Apply to all enemies for simplicity or first one?
-                // Let's apply as a status effect if we have that system, or just debuff current combat
                 const enemies = this.game.combat.enemies;
                 enemies.forEach(enemy => {
                     enemy.armor = Math.max(1, enemy.armor - 3);

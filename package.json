@@ -39,5 +39,8 @@
         "functions": 80,
         "branches": 80,
         "statements": 80
+    },
+    "dependencies": {
+        "three": "^0.182.0"
     }
 }

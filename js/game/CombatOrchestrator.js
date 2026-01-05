@@ -265,7 +265,7 @@ export class CombatOrchestrator {
 
                     // 2. Calculate effective block provided by cards/units
                     // This is returned in result.totalBlock!
-                    const totalBlock = result.totalBlock;
+                    // const totalBlock = result.totalBlock;
 
                     // 3. Gap = rawReq - totalBlock (but totalBlock might ALREADY include move reduction? No, wait.)
                     // BlockingEngine:

@@ -1,4 +1,5 @@
 import { MageKnightGame } from './game.js';
+import { Game3D } from './3d/Game3D.js';
 import i18n from './i18n/index.js';
 import { ErrorHandler } from './errorHandler.js';
 
@@ -54,6 +55,36 @@ const startMageKnight = async () => {
         await new Promise(r => setTimeout(r, 100));
 
         window.game = new MageKnightGame();
+
+        // Initialize 3D View
+        try {
+            window.game3D = new Game3D(window.game);
+            window.game3D.init('game-container-3d');
+
+            // Toggle Button
+            document.getElementById('toggle-3d-btn').addEventListener('click', () => {
+                const isEnabled = window.game3D.toggle();
+                const btn = document.getElementById('toggle-3d-btn');
+                btn.classList.toggle('active', isEnabled);
+                if (isEnabled) {
+                    btn.style.backgroundColor = 'var(--primary-color)';
+                } else {
+                    btn.style.backgroundColor = '';
+                }
+            });
+
+            // Hook into updateStats to refresh 3D view
+            const originalUpdateStats = window.game.updateStats.bind(window.game);
+            window.game.updateStats = () => {
+                originalUpdateStats();
+                if (window.game3D && window.game3D.enabled) {
+                    window.game3D.update();
+                }
+            };
+
+        } catch (e) {
+            console.warn('3D initialization failed:', e);
+        }
 
         updateLoading(70, 'Lade Karten und Einheiten...');
         await new Promise(r => setTimeout(r, 150));

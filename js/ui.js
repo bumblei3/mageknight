@@ -244,10 +244,15 @@ export class UI {
         this.statsRenderer.showFloatingText(element, text, color);
     }
 
-    // Update hero stats display
+    /**
+     * Updates the hero stats display.
+     * @param {Hero} hero 
+     */
     updateHeroStats(hero) {
         this.statsRenderer.updateHeroStats(hero);
-        this.skillRenderer.render(hero);
+        if (this.skillRenderer) {
+            this.skillRenderer.render(hero);
+        }
     }
 
     // Update movement points display

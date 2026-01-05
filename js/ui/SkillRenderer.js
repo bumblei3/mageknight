@@ -1,8 +1,12 @@
 // Skill Renderer
 import { store, ACTIONS } from '../game/Store.js';
-import { t } from '../i18n/index.js';
-// Manages the display and interaction of Hero Skills in the HUD
+import i18n from '../i18n/index.js';
+const { t } = i18n;
 
+/**
+ * SkillRenderer
+ * Renders the list of learned hero skills in the HUD.
+ */
 export class SkillRenderer {
     constructor(ui) {
         this.ui = ui;
@@ -19,46 +23,51 @@ export class SkillRenderer {
         });
     }
 
-    setContainer(container) {
-        this.container = container;
+    setContainer(element) {
+        this.container = element;
     }
 
     render(hero) {
-        if (!this.container || !hero) return;
+        if (!this.container || !hero || !hero.skills) return;
+        this.container.innerHTML = '';
 
-        // Create skills list
-        this.container.innerHTML = `
-            <div class="skills-header">${t('skills.header')}</div>
-            <div class="skills-list">
-                ${hero.skills.length === 0 ? `<div class="no-skills">${t('ui.labels.noSkills')}</div>` : ''}
-                ${hero.skills.map(skill => this.renderSkill(skill, hero)).join('')}
-            </div>
-        `;
+        if (hero.skills.length === 0) {
+            this.container.innerHTML = `<div class="empty-skills">${t('ui.labels.noSkills')}</div>`;
+            return;
+        }
 
-        // Add event listeners for active skills
-        this.container.querySelectorAll('.skill-item.active:not(.used)').forEach(el => {
-            el.addEventListener('click', () => {
-                const skillId = el.dataset.skillId;
-                this.handleSkillClick(skillId, hero);
-            });
-        });
-    }
+        hero.skills.forEach(skill => {
+            const isActive = skill.type === 'active';
+            const isUsed = isActive && (hero.usedSkills instanceof Set ? hero.usedSkills.has(skill.id) : hero.usedSkills.includes(skill.id));
+            const typeClass = isActive ? 'active' : 'passive';
+            const usedClass = isUsed ? 'used' : '';
 
-    renderSkill(skill, hero) {
-        const isActive = skill.type === 'active';
-        const isUsed = isActive && (hero.usedSkills instanceof Set ? hero.usedSkills.has(skill.id) : hero.usedSkills.includes(skill.id));
-        const typeClass = isActive ? 'active' : 'passive';
-        const usedClass = isUsed ? 'used' : '';
+            const skillEl = document.createElement('div');
+            skillEl.className = `skill-item ${typeClass} ${usedClass}`;
+            skillEl.dataset.skillId = skill.id;
 
-        return `
-            <div class="skill-item ${typeClass} ${usedClass}" 
-                 data-skill-id="${skill.id}" 
-                 title="${skill.description}">
+            skillEl.innerHTML = `
                 <span class="skill-icon">${skill.icon}</span>
                 <span class="skill-name">${skill.name}</span>
                 ${isActive ? `<span class="skill-status">${isUsed ? t('skills.used') : t('skills.ready')}</span>` : ''}
-            </div>
-        `;
+            `;
+
+            // Tooltip data
+            skillEl.dataset.tooltip = skill.description;
+            skillEl.dataset.tooltipTitle = skill.name;
+
+            // Add click handler for active skills
+            if (isActive && !isUsed) {
+                skillEl.onclick = () => this.handleSkillClick(skill.id, hero);
+            }
+
+            this.container.appendChild(skillEl);
+
+            // Register tooltip
+            if (this.ui.tooltipManager) {
+                this.ui.tooltipManager.register(skillEl, skill.description, skill.name);
+            }
+        });
     }
 
     handleSkillClick(skillId, _hero) {
@@ -67,9 +76,9 @@ export class SkillRenderer {
             const result = this.ui.game.heroController.useActiveSkill(skillId);
             if (result.success) {
                 this.ui.game.updateStats();
-                this.ui.showToast(result.message, 'success');
+                this.ui.notifications.showToast(result.message, 'success');
             } else {
-                this.ui.showToast(result.message, 'warning');
+                this.ui.notifications.showToast(result.message, 'warning');
             }
         }
     }

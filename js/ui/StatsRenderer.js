@@ -116,6 +116,12 @@ export class StatsRenderer {
             this.elements.healBtn.style.display = (hasWounds && hasHealing) ? 'block' : 'none';
             this.elements.healBtn.textContent = `Heilen (${hero.healingPoints})`;
         }
+
+        // Render Skills
+        // Note: StatsRenderer shouldn't necessarily do this if SkillRenderer exists.
+        // But the data comes from 'hero'. 
+        // We will emit an event or accessing UI.skill_renderer if possible, OR
+        // allow UI to handle the signal.
     }
 
     // Update movement points display

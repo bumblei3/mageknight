@@ -53,7 +53,11 @@ export default {
             unlocked: '{count}/{total} Freigeschaltet ({percent}%)',
             victoryReward: 'Belohnung wählen!',
             artifactFound: 'Du hast einen uralten Schatz gefunden! Wähle ein Artefakt:',
-            artifact: 'Artefakt'
+            artifact: 'Artefakt',
+            ready: 'Bereit',
+            exhausted: 'Erschöpft',
+            noUnits: 'Keine Einheiten',
+            noSkills: 'Keine Skills'
         },
         stats: {
             gamesPlayed: 'Spiele gespielt',
@@ -204,7 +208,12 @@ export default {
             movement: 'Bewegung',
             influence: 'Einfluss',
             healing: 'Heilung'
-        }
+        },
+        woundHint: 'Blockiert einen Kartenslot',
+        sidewaysAction: 'Rechtsklick: Seitlich (+1)',
+        none: 'Keine',
+        basic: 'Basis',
+        strong: 'Stark'
     },
 
     // Achievements
@@ -238,7 +247,10 @@ export default {
         essence_flow: { name: 'Essenz-Fluss', desc: 'Karte + Mana' },
         natural_healing: { name: 'Natürliche Heilung', desc: 'Heile Wunde' },
         noble_manners: { name: 'Edle Manieren', desc: '+2 Einfluss' },
-        avenging_spirit: { name: 'Rächender Geist', desc: '+2 Angriff' }
+        avenging_spirit: { name: 'Rächender Geist', desc: '+2 Angriff' },
+        header: 'Skills',
+        ready: 'Bereit',
+        used: 'Benutzt'
     },
 
     // Mana

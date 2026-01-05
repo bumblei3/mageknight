@@ -2,6 +2,7 @@
  * Internationalization (i18n) System for Mage Knight
  * Provides translation support for multiple languages.
  */
+import { store, ACTIONS } from '../game/Store.js';
 
 // Current language (default: German)
 let currentLanguage = 'de';
@@ -26,6 +27,11 @@ export function setLanguage(lang) {
     if (translations[lang]) {
         currentLanguage = lang;
         localStorage.setItem('mageknightLang', lang);
+
+        if (store) {
+            store.dispatch(ACTIONS.SET_LANGUAGE, lang);
+        }
+
         // Dispatch event for UI refresh
         if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));

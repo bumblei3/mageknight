@@ -9,6 +9,7 @@ import { ManaRenderer } from './ui/ManaRenderer.js';
 import { UnitRenderer } from './ui/UnitRenderer.js';
 import { StatsRenderer } from './ui/StatsRenderer.js';
 import { SkillRenderer } from './ui/SkillRenderer.js';
+import { store, ACTIONS } from './game/Store.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS } from './constants.js';
 
@@ -37,6 +38,19 @@ export class UI {
         this.setupTooltips();
         this.setupPanelToggles(); // Setup collapsible panels
         this.setupGlobalListeners();
+        this.setupStoreSubscriptions();
+    }
+
+    /**
+     * Set up subscriptions to the central store.
+     */
+    setupStoreSubscriptions() {
+        if (!store) return;
+        store.subscribe((state, action) => {
+            if (action === ACTIONS.SET_LANGUAGE) {
+                this.refreshTranslations();
+            }
+        });
     }
 
     /**
@@ -221,13 +235,8 @@ export class UI {
             i18n.translateDocument();
         }
 
-        // Refresh dynamic components if needed
-        if (this.game) {
-            this.updateHeroStats(this.game.hero);
-            this.renderHandCards(this.game.hero.hand);
-            this.renderManaSource(this.game.manaSource);
-            this.renderHeroMana(this.game.hero.getManaInventory());
-        }
+        // Specialized renderers (Stats, Mana, Unit, Hand, Skill) 
+        // handle their own refresh via store subscriptions.
     }
 
     // Show floating text animation
@@ -355,60 +364,7 @@ export class UI {
 
     // World Event Modal
     showEventModal(eventData) {
-        if (!eventData || !eventData.type) return;
-
-        this.elements.eventTitle.textContent = eventData.title;
-        this.elements.eventDescription.textContent = eventData.description;
-        this.elements.eventOptions.innerHTML = '';
-
-        eventData.options.forEach((option, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-primary event-option';
-
-            // Allow styling based on action (e.g. fight = red)
-            if (option.action === 'fight') btn.classList.add('btn-danger');
-
-            btn.innerHTML = `<span class="option-label">${option.label}</span>`;
-
-            btn.addEventListener('click', () => {
-                // Determine logic. Best to delegate to Game/WorldEventManager or callback
-                // But WorldEventManager is not available here directly usually...
-                // Actually game.worldEvents IS available via game.
-
-                // Close modal first
-                this.elements.eventModal.classList.remove('active');
-
-                // Execute
-                const result = this.game.mapManager.worldEvents.resolveEventOption(eventData, index);
-
-                if (result) {
-                    if (result.success) {
-                        this.showToast(result.message, 'success');
-                    } else if (result.action === 'fight') {
-                        // Initiate Combat if it was an ambush
-                        // Find enemy at current pos (MapManager already spawned it maybe? No, Ambush spawns NOW)
-                        // Ambush logic in resolveEventOption just returned 'fight'.
-                        // We need to trigger a fight.
-                        // Let's manually trigger a combat check at current position.
-                        // But MapManager.explore called createEnemies already?
-
-                        // If it's a "Spawn Enemy" event, we might need to physically spawn it now.
-                        // WorldEvents.js logic for 'fight' was incomplete.
-
-                        // Quick Fix: Ambush -> Spawn enemy at hero pos and start combat.
-                        const enemy = this.game.enemyAI.generateEnemy(this.game.hexGrid.getHex(this.game.hero.position.q, this.game.hero.position.r).terrain, this.game.hero.level);
-                        enemy.position = { ...this.game.hero.position };
-                        this.game.enemies.push(enemy);
-                        this.game.initiateCombat(enemy);
-                    } else if (result.message) {
-                        this.showToast(result.message, 'error');
-                    }
-                }
-            });
-            this.elements.eventOptions.appendChild(btn);
-        });
-
-        this.elements.eventModal.classList.add('active');
+        this.modals.showEventModal(eventData);
     }
 
     // Helper Methods for external use

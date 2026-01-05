@@ -53,7 +53,11 @@ export default {
             unlocked: '{count}/{total} Unlocked ({percent}%)',
             victoryReward: 'Select Reward!',
             artifactFound: 'You found an ancient treasure! Choose an artifact:',
-            artifact: 'Artifact'
+            artifact: 'Artifact',
+            ready: 'Ready',
+            exhausted: 'Exhausted',
+            noUnits: 'No Units',
+            noSkills: 'No Skills'
         },
         stats: {
             gamesPlayed: 'Games Played',
@@ -201,7 +205,12 @@ export default {
             movement: 'Movement',
             influence: 'Influence',
             healing: 'Healing'
-        }
+        },
+        woundHint: 'Blocks a card slot',
+        sidewaysAction: 'Right-click: Sideways (+1)',
+        none: 'None',
+        basic: 'Basic',
+        strong: 'Strong'
     },
 
     // Achievements
@@ -235,7 +244,10 @@ export default {
         essence_flow: { name: 'Essence Flow', desc: 'Card + Mana' },
         natural_healing: { name: 'Natural Healing', desc: 'Heal Wound' },
         noble_manners: { name: 'Noble Manners', desc: '+2 Influence' },
-        avenging_spirit: { name: 'Avenging Spirit', desc: '+2 Attack' }
+        avenging_spirit: { name: 'Avenging Spirit', desc: '+2 Attack' },
+        header: 'Skills',
+        ready: 'Ready',
+        used: 'Used'
     },
 
     // Mana

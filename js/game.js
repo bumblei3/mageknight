@@ -38,6 +38,7 @@ import { CombatOrchestrator } from './game/CombatOrchestrator.js';
 import { HeroController } from './game/HeroController.js';
 import { InputController } from './game/InputController.js';
 import { RenderController } from './game/RenderController.js';
+import { store } from './game/Store.js';
 
 /**
  * Main Game Controller Class
@@ -48,8 +49,12 @@ export class MageKnightGame {
      * Initializes the game engine and subsystems.
      */
     constructor() {
-        // Clear global event bus to prevent listener accumulation from previous instances
+        // Clear global event bus and store listeners to prevent listener accumulation from previous instances
         eventBus.clear();
+        if (store) {
+            store.clearListeners();
+            store.reset();
+        }
 
         this.abortController = new AbortController();
         this.gameState = 'playing';

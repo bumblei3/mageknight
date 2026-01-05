@@ -186,4 +186,52 @@ export class ModalManager {
             }
         });
     }
+
+    /**
+     * Show world event modal
+     */
+    showEventModal(eventData) {
+        if (!eventData || !this.elements.eventModal) return;
+
+        const el = this.elements;
+        const game = this.ui.game;
+
+        el.eventTitle.textContent = eventData.title;
+        el.eventDescription.textContent = eventData.description;
+        el.eventOptions.innerHTML = '';
+
+        eventData.options.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary event-option';
+
+            if (option.action === 'fight') btn.classList.add('btn-danger');
+
+            btn.innerHTML = `<span class="option-label">${option.label}</span>`;
+
+            btn.addEventListener('click', () => {
+                el.eventModal.classList.remove('active');
+
+                // Execute resolution logic
+                const result = game.mapManager.worldEvents.resolveEventOption(eventData, index);
+
+                if (result) {
+                    if (result.success) {
+                        this.ui.showToast(result.message, 'success');
+                    } else if (result.action === 'fight') {
+                        // Ambush logic
+                        const currentHex = game.hexGrid.getHex(game.hero.position.q, game.hero.position.r);
+                        const enemy = game.enemyAI.generateEnemy(currentHex.terrain, game.hero.level);
+                        enemy.position = { ...game.hero.position };
+                        game.enemies.push(enemy);
+                        game.initiateCombat(enemy);
+                    } else if (result.message) {
+                        this.ui.showToast(result.message, 'error');
+                    }
+                }
+            });
+            el.eventOptions.appendChild(btn);
+        });
+
+        el.eventModal.classList.add('active');
+    }
 }

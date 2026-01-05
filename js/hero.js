@@ -79,11 +79,14 @@ export class Hero {
             armor: this.armor,
             handLimit: this.handLimit,
             commandLimit: this.commandLimit,
+            skills: [...this.skills],
+            usedSkills: Array.isArray(this.usedSkills) ? [...this.usedSkills] : [...this.usedSkills.values()],
             wounds: this.wounds.length,
             deckSize: this.deck.length,
             handSize: this.hand.length,
             discardSize: this.discard.length,
-            units: this.units.length
+            units: [...this.units],
+            hand: [...this.hand]
         });
 
         store.dispatch(ACTIONS.SET_HERO_RESOURCES, {

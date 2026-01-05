@@ -13,10 +13,14 @@ export class ManaRenderer {
         store.subscribe((state, action) => {
             if (action === ACTIONS.SET_HERO_RESOURCES ||
                 action === ACTIONS.SET_HERO_INVENTORY ||
-                action === ACTIONS.SET_DAY_NIGHT) {
+                action === ACTIONS.SET_DAY_NIGHT ||
+                action === ACTIONS.SET_LANGUAGE) {
 
                 const inventory = this.getInventoryFromState(state.hero);
                 this.renderHeroMana(inventory);
+
+                // If language changed, we might need to refresh the mana source too for tooltips
+                // but we don't have enough info here to call renderManaSource exactly.
             }
         });
     }
@@ -36,6 +40,7 @@ export class ManaRenderer {
 
     // Render mana source
     renderManaSource(manaSource, onDieClick, isNight = false) {
+        if (!this.elements || !this.elements.manaSource) return;
         this.elements.manaSource.innerHTML = '';
 
         const dice = manaSource.getAvailableDice(isNight);
@@ -97,6 +102,7 @@ export class ManaRenderer {
 
         if (!heroManaEl) {
             // Create it if it doesn't exist
+            if (!this.elements || !this.elements.manaSource) return;
             const manaPanel = this.elements.manaSource.parentElement;
             const inventoryDiv = document.createElement('div');
             inventoryDiv.className = 'mana-inventory';

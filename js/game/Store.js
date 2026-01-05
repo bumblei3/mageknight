@@ -17,7 +17,8 @@ export const ACTIONS = {
     SET_COMBAT_STATE: 'SET_COMBAT_STATE',
 
     // UI Actions
-    SET_LOADING: 'SET_LOADING'
+    SET_LOADING: 'SET_LOADING',
+    SET_LANGUAGE: 'SET_LANGUAGE'
 };
 
 class Store {
@@ -50,7 +51,9 @@ class Store {
                 handSize: 0,
                 discardSize: 0,
                 wounds: 0,
-                units: []
+                units: [],
+                skills: [],
+                usedSkills: []
             },
             game: {
                 phase: 'EXPLORATION',
@@ -67,10 +70,18 @@ class Store {
             },
             ui: {
                 loading: false,
-                activeModal: null
+                activeModal: null,
+                language: 'de'
             }
         };
         this.notify();
+    }
+
+    /**
+     * Clears all listeners (useful for testing)
+     */
+    clearListeners() {
+        this.listeners.clear();
     }
 
     /**
@@ -122,6 +133,10 @@ class Store {
                 break;
             case ACTIONS.SET_LOADING:
                 this.state.ui = { ...this.state.ui, loading: !!payload };
+                stateChanged = true;
+                break;
+            case ACTIONS.SET_LANGUAGE:
+                this.state.ui = { ...this.state.ui, language: payload };
                 stateChanged = true;
                 break;
             default:

@@ -12,6 +12,9 @@ export class StatsRenderer {
         store.subscribe((state, action) => {
             if (action === ACTIONS.SET_HERO_STATS || action === ACTIONS.SET_HERO_RESOURCES) {
                 this.updateFromStore(state.hero);
+            } else if (action === ACTIONS.SET_LANGUAGE) {
+                // Refresh anything that might be language dependent in this renderer
+                this.updateFromStore(state.hero);
             }
         });
     }

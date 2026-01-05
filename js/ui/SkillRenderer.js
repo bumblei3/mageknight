@@ -1,10 +1,22 @@
 // Skill Renderer
+import { store, ACTIONS } from '../game/Store.js';
+import { t } from '../i18n/index.js';
 // Manages the display and interaction of Hero Skills in the HUD
 
 export class SkillRenderer {
     constructor(ui) {
         this.ui = ui;
         this.container = null;
+        this.setupSubscriptions();
+    }
+
+    setupSubscriptions() {
+        if (!store) return;
+        store.subscribe((state, action) => {
+            if (action === ACTIONS.SET_HERO_STATS || action === ACTIONS.SET_LANGUAGE) {
+                this.render(state.hero);
+            }
+        });
     }
 
     setContainer(container) {
@@ -16,9 +28,9 @@ export class SkillRenderer {
 
         // Create skills list
         this.container.innerHTML = `
-            <div class="skills-header">Skills</div>
+            <div class="skills-header">${t('skills.header')}</div>
             <div class="skills-list">
-                ${hero.skills.length === 0 ? '<div class="no-skills">Keine Skills</div>' : ''}
+                ${hero.skills.length === 0 ? `<div class="no-skills">${t('ui.labels.noSkills')}</div>` : ''}
                 ${hero.skills.map(skill => this.renderSkill(skill, hero)).join('')}
             </div>
         `;
@@ -34,7 +46,7 @@ export class SkillRenderer {
 
     renderSkill(skill, hero) {
         const isActive = skill.type === 'active';
-        const isUsed = isActive && hero.usedSkills.has(skill.id);
+        const isUsed = isActive && (hero.usedSkills instanceof Set ? hero.usedSkills.has(skill.id) : hero.usedSkills.includes(skill.id));
         const typeClass = isActive ? 'active' : 'passive';
         const usedClass = isUsed ? 'used' : '';
 
@@ -44,7 +56,7 @@ export class SkillRenderer {
                  title="${skill.description}">
                 <span class="skill-icon">${skill.icon}</span>
                 <span class="skill-name">${skill.name}</span>
-                ${isActive ? `<span class="skill-status">${isUsed ? 'Benutzt' : 'Bereit'}</span>` : ''}
+                ${isActive ? `<span class="skill-status">${isUsed ? t('skills.used') : t('skills.ready')}</span>` : ''}
             </div>
         `;
     }

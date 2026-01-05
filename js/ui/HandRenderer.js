@@ -1,16 +1,38 @@
+import { store, ACTIONS } from '../game/Store.js';
+import { t } from '../i18n/index.js';
 import * as CardAnimations from '../cardAnimations.js';
 
 export class HandRenderer {
     constructor(elements, tooltipManager) {
         this.elements = elements;
         this.tooltipManager = tooltipManager;
+        this.callbacks = {
+            onCardClick: null,
+            onCardRightClick: null
+        };
+        this.setupSubscriptions();
+    }
+
+    setupSubscriptions() {
+        if (!store) return;
+        store.subscribe((state, action) => {
+            if (action === ACTIONS.SET_HERO_STATS || action === ACTIONS.SET_LANGUAGE) {
+                if (state.hero.hand && this.callbacks.onCardClick) {
+                    this.renderHandCards(state.hero.hand, this.callbacks.onCardClick, this.callbacks.onCardRightClick);
+                }
+            }
+        });
     }
 
     // Render hand cards
     renderHandCards(hand, onCardClick, onCardRightClick) {
+        if (!this.elements || !this.elements.handCards) return;
+        if (onCardClick) this.callbacks.onCardClick = onCardClick;
+        if (onCardRightClick) this.callbacks.onCardRightClick = onCardRightClick;
         this.elements.handCards.innerHTML = '';
 
         hand.forEach((card, index) => {
+            const isWound = typeof card.isWound === 'function' ? card.isWound() : !!card.isWound;
             const cardEl = this.createCardElement(card, index);
 
             // Animate card draw with stagger
@@ -29,7 +51,7 @@ export class HandRenderer {
             });
 
             cardEl.addEventListener('mousemove', (e) => {
-                if (isHovering && !card.isWound()) {
+                if (isHovering && !isWound) {
                     CardAnimations.animate3DTilt(cardEl, e.clientX, e.clientY);
                 }
             });
@@ -40,7 +62,7 @@ export class HandRenderer {
             });
 
             // Add tooltip events
-            if (!card.isWound()) {
+            if (!isWound) {
                 cardEl.addEventListener('mouseenter', () => {
                     this.tooltipManager.showCardTooltip(cardEl, card);
                 });
@@ -60,7 +82,9 @@ export class HandRenderer {
         cardDiv.dataset.index = index;
         cardDiv.dataset.color = card.color; // For CSS styling
 
-        if (card.isWound()) {
+        const isWound = typeof card.isWound === 'function' ? card.isWound() : !!card.isWound;
+
+        if (isWound) {
             cardDiv.classList.add('wound-card');
             cardDiv.innerHTML = `
                 <div class="card-icon-large">💔</div>
@@ -68,7 +92,7 @@ export class HandRenderer {
                     <span class="card-name">${card.name}</span>
                 </div>
                 <div class="card-effects">
-                    <div class="card-effect">Blockiert einen Kartenslot</div>
+                    <div class="card-effect">${t('cards.woundHint')}</div>
                 </div>
             `;
             return cardDiv;
@@ -91,11 +115,11 @@ export class HandRenderer {
                 <span class="card-name">${card.name}</span>
             </div>
             <div class="card-effects">
-                <div class="card-effect"><strong>Basic:</strong> ${basicEffect}</div>
-                ${strongEffect && strongEffect !== 'Keine' ?
-        `<div class="card-effect"><strong>Strong:</strong> ${strongEffect}</div>` : ''}
+                <div class="card-effect"><strong>${t('cards.basic')}:</strong> ${basicEffect}</div>
+                ${strongEffect && strongEffect !== t('cards.none') ?
+                `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
             </div>
-            <div class="card-hint">Rechtsklick: Seitlich (+1)</div>
+            <div class="card-hint">${t('cards.sidewaysAction')}</div>
         `;
 
         return cardDiv;
@@ -124,13 +148,14 @@ export class HandRenderer {
 
     // Format card effect for display
     formatEffect(effect) {
+        if (!effect) return t('cards.none');
         const parts = [];
         if (effect.movement) parts.push(`+${effect.movement} 👣`);
         if (effect.attack) parts.push(`+${effect.attack} ⚔️`);
         if (effect.block) parts.push(`+${effect.block} 🛡️`);
         if (effect.influence) parts.push(`+${effect.influence} 💬`);
         if (effect.healing) parts.push(`+${effect.healing} ❤️`);
-        return parts.join(' ') || 'Keine';
+        return parts.join(' ') || t('cards.none');
     }
 
     // Get hex color for mana color

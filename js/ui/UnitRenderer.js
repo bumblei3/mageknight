@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { store, ACTIONS } from '../game/Store.js';
 
 export class UnitRenderer {
@@ -9,7 +10,7 @@ export class UnitRenderer {
     setupSubscriptions() {
         if (!store) return;
         store.subscribe((state, action) => {
-            if (action === ACTIONS.SET_HERO_STATS) {
+            if (action === ACTIONS.SET_HERO_STATS || action === ACTIONS.SET_LANGUAGE) {
                 this.renderUnits(state.hero.units);
             }
         });
@@ -22,7 +23,7 @@ export class UnitRenderer {
         this.elements.heroUnits.innerHTML = '';
 
         if (!units || units.length === 0) {
-            this.elements.heroUnits.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 1rem; font-size: 0.9rem;">Keine Einheiten</div>';
+            this.elements.heroUnits.innerHTML = `<div style="text-align: center; color: #6b7280; padding: 1rem; font-size: 0.9rem;">${t('ui.labels.noUnits')}</div>`;
             return;
         }
 
@@ -74,9 +75,9 @@ export class UnitRenderer {
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 0.8rem; color: ${isReady ? '#10b981' : '#6b7280'};">
-                            ${isReady ? '✓ Bereit' : '○ Erschöpft'}
+                            ${isReady ? '✓ ' + t('ui.labels.ready') : '○ ' + t('ui.labels.exhausted')}
                         </div>
-                        ${unitWounds > 0 ? `<div style="font-size: 0.8rem; color: #ef4444;">💔 ${unitWounds} Wounds</div>` : ''}
+                        ${unitWounds > 0 ? `<div style="font-size: 0.8rem; color: #ef4444;">💔 ${unitWounds} ${t('ui.labels.wounds')}</div>` : ''}
                     </div>
                 </div>
                 <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.25rem;">

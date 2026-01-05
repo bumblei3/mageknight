@@ -4,6 +4,16 @@ test.describe('Mage Knight Game Loading', () => {
     test.beforeEach(async ({ page }) => {
         page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
         await page.goto('/');
+
+        // Wait for game load
+        await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 10000 });
+
+        // Dismiss tutorial if it appears
+        const skipBtn = page.locator('button:has-text("Überspringen")');
+        if (await skipBtn.isVisible()) {
+            await skipBtn.click();
+            await expect(page.locator('.tutorial-overlay-custom')).toBeHidden();
+        }
     });
 
     test('should load the game and show title', async ({ page }) => {

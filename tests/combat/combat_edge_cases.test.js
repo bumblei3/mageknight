@@ -41,6 +41,8 @@ describe('MageKnightGame Coverage Boost v2', () => {
             click: vi.fn(),
             error: vi.fn(),
             toggle: vi.fn(),
+            init: vi.fn(),
+            ctx: null,
             enabled: true
         };
     });
@@ -68,7 +70,9 @@ describe('MageKnightGame Coverage Boost v2', () => {
                 this.enabled = !this.enabled;
                 return this.enabled;
             },
-            click: vi.fn() // Add click sound mock
+            click: vi.fn(), // Add click sound mock
+            init: vi.fn(),
+            ctx: null
         };
 
         // game.inputController.setupSoundToggle(); // Already called in startNewGame
@@ -185,6 +189,8 @@ describe('MageKnightGame Coverage Boost v2', () => {
             click: vi.fn(),
             error: vi.fn(),
             toggle: vi.fn(),
+            init: vi.fn(),
+            ctx: null,
             enabled: true
         };
 

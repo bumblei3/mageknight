@@ -57,6 +57,7 @@ export class MageKnightGame {
         }
 
         this.abortController = new AbortController();
+        this.activeTimeouts = new Set();
         this.gameState = 'playing';
         this.isTestEnvironment = !!(typeof window !== 'undefined' && (window.isTest || window.__playwright__));
 
@@ -135,6 +136,20 @@ export class MageKnightGame {
         this.startNewGame();
     }
 
+    /**
+     * Safe wrapper for setTimeout that tracks active timeouts for cleanup.
+     * @param {Function} callback 
+     * @param {number} delay 
+     */
+    setGameTimeout(callback, delay) {
+        const id = setTimeout(() => {
+            this.activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this.activeTimeouts.add(id);
+        return id;
+    }
+
     get turnNumber() { return this.turnManager ? this.turnManager.turnNumber : 1; }
     set turnNumber(value) { if (this.turnManager) this.turnManager.turnNumber = value; }
 
@@ -195,6 +210,8 @@ export class MageKnightGame {
      * Cleans up resources and listeners when the game instance is destroyed.
      */
     destroy() {
+        this.activeTimeouts.forEach(id => clearTimeout(id));
+        this.activeTimeouts.clear();
         this.abortController.abort();
         if (this.ui) this.ui.destroy();
         if (this.touchController) this.touchController.destroy();
@@ -570,10 +587,12 @@ export class MageKnightGame {
                 // Play sound
                 // this.sound.playTone(isNight ? 200 : 600, 1.0, 'sine'); // Placeholder if sound not ready
 
-                setTimeout(() => {
+                this.setGameTimeout(() => {
                     // Update Game State visuals behind curtain
                     this.hexGrid.setTimeOfDay(isNight);
-                    document.body.classList.toggle('night-mode', isNight);
+                    if (document.body) {
+                        document.body.classList.toggle('night-mode', isNight);
+                    }
 
                     // Update UI Icons
                     const timeIcon = document.getElementById('time-icon');
@@ -586,8 +605,8 @@ export class MageKnightGame {
 
                     this.render();
 
-                    setTimeout(() => {
-                        overlay.classList.remove('active');
+                    this.setGameTimeout(() => {
+                        if (overlay) overlay.classList.remove('active');
                     }, 1500);
                 }, 1000);
             } else {

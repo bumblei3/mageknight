@@ -17,6 +17,41 @@ export class Game3D {
 
     init(containerId) {
         this.sceneManager = new SceneManager3D(containerId);
+
+        // Input Handling
+        const container = document.getElementById(containerId);
+        container.addEventListener('pointerdown', (e) => this.onClick(e));
+    }
+
+    onClick(event) {
+        if (!this.enabled || !this.game || !this.sceneManager) return;
+
+        // Calculate Normalized Device Coordinates (NDC)
+        // x and y between -1 and +1
+        const rect = this.sceneManager.renderer.domElement.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        const hitObject = this.sceneManager.getIntersection(x, y);
+        if (hitObject && hitObject.userData) {
+            const data = hitObject.userData;
+            if (data.type === 'hex') {
+                // Delegate to Game Logic
+                if (this.game.toggleHexSelection && typeof this.game.toggleHexSelection === 'function') {
+                    // Try direct selection first if available (UI helper)
+                    this.game.toggleHexSelection(data.q, data.r);
+                } else {
+                    // Fallback to core movement/interaction logic
+                    if (this.game.movementMode) {
+                        this.game.moveHero(data.q, data.r);
+                    } else if (this.game.selectHex) {
+                        this.game.selectHex(data.q, data.r);
+                    } else {
+                        console.warn('[3D] No suitable method found to handle hex click');
+                    }
+                }
+            }
+        }
     }
 
     toggle() {

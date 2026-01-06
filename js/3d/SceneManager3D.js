@@ -31,6 +31,8 @@ export class SceneManager3D {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x202025); // Dark background
         this.scene.fog = new THREE.Fog(0x202025, 20, 100);
+
+        this.raycaster = new THREE.Raycaster();
     }
 
     initCamera() {
@@ -112,6 +114,34 @@ export class SceneManager3D {
         // Optional animations here
 
         this.renderer.render(this.scene, this.camera);
+    }
+
+    getIntersection(ndcX, ndcY) {
+        if (!this.raycaster || !this.camera) return null;
+
+        // Set raycaster from camera
+        this.raycaster.setFromCamera({ x: ndcX, y: ndcY }, this.camera);
+
+        // Intersect with world group (recursive for props)
+        const intersects = this.raycaster.intersectObjects(this.worldGroup.children, true);
+
+        if (intersects.length > 0) {
+            // Find first object that has user data (might hit a prop on top of a hex)
+            // Or just return the top-most hit and let calling code handle bubbling?
+            // Better: find closest object with meaningful userData.
+            for (const hit of intersects) {
+                // Check if hit object or its parents have userData
+                let obj = hit.object;
+                while (obj) {
+                    if (obj.userData && (obj.userData.type === 'hex' || obj.userData.type === 'unit')) {
+                        return obj;
+                    }
+                    if (obj === this.worldGroup) break;
+                    obj = obj.parent;
+                }
+            }
+        }
+        return null;
     }
 
     // Helper to add meshes

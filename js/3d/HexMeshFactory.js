@@ -46,13 +46,13 @@ export class HexMeshFactory {
             // Define colors/textures based on terrain
             let color = 0x888888;
             switch (terrainType) {
-            case 'plains': color = 0x4ade80; break;     // Green
-            case 'forest': color = 0x166534; break;     // Dark Green
-            case 'hills': color = 0xd97706; break;      // Orange-ish Brown
-            case 'mountains': color = 0x57534e; break;  // Grey
-            case 'water': color = 0x3b82f6; break;      // Blue
-            case 'wasteland': color = 0x7f1d1d; break;  // Dark Red
-            case 'desert': color = 0xfde047; break;     // Yellow
+                case 'plains': color = 0x4ade80; break;     // Green
+                case 'forest': color = 0x166534; break;     // Dark Green
+                case 'hills': color = 0xd97706; break;      // Orange-ish Brown
+                case 'mountains': color = 0x57534e; break;  // Grey
+                case 'water': color = 0x3b82f6; break;      // Blue
+                case 'wasteland': color = 0x7f1d1d; break;  // Dark Red
+                case 'desert': color = 0xfde047; break;     // Yellow
             }
 
             const material = new THREE.MeshStandardMaterial({
@@ -69,6 +69,7 @@ export class HexMeshFactory {
     createHexMesh(hex) {
         const material = this.getMaterial(hex.terrain);
         const mesh = new THREE.Mesh(this.geometry, material);
+        mesh.userData = { type: 'hex', q: hex.q, r: hex.r };
 
         // Receive shadows
         mesh.receiveShadow = true;

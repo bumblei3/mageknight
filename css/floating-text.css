@@ -1,0 +1,128 @@
+/* Floating Text Animations */
+
+#floating-text-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9000;
+    overflow: hidden;
+}
+
+.floating-text {
+    position: absolute;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    font-size: 24px;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+    animation: floatUpFade 1.5s ease-out forwards;
+    transform-origin: center center;
+}
+
+/* Specific Types */
+.ft-damage {
+    color: #ef4444;
+    /* bright red */
+    font-size: 28px;
+    animation: floatUpBounce 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.ft-heal {
+    color: #34d399;
+    /* emerald green */
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    animation: floatUpFade 2s ease-out forwards;
+}
+
+.ft-xp {
+    color: #f59e0b;
+    /* amber/gold */
+    font-size: 20px;
+}
+
+.ft-mana {
+    color: #60a5fa;
+    /* blue */
+    font-family: 'Roboto', sans-serif;
+    text-shadow: 0 0 5px #2563eb;
+}
+
+.ft-crit {
+    color: #fbbf24;
+    /* yellow/gold */
+    font-size: 42px;
+    z-index: 10;
+    animation: critPop 1.5s ease-out forwards;
+}
+
+.ft-block {
+    color: #94a3b8;
+    /* slate/grey */
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Animations */
+
+@keyframes floatUpFade {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.8);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(1);
+    }
+}
+
+@keyframes floatUpBounce {
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.5);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translateY(-20px) scale(1.2);
+    }
+
+    40% {
+        transform: translateY(-15px) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(1);
+    }
+}
+
+@keyframes critPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.2) rotate(-10deg);
+    }
+
+    30% {
+        opacity: 1;
+        transform: scale(1.5) rotate(5deg);
+    }
+
+    50% {
+        transform: scale(1.0) rotate(0deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-50px) scale(1);
+    }
+}

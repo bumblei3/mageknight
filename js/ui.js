@@ -43,6 +43,16 @@ export class UI {
         this.heroSelectionModal = new HeroSelectionModal(this);
         this.settingsModal = new SettingsModal(this);
 
+        // Visual effects
+        // Only initialize if game board exists (skips in some tests)
+        const gameBoard = document.querySelector('#game-board');
+        if (gameBoard) {
+            import('./ui/FloatingTextManager.js').then(({ FloatingTextManager }) => {
+                this.floatingText = new FloatingTextManager(gameBoard);
+                this.setupFloatingTextListeners();
+            }).catch(err => console.error('Failed to load FloatingTextManager', err)); // Safe fail
+        }
+
         this.setupEventListeners();
         this.setupTooltips();
         this.setupPanelToggles(); // Setup collapsible panels
@@ -59,6 +69,45 @@ export class UI {
             if (action === ACTIONS.SET_LANGUAGE) {
                 this.refreshTranslations();
             }
+        });
+    }
+
+    /**
+     * Sets up listeners for floating text visual feedback.
+     * @private
+     */
+    setupFloatingTextListeners() {
+        if (!this.floatingText) return;
+
+        // Damage Dealt (to Enemy)
+        eventBus.on('DAMAGE_DEALT', (data) => {
+            // data: { target, amount, type, hex }
+            // If hex unavailable, use mouse pos or screen center fallback
+            if (data.hex) {
+                this.floatingText.spawnOnHex(this.game.hexGrid, data.hex, `-${data.amount}`, 'damage');
+            } else if (data.x && data.y) {
+                this.floatingText.spawn(data.x, data.y, `-${data.amount}`, 'damage');
+            }
+        });
+
+        // XP Gained
+        eventBus.on('XP_GAINED', (data) => {
+            // data: { amount, source }
+            // Show near hero
+            const heroHex = this.game.hero.position;
+            this.floatingText.spawnOnHex(this.game.hexGrid, heroHex, `+${data.amount} XP`, 'xp');
+        });
+
+        // Healing
+        eventBus.on('HERO_HEALED', (data) => {
+            const heroHex = this.game.hero.position;
+            this.floatingText.spawnOnHex(this.game.hexGrid, heroHex, `+${data.amount}`, 'heal');
+        });
+
+        // Mana Gained
+        eventBus.on('MANA_GAINED', (data) => {
+            const heroHex = this.game.hero.position;
+            this.floatingText.spawnOnHex(this.game.hexGrid, heroHex, `+1 ${data.color}`, 'mana');
         });
     }
 

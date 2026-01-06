@@ -9,7 +9,7 @@ import { ManaSource } from './mana.js';
 import { EnemyAI } from './enemyAI.js';
 import { UI } from './ui.js';
 import Terrain from './terrain.js';
-import { SaveManager } from './persistence/SaveManager.js';
+// import { SaveManager } from './persistence/SaveManager.js'; // Removed unused import
 import TutorialManager from './tutorialManager.js';
 import { TimeManager } from './timeManager.js';
 import { MapManager } from './mapManager.js';
@@ -65,7 +65,7 @@ export class MageKnightGame {
         this.terrain = new Terrain();
         // Legacy compatibility for tests
         this.saveManager = {
-            saveGame: (slotId, state) => this.stateManager.saveGame(slotId),
+            saveGame: (slotId, _state) => this.stateManager.saveGame(slotId),
             loadGame: (slotId) => this.stateManager.loadGame(slotId),
             autoSave: () => this.stateManager.saveGame('auto')
         };

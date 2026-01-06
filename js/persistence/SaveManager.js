@@ -47,7 +47,7 @@ export class SaveManager {
 
     /**
      * Check if a save slot exists.
-     * @param {string} slotId 
+     * @param {string} slotId
      * @returns {boolean}
      */
     static hasSave(slotId) {
@@ -56,7 +56,7 @@ export class SaveManager {
 
     /**
      * Get metadata for a save slot (timestamp, etc.)
-     * @param {string} slotId 
+     * @param {string} slotId
      */
     static getSaveMeta(slotId) {
         try {

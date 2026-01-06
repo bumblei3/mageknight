@@ -35,7 +35,7 @@ export class GameStateManager {
 
     /**
      * Loads game state from a specific slot
-     * @param {number|string} slotId 
+     * @param {number|string} slotId
      * @returns {boolean} Success
      */
     loadGame(slotId) {

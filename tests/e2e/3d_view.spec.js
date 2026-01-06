@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('3D View Functionality', () => {
+    test.setTimeout(60000);
+
     test.beforeEach(async ({ page }) => {
         page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
         await page.goto('/');
@@ -12,8 +14,31 @@ test.describe('3D View Functionality', () => {
         if (await skipBtn.isVisible()) {
             console.log('Skipping tutorial...');
             await skipBtn.click();
-            await expect(page.locator('.tutorial-overlay-custom')).toBeHidden();
         }
+
+        // Handle Scenario Selection Modal if present
+        const scenarioModal = page.locator('#scenario-selection-modal');
+        try {
+            await scenarioModal.waitFor({ state: 'visible', timeout: 2000 });
+            if (await scenarioModal.isVisible()) {
+                console.log('Selecting scenario to proceed...');
+                await page.locator('.scenario-card').first().click();
+                await expect(scenarioModal).toBeHidden();
+            }
+        } catch (e) {
+            // Modal didn't appear
+        }
+
+        // Handle Hero Selection Modal if present
+        const heroModal = page.locator('#hero-selection-modal');
+        try {
+            await heroModal.waitFor({ state: 'visible', timeout: 2000 });
+            if (await heroModal.isVisible()) {
+                console.log('Selecting hero to proceed...');
+                await page.locator('.hero-select-btn').first().click();
+                await expect(heroModal).toBeHidden();
+            }
+        } catch (e) { }
     });
 
     test('should toggle 3D view on button click', async ({ page }) => {

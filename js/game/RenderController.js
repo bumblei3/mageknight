@@ -114,7 +114,7 @@ export class RenderController {
 
         const phaseNames = {
             block: t('ui.phases.block'),
-            damage: t('ui.phases.damage'), // New key might be needed if damage phase != combat
+            damage: t('ui.phases.damage'),
             attack: t('ui.phases.attack'),
             end: t('combat.combatEnded')
         };
@@ -132,5 +132,49 @@ export class RenderController {
             phaseText.textContent = t('ui.phases.exploration');
             phaseHint.textContent = t('ui.hints.exploration');
         }
+    }
+
+    /**
+     * Orchestrates the update of all HUD stats and contextual buttons.
+     */
+    updateStats() {
+        if (!this.game.ui) return;
+
+        this.game.ui.updateHeroStats(this.game.hero);
+        this.game.ui.updateMovementPoints(this.game.hero.movementPoints);
+        this.game.ui.renderUnits(this.game.hero.units);
+
+        // Update Explore button
+        const canExplore = this.game.mapManager.canExplore(this.game.hero.position.q, this.game.hero.position.r);
+        const hasPoints = this.game.hero.movementPoints >= 2;
+
+        if (this.game.ui.elements.exploreBtn) {
+            this.game.ui.setButtonEnabled(this.game.ui.elements.exploreBtn, canExplore && hasPoints && !this.game.combat);
+            this.game.ui.elements.exploreBtn.title = this._getExploreTitle(canExplore, hasPoints);
+        }
+
+        // Update Visit Button
+        const currentHex = this.game.hexGrid.getHex(this.game.hero.position.q, this.game.hero.position.r);
+        const visitBtn = document.getElementById('visit-btn');
+        if (visitBtn) {
+            const hasSite = currentHex && currentHex.site;
+            this.game.ui.setButtonEnabled(visitBtn, hasSite && !this.game.combat);
+            if (hasSite) {
+                visitBtn.textContent = `Besuche ${currentHex.site.getName()} `;
+                visitBtn.style.display = 'inline-block';
+            } else {
+                visitBtn.style.display = 'none';
+            }
+        }
+    }
+
+    /**
+     * Returns the localized title for the explore button based on state.
+     * @private
+     */
+    _getExploreTitle(canExplore, hasPoints) {
+        if (canExplore && hasPoints) return 'Erkunden (2 Bewegungspunkte)';
+        if (!canExplore) return 'Kein unbekanntes Gebiet angrenzend';
+        return 'Nicht genug Bewegungspunkte (2 benötigt)';
     }
 }

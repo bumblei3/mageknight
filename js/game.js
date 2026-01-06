@@ -216,7 +216,10 @@ export class MageKnightGame {
             this.addLog('Touch-Steuerung aktiviert', 'info');
         }
 
-        this.setupParticleSystem();
+        // Delegate UI setup to UI manager
+        this.ui.setupHelpSystem(this.abortController);
+        const overlayParticles = this.ui.setupParticleSystem(this.canvas);
+        if (overlayParticles) this.particleSystem = overlayParticles;
 
         // Handle Window Resize
         window.addEventListener('resize', () => this.handleResize());
@@ -405,101 +408,19 @@ export class MageKnightGame {
     createEnemies() { this.entityManager.createEnemies(); }
 
     /**
-     * Sets up the particle system overlay.
+     * Compatibility wrapper for UI help system setup.
      */
-    setupParticleSystem() {
-        // Create overlay canvas for particles
-        const container = document.querySelector('.canvas-layer');
-        if (!container) {
-            console.warn('Canvas layer not found for particle system');
-            return;
-        }
-        this.particleCanvas = document.createElement('canvas');
-        this.particleCanvas.width = this.canvas.width;
-        this.particleCanvas.height = this.canvas.height;
-        this.particleCanvas.style.position = 'absolute';
-        this.particleCanvas.style.top = '0';
-        this.particleCanvas.style.left = '0';
-        this.particleCanvas.style.pointerEvents = 'none'; // Click through to game board
-        this.particleCanvas.style.zIndex = '10'; // Above game board
+    setupHelpSystem() { this.ui.setupHelpSystem(this.abortController); }
 
-        container.appendChild(this.particleCanvas);
-
-        this.particleSystem = new ParticleSystem(this.particleCanvas);
-
-        // Override clear to clear rect
-        this.particleSystem.clearCanvas = () => {
-            const ctx = this.particleCanvas.getContext('2d');
-            ctx.clearRect(0, 0, this.particleCanvas.width, this.particleCanvas.height);
-        };
-
-        // Hook into update loop
-        const originalUpdate = this.particleSystem.update.bind(this.particleSystem);
-        this.particleSystem.update = () => {
-            this.particleSystem.clearCanvas();
-            originalUpdate();
-        };
-    }
+    /**
+     * Compatibility wrapper for UI particle system setup.
+     */
+    setupParticleSystem() { this.particleSystem = this.ui.setupParticleSystem(this.canvas); }
 
     /**
      * Updates the phase indicator in the UI.
      */
-    updatePhaseIndicator() { this.phaseManager.updatePhaseIndicator(); }
-
-    /**
-     * Sets up the help system modal and tab listeners.
-     */
-    setupHelpSystem() {
-        const signal = this.abortController.signal;
-        const helpBtn = document.getElementById('help-btn');
-        const helpModal = document.getElementById('help-modal');
-        const helpClose = document.getElementById('help-close');
-        const helpTabs = document.querySelectorAll('.help-tab');
-
-        if (!helpBtn || !helpModal || !helpClose) return;
-
-        // Open help modal
-        helpBtn.addEventListener('click', () => {
-            helpModal.classList.add('active');
-        }, { signal });
-
-        // Close help modal
-        helpClose.addEventListener('click', () => {
-            helpModal.classList.remove('active');
-        }, { signal });
-
-        // Close on outside click
-        helpModal.addEventListener('click', (e) => {
-            if (e.target === helpModal) {
-                helpModal.classList.remove('active');
-            }
-        }, { signal });
-
-        // Close on ESC key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && helpModal.classList.contains('active')) {
-                helpModal.classList.remove('active');
-            }
-        }, { signal });
-
-        // Tab switching
-        helpTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const targetTab = tab.dataset.tab;
-
-                // Remove active from all tabs and contents
-                helpTabs.forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.help-tab-content').forEach(c => c.classList.remove('active'));
-
-                // Add active to clicked tab and corresponding content
-                tab.classList.add('active');
-                const targetContent = document.getElementById(`help-${targetTab}`);
-                if (targetContent) targetContent.classList.add('active');
-            }, { signal });
-        });
-
-
-    }
+    updatePhaseIndicator() { this.renderController.updatePhaseIndicator(); }
 
 
 
@@ -649,43 +570,7 @@ export class MageKnightGame {
     /**
      * Updates all HUD stats, movement points, and unit displays.
      */
-    updateStats() {
-        this.ui.updateHeroStats(this.hero);
-        this.ui.updateMovementPoints(this.hero.movementPoints);
-
-        // Update units display
-        this.ui.renderUnits(this.hero.units);
-
-        // Update Explore button
-        const canExplore = this.mapManager.canExplore(this.hero.position.q, this.hero.position.r);
-        const hasPoints = this.hero.movementPoints >= 2;
-
-        if (this.ui.elements.exploreBtn) {
-            this.ui.setButtonEnabled(this.ui.elements.exploreBtn, canExplore && hasPoints && !this.combat);
-
-            if (canExplore && hasPoints) {
-                this.ui.elements.exploreBtn.title = 'Erkunden (2 Bewegungspunkte)';
-            } else if (!canExplore) {
-                this.ui.elements.exploreBtn.title = 'Kein unbekanntes Gebiet angrenzend';
-            } else {
-                this.ui.elements.exploreBtn.title = 'Nicht genug Bewegungspunkte (2 benötigt)';
-            }
-        }
-
-        // Update Visit Button
-        const currentHex = this.hexGrid.getHex(this.hero.position.q, this.hero.position.r);
-        const visitBtn = document.getElementById('visit-btn');
-        if (visitBtn) {
-            const hasSite = currentHex && currentHex.site;
-            this.ui.setButtonEnabled(visitBtn, hasSite && !this.combat);
-            if (hasSite) {
-                visitBtn.textContent = `Besuche ${currentHex.site.getName()} `;
-                visitBtn.style.display = 'inline-block';
-            } else {
-                visitBtn.style.display = 'none';
-            }
-        }
-    }
+    updateStats() { this.renderController.updateStats(); }
 
     /**
      * Visits a site at the hero's current location.

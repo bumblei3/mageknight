@@ -12,6 +12,7 @@ import { SkillRenderer } from './ui/SkillRenderer.js';
 import { store, ACTIONS } from './game/Store.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS } from './constants.js';
+import { ParticleSystem } from './particles.js';
 
 /**
  * User Interface Controller (Orchestrator)
@@ -418,6 +419,82 @@ export class UI {
     // --- Level Up Modal Logic ---
     showLevelUpModal(newLevel, choices, onConfirm) {
         this.modals.showLevelUpModal(newLevel, choices, onConfirm);
+    }
+
+    /**
+     * Sets up the particle system overlay.
+     * @param {HTMLCanvasElement} gameCanvas
+     * @returns {ParticleSystem}
+     */
+    setupParticleSystem(gameCanvas) {
+        const container = document.querySelector('.canvas-layer');
+        if (!container) {
+            console.warn('Canvas layer not found for particle system');
+            return null;
+        }
+        this.particleCanvas = document.createElement('canvas');
+        this.particleCanvas.width = gameCanvas.width;
+        this.particleCanvas.height = gameCanvas.height;
+        this.particleCanvas.style.position = 'absolute';
+        this.particleCanvas.style.top = '0';
+        this.particleCanvas.style.left = '0';
+        this.particleCanvas.style.pointerEvents = 'none';
+        this.particleCanvas.style.zIndex = '10';
+
+        container.appendChild(this.particleCanvas);
+
+        this.particleSystem = new ParticleSystem(this.particleCanvas);
+
+        // Override clear
+        this.particleSystem.clearCanvas = () => {
+            const ctx = this.particleCanvas.getContext('2d');
+            if (ctx) ctx.clearRect(0, 0, this.particleCanvas.width, this.particleCanvas.height);
+        };
+
+        // Hook update
+        const originalUpdate = this.particleSystem.update.bind(this.particleSystem);
+        this.particleSystem.update = () => {
+            this.particleSystem.clearCanvas();
+            originalUpdate();
+        };
+
+        return this.particleSystem;
+    }
+
+    /**
+     * Sets up the help system modal and tab listeners.
+     * @param {AbortController} abortController
+     */
+    setupHelpSystem(abortController) {
+        const signal = abortController.signal;
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const helpClose = document.getElementById('help-close');
+        const helpTabs = document.querySelectorAll('.help-tab');
+
+        if (!helpBtn || !helpModal || !helpClose) return;
+
+        helpBtn.addEventListener('click', () => helpModal.classList.add('active'), { signal });
+        helpClose.addEventListener('click', () => helpModal.classList.remove('active'), { signal });
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) helpModal.classList.remove('active');
+        }, { signal });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && helpModal.classList.contains('active')) {
+                helpModal.classList.remove('active');
+            }
+        }, { signal });
+
+        helpTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                helpTabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.help-tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                const targetContent = document.getElementById(`help-${targetTab}`);
+                if (targetContent) targetContent.classList.add('active');
+            }, { signal });
+        });
     }
 }
 

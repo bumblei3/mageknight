@@ -1,0 +1,47 @@
+import { BaseSiteHandler } from './BaseSiteHandler.js';
+import { SITE_TYPES } from '../sites.js';
+import { getUnitsForLocation } from '../unit.js';
+import { SAMPLE_SPELLS } from '../card.js';
+
+export class CityHandler extends BaseSiteHandler {
+    getOptions(site) {
+        const options = [];
+
+        // Expensive Healing
+        options.push({
+            id: 'heal',
+            label: 'Heilen (4 Einfluss / Wunde)',
+            action: () => this.healWounds(4),
+            enabled: this.game.hero.wounds.length > 0
+        });
+
+        // Elite Units
+        const units = getUnitsForLocation(SITE_TYPES.CITY);
+        options.push({
+            id: 'recruit_elite',
+            label: 'Elite-Einheiten rekrutieren',
+            subItems: units.length > 0 ? units.map(u => ({
+                type: 'unit',
+                data: u,
+                cost: u.cost,
+                action: () => this.recruitUnit(u)
+            })) : [{ label: 'Keine Einheiten verfügbar', enabled: false }]
+        });
+
+        // Spells
+        const spells = SAMPLE_SPELLS;
+        options.push({
+            id: 'city_spells',
+            label: 'Zauber im Laden (8 Einfluss + Mana)',
+            subItems: spells.map(c => ({
+                type: 'card',
+                data: c,
+                cost: 8,
+                manaCost: c.color,
+                action: () => this.buyCard(c, 8)
+            }))
+        });
+
+        return options;
+    }
+}

@@ -1,0 +1,51 @@
+import { BaseSiteHandler } from './BaseSiteHandler.js';
+import { SITE_TYPES } from '../sites.js';
+import { getUnitsForLocation } from '../unit.js';
+
+export class KeepHandler extends BaseSiteHandler {
+    getOptions(site) {
+        const options = [];
+
+        if (!site.conquered) {
+            options.push({
+                id: 'attack',
+                label: 'Angreifen (Erobern)',
+                action: () => this.attackSite(site),
+                enabled: true
+            });
+        } else {
+            // Recruitment
+            const units = getUnitsForLocation(SITE_TYPES.KEEP);
+            options.push({
+                id: 'recruit',
+                label: 'Einheiten rekrutieren',
+                subItems: units.map(u => ({
+                    type: 'unit',
+                    data: u,
+                    cost: u.cost,
+                    action: () => this.recruitUnit(u)
+                }))
+            });
+        }
+        return options;
+    }
+
+    attackSite(site) {
+        const enemy = {
+            name: 'Festungswache',
+            armor: 6,
+            attack: 4,
+            fame: 5,
+            icon: '🛡️',
+            type: 'keep_guard',
+            color: '#9ca3af',
+            fortified: true,
+            attackType: 'physical'
+        };
+
+        const msg = `Kampf gegen ${site.getName()} gestartet! Du musst die Befestigung überwinden.`;
+        this.game.addLog(msg, 'warning');
+        this.game.initiateCombat(enemy);
+        return { success: true, message: 'Direkter Angriff!' };
+    }
+}

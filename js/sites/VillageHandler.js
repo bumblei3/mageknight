@@ -1,0 +1,32 @@
+import { BaseSiteHandler } from './BaseSiteHandler.js';
+import { SITE_TYPES } from '../sites.js';
+import { getUnitsForLocation } from '../unit.js';
+
+export class VillageHandler extends BaseSiteHandler {
+    getOptions(site) {
+        const options = [];
+
+        // Healing
+        options.push({
+            id: 'heal',
+            label: 'Heilen (3 Einfluss / Wunde)',
+            action: () => this.healWounds(3),
+            enabled: this.game.hero.wounds.length > 0
+        });
+
+        // Recruitment
+        const units = getUnitsForLocation(SITE_TYPES.VILLAGE);
+        options.push({
+            id: 'recruit',
+            label: 'Einheiten rekrutieren',
+            subItems: units.map(u => ({
+                type: 'unit',
+                data: u,
+                cost: u.cost,
+                action: () => this.recruitUnit(u)
+            }))
+        });
+
+        return options;
+    }
+}

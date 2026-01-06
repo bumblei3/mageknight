@@ -1,7 +1,7 @@
 
 import { Animator } from '../js/animator.js';
 import { createSpy } from './test-mocks.js';
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('Animator Stress Tests', () => {
     let animator;

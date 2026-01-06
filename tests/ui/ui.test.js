@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { UI } from '../../js/ui.js';
 import { TutorialManager } from '../../js/tutorialManager.js';
-import { createSpy, createMockElement } from '../test-mocks.js';
+import { createSpy } from '../test-mocks.js';
 
 // Mock TooltipManager since UI imports it
 // We need to ensure the import in UI.js doesn't fail or use the real one if it has side effects.
@@ -13,11 +13,78 @@ describe('UI', () => {
     let ui;
     let mockElements;
 
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+
     beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="hand-cards"></div>
+            <div id="mana-source"></div>
+            <div id="game-log"></div>
+            <div id="combat-panel" style="display: none"></div>
+            <div id="combat-info"></div>
+            <div id="combat-units"></div>
+            <div id="hero-units"></div>
+            <div id="play-area" style="display: none"></div>
+            <div id="played-cards"></div>
+            <div id="site-modal">
+                <div id="site-modal-icon"></div>
+                <div id="site-modal-title"></div>
+                <div id="site-modal-description"></div>
+                <div id="site-options"></div>
+                <button id="site-close-btn"></button>
+                <button id="site-close"></button>
+            </div>
+            <div id="event-modal">
+                <div id="event-title"></div>
+                <div id="event-description"></div>
+                <div id="event-options"></div>
+                <button id="event-close"></button>
+            </div>
+            <div id="level-up-modal">
+                <div id="new-level-display"></div>
+                <div id="skill-choices"></div>
+                <div id="card-choices"></div>
+                <button id="confirm-level-up"></button>
+            </div>
+            <div id="toast-container"></div>
+            <button id="heal-btn" style="display: none"></button>
+            <button id="explore-btn"></button>
+            <button id="end-turn-btn"></button>
+            <button id="rest-btn"></button>
+            <button id="new-game-btn"></button>
+            <button id="language-btn"></button>
+            <div id="skill-list"></div>
+            <div id="mana-bank"></div>
+            <div id="phase-hint"></div>
+            <div class="phase-text"></div>
+        `;
         ui = new UI();
         const mockGame = {
             combat: {
-                blockedEnemies: new Set()
+                blockedEnemies: new Set(),
+                phase: 'block'
+            },
+            sound: {
+                click: vi.fn(),
+                cardPlay: vi.fn(),
+                hover: vi.fn(),
+                levelUp: vi.fn(),
+                cardPlaySideways: vi.fn()
+            },
+            hero: {
+                hand: [],
+                units: [],
+                deck: [],
+                discard: []
             }
         };
         ui.setGame(mockGame);
@@ -271,7 +338,7 @@ describe('UI', () => {
     });
 
     it('should show toast notifications', () => {
-        ui.notifications.toastContainer = createMockElement('div');
+        ui.notifications.toastContainer = document.createElement('div');
         ui.showToast('Test Toast', 'info');
         expect(ui.notifications.toastContainer.children.length).toBe(1);
         expect(ui.notifications.toastContainer.textContent).toContain('Test Toast');

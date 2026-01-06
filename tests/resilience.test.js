@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
 import { setupGlobalMocks } from './test-mocks.js';
 import { MANA_COLORS } from '../js/constants.js';

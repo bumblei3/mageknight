@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { store, ACTIONS } from '../../js/game/Store.js';
 
 describe('Store', () => {

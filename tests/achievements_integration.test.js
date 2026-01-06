@@ -1,10 +1,10 @@
-
 import { MageKnightGame } from '../js/game.js';
 import { ACHIEVEMENTS } from '../js/achievements.js';
-import { createMockWindow, createMockDocument, MockHTMLElement } from './test-mocks.js';
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { eventBus } from '../js/eventBus.js';
 import { GAME_EVENTS } from '../js/constants.js';
+import { store } from '../js/game/Store.js';
+import { setLanguage } from '../js/i18n/index.js';
 
 describe('Achievements Integration', () => {
     let game;
@@ -12,21 +12,25 @@ describe('Achievements Integration', () => {
     let mockDocument;
 
     beforeEach(() => {
-        // Setup global mocks
-        mockWindow = createMockWindow();
-        mockDocument = createMockDocument();
-        global.window = mockWindow;
-        global.document = mockDocument;
-        global.HTMLElement = MockHTMLElement;
-        global.AudioContext = mockWindow.AudioContext; // Ensure sound manager doesn't crash
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="game-log"></div>
+            <div id="hand-cards"></div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer" class="canvas-layer"></div>
+        `;
 
-        // Reset body
-        document.body.innerHTML = '';
-        const gameBoard = document.createElement('canvas');
-        gameBoard.id = 'game-board';
-        document.body.appendChild(gameBoard);
-
-        // Init game
         game = new MageKnightGame();
 
         // Listen for notifications via event bus
@@ -37,12 +41,13 @@ describe('Achievements Integration', () => {
 
         // Reset achievements
         game.achievementManager.reset();
+    });
 
-        // Mock Sound to prevent errors
-        if (game.sound) {
-            game.sound.success = () => { };
-            game.sound.enabled = true;
-        }
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+        eventBus.clear(); // Ensure eventBus is clean
     });
 
     it('should unlock "FIRST_BLOOD" achievement upon first kill', () => {

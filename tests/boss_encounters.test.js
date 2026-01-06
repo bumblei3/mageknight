@@ -1,13 +1,15 @@
-// Tests for Boss Encounter mechanics
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { BossEnemy, BOSS_DEFINITIONS, BOSS_PHASES, createBoss } from '../js/enemy.js';
 import { Combat, COMBAT_PHASE } from '../js/combat.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
 
 describe('Boss Encounters', () => {
     let boss;
     let mockHero;
 
     beforeEach(() => {
+        setLanguage('de');
         // Create a test boss
         boss = createBoss('dark_lord');
 
@@ -20,6 +22,11 @@ describe('Boss Encounters', () => {
             takeWound: function () { this.wounds.push('wound'); },
             takeWoundToDiscard: function () { this.wounds.push('discard_wound'); }
         };
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
     });
 
     describe('BossEnemy Class', () => {

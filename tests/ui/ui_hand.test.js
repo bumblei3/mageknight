@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { UI } from '../../js/ui.js';
 import { Card } from '../../js/card.js';
 import { createSpy } from '../test-mocks.js';
@@ -9,8 +9,7 @@ describe('UI Hand Rendering', () => {
 
     beforeEach(() => {
         // Mock the specific container we care about
-        // We need a real MockHTMLElement to support addEventListener and click dispatch
-        // So we use document.createElement which returns MockHTMLElement (global mock)
+        // In JSDOM this returns a real HTMLDivElement
         mockHandContainer = document.createElement('div');
 
         ui = new UI();
@@ -56,7 +55,7 @@ describe('UI Hand Rendering', () => {
         const cardEl = ui.elements.handCards.children[0];
 
         // Simulate click
-        cardEl.dispatchEvent({ type: 'click', target: cardEl });
+        cardEl.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
         expect(clickSpy.callCount).toBeGreaterThan(0);
         // Verify arguments passed to callback: index, card

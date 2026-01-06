@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Combat, COMBAT_PHASE } from '../../js/combat.js';
 
 describe('Combat System', () => {

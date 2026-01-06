@@ -1,6 +1,7 @@
 
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { SoundManager } from '../../js/soundManager.js';
+import { store } from '../../js/game/Store.js';
 
 describe('SoundManager Coverage', () => {
     let soundManager;
@@ -11,11 +12,17 @@ describe('SoundManager Coverage', () => {
         soundManager.enabled = false;
     });
 
+    afterEach(() => {
+        if (soundManager) soundManager.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+    });
+
     describe('initialization', () => {
         it('should initialize with sound enabled by default', () => {
             const sm = new SoundManager();
             expect(sm.enabled).toBe(true);
-            expect(sm.volume).toBe(0.3);
+            expect(sm.masterVolume).toBe(1.0);
         });
     });
 
@@ -30,7 +37,7 @@ describe('SoundManager Coverage', () => {
     describe('setVolume', () => {
         it('should accept volume without error', () => {
             soundManager.setVolume(0.5);
-            expect(soundManager.volume).toBe(0.5);
+            expect(soundManager.masterVolume).toBe(0.5);
         });
     });
 

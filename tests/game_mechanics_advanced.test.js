@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
 import { setupGlobalMocks, resetMocks, setupStandardGameDOM, createSpy } from './test-mocks.js';
 import { TIME_OF_DAY } from '../js/constants.js';

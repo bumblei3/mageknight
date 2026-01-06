@@ -118,21 +118,31 @@ export class UI {
      * @private
      */
     setupTooltips() {
-        // Hero Stats
-        this.tooltipManager.attachToElement(this.elements.heroArmor,
-            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.armor.title'), t('ui.tooltips.armor.desc')));
+        // Hero Stats - with null checks for test environments
+        if (this.elements.heroArmor) {
+            this.tooltipManager.attachToElement(this.elements.heroArmor,
+                this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.armor.title'), t('ui.tooltips.armor.desc')));
+        }
 
-        this.tooltipManager.attachToElement(this.elements.heroHandLimit,
-            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.handLimit.title'), t('ui.tooltips.handLimit.desc')));
+        if (this.elements.heroHandLimit) {
+            this.tooltipManager.attachToElement(this.elements.heroHandLimit,
+                this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.handLimit.title'), t('ui.tooltips.handLimit.desc')));
+        }
 
-        this.tooltipManager.attachToElement(this.elements.heroWounds,
-            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.wounds.title'), t('ui.tooltips.wounds.desc')));
+        if (this.elements.heroWounds) {
+            this.tooltipManager.attachToElement(this.elements.heroWounds,
+                this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.wounds.title'), t('ui.tooltips.wounds.desc')));
+        }
 
-        this.tooltipManager.attachToElement(this.elements.fameValue.parentElement,
-            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.fame.title'), t('ui.tooltips.fame.desc')));
+        if (this.elements.fameValue?.parentElement) {
+            this.tooltipManager.attachToElement(this.elements.fameValue.parentElement,
+                this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.fame.title'), t('ui.tooltips.fame.desc')));
+        }
 
-        this.tooltipManager.attachToElement(this.elements.reputationValue.parentElement,
-            this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.reputation.title'), t('ui.tooltips.reputation.desc')));
+        if (this.elements.reputationValue?.parentElement) {
+            this.tooltipManager.attachToElement(this.elements.reputationValue.parentElement,
+                this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.reputation.title'), t('ui.tooltips.reputation.desc')));
+        }
 
         // Phase Indicator
         const phaseEl = document.getElementById('phase-indicator');

@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { AchievementManager, ACHIEVEMENTS } from '../js/achievements.js';
 import { createMockUI, createMockLocalStorage, createSpy as createSpyMock } from './test-mocks.js';
 

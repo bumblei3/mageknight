@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { logger, LOG_LEVELS } from '../js/logger.js';
 import { createSpy } from './test-mocks.js';
 

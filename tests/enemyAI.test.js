@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { EnemyAI, ENEMY_ABILITIES } from '../js/enemyAI.js';
 import { ENEMY_TYPES } from '../js/enemy.js';
 

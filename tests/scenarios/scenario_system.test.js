@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { ScenarioManager } from '../../js/game/ScenarioManager.js';
 import { SITE_TYPES } from '../../js/sites.js';
 

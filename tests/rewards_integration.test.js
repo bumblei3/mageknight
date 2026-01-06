@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { CombatOrchestrator } from '../js/game/CombatOrchestrator.js';
 import { RewardManager } from '../js/game/RewardManager.js';
 

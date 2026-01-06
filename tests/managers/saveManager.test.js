@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { SaveManager } from '../../js/persistence/SaveManager.js';
 
 // Mock localStorage for Node.js environment

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
 import { UI } from '../js/ui.js';
 import { TouchController } from '../js/touchController.js';

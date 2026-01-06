@@ -1,19 +1,46 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TouchController } from '../js/touchController.js';
-import { createMockElement, createSpy } from './test-mocks.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
+import { eventBus } from '../js/eventBus.js';
 
 describe('Touch Controller', () => {
     let game;
     let controller;
     let canvas;
-
-    let originalVibrate, originalMatchMedia, originalGetElementById;
+    let originalVibrate;
+    let originalMatchMedia;
 
     beforeEach(() => {
+        setLanguage('de');
+        document.body.innerHTML = `
+            <div id="game-container" style="width: 800px; height: 600px;">
+                <canvas id="game-board"></canvas>
+            </div>
+            <div id="hand-cards"></div>
+            <div id="game-log"></div>
+            <div id="phase-indicator"></div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name"></div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer"></div>
+            <div id="visit-btn"></div>
+            <button id="undo-btn"></button>
+            <button id="end-turn-btn"></button>
+        `;
+
         originalVibrate = global.navigator.vibrate;
         originalMatchMedia = global.window.matchMedia;
-        originalGetElementById = global.document.getElementById;
-        canvas = createMockElement('canvas');
+
+        canvas = document.getElementById('game-board');
         canvas.getBoundingClientRect = () => ({
             left: 0,
             top: 0,
@@ -24,45 +51,45 @@ describe('Touch Controller', () => {
         game = {
             canvas: canvas,
             movementMode: false,
-            addLog: createSpy('addLog'),
+            addLog: vi.fn(),
             hexGrid: {
                 hasHex: () => true,
                 pixelToAxial: (x, y) => ({ q: Math.floor(x / 50), r: Math.floor(y / 50) }),
-                getHex: () => ({ terrain: 1 })
+                getHex: () => ({ terrain: 1 }),
+                clearSelection: vi.fn(),
+                highlightHexes: vi.fn()
             },
             ui: {
-                addLog: createSpy('addLog'),
+                addLog: vi.fn(),
                 tooltipManager: {
-                    showEnemyTooltip: createSpy('showEnemyTooltip'),
-                    showTerrainTooltip: createSpy('showTerrainTooltip'),
-                    hideTooltip: createSpy('hideTooltip')
+                    showEnemyTooltip: vi.fn(),
+                    showTerrainTooltip: vi.fn(),
+                    hideTooltip: vi.fn()
                 }
             },
             enemies: [],
             terrain: { getName: () => 'plains' },
-            moveHero: createSpy('moveHero'),
-            selectHex: createSpy('selectHex'),
-            handleCardClick: createSpy('handleCardClick'),
-            handleCardRightClick: createSpy('handleCardRightClick'),
+            moveHero: vi.fn(),
+            selectHex: vi.fn(),
+            handleCardClick: vi.fn(),
+            handleCardRightClick: vi.fn(),
             hero: { hand: [{ name: 'Card 1' }] }
         };
 
-        global.navigator.vibrate = createSpy('vibrate');
+        global.navigator.vibrate = vi.fn();
         global.window.matchMedia = () => ({ matches: false });
-
-        // Mock getElementById for cards
-        global.document.getElementById = (id) => {
-            if (id === 'hand-cards') return createMockElement('div');
-            return null;
-        };
 
         controller = new TouchController(game);
     });
 
     afterEach(() => {
+        if (controller) controller.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
         global.navigator.vibrate = originalVibrate;
         global.window.matchMedia = originalMatchMedia;
-        global.document.getElementById = originalGetElementById;
+        document.body.innerHTML = '';
+        eventBus.clear();
     });
 
     it('should handle simple tap', () => {
@@ -76,7 +103,7 @@ describe('Touch Controller', () => {
         controller.handleTouchStart(event);
         controller.handleTouchEnd(event);
 
-        expect(game.selectHex.called).toBe(true);
+        expect(game.selectHex).toHaveBeenCalled();
     });
 
     it('should handle all swipe directions', () => {
@@ -85,22 +112,22 @@ describe('Touch Controller', () => {
         // Swipe Right
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 200, clientY: 100 }], preventDefault: () => { } });
-        expect(game.addLog.calledWith('Swipe rechts', 'info')).toBe(true);
+        expect(game.addLog).toHaveBeenCalledWith('Swipe rechts', 'info');
 
         // Swipe Left
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 0, clientY: 100 }], preventDefault: () => { } });
-        expect(game.addLog.calledWith('Swipe links', 'info')).toBe(true);
+        expect(game.addLog).toHaveBeenCalledWith('Swipe links', 'info');
 
         // Swipe Down
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 100, clientY: 200 }], preventDefault: () => { } });
-        expect(game.addLog.calledWith('Swipe runter', 'info')).toBe(true);
+        expect(game.addLog).toHaveBeenCalledWith('Swipe runter', 'info');
 
         // Swipe Up
         controller.handleTouchStart({ touches: [touchStart], preventDefault: () => { } });
         controller.handleTouchEnd({ changedTouches: [{ clientX: 100, clientY: 0 }], preventDefault: () => { } });
-        expect(game.addLog.calledWith('Swipe hoch', 'info')).toBe(true);
+        expect(game.addLog).toHaveBeenCalledWith('Swipe hoch', 'info');
     });
 
     it('should show tooltips for enemies and terrain', () => {
@@ -110,12 +137,12 @@ describe('Touch Controller', () => {
         // Enemy tooltip
         game.enemies = [{ position: { q: 2, r: 2 }, name: 'Orc' }];
         controller.showHexTooltip(touch, hex);
-        expect(game.ui.tooltipManager.showEnemyTooltip.called).toBe(true);
+        expect(game.ui.tooltipManager.showEnemyTooltip).toHaveBeenCalled();
 
         // Terrain tooltip
         game.enemies = [];
         controller.showHexTooltip(touch, hex);
-        expect(game.ui.tooltipManager.showTerrainTooltip.called).toBe(true);
+        expect(game.ui.tooltipManager.showTerrainTooltip).toHaveBeenCalled();
     });
 
     it('should handle long press', async () => {
@@ -126,19 +153,19 @@ describe('Touch Controller', () => {
         // Wait for long press threshold
         await new Promise(resolve => setTimeout(resolve, 600));
 
-        expect(game.addLog.called).toBe(true);
+        expect(game.addLog).toHaveBeenCalled();
     });
 
     it('should handle resize', () => {
-        game.canvas.parentNode = createMockElement('div');
-        game.canvas.parentNode.getBoundingClientRect = () => ({ width: 1000, height: 800 });
+        const container = document.getElementById('game-container');
+        vi.spyOn(container, 'getBoundingClientRect').mockReturnValue({ width: 1000, height: 800 });
 
         controller.handleResize();
 
         // Resize is debounced, so we wait
         return new Promise(resolve => {
             setTimeout(() => {
-                expect(game.canvas.width).toBe(1000);
+                expect(canvas.width).toBe(1000);
                 resolve();
             }, 200);
         });
@@ -152,52 +179,56 @@ describe('Touch Controller', () => {
 
     it('should handle card tap', () => {
         game.hero.hand = [{ name: 'Card 0' }];
-        game.handleCardClick = createSpy();
+        game.handleCardClick = vi.fn();
 
         controller.handleCardTap(0);
-        expect(game.handleCardClick.called).toBe(true);
+        expect(game.handleCardClick).toHaveBeenCalled();
     });
 
     it('should handle full touch lifecycle for tap', () => {
         const touchStart = { clientX: 100, clientY: 100, target: canvas };
-        const touchEnd = { changedTouches: [{ clientX: 105, clientY: 105, target: canvas }] };
+        const touchEnd = { clientX: 105, clientY: 105, target: canvas };
 
-        canvas.dispatchEvent({ type: 'touchstart', touches: [touchStart], preventDefault: () => { } });
-        canvas.dispatchEvent({ type: 'touchend', changedTouches: touchEnd.changedTouches, preventDefault: () => { } });
+        const startEvt = new Event('touchstart', { bubbles: true });
+        startEvt.touches = [touchStart];
+        canvas.dispatchEvent(startEvt);
+
+        const endEvt = new Event('touchend', { bubbles: true });
+        endEvt.changedTouches = [touchEnd];
+        canvas.dispatchEvent(endEvt);
 
         // This should trigger handleTap which calls handleHexClick
-        expect(game.selectHex.called).toBe(true);
+        expect(game.selectHex).toHaveBeenCalled();
     });
 
     it('should handle card long press', () => {
         game.hero.hand = [{ name: 'Card 1' }];
-        game.handleCardRightClick = createSpy();
+        game.handleCardRightClick = vi.fn();
 
         controller.handleCardLongPress(0);
-        expect(game.handleCardRightClick.called).toBe(true);
-        expect(global.navigator.vibrate.called).toBe(true);
+        expect(game.handleCardRightClick).toHaveBeenCalled();
+        expect(global.navigator.vibrate).toHaveBeenCalled();
     });
 
-    it('should resize particle canvas if present', (done) => {
-        game.particleCanvas = createMockElement('canvas');
-        game.canvas.parentNode = createMockElement('div');
-        game.canvas.parentNode.getBoundingClientRect = () => ({ width: 500, height: 400 });
+    it('should resize particle canvas if present', () => {
+        game.particleCanvas = document.createElement('canvas');
+        const container = document.getElementById('game-container');
+        vi.spyOn(container, 'getBoundingClientRect').mockReturnValue({ width: 500, height: 400 });
 
         controller.resizeCanvas();
 
         expect(game.particleCanvas.width).toBe(500);
         expect(game.particleCanvas.height).toBe(400);
-        done();
     });
 
     it('should render on resize if hero present', () => {
         game.hero = { getStats: () => ({}) };
-        game.render = createSpy('render');
-        game.canvas.parentNode = createMockElement('div');
-        game.canvas.parentNode.getBoundingClientRect = () => ({ width: 1000, height: 800 });
+        game.render = vi.fn();
+        const container = document.getElementById('game-container');
+        vi.spyOn(container, 'getBoundingClientRect').mockReturnValue({ width: 1000, height: 800 });
 
         controller.resizeCanvas();
-        expect(game.render.called).toBe(true);
+        expect(game.render).toHaveBeenCalled();
     });
 
     it('should return device pixel ratio', () => {
@@ -219,9 +250,9 @@ describe('Touch Controller', () => {
         game.enemies = [{ position: { q: 1, r: 1 }, name: 'Enemy', armor: 3, attack: 2 }];
         // showHexContextMenu calls alert(), not addLog
         const originalAlert = global.alert;
-        global.alert = createSpy('alert');
+        global.alert = vi.fn();
         controller.showHexContextMenu(hex);
-        expect(global.alert.called).toBe(true);
+        expect(global.alert).toHaveBeenCalled();
         global.alert = originalAlert;
     });
 
@@ -236,7 +267,7 @@ describe('Touch Controller', () => {
         controller.handleTouchStart({ touches: [touch], preventDefault: () => { } });
         controller.handleTouchMove({ touches: [{ clientX: 105, clientY: 105 }], preventDefault: () => { } });
         // Small movement should not trigger swipe
-        expect(game.addLog.calledWith('Swipe rechts', 'info')).toBe(false);
+        expect(game.addLog).not.toHaveBeenCalledWith('Swipe rechts', 'info');
     });
 
     it('should setup touch events on canvas', () => {

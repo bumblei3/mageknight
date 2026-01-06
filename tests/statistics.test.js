@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { StatisticsManager } from '../js/statistics.js';
 
 describe('StatisticsManager', () => {

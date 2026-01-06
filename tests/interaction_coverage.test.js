@@ -1,23 +1,57 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { InteractionController } from '../js/interactionController.js';
 import { MageKnightGame } from '../js/game.js';
-import { createMockUI, setupStandardGameDOM, resetMocks, createSpy } from './test-mocks.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
+import { eventBus } from '../js/eventBus.js';
 
 describe('InteractionController Coverage', () => {
     let game;
     let controller;
 
     beforeEach(() => {
-        resetMocks();
-        setupStandardGameDOM();
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="game-log"></div>
+            <div id="hand-cards"></div>
+            <div id="play-area" style="display: none;">
+                <div id="played-cards"></div>
+            </div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer" class="canvas-layer"></div>
+            <div id="card-play-modal" style="display: none;">
+                <div id="basic-effect-desc"></div>
+                <div id="strong-effect-desc"></div>
+                <div id="strong-cost-desc"></div>
+                <button id="play-basic-btn"></button>
+                <button id="play-strong-btn"></button>
+                <button id="card-play-close"></button>
+            </div>
+            <div class="board-wrapper"></div>
+        `;
         game = new MageKnightGame();
         // Mock UI further if needed
-        game.ui.addLog = () => { };
+        game.ui.addLog = vi.fn();
         controller = new InteractionController(game);
     });
 
     afterEach(() => {
-        resetMocks();
+        if (game && game.destroy) game.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+        eventBus.clear();
     });
 
     it('should show card play modal when card has strong effect and hero can afford it', () => {
@@ -186,7 +220,7 @@ describe('InteractionController Coverage', () => {
         const modal = document.getElementById('card-play-modal');
 
         // Mock event targeting the modal itself
-        modal.dispatchEvent({ type: 'click', target: modal });
+        modal.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(modal.style.display).toBe('none');
     });
 

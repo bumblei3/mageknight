@@ -402,7 +402,9 @@ export class MockHTMLElement {
 
     appendChild(child) {
         this.children.push(child);
-        child.parentNode = this;
+        try {
+            child.parentNode = this;
+        } catch (e) { /* ignore read-only */ }
         return child;
     }
 
@@ -413,7 +415,9 @@ export class MockHTMLElement {
         } else {
             this.children.push(newNode); // Fallback to append if ref not found
         }
-        newNode.parentNode = this;
+        try {
+            newNode.parentNode = this;
+        } catch (e) { /* ignore read-only */ }
         return newNode;
     }
 
@@ -847,7 +851,7 @@ export function setupGlobalMocks() {
     global.MouseEvent = MockMouseEvent;
     global.KeyboardEvent = MockKeyboardEvent;
 
-    if (typeof prompt === 'undefined' || global.prompt.toString().includes('native')) {
+    if (typeof prompt === 'undefined' || (global.prompt && global.prompt.toString().includes('native'))) {
         global.prompt = () => '1';
     }
 

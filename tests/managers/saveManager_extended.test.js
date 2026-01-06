@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { SaveManager } from '../../js/persistence/SaveManager.js';
 import { setupGlobalMocks, resetMocks, createMockLocalStorage } from '../test-mocks.js';
 

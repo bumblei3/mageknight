@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { UI } from '../../js/ui.js';
 import { TooltipManager } from '../../js/ui/TooltipManager.js';
 import { animator } from '../../js/animator.js';
-import { setupStandardGameDOM, setupGlobalMocks, resetMocks, createMockElement, createSpy } from '../test-mocks.js';
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
+import { createSpy } from '../test-mocks.js';
 
 // Mock animator to be synchronous for tests
 animator.animate = (options) => {
@@ -16,16 +18,39 @@ describe('UI Coverage Final', () => {
     let mockGame;
 
     beforeEach(() => {
-        setupGlobalMocks();
-        setupStandardGameDOM();
-        resetMocks();
-
-        // Ensure toast-container exists (it should be in standard DOM but let's be safe)
-        if (!document.getElementById('toast-container')) {
-            const tc = document.createElement('div');
-            tc.id = 'toast-container';
-            document.body.appendChild(tc);
-        }
+        setLanguage('de');
+        document.body.innerHTML = `
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="hand-cards"></div>
+            <div id="mana-source"></div>
+            <div id="game-log"></div>
+            <div id="combat-panel" style="display: none"></div>
+            <div id="combat-info"></div>
+            <div id="combat-units"></div>
+            <div id="hero-units"></div>
+            <div id="play-area" style="display: none"></div>
+            <div id="played-cards"></div>
+            <div id="toast-container"></div>
+            <div id="site-modal">
+                <div id="site-modal-icon"></div>
+                <div id="site-modal-title"></div>
+                <div id="site-modal-description"></div>
+                <div id="site-options"></div>
+                <button id="site-close-btn"></button>
+            </div>
+            <div id="event-modal">
+                <div id="event-title"></div>
+                <div id="event-description"></div>
+                <div id="event-options"></div>
+                <button id="event-close"></button>
+            </div>
+        `;
 
         mockGame = {
             hero: {
@@ -49,12 +74,13 @@ describe('UI Coverage Final', () => {
     });
 
     afterEach(() => {
+        if (store) store.clearListeners();
         document.body.innerHTML = '';
     });
 
     describe('TooltipManager Edge Cases', () => {
         it('should show terrain tooltip with movement costs', () => {
-            const el = createMockElement('div');
+            const el = document.createElement('div');
             tooltipManager.showTerrainTooltip(el, 'forest', { day: 3, night: 5 });
             const tooltip = tooltipManager.tooltip;
             expect(tooltip.innerHTML).toContain('Wald');
@@ -235,7 +261,7 @@ describe('UI Coverage Final', () => {
             // Trigger timeout logic manually to avoid long wait
             setTimeout(() => {
                 expect(toast.classList.contains('hiding')).toBe(true);
-                toast.dispatchEvent({ type: 'animationend' });
+                toast.dispatchEvent(new Event('animationend'));
                 expect(ui.notifications.toastContainer.children.length).toBe(0);
                 done();
             }, 3500);

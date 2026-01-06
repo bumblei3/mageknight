@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Hero from '../js/hero.js';
 import { Card, CARD_TYPES } from '../js/card.js';
 import { setupGlobalMocks, resetMocks, createSpy } from './test-mocks.js';

@@ -1,6 +1,8 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { NotificationManager } from '../js/ui/NotificationManager.js';
-import { createMockElement } from './test-mocks.js';
+import { NotificationManager } from '../js/ui/NotificationManager.js';
+import { store } from '../js/game/Store.js';
+import { afterEach } from 'vitest';
 
 /**
  * Tests for NotificationManager - log grouping, limits, and toasts.
@@ -12,9 +14,14 @@ describe('NotificationManager', () => {
 
     beforeEach(() => {
         mockElements = {
-            gameLog: createMockElement('div')
+            gameLog: document.createElement('div')
         };
         notificationManager = new NotificationManager(mockElements);
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        document.body.innerHTML = '';
     });
 
     describe('Log Entry Creation', () => {

@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { StatusEffect, StatusEffectManager, EFFECT_TYPES } from '../js/statusEffects.js';
 import { Hero } from '../js/hero.js';
 import { Enemy } from '../js/enemy.js';

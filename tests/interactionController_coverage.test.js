@@ -1,27 +1,26 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { InteractionController } from '../js/interactionController.js';
-import { setupGlobalMocks, resetMocks, setupStandardGameDOM, createSpy, createMockCanvas } from './test-mocks.js';
-
-setupGlobalMocks();
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
 
 describe('InteractionController Coverage', () => {
     let controller;
     let mockGame;
 
     beforeEach(() => {
-        setupStandardGameDOM();
-        resetMocks();
-
-        const mockCanvas = createMockCanvas(800, 600);
+        setLanguage('de');
+        document.body.innerHTML = '<canvas id="game-board"></canvas>';
+        const canvas = document.getElementById('game-board');
+        canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 800, height: 600 });
 
         mockGame = {
-            canvas: mockCanvas,
+            canvas: canvas,
             hexGrid: {
-                pixelToAxial: createSpy(() => ({ q: 0, r: 0 })),
-                hasHex: createSpy(() => true),
-                getHex: createSpy(() => ({ revealed: true, terrain: 'plains' })),
-                axialToPixel: createSpy(() => ({ x: 400, y: 300 }))
+                pixelToAxial: vi.fn(() => ({ q: 0, r: 0 })),
+                hasHex: vi.fn(() => true),
+                getHex: vi.fn(() => ({ revealed: true, terrain: 'plains' })),
+                axialToPixel: vi.fn(() => ({ x: 400, y: 300 }))
             },
             hero: {
                 position: { q: 0, r: 0 },
@@ -30,30 +29,35 @@ describe('InteractionController Coverage', () => {
             enemies: [],
             ui: {
                 tooltipManager: {
-                    hideTooltip: createSpy(),
-                    showTooltip: createSpy(),
-                    createTerrainTooltipHTML: createSpy(() => '<div>Terrain</div>'),
-                    createEnemyTooltipHTML: createSpy(() => '<div>Enemy</div>'),
-                    createSiteTooltipHTML: createSpy(() => '<div>Site</div>')
+                    hideTooltip: vi.fn(),
+                    showTooltip: vi.fn(),
+                    createTerrainTooltipHTML: vi.fn(() => '<div>Terrain</div>'),
+                    createEnemyTooltipHTML: vi.fn(() => '<div>Enemy</div>'),
+                    createSiteTooltipHTML: vi.fn(() => '<div>Site</div>')
                 }
             },
             movementMode: false,
-            debugTeleport: false,
-            render: createSpy(),
-            addLog: createSpy(),
-            moveHero: createSpy()
+            render: vi.fn(),
+            addLog: vi.fn(),
+            moveHero: vi.fn()
         };
 
         controller = new InteractionController(mockGame);
     });
 
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+    });
+
     describe('handleCanvasClick', () => {
         it('should do nothing if hex does not exist', () => {
-            mockGame.hexGrid.hasHex = createSpy(() => false);
+            mockGame.hexGrid.hasHex = vi.fn(() => false);
 
             controller.handleCanvasClick({ clientX: 100, clientY: 100 });
 
-            expect(mockGame.moveHero.called).toBe(false);
+            expect(mockGame.moveHero).not.toHaveBeenCalled();
         });
 
         it('should call moveHero in movement mode', () => {
@@ -61,7 +65,7 @@ describe('InteractionController Coverage', () => {
 
             controller.handleCanvasClick({ clientX: 100, clientY: 100 });
 
-            expect(mockGame.moveHero.called).toBe(true);
+            expect(mockGame.moveHero).toHaveBeenCalled();
         });
 
         it('should handle debug teleport', () => {
@@ -69,24 +73,24 @@ describe('InteractionController Coverage', () => {
 
             controller.handleCanvasClick({ clientX: 100, clientY: 100 });
 
-            expect(mockGame.render.called).toBe(true);
+            expect(mockGame.render).toHaveBeenCalled();
             expect(mockGame.debugTeleport).toBe(false);
         });
     });
 
     describe('handleCanvasMouseMove', () => {
         it('should hide tooltip when no hex found', () => {
-            mockGame.hexGrid.pixelToAxial = createSpy(() => null);
+            mockGame.hexGrid.pixelToAxial = vi.fn(() => null);
 
             controller.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
 
-            expect(mockGame.ui.tooltipManager.hideTooltip.called).toBe(true);
+            expect(mockGame.ui.tooltipManager.hideTooltip).toHaveBeenCalled();
         });
 
         it('should show terrain tooltip for revealed hex', () => {
             controller.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
 
-            expect(mockGame.ui.tooltipManager.showTooltip.called).toBe(true);
+            expect(mockGame.ui.tooltipManager.showTooltip).toHaveBeenCalled();
         });
     });
 });

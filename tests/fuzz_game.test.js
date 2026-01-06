@@ -1,49 +1,53 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
-import { createMockDocument } from './test-mocks.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
 
 describe('Game Fuzzing', () => {
     // Helper to generate random int
     const randomInt = (max) => Math.floor(Math.random() * max);
 
     beforeEach(() => {
-        // Ensure global document exists
-        if (!global.document) {
-            global.document = createMockDocument();
-        }
-
-        // Ensure querySelector returns something usable for game init
-        // The game looks for .board-wrapper to append particle canvas
-        const originalQuerySelector = global.document.querySelector;
-        global.document.querySelector = (selector) => {
-            if (selector === '.board-wrapper') {
-                return {
-                    appendChild: () => { },
-                    style: {},
-                    getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 600 })
-                };
-            }
-            // Fallback to original or default mock
-            return originalQuerySelector ? originalQuerySelector(selector) : { appendChild: () => { }, style: {} };
-        };
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="game-log"></div>
+            <div id="hand-cards"></div>
+            <div id="play-area" style="display: none;">
+                <div id="played-cards"></div>
+            </div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer" class="canvas-layer"></div>
+            <div class="board-wrapper"></div>
+            <div id="end-turn-btn"></div>
+            <div id="rest-btn"></div>
+            <div id="explore-btn"></div>
+            <div id="save-btn"></div>
+            <div id="load-btn"></div>
+        `;
     });
 
     let game;
 
     afterEach(() => {
         if (game && game.destroy) game.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
     });
 
     it('should survive random input sequences with resets', async () => {
         game = new MageKnightGame();
-        // Mock UI elements that might be accessed
-        if (!document.getElementById('end-turn-btn')) {
-            ['end-turn-btn', 'rest-btn', 'explore-btn', 'save-btn', 'load-btn'].forEach(id => {
-                const btn = document.createElement('button');
-                btn.id = id;
-                document.body.appendChild(btn);
-            });
-        }
 
         game.init();
 

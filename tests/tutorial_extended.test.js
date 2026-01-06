@@ -1,27 +1,30 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TutorialManager } from '../js/tutorialManager.js';
-import { setupStandardGameDOM, setupGlobalMocks, resetMocks, createMockElement, createSpy } from './test-mocks.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
 
 describe('TutorialManager Extended', () => {
     let tutorialManager;
     let mockGame;
 
     beforeEach(() => {
-        if (document._clearElements) document._clearElements();
-        setupGlobalMocks();
-        setupStandardGameDOM();
-        resetMocks();
-
+        setLanguage('de');
+        document.body.innerHTML = '';
         mockGame = {
-            ui: { showToast: createSpy('showToast') }
+            ui: { showToast: vi.fn() }
         };
         tutorialManager = new TutorialManager(mockGame);
     });
 
     afterEach(() => {
-        const overlay = document.getElementById('tutorial-overlay-custom');
-        if (overlay) overlay.remove();
+        if (tutorialManager) {
+            const overlay = document.getElementById('tutorial-overlay-custom');
+            if (overlay) overlay.remove();
+        }
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
         localStorage.clear();
+        document.body.innerHTML = '';
     });
 
     it('should start tutorial and show first step', () => {
@@ -39,29 +42,16 @@ describe('TutorialManager Extended', () => {
     });
 
     it('should create UI from scratch', () => {
-        // Clear everything
-        if (document._clearElements) document._clearElements();
         document.body.innerHTML = '';
+        tutorialManager.createTutorialUI();
 
-        // Force getElementById to return null for everything during creation
-        const originalGEBI = document.getElementById;
-        document.getElementById = (id) => null;
-
-        try {
-            tutorialManager.createTutorialUI();
-        } catch (e) {
-            // It will throw on line 69 because it can't addEventListener to null
-            // But the creation lines (37-66) should be hit!
-        }
-
-        document.getElementById = originalGEBI;
         // Verify creation
         const overlay = document.querySelector('.tutorial-overlay-custom');
         expect(overlay).not.toBe(null);
     });
 
     it('should highlight element and clear highlight', () => {
-        const element = createMockElement('div');
+        const element = document.createElement('div');
         element.id = 'test-highlight';
         document.body.appendChild(element);
 
@@ -108,17 +98,14 @@ describe('TutorialManager Extended', () => {
     });
 
     it('should navigate next, prev, and skip', () => {
-        // Pre-create buttons because innerHTML doesn't parse in mock
-        const nextBtn = document.createElement('button'); nextBtn.id = 'tutorial-next-btn'; document.body.appendChild(nextBtn);
-        const prevBtn = document.createElement('button'); prevBtn.id = 'tutorial-prev-btn'; document.body.appendChild(prevBtn);
-        const skipBtn = document.createElement('button'); skipBtn.id = 'tutorial-skip-btn'; document.body.appendChild(skipBtn);
-
-        // Manually wire up the same callbacks as the manager would
-        nextBtn.addEventListener('click', () => tutorialManager.nextStep());
-        prevBtn.addEventListener('click', () => tutorialManager.prevStep());
-        skipBtn.addEventListener('click', () => tutorialManager.skip());
-
         tutorialManager.start();
+
+        // Get the buttons created by tutorialManager.start()
+        const nextBtn = document.getElementById('tutorial-next-btn');
+        const prevBtn = document.getElementById('tutorial-prev-btn');
+        const skipBtn = document.getElementById('tutorial-skip-btn');
+
+        expect(tutorialManager.currentStep).toBe(0);
 
         nextBtn.click();
         expect(tutorialManager.currentStep).toBe(1);

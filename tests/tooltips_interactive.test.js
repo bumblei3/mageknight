@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { TooltipManager } from '../js/ui/TooltipManager.js';
 import { NotificationManager } from '../js/ui/NotificationManager.js';
 

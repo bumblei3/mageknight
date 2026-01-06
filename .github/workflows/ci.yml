@@ -69,11 +69,23 @@ jobs:
         with:
           enablement: true
         
+      - name: Prepare production build
+        run: |
+          mkdir -p dist
+          cp index.html dist/
+          cp manifest.json dist/
+          cp sw.js dist/
+          cp favicon.png dist/
+          cp *.css dist/
+          cp -r js dist/
+          cp -r css dist/
+          cp -r icons dist/ || true
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Upload only dist directory
+          path: 'dist/'
           
       - name: Deploy to GitHub Pages
         id: deployment

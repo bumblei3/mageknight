@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Animator, animateCounter, shake } from '../js/animator.js';
 
 describe('Animator', () => {

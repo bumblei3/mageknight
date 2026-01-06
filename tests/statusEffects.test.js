@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { StatusEffectManager, StatusEffect, EFFECT_TYPES, EFFECT_DEFINITIONS } from '../js/statusEffects.js';
 
 describe('Status Effects System', () => {

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { StatusEffectManager, EFFECT_TYPES } from '../js/statusEffects.js';
 import { createSpy } from './test-mocks.js';
 

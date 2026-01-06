@@ -1,4 +1,4 @@
-import { describe, it, expect } from './testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Hero } from '../js/hero.js';
 import { HexGrid } from '../js/hexgrid.js';
 import { HeroBuilder } from './test-helpers.js';

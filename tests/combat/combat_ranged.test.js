@@ -1,14 +1,34 @@
 
-import { describe, it, expect, beforeEach, afterEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../../js/game.js';
 import { Combat, COMBAT_PHASE } from '../../js/combat.js';
 import { createSpy } from '../test-mocks.js';
+import { store } from '../../js/game/Store.js';
+import { setLanguage } from '../../js/i18n/index.js';
 
 describe('Combat Ranged Phase Integration', () => {
     let game;
     let enemy;
 
     beforeEach(() => {
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="game-log"></div>
+            <div id="hand-cards"></div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer" class="canvas-layer"></div>
+        `;
         game = new MageKnightGame();
 
         enemy = {
@@ -55,6 +75,12 @@ describe('Combat Ranged Phase Integration', () => {
         };
 
         game.initiateCombat(enemy);
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
     });
 
     it('should start in RANGED phase', () => {

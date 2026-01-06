@@ -1,4 +1,4 @@
-import { describe, it, expect } from '../testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Combat } from '../../js/combat.js';
 import { Hero } from '../../js/hero.js';
 import { createMockEnemy } from '../test-helpers.js';

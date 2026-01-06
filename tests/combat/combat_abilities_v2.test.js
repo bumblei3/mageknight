@@ -1,21 +1,28 @@
-
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createSpy } from '../test-mocks.js';
 import { Combat } from '../../js/combat.js';
 import { Hero } from '../../js/hero.js';
 import { Enemy } from '../../js/enemy.js';
 import { ATTACK_ELEMENTS } from '../../js/constants.js';
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
 
 describe('Advanced Combat Abilities V2', () => {
     let hero;
     let combat;
 
     beforeEach(() => {
+        setLanguage('de');
         hero = new Hero('Test Hero');
         hero.armor = 2;
         hero.hand = [];
         hero.deck = [];
         hero.discard = [];
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
     });
 
     it('1. Assassinate: prevents assigning damage to units', () => {

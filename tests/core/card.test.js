@@ -1,4 +1,4 @@
-import { describe, it, expect } from '../testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Card } from '../../js/card.js';
 
 describe('Card System', () => {

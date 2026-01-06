@@ -1,5 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
+import { eventBus } from '../js/eventBus.js';
 
 // Mock global.confirm
 const originalConfirm = global.confirm;
@@ -8,13 +11,43 @@ describe('Game Reset', () => {
     let game;
 
     beforeEach(() => {
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="game-log"></div>
+            <div id="hand-cards"></div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer" class="canvas-layer"></div>
+            <div id="reset-modal">
+                <button id="confirm-reset-btn"></button>
+                <button id="cancel-reset-btn"></button>
+                <button id="close-reset-modal"></button>
+            </div>
+            <div id="play-area">
+                <div id="played-cards"></div>
+            </div>
+        `;
         game = new MageKnightGame();
         // Mock confirm to always return true
-        global.confirm = () => true;
+        global.confirm = vi.fn(() => true);
     });
 
     afterEach(() => {
         if (game && game.destroy) game.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+        eventBus.clear();
         // Restore confirm
         global.confirm = originalConfirm;
     });

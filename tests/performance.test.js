@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
 import { ParticleSystem } from '../js/particles.js';
 import { HexGrid } from '../js/hexgrid.js';

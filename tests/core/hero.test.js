@@ -1,4 +1,4 @@
-import { describe, it, expect } from '../testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Hero, LEVEL_TABLE } from '../../js/hero.js';
 import { assertHeroState, HeroBuilder } from '../test-helpers.js';
 

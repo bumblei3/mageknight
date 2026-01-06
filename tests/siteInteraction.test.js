@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { createSpy } from './test-mocks.js';
 import { SiteInteractionManager } from '../js/siteInteraction.js';
 import { SITE_TYPES } from '../js/sites.js';

@@ -1,35 +1,50 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
-import { createMockElement, createMockCanvas, createSpy, createMockContext } from './test-mocks.js';
 import { SKILLS } from '../js/skills.js';
 import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
+import { eventBus } from '../js/eventBus.js';
 
 describe('Long Session - Integration', () => {
     let game;
     let originalGetElementById, originalQuerySelector;
 
     beforeEach(() => {
-        originalGetElementById = global.document.getElementById;
-        originalQuerySelector = global.document.querySelector;
-
-        global.document.getElementById = (id) => {
-            const el = createMockElement('div');
-            el.id = id;
-            if (id === 'game-board') el.getContext = () => createMockContext();
-            return el;
-        };
-        global.document.querySelector = () => createMockElement('div');
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="game-log"></div>
+            <div id="hand-cards"></div>
+            <div id="play-area" style="display: none;">
+                <div id="played-cards"></div>
+            </div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer" class="canvas-layer"></div>
+        `;
 
         game = new MageKnightGame();
         // Mock heavy systems to avoid actual timers/loops
-        game.sound = { play: () => { }, success: () => { } };
-        game.particles = { start: () => { }, stop: () => { }, burst: () => { }, addParticle: () => { } };
+        game.sound = { play: vi.fn(), success: vi.fn() };
+        game.particles = { start: vi.fn(), stop: vi.fn(), burst: vi.fn(), addParticle: vi.fn() };
     });
 
     afterEach(() => {
         if (game && game.destroy) game.destroy();
-        global.document.getElementById = originalGetElementById;
-        global.document.querySelector = originalQuerySelector;
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+        eventBus.clear();
     });
 
     it('should maintain state over a 3-turn sequence', () => {

@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { animateCardPlay, animateCardDiscard, animateCardDraw } from '../js/cardAnimations.js';
 import { createMockElement, setupGlobalMocks, resetMocks, createMockWindow } from './test-mocks.js';
 

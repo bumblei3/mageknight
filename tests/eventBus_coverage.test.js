@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { eventBus } from '../js/eventBus.js';
 import { createSpy } from './test-mocks.js';
 

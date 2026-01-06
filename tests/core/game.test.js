@@ -1,35 +1,62 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
-import { createMockElement, createSpy, setupGlobalMocks } from '../test-mocks.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Hero } from '../../js/hero.js';
-
-// --- Global Mocks Setup ---
-// Rely on setupGlobalMocks() from test-mocks.js called via setup.js
-
-// Import Game
 import { MageKnightGame } from '../../js/game.js';
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
 
 describe('Game Core', () => {
     let game;
 
     beforeEach(() => {
-        // Reset mocks
-        localStorage.clear();
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="game-log"></div>
+            <div id="hand-cards"></div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name">Hero</div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer" class="canvas-layer"></div>
+            <div id="reset-modal">
+                <button id="confirm-reset-btn"></button>
+                <button id="cancel-reset-btn"></button>
+                <button id="close-reset-modal"></button>
+            </div>
+            <div id="play-area">
+                <div id="played-cards"></div>
+            </div>
+            <div id="visit-btn"></div>
+        `;
 
         // Initialize game
         game = new MageKnightGame();
 
         game.sound = {
-            play: createSpy('play'),
-            stop: createSpy('stop'),
-            heal: createSpy('heal')
+            play: vi.fn(),
+            stop: vi.fn(),
+            heal: vi.fn()
         };
         // Mock StateManager to prevent saveGame recursion/error in tests
         game.stateManager = {
-            saveGame: createSpy('saveGame'),
-            loadGame: createSpy('loadGame'),
+            saveGame: vi.fn(),
+            loadGame: vi.fn(),
             getGameState: () => ({}),
             loadGameState: () => true
         };
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
     });
 
     it('should initialize game state', () => {

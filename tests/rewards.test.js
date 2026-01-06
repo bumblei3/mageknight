@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createSpy } from './test-mocks.js';
+import { store } from '../js/game/Store.js';
+import { setLanguage } from '../js/i18n/index.js';
 import { Hero } from '../js/hero.js';
 import { MageKnightGame } from '../js/game.js';
 import { CombatOrchestrator } from '../js/game/CombatOrchestrator.js';
@@ -15,9 +17,10 @@ describe('Reward System & Ruins', () => {
     let combatOrchestrator;
 
     beforeEach(() => {
+        setLanguage('de');
         // Mock DOM
         document.body.innerHTML = `
-            <div id="game-board"></div>
+            <canvas id="game-board"></canvas>
             <div id="reward-modal" class="modal">
                 <div id="reward-choices"></div>
             </div>
@@ -58,6 +61,11 @@ describe('Reward System & Ruins', () => {
         siteInteraction = new SiteInteractionManager(game);
         game.siteManager = siteInteraction;
         combatOrchestrator = game.combatOrchestrator;
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
     });
 
     it('Ruin site information is correctly defined', () => {

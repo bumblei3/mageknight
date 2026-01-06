@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { CombatOrchestrator } from '../js/game/CombatOrchestrator.js';
 import { SiteInteractionManager } from '../js/siteInteraction.js';
 import { Combat } from '../js/combat.js'; // We need actual Combat class for orchestrator to work? Or mock it?

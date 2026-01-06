@@ -1,9 +1,20 @@
-import { describe, it, expect } from '../testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Combat, COMBAT_PHASE } from '../../js/combat.js';
 import { Hero } from '../../js/hero.js';
 import { createEnemy } from '../../js/enemy.js';
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
+import { beforeEach, afterEach } from 'vitest';
 
 describe('Combat Integration Tests', () => {
+    beforeEach(() => {
+        setLanguage('de');
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+    });
+
     it('should complete full combat cycle with real enemy', () => {
         const hero = new Hero('TestHero');
         const enemy = createEnemy('orc', { q: 0, r: 0 });

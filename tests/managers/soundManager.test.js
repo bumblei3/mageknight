@@ -1,15 +1,29 @@
-import { describe, it, expect } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { SoundManager } from '../../js/soundManager.js';
-import { createSpy } from '../test-mocks.js';
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
 
 describe('SoundManager', () => {
+    let soundManager;
+
+    beforeEach(() => {
+        setLanguage('de');
+        soundManager = new SoundManager();
+        soundManager.enabled = false;
+    });
+
+    afterEach(() => {
+        if (soundManager) soundManager.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+    });
+
     describe('Initialization', () => {
         it('should initialize with enabled state', () => {
             const sm = new SoundManager();
 
             expect(sm.enabled).toBe(true);
-            expect(sm.volume).toBe(0.3);
-            expect(sm.initialized).toBe(false);
+            expect(sm.masterVolume).toBe(1.0);
         });
     });
 
@@ -32,13 +46,13 @@ describe('SoundManager', () => {
             const sm = new SoundManager();
 
             sm.setVolume(0.5);
-            expect(sm.volume).toBe(0.5);
+            expect(sm.masterVolume).toBe(0.5);
 
             sm.setVolume(-1);
-            expect(sm.volume).toBe(0);
+            expect(sm.masterVolume).toBe(0);
 
             sm.setVolume(2);
-            expect(sm.volume).toBe(1);
+            expect(sm.masterVolume).toBe(1);
         });
     });
 
@@ -99,7 +113,7 @@ describe('SoundManager', () => {
             sm.setVolume(0.8);
 
             expect(sm.enabled).toBe(false);
-            expect(sm.volume).toBe(0.8);
+            expect(sm.masterVolume).toBe(0.8);
         });
     });
 });

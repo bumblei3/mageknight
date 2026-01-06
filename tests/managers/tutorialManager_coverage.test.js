@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { TutorialManager } from '../../js/tutorialManager.js';
 import { setupGlobalMocks, resetMocks, setupStandardGameDOM, createMockElement } from '../test-mocks.js';
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { createSpy } from '../test-mocks.js';
 import { TooltipManager } from '../../js/ui/TooltipManager.js';
 import { CombatUIManager } from '../../js/ui/CombatUIManager.js';
@@ -91,8 +91,8 @@ describe('UI Tooltips', () => {
         // We need to re-create manager or manually call attach for THIS element
         tooltipManager.attachToElement(element);
 
-        // Simulate mouseenter with a plain object to avoid Event constructor issues in test env
-        element.dispatchEvent({ type: 'mouseenter' });
+        // Simulate mouseenter
+        element.dispatchEvent(new Event('mouseenter'));
 
         expect(showSpy.callCount).toBe(1);
         const content = showSpy.calls[0][1];

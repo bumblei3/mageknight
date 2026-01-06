@@ -1,9 +1,18 @@
-// Tests for new enemy types
-
-import { describe, it, expect } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Enemy, createEnemy, ENEMY_DEFINITIONS } from '../js/enemy.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
 
 describe('New Enemy Types', () => {
+    beforeEach(() => {
+        setLanguage('de');
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+    });
+
     describe('Mage', () => {
         it('creates mage enemy with correct stats', () => {
             const mage = createEnemy('mage');

@@ -5,25 +5,22 @@
 
 export class SoundManager {
     constructor() {
-        this.enabled = true;
-        this.volume = 0.3;
-        this.audioContext = null;
-        this.masterGain = null;
-        this.initialized = false;
+        this.ctx = null;
+        this.enabled = false;
+        this.masterVolume = 1.0;
+        this.timeouts = new Set();
+        this.init();
     }
 
     /**
      * Initialize the audio context (must be called after user interaction)
      */
     init() {
-        if (this.initialized) return;
+        if (this.ctx && this.ctx.state !== 'closed') return;
 
         try {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            this.masterGain = this.audioContext.createGain();
-            this.masterGain.connect(this.audioContext.destination);
-            this.masterGain.gain.value = this.volume;
-            this.initialized = true;
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.enabled = true; // Enable sound if context is successfully created
         } catch (e) {
             console.warn('Web Audio API not supported:', e);
             this.enabled = false;
@@ -42,36 +39,33 @@ export class SoundManager {
      * Set master volume (0-1)
      */
     setVolume(vol) {
-        this.volume = Math.max(0, Math.min(1, vol));
-        if (this.masterGain) {
-            this.masterGain.gain.value = this.volume;
-        }
+        this.masterVolume = Math.max(0, Math.min(1, vol));
     }
 
     /**
      * Play a single tone
      */
-    playTone(frequency, duration, type = 'sine', attack = 0.01) {
-        if (!this.enabled || !this.audioContext) {
-            this.init();
-            if (!this.audioContext) return;
+    playTone(frequency, duration, type = 'sine', volume = 0.1) {
+        if (!this.enabled || !this.ctx || this.ctx.state === 'closed') return;
+
+        try {
+            const oscillator = this.ctx.createOscillator();
+            const gainNode = this.ctx.createGain();
+
+            oscillator.type = type;
+            oscillator.frequency.value = frequency;
+
+            gainNode.gain.setValueAtTime(volume * this.masterVolume, this.ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(this.ctx.destination);
+
+            oscillator.start();
+            oscillator.stop(this.ctx.currentTime + duration);
+        } catch (e) {
+            console.warn('Failed to play tone:', e.message);
         }
-
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-
-        oscillator.type = type;
-        oscillator.frequency.value = frequency;
-
-        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.5, this.audioContext.currentTime + attack);
-        gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + duration);
-
-        oscillator.connect(gainNode);
-        gainNode.connect(this.masterGain);
-
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + duration);
     }
 
     /**
@@ -150,7 +144,11 @@ export class SoundManager {
     /** Hero movement */
     move() {
         this.playTone(200, 0.08, 'sine');
-        setTimeout(() => this.playTone(250, 0.06, 'sine'), 50);
+        const t = setTimeout(() => {
+            this.playTone(250, 0.06, 'sine');
+            this.timeouts.delete(t);
+        }, 50);
+        this.timeouts.add(t);
     }
 
     /** Attack sound */
@@ -163,7 +161,11 @@ export class SoundManager {
     hit() {
         this.playNoise(0.1, 600);
         this.playTone(100, 0.15, 'square');
-        setTimeout(() => this.playTone(80, 0.1, 'square'), 80);
+        const t = setTimeout(() => {
+            this.playTone(80, 0.1, 'square');
+            this.timeouts.delete(t);
+        }, 80);
+        this.timeouts.add(t);
     }
 
     /** Block successful */
@@ -177,8 +179,20 @@ export class SoundManager {
     victory() {
         const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
         notes.forEach((freq, i) => {
-            setTimeout(() => this.playTone(freq, 0.3, 'sine'), i * 150);
+            const t = setTimeout(() => {
+                this.playTone(freq, 0.3, 'sine');
+                this.timeouts.delete(t);
+            }, i * 150);
+            this.timeouts.add(t);
         });
+    }
+
+    destroy() {
+        this.timeouts.forEach(t => clearTimeout(t));
+        this.timeouts.clear();
+        if (this.ctx && this.ctx.state !== 'closed') {
+            try { this.ctx.close(); } catch (e) { }
+        }
     }
 
     /** Defeat sound */

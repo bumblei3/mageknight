@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Enemy, BossEnemy, ENEMY_TYPES, BOSS_PHASES, createEnemy, createBoss, createEnemies, ENEMY_DEFINITIONS } from '../js/enemy.js';
 import { setLanguage } from '../js/i18n/index.js';
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { eventBus } from '../js/eventBus.js';
 import * as Constants from '../js/constants.js';
 

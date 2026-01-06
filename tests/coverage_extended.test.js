@@ -1,19 +1,89 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { setLanguage } from '../js/i18n/index.js';
 import { MageKnightGame } from '../js/game.js';
 import { UI } from '../js/ui.js';
 import { createEnemy } from '../js/enemy.js';
 import { Card } from '../js/card.js';
 import { animator } from '../js/animator.js';
-import { createSpy } from './test-mocks.js';
+import { store } from '../js/game/Store.js';
+import { eventBus } from '../js/eventBus.js';
 
 describe('Coverage Gap Fill', () => {
     let game;
     let ui;
 
     beforeEach(() => {
+        setLanguage('de');
+        document.body.innerHTML = `
+            <div id="level-up-modal">
+                <div id="new-level-display"></div>
+                <div id="skill-choices"></div>
+                <div id="card-choices"></div>
+                <button id="confirm-level-up"></button>
+            </div>
+            <div id="combat-units"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name"></div>
+            <div id="explore-btn"></div>
+            <button id="end-turn-btn"></button>
+            <div id="hand-cards"></div>
+            <div id="mana-bank"></div>
+            <div id="mana-source"></div>
+            <div id="play-area">
+                <div id="played-cards"></div>
+            </div>
+            <div id="combat-panel"></div>
+            <div id="site-modal">
+                <div id="site-modal-title"></div>
+                <div id="site-modal-description"></div>
+                <div id="site-options"></div>
+                <button id="site-close-btn"></button>
+            </div>
+            <div id="game-log"></div>
+            <div id="phase-indicator"></div>
+            <div id="movement-points">0</div>
+            <div id="rest-btn"></div>
+            <div id="heal-btn"></div>
+            <div id="save-btn"></div>
+            <div id="load-btn"></div>
+            <div id="undo-btn"></div>
+            <div id="new-game-btn"></div>
+            <div id="achievements-btn"></div>
+            <div id="achievements-modal">
+                <button id="achievements-close"></button>
+            </div>
+            <div id="statistics-btn"></div>
+            <div id="statistics-modal">
+                <button id="statistics-close"></button>
+                <div id="statistics-grid"></div>
+            </div>
+            <div id="help-modal">
+                <button id="help-btn"></button>
+            </div>
+            <div id="sound-toggle-btn"></div>
+            <canvas id="game-board"></canvas>
+            <div id="particle-layer"></div>
+            <div id="visit-btn"></div>
+        `;
+
         game = new MageKnightGame();
         ui = new UI();
         game.ui = ui; // Link UI to game
+    });
+
+    afterEach(() => {
+        if (game && game.inputController) {
+            game.inputController.destroy();
+        }
+        if (game && game.destroy) game.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+        eventBus.clear();
     });
 
     describe('UI: Level Up Modal', () => {
@@ -35,21 +105,21 @@ describe('Coverage Gap Fill', () => {
             // Select Skill
             const skillEl = ui.elements.skillChoices.querySelector('.skill-choice');
             expect(skillEl).toBeDefined();
-            skillEl.dispatchEvent({ type: 'click' });
+            skillEl.dispatchEvent(new Event('click'));
             expect(skillEl.classList.contains('selected')).toBe(true);
             expect(ui.elements.confirmLevelUpBtn.disabled).toBe(true); // Still need card
 
             // Select Card
             const cardEl = ui.elements.cardChoices.querySelector('.card-choice');
             expect(cardEl).toBeDefined();
-            cardEl.dispatchEvent({ type: 'click' });
+            cardEl.dispatchEvent(new Event('click'));
             expect(cardEl.classList.contains('selected')).toBe(true);
 
             // Confirm button should be enabled now
             expect(ui.elements.confirmLevelUpBtn.disabled).toBe(false);
 
             // Confirm
-            ui.elements.confirmLevelUpBtn.dispatchEvent({ type: 'click' });
+            ui.elements.confirmLevelUpBtn.dispatchEvent(new Event('click'));
             expect(modal.style.display).toBe('none');
             expect(confirmed).toBeDefined();
             expect(confirmed.skill.name).toBe('S1');
@@ -83,11 +153,6 @@ describe('Coverage Gap Fill', () => {
 
             // Trigger Mouse Move
             game.handleCanvasMouseMove({ clientX: 10, clientY: 10 });
-            // Should verify content contains enemy info. 
-            // Since we mocked showTooltip, we can just check if it was called.
-            // But createEnemyTooltipHTML is called internally found in ui.js, which we are using (game.ui = ui from beforeEach/new UI).
-            // But game.ui inside game is likely the one created in game constructor unless we overwrite it.
-            // checked: game.ui = ui in beforeEach.
 
             expect(tooltipContent).toBeDefined();
             expect(tooltipContent).toContain('Ork');
@@ -129,11 +194,10 @@ describe('Coverage Gap Fill', () => {
     });
 
     describe('Game: Statistics & Animation', () => {
-        it('should render session statistics', () => {
-            // Setup real container in mock DOM BEFORE game init
-            const container = document.createElement('div');
-            container.id = 'statistics-grid';
-            document.body.appendChild(container);
+        it('should render session statistics', async () => {
+            // Use existing container from beforeEach
+            const container = document.getElementById('statistics-grid');
+            container.innerHTML = '';
 
             // Re-init game to pick up element
             const localGame = new MageKnightGame();
@@ -143,11 +207,9 @@ describe('Coverage Gap Fill', () => {
             // Render
             localGame.renderController.renderStatistics('current');
 
-            expect(container.innerHTML).toContain('Runde');
-            expect(container.innerHTML).toContain('5');
-
-            // Cleanup
-            document.body.removeChild(container);
+            const content = container.innerHTML;
+            expect(content).toContain('Runde');
+            expect(content).toContain('5');
         });
 
         it('should handle moveHero animation and callbacks (Explore & Encounter)', async () => {
@@ -272,13 +334,13 @@ describe('Coverage Gap Fill', () => {
             const unitCard = ui.elements.combatUnits.querySelector('.unit-combat-card');
             expect(unitCard).toBeDefined();
 
-            unitCard.dispatchEvent({ type: 'click' });
+            unitCard.dispatchEvent(new Event('click'));
             expect(activated).toBe(true);
 
-            unitCard.dispatchEvent({ type: 'mouseenter' });
+            unitCard.dispatchEvent(new Event('mouseenter'));
             expect(unitCard.style.background).toContain('rgb');
 
-            unitCard.dispatchEvent({ type: 'mouseleave' });
+            unitCard.dispatchEvent(new Event('mouseleave'));
         });
     });
 
@@ -339,15 +401,19 @@ describe('Coverage Gap Fill', () => {
         });
 
         it('should handle mana interaction', () => {
-            game.manaSource = { takeDie: () => 'red', getState: () => ({ dice: [] }) };
-            game.hero.takeManaFromSource = createSpy();
-            game.renderController = { renderMana: createSpy() }; // usage in handleManaClick
-            game.updateHeroMana = createSpy(); // Assuming this is called if it existed, or mock UI update
+            game.manaSource = {
+                takeDie: () => 'red',
+                getState: () => ({ dice: [] }),
+                loadState: vi.fn()
+            };
+            game.hero.takeManaFromSource = vi.fn();
+            game.renderController = { renderMana: vi.fn() }; // usage in handleManaClick
+            game.updateHeroMana = vi.fn(); // Assuming this is called if it existed, or mock UI update
 
             // InteractionController handles this now
             game.interactionController.handleManaClick(0, 'red');
 
-            expect(game.hero.takeManaFromSource.calls.length).toBe(1);
+            expect(game.hero.takeManaFromSource).toHaveBeenCalled();
         });
 
         it('should handle endTurn and round reset', () => {

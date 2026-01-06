@@ -506,14 +506,17 @@ export class MageKnightGame {
         // Update Explore button
         const canExplore = this.mapManager.canExplore(this.hero.position.q, this.hero.position.r);
         const hasPoints = this.hero.movementPoints >= 2;
-        this.ui.setButtonEnabled(this.ui.elements.exploreBtn, canExplore && hasPoints && !this.combat);
 
-        if (canExplore && hasPoints) {
-            this.ui.elements.exploreBtn.title = 'Erkunden (2 Bewegungspunkte)';
-        } else if (!canExplore) {
-            this.ui.elements.exploreBtn.title = 'Kein unbekanntes Gebiet angrenzend';
-        } else {
-            this.ui.elements.exploreBtn.title = 'Nicht genug Bewegungspunkte (2 benötigt)';
+        if (this.ui.elements.exploreBtn) {
+            this.ui.setButtonEnabled(this.ui.elements.exploreBtn, canExplore && hasPoints && !this.combat);
+
+            if (canExplore && hasPoints) {
+                this.ui.elements.exploreBtn.title = 'Erkunden (2 Bewegungspunkte)';
+            } else if (!canExplore) {
+                this.ui.elements.exploreBtn.title = 'Kein unbekanntes Gebiet angrenzend';
+            } else {
+                this.ui.elements.exploreBtn.title = 'Nicht genug Bewegungspunkte (2 benötigt)';
+            }
         }
 
         // Update Visit Button

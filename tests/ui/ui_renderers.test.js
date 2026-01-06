@@ -1,12 +1,20 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { HandRenderer } from '../../js/ui/HandRenderer.js';
 import { ManaRenderer } from '../../js/ui/ManaRenderer.js';
 import { StatsRenderer } from '../../js/ui/StatsRenderer.js';
-import { createMockElement } from '../test-mocks.js';
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
+import { vi, afterEach } from 'vitest';
+
 
 /**
  * Tests for UI Renderer components.
  */
+
+afterEach(() => {
+    if (store) store.clearListeners();
+    vi.clearAllMocks();
+});
 
 describe('HandRenderer', () => {
     let handRenderer;
@@ -14,10 +22,11 @@ describe('HandRenderer', () => {
     let mockTooltipManager;
 
     beforeEach(() => {
+        setLanguage('de');
         mockElements = {
-            handCards: createMockElement('div'),
-            playArea: createMockElement('div'),
-            playedCards: createMockElement('div')
+            handCards: document.createElement('div'),
+            playArea: document.createElement('div'),
+            playedCards: document.createElement('div')
         };
 
         mockTooltipManager = {
@@ -170,8 +179,9 @@ describe('ManaRenderer', () => {
     let mockTooltipManager;
 
     beforeEach(() => {
+        setLanguage('de');
         mockElements = {
-            manaSource: createMockElement('div')
+            manaSource: document.createElement('div')
         };
 
         mockTooltipManager = {
@@ -273,15 +283,16 @@ describe('StatsRenderer', () => {
     let mockElements;
 
     beforeEach(() => {
+        setLanguage('de');
         mockElements = {
-            heroName: createMockElement('span'),
-            heroArmor: createMockElement('span'),
-            heroHandLimit: createMockElement('span'),
-            heroWounds: createMockElement('span'),
-            fameValue: createMockElement('span'),
-            reputationValue: createMockElement('span'),
-            movementPoints: createMockElement('span'),
-            healBtn: createMockElement('button')
+            heroName: document.createElement('span'),
+            heroArmor: document.createElement('span'),
+            heroHandLimit: document.createElement('span'),
+            heroWounds: document.createElement('span'),
+            fameValue: document.createElement('span'),
+            reputationValue: document.createElement('span'),
+            movementPoints: document.createElement('span'),
+            healBtn: document.createElement('button')
         };
 
         // Set initial values

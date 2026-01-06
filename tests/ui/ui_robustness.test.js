@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import UI from '../../js/ui.js';
 import { setupGlobalMocks, resetMocks, createSpy, MockHTMLElement } from '../test-mocks.js';
 

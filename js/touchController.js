@@ -351,6 +351,11 @@ export class TouchController {
     resizeCanvas() {
         if (!this.game.canvas || !this.game.canvas.parentElement) return;
 
+        // Check for context before proceeding
+        if (typeof this.game.canvas.getContext !== 'function') return;
+        const ctx = this.game.canvas.getContext('2d');
+        if (!ctx) return;
+
         const container = this.game.canvas.parentElement;
         const rect = container.getBoundingClientRect();
 
@@ -369,12 +374,25 @@ export class TouchController {
             }
 
             // Re-render
-            if (this.game.hero && typeof this.game.hero.getStats === 'function') {
-                this.game.render();
+            if (this.game.hero && typeof this.game.hero.getStats === 'function' && this.game.render) {
+                try {
+                    this.game.render();
+                } catch (e) {
+                    console.warn('Render failed during resize:', e.message);
+                }
             }
 
             console.log(`Canvas resized to ${width}x${height}`);
         }
+    }
+
+    destroy() {
+        if (this.resizeTimer) {
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = null;
+        }
+        window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener('orientationchange', this.handleResize);
     }
 
     // Utility: Check if device is touch-enabled

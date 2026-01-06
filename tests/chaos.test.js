@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { SaveManager } from '../js/persistence/SaveManager.js';
 import { StatisticsManager } from '../js/statistics.js';
 import { createMockLocalStorage, createSpy } from './test-mocks.js';

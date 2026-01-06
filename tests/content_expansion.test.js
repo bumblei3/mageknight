@@ -1,5 +1,5 @@
 
-import { describe, it, expect } from './testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Card, CARD_TYPES, CARD_COLORS, createDeck, SAMPLE_SPELLS, SAMPLE_ARTIFACTS } from '../js/card.js';
 import { SKILLS, getRandomSkills, SKILL_TYPES } from '../js/skills.js';
 

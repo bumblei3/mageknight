@@ -1,10 +1,26 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import UI from '../../js/ui.js';
 
 describe('UI Reset', () => {
     let ui;
 
     beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="hand-cards"></div>
+            <div id="played-cards"></div>
+            <div id="hero-units"></div>
+            <div id="play-area"></div>
+            <div id="game-log"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">2</div>
+            <div id="hero-handlimit">5</div>
+            <div id="hero-wounds">0</div>
+            <div id="movement-points">0</div>
+            <div id="mana-source"></div>
+            <div id="hero-mana"></div>
+            <button id="heal-btn" style="display: none"></button>
+        `;
         ui = new UI();
     });
 

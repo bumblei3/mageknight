@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Combat from '../../js/combat.js';
 import { Hero } from '../../js/hero.js';
 import { ENEMY_DEFINITIONS, COMBAT_PHASES } from '../../js/constants.js'; // Ensure correct import

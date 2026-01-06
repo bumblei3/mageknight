@@ -1,11 +1,11 @@
-// Tests for combo system in combat.js
-
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Combat, COMBAT_PHASE } from '../../js/combat.js';
 import { CombatCombos } from '../../js/combat/CombatCombos.js';
 import { Card, CARD_COLORS, CARD_TYPES } from '../../js/card.js';
 import Hero from '../../js/hero.js';
 import { Enemy } from '../../js/enemy.js';
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
 
 describe('Combo System', () => {
     let hero;
@@ -13,6 +13,7 @@ describe('Combo System', () => {
     let combat;
 
     beforeEach(() => {
+        setLanguage('de');
         hero = new Hero('TestHero');
         enemy = new Enemy({
             name: 'Test Enemy',
@@ -22,6 +23,11 @@ describe('Combo System', () => {
             icon: '👹'
         });
         combat = new Combat(hero, enemy);
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
     });
 
     // Mono-Color Combo

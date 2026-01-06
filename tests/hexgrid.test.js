@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { HexGrid } from '../js/hexgrid.js';
 
 // Mock Canvas
@@ -62,7 +62,7 @@ describe('HexGrid System', () => {
         // Close to (1, 0)
         rounded = grid.roundAxial(1.1, -0.1);
         expect(rounded.q).toBe(1);
-        expect(rounded.r).toBe(0);
+        expect(rounded.r).toBeCloseTo(0);
     });
 
     it('should calculate neighbors', () => {

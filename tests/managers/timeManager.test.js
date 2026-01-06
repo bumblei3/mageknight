@@ -1,4 +1,4 @@
-import { describe, it, expect } from '../testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { TIME_OF_DAY, TimeManager } from '../../js/timeManager.js';
 
 describe('TimeManager', () => {

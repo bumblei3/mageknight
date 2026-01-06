@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { SiteInteractionManager } from '../js/siteInteraction.js';
 import { MageKnightGame } from '../js/game.js';
 import { Site, SITE_TYPES } from '../js/sites.js';

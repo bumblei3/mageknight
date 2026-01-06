@@ -1,38 +1,47 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
-import {
-    createMockWindow,
-    createMockDocument,
-    resetMocks
-} from './test-mocks.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
+import { eventBus } from '../js/eventBus.js';
 
 describe('Global Events & Shortcuts', () => {
     let game;
 
     beforeEach(() => {
-        document.body.innerHTML = '';
-        const canvas = document.createElement('canvas');
-        canvas.id = 'game-board';
-        document.body.appendChild(canvas);
-
-        // Helper elements for shortcuts
-        const helpModal = document.createElement('div');
-        helpModal.id = 'help-modal';
-        document.body.appendChild(helpModal);
-
-        const helpBtn = document.createElement('button');
-        helpBtn.id = 'help-btn';
-        document.body.appendChild(helpBtn);
+        setLanguage('de');
+        document.body.innerHTML = `
+            <canvas id="game-board"></canvas>
+            <div id="help-modal"></div>
+            <button id="help-btn"></button>
+            <div id="game-log"></div>
+            <div id="phase-indicator"></div>
+            <div id="hand-cards"></div>
+            <div id="mana-source"></div>
+            <div id="fame-value">0</div>
+            <div id="reputation-value">0</div>
+            <div id="hero-armor">0</div>
+            <div id="hero-handlimit">0</div>
+            <div id="hero-wounds">0</div>
+            <div id="hero-name"></div>
+            <div id="movement-points">0</div>
+            <div id="skill-list"></div>
+            <div id="healing-points">0</div>
+            <div id="mana-bank"></div>
+            <div id="particle-layer"></div>
+            <div id="visit-btn"></div>
+            <button id="undo-btn"></button>
+            <button id="end-turn-btn"></button>
+        `;
 
         game = new MageKnightGame();
-        // Ensure tooltipManager has the required method (patching potential mock/real mismatch)
-        if (game.ui && game.ui.tooltipManager && typeof game.ui.tooltipManager.createStatTooltipHTML !== 'function') {
-            game.ui.tooltipManager.createStatTooltipHTML = (title, desc) => `<div>${title}</div>`;
-        }
     });
 
     afterEach(() => {
-        resetMocks();
+        if (game && game.destroy) game.destroy();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+        eventBus.clear();
     });
 
     describe('Keyboard Shortcuts', () => {

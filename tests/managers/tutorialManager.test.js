@@ -1,44 +1,28 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TutorialManager } from '../../js/tutorialManager.js';
-import { createSpy, createMockElement } from '../test-mocks.js';
-
-// Mock DOM
-const mockElement = {
-    style: {},
-    dataset: {},
-    addEventListener: () => { },
-    getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }),
-    appendChild: () => { },
-    textContent: ''
-};
-
-const mockDocument = {
-    getElementById: () => mockElement,
-    createElement: () => mockElement,
-    body: { appendChild: () => { } },
-    querySelector: () => mockElement,
-    querySelectorAll: () => []
-};
-
-if (typeof document === 'undefined') {
-    global.document = mockDocument;
-    global.localStorage = {
-        store: {},
-        getItem: (k) => global.localStorage.store[k] || null,
-        setItem: (k, v) => global.localStorage.store[k] = v,
-        clear: () => global.localStorage.store = {}
-    };
-}
+import { setLanguage } from '../../js/i18n/index.js';
+import { store } from '../../js/game/Store.js';
 
 describe('TutorialManager', () => {
     let tutorial;
-    let game = {
-        addLog: createSpy('addLog')
-    };
+    let game;
 
     beforeEach(() => {
+        setLanguage('de');
+        document.body.innerHTML = '';
+        game = {
+            addLog: vi.fn(),
+            ui: { showToast: vi.fn() }
+        };
         tutorial = new TutorialManager(game);
-        if (typeof localStorage !== 'undefined') localStorage.clear();
+        localStorage.clear();
+    });
+
+    afterEach(() => {
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
+        localStorage.clear();
     });
 
 
@@ -88,20 +72,28 @@ describe('TutorialManager', () => {
     });
 
     it('should handle highlighting and clearing accurately', () => {
-        tutorial.createTutorialUI();
-        // Mock querySelector to return null for non-existent
-        const originalQS = global.document.querySelector;
-        global.document.querySelector = (sel) => sel === '.non-existent' ? null : mockElement;
+        const testEl = document.createElement('div');
+        testEl.className = 'test-highlight';
+        testEl.id = 'test-id';
+        testEl.style.width = '100px';
+        testEl.style.height = '100px';
+        document.body.appendChild(testEl);
 
+        tutorial.createTutorialUI();
+
+        // 1. Element not found
         tutorial.highlightElement('.non-existent');
         expect(tutorial.spotlight.style.display).toBe('none');
 
-        global.document.querySelector = originalQS;
+        // 2. Element found
+        tutorial.highlightElement('#test-id');
+        expect(tutorial.spotlight.style.display).toBe('block');
+        expect(testEl.dataset.tutorialHighlight).toBe('true');
 
-        const el = { style: {}, dataset: { tutorialHighlight: 'true' } };
-        global.document.querySelectorAll = () => [el];
+        // 3. Clear highlight
         tutorial.clearHighlight();
-        expect(el.style.zIndex).toBe('');
+        expect(testEl.style.zIndex).toBe('');
+        expect(testEl.dataset.tutorialHighlight).toBeUndefined();
     });
 
     it('should position box correctly', () => {

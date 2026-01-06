@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { UI } from '../../js/ui.js';
 import { createMockElement } from '../test-mocks.js';
 

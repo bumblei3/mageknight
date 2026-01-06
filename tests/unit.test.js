@@ -1,4 +1,4 @@
-import { describe, it, expect } from './testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Unit, UNIT_TYPES, UNIT_INFO, getUnitsForLocation, createUnit } from '../js/unit.js';
 
 describe('Unit System', () => {

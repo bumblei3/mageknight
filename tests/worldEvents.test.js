@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldEventManager, EVENT_TYPES } from '../js/worldEvents.js';
 
 describe('WorldEventManager', () => {

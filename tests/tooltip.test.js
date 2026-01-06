@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { setLanguage } from '../js/i18n/index.js';
 import { TooltipManager } from '../js/ui/TooltipManager.js';
 

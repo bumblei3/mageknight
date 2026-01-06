@@ -1,4 +1,4 @@
-import { describe, it, expect } from './testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Terrain } from '../js/terrain.js';
 import { TERRAIN_TYPES } from '../js/constants.js';
 

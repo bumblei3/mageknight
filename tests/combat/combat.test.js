@@ -1,4 +1,4 @@
-import { describe, it, expect } from '../testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Combat, COMBAT_PHASE } from '../../js/combat.js';
 import { Hero } from '../../js/hero.js';
 import { Unit } from '../../js/unit.js';

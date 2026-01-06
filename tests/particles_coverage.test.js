@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach } from './testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { ParticleSystem, Particle } from '../js/particles.js';
 import { setupGlobalMocks, resetMocks, createMockCanvas, createMockContext } from './test-mocks.js';
 

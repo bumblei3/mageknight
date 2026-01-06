@@ -1,4 +1,4 @@
-import { describe, it, expect } from './testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { ManaSource, MANA_COLORS } from '../js/mana.js';
 
 describe('ManaSource', () => {

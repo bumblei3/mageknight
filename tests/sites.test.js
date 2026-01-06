@@ -1,4 +1,4 @@
-import { describe, it, expect } from './testRunner.js';
+import { describe, it, expect } from 'vitest';
 import { Hero } from '../js/hero.js';
 import { SiteInteractionManager } from '../js/siteInteraction.js';
 import { Site, SITE_TYPES } from '../js/sites.js';

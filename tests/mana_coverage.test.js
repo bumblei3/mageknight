@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ManaRenderer } from '../js/ui/ManaRenderer.js';
-import { setupStandardGameDOM, resetMocks, createSpy } from './test-mocks.js';
+import { setLanguage } from '../js/i18n/index.js';
+import { store } from '../js/game/Store.js';
 
 describe('ManaRenderer Coverage', () => {
     let renderer;
@@ -8,18 +9,26 @@ describe('ManaRenderer Coverage', () => {
     let tooltipManager;
 
     beforeEach(() => {
-        resetMocks();
-        elements = setupStandardGameDOM();
+        setLanguage('de');
+        document.body.innerHTML = `
+            <div id="mana-source"></div>
+            <div id="hero-mana"></div>
+        `;
+        elements = {
+            manaSource: document.getElementById('mana-source')
+        };
         tooltipManager = {
-            attachToElement: createSpy(),
-            createStatTooltipHTML: createSpy(() => 'Tooltip'),
-            hideTooltip: createSpy()
+            attachToElement: vi.fn(),
+            createStatTooltipHTML: vi.fn(() => 'Tooltip'),
+            hideTooltip: vi.fn()
         };
         renderer = new ManaRenderer(elements, tooltipManager);
     });
 
     afterEach(() => {
-        resetMocks();
+        if (store) store.clearListeners();
+        vi.clearAllMocks();
+        document.body.innerHTML = '';
     });
 
     it('should render mana source with diverse colors', () => {

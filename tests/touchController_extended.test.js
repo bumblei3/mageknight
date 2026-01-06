@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { TouchController } from '../js/touchController.js';
 import { createMockElement, createSpy, setupGlobalMocks, resetMocks } from './test-mocks.js';
 

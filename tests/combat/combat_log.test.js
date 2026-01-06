@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '../testRunner.js';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { BlockingEngine } from '../../js/combat/BlockingEngine.js';
 import { ATTACK_ELEMENTS } from '../../js/constants.js';
 import { t, setLanguage } from '../../js/i18n/index.js'; // Use index.js which initializes validation

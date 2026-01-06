@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, afterEach } from './testRunner.js';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MapManager } from '../js/mapManager.js';
 import { HexGrid } from '../js/hexgrid.js';
 import { TERRAIN_TYPES } from '../js/constants.js';

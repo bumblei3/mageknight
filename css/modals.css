@@ -922,3 +922,136 @@ input:checked+.slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+/* --- Hero Selection Modal --- */
+.hero-selection-content {
+    max-width: 1100px;
+    width: 95%;
+    background: linear-gradient(135deg, rgba(20, 15, 30, 0.98), rgba(10, 20, 35, 0.98));
+    border: 1px solid var(--glass-border-highlight);
+}
+
+.hero-selection-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hero-selection-header h2 {
+    font-size: 2.5rem;
+    color: var(--color-accent-gold);
+}
+
+.hero-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero-card {
+    --hero-color: #ff4d4d;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+.hero-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--hero-color);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(var(--hero-color), 0.2);
+}
+
+.hero-card-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.hero-portrait-container {
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.hero-card:hover .hero-portrait {
+    transform: scale(1.05);
+}
+
+.hero-tag {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 10px;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+}
+
+.hero-info {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hero-info h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.6rem;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 1rem;
+    margin: 0.5rem 0;
+}
+
+.hero-stats .stat {
+    font-size: 0.85rem;
+    color: var(--color-text-highlight);
+    background: rgba(255,255,255,0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.hero-description {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.hero-selection-overlay {
+    padding: 1rem;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+}
+
+.select-hero-btn {
+    width: 100%;
+    background: var(--hero-color);
+    border: none;
+    color: #fff;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: bold;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.hero-card:hover .select-hero-btn {
+    filter: brightness(1.2);
+}

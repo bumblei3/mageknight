@@ -143,4 +143,14 @@ export class GameStateManager {
             this.game.ui.scenarioSelectionModal.show();
         }
     }
+
+    /**
+     * Opens the hero selection dialog
+     * @param {string} scenarioId - The scenario chosen in the previous step
+     */
+    openHeroSelection(scenarioId) {
+        if (this.game.ui && this.game.ui.heroSelectionModal) {
+            this.game.ui.heroSelectionModal.show(scenarioId);
+        }
+    }
 }

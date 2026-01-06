@@ -26,6 +26,7 @@ describe('ScenarioSelectionModal', () => {
                 getObjectivesTextForScenario: vi.fn().mockReturnValue('Objectives')
             },
             startNewGame: vi.fn(),
+            selectScenario: vi.fn(),
             reset: vi.fn()
         };
 
@@ -49,12 +50,12 @@ describe('ScenarioSelectionModal', () => {
         expect(cards[1].querySelector('h3').textContent).toBe('Scenario 2');
     });
 
-    it('should call startNewGame when a card is clicked', () => {
+    it('should call selectScenario when a card is clicked', () => {
         modal.show();
         const firstCard = document.querySelector('.scenario-card');
         firstCard.click();
 
-        expect(game.startNewGame).toHaveBeenCalledWith('s1');
+        expect(game.selectScenario).toHaveBeenCalledWith('s1');
         expect(modal.modal.classList.contains('show')).toBe(false);
     });
 

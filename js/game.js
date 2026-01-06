@@ -38,6 +38,7 @@ import { CombatOrchestrator } from './game/CombatOrchestrator.js';
 import { HeroController } from './game/HeroController.js';
 import { InputController } from './game/InputController.js';
 import { RenderController } from './game/RenderController.js';
+import { HeroManager } from './game/HeroManager.js';
 import { store } from './game/Store.js';
 
 /**
@@ -253,10 +254,28 @@ export class MageKnightGame {
     }
 
     /**
+     * Called when a scenario is selected. Triggers hero selection.
+     * @param {string} scenarioId 
+     */
+    selectScenario(scenarioId) {
+        this.stateManager.openHeroSelection(scenarioId);
+    }
+
+    /**
+     * Finalizes game setup after hero and scenario are chosen.
+     * @param {string} scenarioId 
+     * @param {string} heroId 
+     */
+    finishGameSetup(scenarioId, heroId) {
+        this.startNewGame(scenarioId, heroId);
+    }
+
+    /**
      * Resets game state and starts a fresh session.
      * @param {string} [scenarioId=null] Optional scenario ID to load
+     * @param {string} [heroId='goldyx'] Optional hero ID to load
      */
-    startNewGame(scenarioId = null) {
+    startNewGame(scenarioId = null, heroId = 'goldyx') {
         logger.info(`Starting new game... Scenario: ${scenarioId || 'default'}`);
         // Reset Game State
         this.turnNumber = 0;
@@ -296,9 +315,11 @@ export class MageKnightGame {
         // Init Debug
         // this.debugManager = new DebugManager(this); // Moved to initializeSystem
 
-        // Create hero
-        this.hero = new Hero('Goldyx', { q: 0, r: 0 });
+        // Create hero using HeroManager
+        const heroConfig = HeroManager.getHero(heroId);
+        this.hero = new Hero(heroConfig, { q: 0, r: 0 });
         this.hero.drawCards();
+        logger.info(`Hero created: ${heroConfig.name} (${heroId})`);
 
         // Create mana source
         this.manaSource = new ManaSource(1);

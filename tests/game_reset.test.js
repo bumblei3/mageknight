@@ -62,14 +62,8 @@ describe('Game Reset', () => {
         game.turnNumber = 5;
         game.hero.movementPoints = 3;
 
-        // Call reset - this shows the modal
-        game.reset();
-
-        // Simulate scenario card click (the new flow)
-        const firstCard = document.querySelector('.scenario-card');
-        if (firstCard) {
-            firstCard.click();
-        }
+        // Call startNewGame directly (bypassing modal flow for this unit test)
+        game.startNewGame(null, 'goldyx');
 
         // Verify reset
         expect(game.turnNumber).toBe(0);
@@ -78,16 +72,13 @@ describe('Game Reset', () => {
     });
 
     it('should re-initialize hero and map on reset()', () => {
-        const originalHeroId = game.hero.id;
+        const originalHero = game.hero;
         const originalMapManager = game.mapManager;
 
-        game.reset();
+        // Call startNewGame directly
+        game.startNewGame(null, 'goldyx');
 
-        // Simulate scenario card click
-        const firstCard = document.querySelector('.scenario-card');
-        if (firstCard) firstCard.click();
-
-        expect(game.hero).not.toBe(originalHeroId);
+        expect(game.hero).not.toBe(originalHero);
         expect(game.mapManager).not.toBe(originalMapManager);
     });
 

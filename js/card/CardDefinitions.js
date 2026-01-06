@@ -17,25 +17,62 @@ export const CARD_TYPES = {
     WOUND: 'wound'
 };
 
-// Goldyx's starter deck
+// Goldyx's starter deck (Focus on Fire/Crystal)
 export const GOLDYX_STARTER_DECK = [
-    // Movement cards (Green)
     { id: 'move_1', name: 'Marsch', color: CARD_COLORS.GREEN, basicEffect: { movement: 2 }, strongEffect: { movement: 4 }, manaCost: 1, description: 'Basic: +2 Bewegung | Strong: +4 Bewegung' },
     { id: 'move_2', name: 'Schneller Marsch', color: CARD_COLORS.GREEN, basicEffect: { movement: 3 }, strongEffect: { movement: 5 }, manaCost: 1, description: 'Basic: +3 Bewegung | Strong: +5 Bewegung' },
-    // Attack cards (Red)
     { id: 'atk_1', name: 'Schlag', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +4 Angriff' },
     { id: 'atk_2', name: 'Rage', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { block: 2, attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +2 Block, +4 Angriff' },
     { id: 'atk_3', name: 'Angriff', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 5 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +5 Angriff' },
     { id: 'atk_4', name: 'Wilder Angriff', color: CARD_COLORS.RED, basicEffect: { attack: 3 }, strongEffect: { attack: 6 }, manaCost: 1, description: 'Basic: +3 Angriff | Strong: +6 Angriff' },
-    // Block cards (Blue)
     { id: 'blk_1', name: 'Parade', color: CARD_COLORS.BLUE, basicEffect: { block: 3 }, strongEffect: { block: 6 }, manaCost: 1, description: 'Basic: +3 Block | Strong: +6 Block' },
     { id: 'blk_2', name: 'Eile', color: CARD_COLORS.BLUE, basicEffect: { block: 2 }, strongEffect: { movement: 2, block: 3 }, manaCost: 1, description: 'Basic: +2 Block | Strong: +2 Bewegung, +3 Block' },
     { id: 'blk_3', name: 'Konzentration', color: CARD_COLORS.BLUE, basicEffect: { block: 3 }, strongEffect: { block: 7 }, manaCost: 1, description: 'Basic: +3 Block | Strong: +7 Block' },
-    // Influence cards (White)
     { id: 'inf_1', name: 'Diplomatie', color: CARD_COLORS.WHITE, basicEffect: { influence: 2 }, strongEffect: { influence: 5 }, manaCost: 1, description: 'Basic: +2 Einfluss | Strong: +5 Einfluss' },
     { id: 'swi_1', name: 'Schnelligkeit', color: CARD_COLORS.WHITE, basicEffect: { movement: 2 }, strongEffect: { ranged: true, attack: 3 }, manaCost: 1, description: 'Basic: +2 Bewegung | Strong: Fernkampf +3' },
-    // Healing card
     { id: 'heal_1', name: 'Meditation', color: CARD_COLORS.WHITE, basicEffect: { healing: 1 }, strongEffect: { healing: 2 }, manaCost: 1, description: 'Basic: +1 Heilung | Strong: +2 Heilung' }
+];
+
+// Norowas's starter deck (Focus on Units/Influence)
+export const NOROWAS_STARTER_DECK = [
+    { id: 'move_1', name: 'Marsch', color: CARD_COLORS.GREEN, basicEffect: { movement: 2 }, strongEffect: { movement: 4 }, manaCost: 1, description: 'Basic: +2 Bewegung | Strong: +4 Bewegung' },
+    { id: 'move_2', name: 'Schneller Marsch', color: CARD_COLORS.GREEN, basicEffect: { movement: 3 }, strongEffect: { movement: 5 }, manaCost: 1, description: 'Basic: +3 Bewegung | Strong: +5 Bewegung' },
+    { id: 'atk_1', name: 'Schlag', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +4 Angriff' },
+    { id: 'atk_2', name: 'Rage', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { block: 2, attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +2 Block, +4 Angriff' },
+    { id: 'blk_1', name: 'Parade', color: CARD_COLORS.BLUE, basicEffect: { block: 3 }, strongEffect: { block: 6 }, manaCost: 1, description: 'Basic: +3 Block | Strong: +6 Block' },
+    { id: 'blk_2', name: 'Eile', color: CARD_COLORS.BLUE, basicEffect: { block: 2 }, strongEffect: { movement: 2, block: 3 }, manaCost: 1, description: 'Basic: +2 Block | Strong: +2 Bewegung, +3 Block' },
+    { id: 'inf_1', name: 'Diplomatie', color: CARD_COLORS.WHITE, basicEffect: { influence: 2 }, strongEffect: { influence: 5 }, manaCost: 1, description: 'Basic: +2 Einfluss | Strong: +5 Einfluss' },
+    { id: 'inf_2', name: 'Versprechen', color: CARD_COLORS.WHITE, basicEffect: { influence: 2, reputation: 1 }, strongEffect: { influence: 5, reputation: 1 }, manaCost: 1, description: 'Basic: +2 Einfluss, +1 Ruf | Strong: +5 Einfluss, +1 Ruf' },
+    { id: 'inf_3', name: 'Edle Manieren', color: CARD_COLORS.WHITE, basicEffect: { influence: 2 }, strongEffect: { influence: 4, draws: 1 }, manaCost: 1, description: 'Basic: +2 Einfluss | Strong: +4 Einfluss, +1 Karte' },
+    { id: 'swi_1', name: 'Schnelligkeit', color: CARD_COLORS.WHITE, basicEffect: { movement: 2 }, strongEffect: { ranged: true, attack: 3 }, manaCost: 1, description: 'Basic: +2 Bewegung | Strong: Fernkampf +3' },
+    { id: 'heal_1', name: 'Meditation', color: CARD_COLORS.WHITE, basicEffect: { healing: 1 }, strongEffect: { healing: 2 }, manaCost: 1, description: 'Basic: +1 Heilung | Strong: +2 Heilung' },
+    { id: 'unit_1', name: 'Führung', color: CARD_COLORS.WHITE, basicEffect: { influence: 2 }, strongEffect: { readyUnit: true }, manaCost: 1, description: 'Basic: +2 Einfluss | Strong: Einheit bereit machen' }
+];
+
+// Arythea's starter deck (Focus on Combat/Chaos)
+export const ARYTHEA_STARTER_DECK = [
+    { id: 'move_1', name: 'Marsch', color: CARD_COLORS.GREEN, basicEffect: { movement: 2 }, strongEffect: { movement: 4 }, manaCost: 1, description: 'Basic: +2 Bewegung | Strong: +4 Bewegung' },
+    { id: 'atk_1', name: 'Schlag', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +4 Angriff' },
+    { id: 'atk_2', name: 'Rage', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { block: 2, attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +2 Block, +4 Angriff' },
+    { id: 'atk_cha', name: 'Dunkles Schicksal', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 4, draws: 1 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +4 Angriff, +1 Karte' },
+    { id: 'atk_wnd', name: 'Brennender Hass', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 5, wound: true }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +5 Angriff, nimm 1 Wunde' },
+    { id: 'blk_1', name: 'Parade', color: CARD_COLORS.BLUE, basicEffect: { block: 3 }, strongEffect: { block: 6 }, manaCost: 1, description: 'Basic: +3 Block | Strong: +6 Block' },
+    { id: 'inf_1', name: 'Diplomatie', color: CARD_COLORS.WHITE, basicEffect: { influence: 2 }, strongEffect: { influence: 5 }, manaCost: 1, description: 'Basic: +2 Einfluss | Strong: +5 Einfluss' },
+    { id: 'heal_1', name: 'Meditation', color: CARD_COLORS.WHITE, basicEffect: { healing: 1 }, strongEffect: { healing: 2 }, manaCost: 1, description: 'Basic: +1 Heilung | Strong: +2 Heilung' },
+    { id: 'chaos_1', name: 'Macht des Chaos', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 6 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +6 Angriff' }
+];
+
+// Tovak's starter deck (Focus on Tactics/Defense)
+export const TOVAK_STARTER_DECK = [
+    { id: 'move_1', name: 'Marsch', color: CARD_COLORS.GREEN, basicEffect: { movement: 2 }, strongEffect: { movement: 4 }, manaCost: 1, description: 'Basic: +2 Bewegung | Strong: +4 Bewegung' },
+    { id: 'atk_1', name: 'Schlag', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +4 Angriff' },
+    { id: 'atk_2', name: 'Rage', color: CARD_COLORS.RED, basicEffect: { attack: 2 }, strongEffect: { block: 2, attack: 4 }, manaCost: 1, description: 'Basic: +2 Angriff | Strong: +2 Block, +4 Angriff' },
+    { id: 'blk_1', name: 'Parade', color: CARD_COLORS.BLUE, basicEffect: { block: 3 }, strongEffect: { block: 6 }, manaCost: 1, description: 'Basic: +3 Block | Strong: +6 Block' },
+    { id: 'blk_2', name: 'Eile', color: CARD_COLORS.BLUE, basicEffect: { block: 2 }, strongEffect: { movement: 2, block: 3 }, manaCost: 1, description: 'Basic: +2 Block | Strong: +2 Bewegung, +3 Block' },
+    { id: 'blk_tac', name: 'Kaltgeplante Parade', color: CARD_COLORS.BLUE, basicEffect: { block: 3 }, strongEffect: { block: 5, draw: 1 }, manaCost: 1, description: 'Basic: +3 Block | Strong: +5 Block, +1 Karte' },
+    { id: 'inf_1', name: 'Diplomatie', color: CARD_COLORS.WHITE, basicEffect: { influence: 2 }, strongEffect: { influence: 5 }, manaCost: 1, description: 'Basic: +2 Einfluss | Strong: +5 Einfluss' },
+    { id: 'heal_1', name: 'Meditation', color: CARD_COLORS.WHITE, basicEffect: { healing: 1 }, strongEffect: { healing: 2 }, manaCost: 1, description: 'Basic: +1 Heilung | Strong: +2 Heilung' },
+    { id: 'tac_1', name: 'Instinkt', color: CARD_COLORS.BLUE, basicEffect: { movement: 2, block: 1 }, strongEffect: { movement: 4, block: 2 }, manaCost: 1, description: 'Basic: +2 Bewegung, +1 Block | Strong: +4 Bewegung, +2 Block' }
 ];
 
 // Sample Spells

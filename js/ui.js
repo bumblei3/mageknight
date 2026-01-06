@@ -15,6 +15,7 @@ import { GAME_EVENTS } from './constants.js';
 import { ParticleSystem } from './particles.js';
 import { SaveLoadModal } from './ui/SaveLoadModal.js';
 import { ScenarioSelectionModal } from './ui/ScenarioSelectionModal.js';
+import { HeroSelectionModal } from './ui/HeroSelectionModal.js';
 import { SettingsModal } from './ui/SettingsModal.js';
 
 /**
@@ -39,6 +40,7 @@ export class UI {
         this.skillRenderer = new SkillRenderer(this);
         this.saveLoadModal = new SaveLoadModal(this);
         this.scenarioSelectionModal = new ScenarioSelectionModal(this);
+        this.heroSelectionModal = new HeroSelectionModal(this);
         this.settingsModal = new SettingsModal(this);
 
         this.setupEventListeners();

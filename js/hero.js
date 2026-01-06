@@ -21,15 +21,23 @@ export const LEVEL_TABLE = [
 ];
 
 export class Hero {
-    constructor(name, startingPosition = { q: 0, r: 0 }) {
-        this.name = name;
+    constructor(configOrName, startingPosition = { q: 0, r: 0 }) {
+        // Handle backward compatibility: accept either a config object or a legacy string name
+        if (typeof configOrName === 'string') {
+            this.config = { name: configOrName, id: configOrName.toLowerCase(), stats: {} };
+        } else {
+            this.config = configOrName || { name: 'Hero', id: 'hero', stats: {} };
+        }
+
+        this.name = this.config.name;
+        this.id = this.config.id;
         this.position = startingPosition;
         this.displayPosition = { ...startingPosition };
 
         // Stats
         this.level = 1;
-        this.armor = 2;
-        this.handLimit = 5;
+        this.armor = this.config.stats?.armor || 2;
+        this.handLimit = this.config.stats?.handLimit || 5;
         this.fame = 0;
         this.reputation = 0;
         this.commandLimit = 1;
@@ -107,8 +115,8 @@ export class Hero {
     }
 
     initializeDeck() {
-        // Create Goldyx starter deck
-        this.deck = shuffleDeck(createDeck(GOLDYX_STARTER_DECK));
+        const starterDeck = this.config?.starterDeck || GOLDYX_STARTER_DECK;
+        this.deck = shuffleDeck(createDeck(starterDeck));
         this.hand = [];
         this.discard = [];
     }

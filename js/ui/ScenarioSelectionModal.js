@@ -83,6 +83,6 @@ export class ScenarioSelectionModal {
     }
 
     confirmSelection(scenarioId) {
-        this.ui.game.startNewGame(scenarioId);
+        this.ui.game.selectScenario(scenarioId);
     }
 }

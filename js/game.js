@@ -360,39 +360,10 @@ export class MageKnightGame {
     }
 
     /**
-     * Shows a reset confirmation modal and optionally resumes with a new scenario.
+     * Opens the scenario selection modal to start a fresh session.
      */
     reset() {
-        // Use custom modal instead of confirm
-        const modal = document.getElementById('reset-modal');
-        const confirmBtn = document.getElementById('confirm-reset-btn');
-        const cancelBtn = document.getElementById('cancel-reset-btn');
-        const closeBtn = document.getElementById('close-reset-modal');
-        const scenarioSelect = document.getElementById('scenario-select');
-
-        const closeModal = () => {
-            modal.classList.remove('active');
-            // Clean up listeners to avoid duplicates
-            confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-            closeBtn.replaceWith(closeBtn.cloneNode(true));
-        };
-
-        const onConfirm = () => {
-            const selectedScenario = scenarioSelect ? scenarioSelect.value : null;
-            closeModal();
-            this.ui.reset();
-            this.startNewGame(selectedScenario);
-        };
-
-        // Wire up new listeners
-        // We need to re-query because of cloneNode
-        document.getElementById('confirm-reset-btn').addEventListener('click', onConfirm);
-        document.getElementById('cancel-reset-btn').addEventListener('click', closeModal);
-        document.getElementById('close-reset-modal').addEventListener('click', closeModal);
-
-        // Show modal
-        modal.classList.add('active');
+        this.stateManager.openScenarioSelection();
     }
 
     /**

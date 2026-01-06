@@ -126,7 +126,11 @@ export class ScenarioManager {
     }
 
     getObjectivesText() {
-        const scenario = this.getCurrentScenario();
+        return this.getObjectivesTextForScenario(this.getCurrentScenario());
+    }
+
+    getObjectivesTextForScenario(scenario) {
+        if (!scenario) return '';
         if (scenario.id === 'mines_freedom') {
             return 'Ziele: 2 Minen befreien, 1 Festung erobern.';
         } else if (scenario.id === 'druid_nights') {

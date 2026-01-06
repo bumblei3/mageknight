@@ -14,6 +14,7 @@ import { eventBus } from './eventBus.js';
 import { GAME_EVENTS } from './constants.js';
 import { ParticleSystem } from './particles.js';
 import { SaveLoadModal } from './ui/SaveLoadModal.js';
+import { ScenarioSelectionModal } from './ui/ScenarioSelectionModal.js';
 
 /**
  * User Interface Controller (Orchestrator)
@@ -36,6 +37,7 @@ export class UI {
         this.handRenderer = new HandRenderer(this.elements, this.tooltipManager, this);
         this.skillRenderer = new SkillRenderer(this);
         this.saveLoadModal = new SaveLoadModal(this);
+        this.scenarioSelectionModal = new ScenarioSelectionModal(this);
 
         this.setupEventListeners();
         this.setupTooltips();

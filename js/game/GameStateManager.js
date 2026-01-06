@@ -134,4 +134,13 @@ export class GameStateManager {
             }
         }
     }
+
+    /**
+     * Opens the scenario selection dialog
+     */
+    openScenarioSelection() {
+        if (this.game.ui && this.game.ui.scenarioSelectionModal) {
+            this.game.ui.scenarioSelectionModal.show();
+        }
+    }
 }

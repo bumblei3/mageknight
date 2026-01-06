@@ -671,27 +671,21 @@
             <div id="day-night-message" class="day-night-message">Nacht bricht herein...</div>
         </div>
 
-        <!-- Reset Confirmation Modal -->
-        <div class="modal" id="reset-modal">
-            <div class="modal-content">
-                <span class="modal-close" id="close-reset-modal">&times;</span>
-                <div class="reset-modal-header">
-                    <h2>Neues Spiel starten</h2>
+        <!-- Scenario Selection Modal -->
+        <div class="modal" id="scenario-selection-modal">
+            <div class="modal-content scenario-selection-content">
+                <span class="modal-close" id="scenario-selection-close">&times;</span>
+                <div class="scenario-selection-header">
+                    <h2 data-i18n="ui.titles.selectScenario">Szenario wählen</h2>
+                    <p data-i18n="ui.labels.selectScenarioDesc">Wähle dein nächstes Abenteuer. Jedes Szenario bietet einzigartige Herausforderungen.</p>
                 </div>
-                <div class="reset-modal-body">
-                    <p>Möchtest du wirklich ein neues Spiel starten?</p>
-                    <div class="scenario-selection">
-                        <label for="scenario-select">Szenario wählen:</label>
-                        <select id="scenario-select" class="scenario-dropdown">
-                            <option value="mines_freedom" selected>Freiheit für die Minen</option>
-                            <option value="druid_nights">Nächte der Druiden</option>
-                        </select>
-                    </div>
-                    <p class="warning-text">Der aktuelle Fortschritt geht unwiderruflich verloren!</p>
-                    <div class="modal-actions">
-                        <button class="btn btn-secondary" id="cancel-reset-btn">Abbrechen</button>
-                        <button class="btn btn-danger" id="confirm-reset-btn">Neues Spiel</button>
-                    </div>
+                
+                <div class="scenario-cards-grid" id="scenario-cards-grid">
+                    <!-- Scenario cards will be injected here -->
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="scenario-cancel-btn" data-i18n="ui.buttons.cancel">Abbrechen</button>
                 </div>
             </div>
         </div>

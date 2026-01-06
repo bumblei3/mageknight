@@ -1,8 +1,8 @@
 # Mage Knight - Base Game
 
-[![Test Suite](https://github.com/bumblei3/mageknight/actions/workflows/test.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/test.yml)
+[![Mage Knight CI/CD](https://github.com/bumblei3/mageknight/actions/workflows/ci.yml/badge.svg)](https://github.com/bumblei3/mageknight/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/bumblei3/mageknight/branch/master/graph/badge.svg)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 944 passing](https://img.shields.io/badge/tests-944%20passing-brightgreen)
+![Tests: 1227 passing](https://img.shields.io/badge/tests-1227%20passing-brightgreen)
 ![Coverage: 94.67%](https://img.shields.io/badge/coverage-94.67%25-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.

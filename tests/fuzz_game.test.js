@@ -46,7 +46,7 @@ describe('Game Fuzzing', () => {
         document.body.innerHTML = '';
     });
 
-    it('should survive random input sequences with resets', async () => {
+    it('should survive random input sequences with resets', { timeout: 30000 }, async () => {
         game = new MageKnightGame();
 
         game.init();

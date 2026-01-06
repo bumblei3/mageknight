@@ -100,8 +100,12 @@ async function cacheFirst(request) {
         return response;
     } catch (error) {
         console.warn('[SW] Fetch failed:', error);
-        // Return offline fallback if available
-        return caches.match('/index.html');
+        // Only return offline fallback for navigation requests
+        if (request.mode === 'navigate') {
+            return caches.match('/index.html');
+        }
+        // For other resources, let it fail naturally or return null
+        return Promise.reject(error);
     }
 }
 
@@ -119,7 +123,10 @@ async function networkFirst(request) {
         if (cached) {
             return cached;
         }
-        // Return offline fallback
-        return caches.match('/index.html');
+        // Only return offline fallback for navigation requests
+        if (request.mode === 'navigate') {
+            return caches.match('/index.html');
+        }
+        return Promise.reject(error);
     }
 }

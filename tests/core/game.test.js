@@ -30,6 +30,11 @@ describe('Game Core', () => {
                 <button id="cancel-reset-btn"></button>
                 <button id="close-reset-modal"></button>
             </div>
+            <div id="scenario-selection-modal">
+                <div id="scenario-cards-grid"></div>
+                <button id="scenario-selection-close"></button>
+                <button id="scenario-cancel-btn"></button>
+            </div>
             <div id="play-area">
                 <div id="played-cards"></div>
             </div>
@@ -49,7 +54,8 @@ describe('Game Core', () => {
             saveGame: vi.fn(),
             loadGame: vi.fn(),
             getGameState: () => ({}),
-            loadGameState: () => true
+            loadGameState: () => true,
+            openScenarioSelection: vi.fn()
         };
     });
 
@@ -173,12 +179,11 @@ describe('Game Core', () => {
 
     describe('System Transitions', () => {
         it('should reset game state', () => {
-            const el = document.getElementById('reset-modal');
             let startCalled = false;
             game.startNewGame = () => { startCalled = true; };
 
             game.reset();
-            expect(el.classList.contains('active')).toBe(true);
+            expect(game.stateManager.openScenarioSelection).toHaveBeenCalled();
             game.startNewGame();
             expect(startCalled).toBe(true);
         });

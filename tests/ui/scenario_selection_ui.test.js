@@ -17,7 +17,7 @@ describe('ScenarioSelectionModal', () => {
             </div>
         `;
 
-        game = {
+        const mockGame = {
             scenarioManager: {
                 scenarios: {
                     's1': { id: 's1', name: 'Scenario 1', description: 'Desc 1' },
@@ -29,7 +29,11 @@ describe('ScenarioSelectionModal', () => {
             reset: vi.fn()
         };
 
-        modal = new ScenarioSelectionModal(game);
+        const ui = { game: mockGame };
+        modal = new ScenarioSelectionModal(ui);
+
+        // Store game for assertions
+        game = mockGame;
     });
 
     it('should initialize correctly', () => {

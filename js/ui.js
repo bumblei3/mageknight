@@ -15,6 +15,7 @@ import { GAME_EVENTS } from './constants.js';
 import { ParticleSystem } from './particles.js';
 import { SaveLoadModal } from './ui/SaveLoadModal.js';
 import { ScenarioSelectionModal } from './ui/ScenarioSelectionModal.js';
+import { SettingsModal } from './ui/SettingsModal.js';
 
 /**
  * User Interface Controller (Orchestrator)
@@ -38,6 +39,7 @@ export class UI {
         this.skillRenderer = new SkillRenderer(this);
         this.saveLoadModal = new SaveLoadModal(this);
         this.scenarioSelectionModal = new ScenarioSelectionModal(this);
+        this.settingsModal = new SettingsModal(this);
 
         this.setupEventListeners();
         this.setupTooltips();
@@ -66,6 +68,11 @@ export class UI {
         this.combatUI.game = game;
         if (this.elements.skillList) {
             this.skillRenderer.setContainer(this.elements.skillList);
+        }
+
+        // Apply stored settings now that game is linked
+        if (this.settingsModal) {
+            this.settingsModal.applySettings(this.settingsModal.settings);
         }
     }
 
@@ -181,6 +188,7 @@ export class UI {
             exploreBtn: document.getElementById('explore-btn'),
             newGameBtn: document.getElementById('new-game-btn'),
             languageBtn: document.getElementById('language-btn'),
+            settingsBtn: document.getElementById('settings-btn'),
 
             // Areas
             handCards: document.getElementById('hand-cards'),
@@ -239,6 +247,12 @@ export class UI {
         if (this.elements.languageBtn) {
             this.elements.languageBtn.addEventListener('click', () => {
                 this.toggleLanguage();
+                if (this.game && this.game.sound) this.game.sound.click();
+            });
+        }
+        if (this.elements.settingsBtn) {
+            this.elements.settingsBtn.addEventListener('click', () => {
+                this.settingsModal.show();
                 if (this.game && this.game.sound) this.game.sound.click();
             });
         }

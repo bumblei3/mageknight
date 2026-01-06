@@ -109,6 +109,7 @@
                             <span class="stat-value" id="reputation-value">0</span>
                         </div>
                         <div class="header-controls">
+                            <button class="btn-icon" id="settings-btn" title="Einstellungen">⚙️</button>
                             <button class="btn-icon" id="toggle-3d-btn" title="3D Ansicht umschalten">🎲</button>
                             <button class="btn-icon" id="language-btn" title="Sprache wechseln"
                                 data-i18n-title="ui.buttons.settings">🌐</button>
@@ -677,15 +678,88 @@
                 <span class="modal-close" id="scenario-selection-close">&times;</span>
                 <div class="scenario-selection-header">
                     <h2 data-i18n="ui.titles.selectScenario">Szenario wählen</h2>
-                    <p data-i18n="ui.labels.selectScenarioDesc">Wähle dein nächstes Abenteuer. Jedes Szenario bietet einzigartige Herausforderungen.</p>
+                    <p data-i18n="ui.labels.selectScenarioDesc">Wähle dein nächstes Abenteuer. Jedes Szenario bietet
+                        einzigartige Herausforderungen.</p>
                 </div>
-                
+
                 <div class="scenario-cards-grid" id="scenario-cards-grid">
                     <!-- Scenario cards will be injected here -->
                 </div>
 
                 <div class="modal-actions">
-                    <button class="btn btn-secondary" id="scenario-cancel-btn" data-i18n="ui.buttons.cancel">Abbrechen</button>
+                    <button class="btn btn-secondary" id="scenario-cancel-btn"
+                        data-i18n="ui.buttons.cancel">Abbrechen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settings-modal">
+            <div class="modal-content settings-modal-content">
+                <span class="modal-close" id="settings-close">&times;</span>
+                <div class="settings-header">
+                    <h2>⚙️ Einstellungen</h2>
+                </div>
+                <div class="settings-body">
+                    <div class="settings-tabs">
+                        <button class="settings-tab-btn active" data-tab="general">Allgemein</button>
+                        <button class="settings-tab-btn" data-tab="audio">Audio</button>
+                        <button class="settings-tab-btn" data-tab="gameplay">Gameplay</button>
+                    </div>
+
+                    <div class="settings-tab-content active" id="settings-general">
+                        <div class="setting-item">
+                            <label for="setting-language">Sprache</label>
+                            <select id="setting-language">
+                                <option value="de">Deutsch</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="setting-theme">Design</label>
+                            <select id="setting-theme">
+                                <option value="classic">Klassisch (Pergament)</option>
+                                <option value="dark">Dunkel (Glas)</option>
+                                <option value="premium">Premium (Gold)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-tab-content" id="settings-audio">
+                        <div class="setting-item">
+                            <label>Sound Effekte</label>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-sound-enabled" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label for="setting-volume">Lautstärke</label>
+                            <input type="range" id="setting-volume" min="0" max="100" value="100">
+                        </div>
+                    </div>
+
+                    <div class="settings-tab-content" id="settings-gameplay">
+                        <div class="setting-item">
+                            <label for="setting-anim-speed">Animationsgeschwindigkeit</label>
+                            <select id="setting-anim-speed">
+                                <option value="1">Normal</option>
+                                <option value="1.5">Schnell</option>
+                                <option value="2">Sehr Schnell</option>
+                                <option value="0">Sofort</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Tooltips anzeigen</label>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-tooltips-enabled" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="settings-save-btn">Speichern & Schließen</button>
                 </div>
             </div>
         </div>

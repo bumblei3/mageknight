@@ -1,8 +1,8 @@
 import { logger } from '../logger.js';
 
 export class ScenarioSelectionModal {
-    constructor(game) {
-        this.game = game;
+    constructor(ui) {
+        this.ui = ui;
         this.modal = document.getElementById('scenario-selection-modal');
         this.closeBtn = document.getElementById('scenario-selection-close');
         this.cancelBtn = document.getElementById('scenario-cancel-btn');
@@ -14,8 +14,8 @@ export class ScenarioSelectionModal {
     init() {
         if (!this.modal) return;
 
-        this.closeBtn.addEventListener('click', () => this.hide());
-        this.cancelBtn.addEventListener('click', () => this.hide());
+        if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.hide());
+        if (this.cancelBtn) this.cancelBtn.addEventListener('click', () => this.hide());
 
         // Hide when clicking outside
         this.modal.addEventListener('click', (e) => {
@@ -34,7 +34,8 @@ export class ScenarioSelectionModal {
     }
 
     renderScenarios() {
-        const scenarios = this.game.scenarioManager.scenarios;
+        if (!this.cardsGrid) return;
+        const scenarios = this.ui.game.scenarioManager.scenarios;
         this.cardsGrid.innerHTML = '';
 
         Object.values(scenarios).forEach(scenario => {
@@ -59,7 +60,7 @@ export class ScenarioSelectionModal {
                 <h3>${scenario.name}</h3>
                 <p class="description">${scenario.description}</p>
                 <div class="scenario-objectives">
-                    ${this.game.scenarioManager.getObjectivesTextForScenario(scenario)}
+                    ${this.ui.game.scenarioManager.getObjectivesTextForScenario(scenario)}
                 </div>
             </div>
         `;
@@ -82,6 +83,6 @@ export class ScenarioSelectionModal {
     }
 
     confirmSelection(scenarioId) {
-        this.game.startNewGame(scenarioId);
+        this.ui.game.startNewGame(scenarioId);
     }
 }

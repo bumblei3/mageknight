@@ -33,6 +33,11 @@ describe('Game Reset', () => {
                 <button id="cancel-reset-btn"></button>
                 <button id="close-reset-modal"></button>
             </div>
+            <div id="scenario-selection-modal">
+                <div id="scenario-cards-grid"></div>
+                <button id="scenario-selection-close"></button>
+                <button id="scenario-cancel-btn"></button>
+            </div>
             <div id="play-area">
                 <div id="played-cards"></div>
             </div>
@@ -60,10 +65,10 @@ describe('Game Reset', () => {
         // Call reset - this shows the modal
         game.reset();
 
-        // Simulate confirm click
-        const confirmBtn = document.getElementById('confirm-reset-btn');
-        if (confirmBtn) {
-            confirmBtn.click();
+        // Simulate scenario card click (the new flow)
+        const firstCard = document.querySelector('.scenario-card');
+        if (firstCard) {
+            firstCard.click();
         }
 
         // Verify reset
@@ -73,16 +78,16 @@ describe('Game Reset', () => {
     });
 
     it('should re-initialize hero and map on reset()', () => {
-        const originalHeroId = game.hero.id; // Assuming hero has ID or we check object reference
+        const originalHeroId = game.hero.id;
         const originalMapManager = game.mapManager;
 
         game.reset();
 
-        // Simulate confirm
-        const confirmBtn = document.getElementById('confirm-reset-btn');
-        if (confirmBtn) confirmBtn.click();
+        // Simulate scenario card click
+        const firstCard = document.querySelector('.scenario-card');
+        if (firstCard) firstCard.click();
 
-        expect(game.hero).not.toBe(originalHeroId); // Should be new object
+        expect(game.hero).not.toBe(originalHeroId);
         expect(game.mapManager).not.toBe(originalMapManager);
     });
 

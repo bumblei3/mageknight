@@ -18,10 +18,10 @@ describe('Game Coverage Tests', () => {
     });
 
     describe('Reset Functionality', () => {
-        it('should show reset modal when reset is called', () => {
-            const modal = document.getElementById('reset-modal');
+        it('should show scenario selection modal when reset is called', () => {
+            const modal = document.getElementById('scenario-selection-modal');
             game.reset();
-            expect(modal.classList.contains('active')).toBe(true);
+            expect(modal.classList.contains('show')).toBe(true);
         });
     });
 

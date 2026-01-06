@@ -78,7 +78,8 @@ describe('UI', () => {
                 cardPlay: vi.fn(),
                 hover: vi.fn(),
                 levelUp: vi.fn(),
-                cardPlaySideways: vi.fn()
+                cardPlaySideways: vi.fn(),
+                setVolume: vi.fn()
             },
             hero: {
                 hand: [],

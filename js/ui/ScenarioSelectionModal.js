@@ -51,7 +51,7 @@ export class ScenarioSelectionModal {
         card.className = 'scenario-card';
 
         const difficulty = this.getDifficultyLabel(scenario.id);
-        const imagePath = `assets/scenarios/${scenario.id}.png`;
+        const imagePath = `assets/scenarios/${scenario.id}.webp`;
 
         card.innerHTML = `
             <div class="scenario-difficulty ${difficulty.toLowerCase()}">${difficulty}</div>

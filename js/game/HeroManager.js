@@ -13,7 +13,7 @@ export const HERO_DEFINITIONS = {
         description: 'Ein mächtiger Draconum, der das Element Feuer beherrscht und Kristalle effizient nutzt.',
         stats: { armor: 2, handLimit: 5 },
         starterDeck: GOLDYX_STARTER_DECK,
-        portrait: 'assets/heroes/goldyx_portrait.png',
+        portrait: 'assets/heroes/goldyx_portrait.webp',
         color: '#ff4d4d'
     },
     'norowas': {
@@ -23,7 +23,7 @@ export const HERO_DEFINITIONS = {
         description: 'Ein charismatischer Anführer, der Einheiten inspiriert und diplomatische Verhandlungen meistert.',
         stats: { armor: 2, handLimit: 5 },
         starterDeck: NOROWAS_STARTER_DECK,
-        portrait: 'assets/heroes/norowas_portrait.png',
+        portrait: 'assets/heroes/norowas_portrait.webp',
         color: '#4db8ff'
     },
     'arythea': {
@@ -33,7 +33,7 @@ export const HERO_DEFINITIONS = {
         description: 'Nutzt Schmerz und Chaos zu ihrem Vorteil. Sie ist verheerend im Angriff, aber oft verwundet.',
         stats: { armor: 2, handLimit: 5 },
         starterDeck: ARYTHEA_STARTER_DECK,
-        portrait: 'assets/heroes/arythea_portrait.png',
+        portrait: 'assets/heroes/arythea_portrait.webp',
         color: '#b84dff'
     },
     'tovak': {
@@ -43,7 +43,7 @@ export const HERO_DEFINITIONS = {
         description: 'Ein Meister der Verteidigung und taktischen Planung. Er findet immer einen Weg, feindliche Schläge zu parieren.',
         stats: { armor: 3, handLimit: 5 },
         starterDeck: TOVAK_STARTER_DECK,
-        portrait: 'assets/heroes/tovak_portrait.png',
+        portrait: 'assets/heroes/tovak_portrait.webp',
         color: '#4dffb8'
     }
 };

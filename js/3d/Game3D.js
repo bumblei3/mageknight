@@ -27,6 +27,8 @@ export class Game3D {
         if (this.enabled) {
             container.style.display = 'block';
             canvas2d.style.display = 'none'; // Hide 2D
+            // Trigger resize now that container is visible
+            this.sceneManager.onWindowResize();
             this.sceneManager.start();
             this.render(); // Initial render
         } else {

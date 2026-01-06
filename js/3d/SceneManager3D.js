@@ -81,8 +81,9 @@ export class SceneManager3D {
 
     onWindowResize() {
         if (!this.container) return;
-        this.width = this.container.clientWidth;
-        this.height = this.container.clientHeight;
+        // Use window dimensions as fallback if container has no size yet
+        this.width = this.container.clientWidth || window.innerWidth;
+        this.height = this.container.clientHeight || window.innerHeight;
 
         this.camera.aspect = this.width / this.height;
         this.camera.updateProjectionMatrix();

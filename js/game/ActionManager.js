@@ -324,8 +324,7 @@ export class ActionManager {
         const result = this.game.hero.playCard(index, useStrong, isNight);
         if (result) {
             // Success logic (Particles, UI)
-            // We can return the result so InteractionController feels good
-            // But actually we should just emit events or let the caller handle UI
+            eventBus.emit(GAME_EVENTS.CARD_PLAYED, {});
             return result;
         } else {
             // Failed, undo the save? No, state didn't change.
@@ -343,6 +342,7 @@ export class ActionManager {
 
         const result = this.game.hero.playCardSideways(index, effectType);
         if (result) {
+            eventBus.emit(GAME_EVENTS.CARD_PLAYED, { sideways: true });
             return result;
         } else {
             this.history.pop();

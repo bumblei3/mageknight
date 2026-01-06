@@ -111,6 +111,35 @@ export class UI {
         });
     }
 
+    setupSoundListeners() {
+        if (!this.game || !this.game.sound) return;
+
+        // Global UI Click Sound & Audio Context Init
+        document.addEventListener('click', (e) => {
+            // Initialize audio on first click
+            if (this.game.sound.ctx && this.game.sound.ctx.state === 'suspended') {
+                this.game.sound.ctx.resume();
+            }
+            if (!this.game.sound.enabled && !this.game.sound.ctx) {
+                this.game.sound.init();
+            }
+
+            // Play click sound for buttons
+            if (e.target.closest('button') || e.target.closest('.card') || e.target.closest('.interactive')) {
+                this.game.sound.click();
+            }
+        }, { capture: true });
+
+        // Game Events
+        eventBus.on('DAMAGE_DEALT', () => this.game.sound.hit());
+        eventBus.on('HERO_HEALED', () => this.game.sound.heal());
+        eventBus.on('CARD_PLAYED', () => this.game.sound.cardPlay());
+        eventBus.on('MANA_GAINED', () => this.game.sound.manaUse()); // Closest match
+        eventBus.on('LEVEL_UP', () => this.game.sound.levelUp());
+        eventBus.on('COMBAT_START', () => this.game.sound.combatStart());
+        eventBus.on('NOTIFY', () => this.game.sound.notification());
+    }
+
     /**
      * Links the game instance to UI and sub-managers.
      */
@@ -125,6 +154,8 @@ export class UI {
         if (this.settingsModal) {
             this.settingsModal.applySettings(this.settingsModal.settings);
         }
+
+        this.setupSoundListeners();
     }
 
     /**

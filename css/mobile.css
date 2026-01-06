@@ -1,0 +1,162 @@
+/* Mobile & Tablet Responsive Styles */
+
+/* Tablet Portrait & Large Phones (Max Width: 1024px) */
+@media screen and (max-width: 1024px) {
+    :root {
+        --hud-width: 250px;
+        /* Smaller HUD */
+    }
+
+    .game-container {
+        grid-template-columns: var(--hud-width) 1fr var(--hud-width);
+    }
+
+    .hud-top-bar {
+        padding: 0.5rem 1rem;
+    }
+
+    .game-logo {
+        font-size: 1.2rem;
+    }
+
+    .stat-pill {
+        padding: 4px 8px;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .header-controls .btn-icon {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Mobile Devices (Max Width: 768px) */
+@media screen and (max-width: 768px) {
+    .game-container {
+        /* Stack layout vertically or use overlay drawers */
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px 1fr auto;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Top Bar */
+    .hud-top-bar {
+        grid-column: 1;
+        grid-row: 1;
+        border-radius: 0;
+        justify-content: space-between;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .game-logo {
+        display: none;
+        /* Hide logo on mobile to save space */
+    }
+
+    .player-stats {
+        gap: 0.5rem;
+    }
+
+    .stat-pill {
+        font-size: 0.8rem;
+    }
+
+    .header-controls {
+        gap: 0.25rem;
+    }
+
+    /* Hide less important buttons on mobile */
+    #toggle-3d-btn,
+    #language-btn,
+    #statistics-btn,
+    #achievements-btn {
+        display: none;
+    }
+
+    /* Sidebars turn into Drawers or Bottom Sheets */
+    .hud-sidebar {
+        position: fixed;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        z-index: 100;
+        transition: transform 0.3s ease;
+        max-height: 80vh;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Left HUD (Hero) -> Bottom Sheet or Toggleable Drawer */
+    .hud-left {
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(85%);
+        /* Show only header hint */
+        padding: 10px;
+        grid-row: auto;
+    }
+
+    .hud-left.expanded {
+        transform: translateY(0);
+    }
+
+    /* Right HUD (Context) -> Top Right Drawer */
+    .hud-right {
+        top: 60px;
+        right: 0;
+        width: 250px;
+        height: auto;
+        transform: translateX(100%);
+        border-radius: 8px 0 0 8px;
+    }
+
+    .hud-right.expanded {
+        transform: translateX(0);
+    }
+
+    /* Center Game Board */
+    #game-board-wrapper {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    /* Mobile Interaction Hints */
+    .mobile-drawer-handle {
+        width: 40px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+        margin: 0 auto 10px auto;
+    }
+
+    /* Card Hand scaling */
+    #hand-container {
+        transform: scale(0.8);
+        transform-origin: bottom center;
+        bottom: 60px;
+        /* Above the bottom sheet */
+    }
+
+    .card {
+        width: 160px;
+        /* Smaller cards */
+        height: 220px;
+    }
+
+    /* Modals need to fit */
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        padding: 1rem;
+    }
+
+    .hero-cards-grid {
+        grid-template-columns: 1fr;
+        /* Stack hero cards */
+    }
+}

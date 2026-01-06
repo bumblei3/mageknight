@@ -53,6 +53,9 @@ export class CombatOrchestrator {
 
         this.game.addLog(t('combat.cardPlayed', { card: result.card.name }), 'combat');
         this.game.ui.addPlayedCard(result.card, result.effect);
+
+        eventBus.emit(GAME_EVENTS.CARD_PLAYED, { combat: true });
+
         this.game.ui.showPlayArea();
 
         this.game.renderHand();

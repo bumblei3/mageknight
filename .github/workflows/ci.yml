@@ -93,6 +93,15 @@ jobs:
         with:
           enablement: true
         
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Build Tools
+        run: npm ci
+
       - name: Prepare production build
         run: |
           mkdir -p dist
@@ -114,6 +123,16 @@ jobs:
           
           # Icons for PWA
           cp -r icons dist/ || true
+
+      - name: Minify assets
+        run: |
+          # Minify CSS
+          find dist -name "*.css" -exec npx cleancss -o {} {} \;
+          
+          # Minify JS (ES Modules)
+          # We skip vendor files if already minified, but here we just do all for simplicity
+          # Terser handles ES modules with --module
+          find dist/js -name "*.js" -exec npx terser {} --module -o {} \;
           
           # List deployed files for verification
           echo "=== Deployed files ==="

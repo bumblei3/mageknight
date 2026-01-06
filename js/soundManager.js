@@ -191,7 +191,7 @@ export class SoundManager {
         this.timeouts.forEach(t => clearTimeout(t));
         this.timeouts.clear();
         if (this.ctx && this.ctx.state !== 'closed') {
-            try { this.ctx.close(); } catch (e) { /* Ignore close errors */ }
+            try { this.ctx.close(); } catch (_e) { /* Ignore close errors */ }
         }
     }
 

@@ -68,7 +68,7 @@ export class SaveManager {
                 timestamp: parsed.timestamp,
                 version: parsed.version
             };
-        } catch (e) {
+        } catch (_e) {
             return null;
         }
     }

@@ -51,7 +51,7 @@
     /* Text Colors */
     --color-text-primary: hsl(210, 20%, 98%);
     --color-text-secondary: hsl(210, 15%, 85%);
-    --color-text-muted: hsl(210, 10%, 65%);
+    --color-text-muted: hsl(210, 10%, 75%);
 
     /* Spacing */
     --spacing-xs: 0.25rem;

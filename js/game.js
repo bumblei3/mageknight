@@ -142,7 +142,8 @@ export class MageKnightGame {
         this.setGameTimeout(() => {
             if (this.stateManager &&
                 this.ui?.scenarioSelectionModal?.modal &&
-                this.scenarioManager) {
+                this.scenarioManager &&
+                !this.isTestEnvironment) { // Skip auto-open in tests
                 this.stateManager.openScenarioSelection();
             }
         }, 500);

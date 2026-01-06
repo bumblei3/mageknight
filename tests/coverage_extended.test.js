@@ -38,6 +38,7 @@ describe('Coverage Gap Fill', () => {
             </div>
             <div id="combat-panel"></div>
             <div id="site-modal">
+                <div id="site-modal-icon"></div>
                 <div id="site-modal-title"></div>
                 <div id="site-modal-description"></div>
                 <div id="site-options"></div>

@@ -150,17 +150,47 @@ export class MageKnightGame {
         return id;
     }
 
+    /**
+     * @returns {number} The current turn number.
+     */
     get turnNumber() { return this.turnManager ? this.turnManager.turnNumber : 1; }
+    /**
+     * @param {number} value The turn number to set.
+     */
     set turnNumber(value) { if (this.turnManager) this.turnManager.turnNumber = value; }
 
     // Combat Totals compatibility getters for UI and Tests
+    /**
+     * @returns {number} Total attack points in current combat.
+     */
     get combatAttackTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatAttackTotal : 0; }
+    /**
+     * @param {number} v Value to set for combat attack total.
+     */
     set combatAttackTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatAttackTotal = v; }
+    /**
+     * @returns {number} Total block points in current combat.
+     */
     get combatBlockTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatBlockTotal : 0; }
+    /**
+     * @param {number} v Value to set for combat block total.
+     */
     set combatBlockTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatBlockTotal = v; }
+    /**
+     * @returns {number} Total ranged attack points.
+     */
     get combatRangedTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatRangedTotal : 0; }
+    /**
+     * @param {number} v Value to set for ranged attack total.
+     */
     set combatRangedTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatRangedTotal = v; }
+    /**
+     * @returns {number} Total siege attack points.
+     */
     get combatSiegeTotal() { return this.combatOrchestrator ? this.combatOrchestrator.combatSiegeTotal : 0; }
+    /**
+     * @param {number} v Value to set for siege attack total.
+     */
     set combatSiegeTotal(v) { if (this.combatOrchestrator) this.combatOrchestrator.combatSiegeTotal = v; }
 
     /**
@@ -287,6 +317,9 @@ export class MageKnightGame {
         this.updatePhaseIndicator();
     }
 
+    /**
+     * Triggers the interactive tutorial.
+     */
     showTutorial() {
         if (this.tutorial) {
             this.tutorial.start();
@@ -323,6 +356,9 @@ export class MageKnightGame {
         eventBus.emit(GAME_EVENTS.NOTIFICATION_SHOW, { message, type });
     }
 
+    /**
+     * Shows a reset confirmation modal and optionally resumes with a new scenario.
+     */
     reset() {
         // Use custom modal instead of confirm
         const modal = document.getElementById('reset-modal');
@@ -356,12 +392,21 @@ export class MageKnightGame {
         modal.classList.add('active');
     }
 
+    /**
+     * Initializes the game board by calling the map manager.
+     */
     createGameBoard() {
         this.mapManager.createStartingMap();
     }
 
+    /**
+     * Creates enemies in appropriate locations via the entity manager.
+     */
     createEnemies() { this.entityManager.createEnemies(); }
 
+    /**
+     * Sets up the particle system overlay.
+     */
     setupParticleSystem() {
         // Create overlay canvas for particles
         const container = document.querySelector('.canvas-layer');
@@ -396,10 +441,14 @@ export class MageKnightGame {
         };
     }
 
-    // Removed in refactor: Moved to InputHandler
-
+    /**
+     * Updates the phase indicator in the UI.
+     */
     updatePhaseIndicator() { this.phaseManager.updatePhaseIndicator(); }
 
+    /**
+     * Sets up the help system modal and tab listeners.
+     */
     setupHelpSystem() {
         const signal = this.abortController.signal;
         const helpBtn = document.getElementById('help-btn');
@@ -454,65 +503,183 @@ export class MageKnightGame {
 
 
 
+    /**
+     * Handles canvas click events via the interaction controller.
+     * @param {MouseEvent} e
+     */
     handleCanvasClick(e) { this.interactionController.handleCanvasClick(e); }
+    /**
+     * Handles canvas mouse move events via the interaction controller.
+     * @param {MouseEvent} e
+     */
     handleCanvasMouseMove(e) { this.interactionController.handleCanvasMouseMove(e); }
+    /**
+     * Selects a hex at the given axial coordinates.
+     * @param {number} q
+     * @param {number} r
+     */
     selectHex(q, r) { this.interactionController.selectHex(q, r); }
+    /**
+     * Handles card click events.
+     * @param {number} index
+     * @param {Object} card
+     */
     handleCardClick(index, card) { this.interactionController.handleCardClick(index, card); }
+    /**
+     * Handles card right-click events (sideways play).
+     * @param {number} index
+     * @param {Object} card
+     */
     handleCardRightClick(index, card) { this.interactionController.handleCardRightClick(index, card); }
 
+    /**
+     * Enables movement mode for the hero.
+     */
     enterMovementMode() { this.actionManager.enterMovementMode(); }
+    /**
+     * Disables movement mode.
+     */
     exitMovementMode() { this.actionManager.exitMovementMode(); }
 
+    /**
+     * Calculates and highlights reachable hexes for the hero.
+     */
     calculateReachableHexes() { this.actionManager.calculateReachableHexes(); }
 
+    /**
+     * Moves the hero to the target hex.
+     * @param {number} q
+     * @param {number} r
+     * @returns {boolean} True if move successful.
+     */
     moveHero(q, r) { return this.actionManager.moveHero(q, r); }
 
 
 
+    /**
+     * Initiates combat with the given enemy.
+     * @param {Object} enemy
+     */
     initiateCombat(enemy) { this.combatOrchestrator.initiateCombat(enemy); }
 
+    /**
+     * Plays a card in combat.
+     * @param {number} index
+     * @param {Object} card
+     * @param {boolean} [useStrong=false]
+     */
     playCardInCombat(index, card, useStrong = false) { this.combatOrchestrator.playCardInCombat(index, card, useStrong); }
 
-    // Render units available for combat
+    /**
+     * Renders units available for combat.
+     */
     renderUnitsInCombat() { this.combatOrchestrator.renderUnitsInCombat(); }
 
+    /**
+     * Activates a unit's ability in combat.
+     * @param {Object} unit
+     */
     activateUnitInCombat(unit) { this.combatOrchestrator.activateUnitInCombat(unit); }
 
+    /**
+     * Ends the block phase of combat.
+     */
     endBlockPhase() { this.combatOrchestrator.endBlockPhase(); }
 
+    /**
+     * Ends combat (usually on retreat or defeat).
+     */
     endCombat() { this.combatOrchestrator.onCombatEnd({ victory: false, enemy: this.combat ? this.combat.enemy : null }); }
 
-    // Update combat totals display in UI
+    /**
+     * Updates combat totals display in UI.
+     */
     updateCombatTotals() { this.combatOrchestrator.updateCombatTotals(); }
 
+    /**
+     * Executes the main attack action in combat.
+     */
     executeAttackAction() { this.combatOrchestrator.executeAttackAction(); }
 
+    /**
+     * Handles clicking an enemy in the combat panel.
+     * @param {Object} enemy
+     */
     handleEnemyClick(enemy) { this.combatOrchestrator.handleEnemyClick(enemy); }
 
+    /**
+     * Executes a ranged attack against the target enemy.
+     * @param {Object} enemy
+     */
     executeRangedAttack(enemy) { this.combatOrchestrator.executeRangedAttack(enemy); }
 
+    /**
+     * Ends the ranged attack phase.
+     */
     endRangedPhase() { this.combatOrchestrator.endRangedPhase(); }
 
+    /**
+     * Grants fame to the hero.
+     * @param {number} amount
+     */
     gainFame(amount) { this.heroController.gainFame(amount); }
+    /**
+     * Triggers the level-up process.
+     * @param {number} newLevel
+     */
     triggerLevelUp(newLevel) { this.heroController.triggerLevelUp(newLevel); }
+    /**
+     * Handles selection of level-up rewards.
+     * @param {Object} selection
+     */
     handleLevelUpSelection(selection) { this.heroController.handleLevelUpSelection(selection); }
+    /**
+     * Gets the emoji representation of a mana color.
+     * @param {string} color
+     * @returns {string}
+     */
     getManaEmoji(color) { return this.heroController.getManaEmoji(color); }
+    /**
+     * Updates hero's mana inventory display.
+     */
     updateHeroMana() { this.heroController.updateHeroMana(); }
+    /**
+     * Applies healing effect to the hero.
+     * @returns {boolean}
+     */
     applyHealing() { return this.heroController.applyHealing(); }
 
+    /**
+     * Ends the current turn.
+     */
     endTurn() { this.phaseManager.endTurn(); }
+    /**
+     * Executes a rest action.
+     */
     rest() { this.phaseManager.rest(); }
 
+    /**
+     * Explorates an adjacent unknown territory.
+     */
     explore() { this.actionManager.explore(); }
 
+    /**
+     * Renders the hero's hand in the UI.
+     */
     renderHand() {
         this.renderController.renderHand();
     }
 
+    /**
+     * Renders the mana source and current mana inventory in the UI.
+     */
     renderMana() {
         this.renderController.renderMana();
     }
 
+    /**
+     * Updates all HUD stats, movement points, and unit displays.
+     */
     updateStats() {
         this.ui.updateHeroStats(this.hero);
         this.ui.updateMovementPoints(this.hero.movementPoints);
@@ -551,8 +718,14 @@ export class MageKnightGame {
         }
     }
 
+    /**
+     * Visits a site at the hero's current location.
+     */
     visitSite() { this.actionManager.visitSite(); }
 
+    /**
+     * Renders the entire game state (map, heroes, enemies).
+     */
     render() {
         if (this.hexGrid && typeof this.hexGrid.render === 'function') {
             this.hexGrid.render(this.hero, this.enemies);
@@ -561,17 +734,43 @@ export class MageKnightGame {
     }
 
     // Save/Load functionality
+    /**
+     * Saves the current game state to the specified slot.
+     * @param {string} slotId
+     */
     saveGame(slotId) { this.stateManager.saveGame(slotId); }
+    /**
+     * Loads the game state from the specified slot.
+     * @param {string} slotId
+     * @returns {boolean} True if load successful.
+     */
     loadGame(slotId) { return this.stateManager.loadGame(slotId); }
 
+    /**
+     * Gets the serializable game state.
+     * @returns {Object}
+     */
     getGameState() { return this.stateManager.getGameState(); }
 
+    /**
+     * Loads a provided game state object.
+     * @param {Object} state
+     */
     loadGameState(state) { this.stateManager.loadGameState(state); }
 
+    /**
+     * Opens the save game dialog.
+     */
     openSaveDialog() { this.stateManager.openSaveDialog(); }
 
+    /**
+     * Opens the load game dialog.
+     */
     openLoadDialog() { this.stateManager.openLoadDialog(); }
 
+    /**
+     * Sets up the listener for day/night cycle changes.
+     */
     setupTimeListener() {
         this.timeManager.addListener((state) => {
             const isNight = state.timeOfDay === TIME_OF_DAY.NIGHT;

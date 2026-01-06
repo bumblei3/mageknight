@@ -21,6 +21,26 @@ export class Game3D {
         // Input Handling
         const container = document.getElementById(containerId);
         container.addEventListener('pointerdown', (e) => this.onClick(e));
+        container.addEventListener('pointermove', (e) => this.onPointerMove(e));
+    }
+
+    onPointerMove(event) {
+        if (!this.enabled || !this.sceneManager) return;
+
+        const rect = this.sceneManager.renderer.domElement.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        const hitObject = this.sceneManager.getIntersection(x, y);
+
+        // Update selector
+        if (hitObject && hitObject.userData && hitObject.userData.type === 'hex') {
+            this.sceneManager.setSelectorPosition(hitObject.position);
+            this.sceneManager.renderer.domElement.style.cursor = 'pointer';
+        } else {
+            this.sceneManager.hideSelector();
+            this.sceneManager.renderer.domElement.style.cursor = 'default';
+        }
     }
 
     onClick(event) {
@@ -110,13 +130,12 @@ export class Game3D {
 
         this.sceneManager.add(this.heroMesh);
 
-        // Camera follow hero
-        if (this.heroMesh) {
-            // Smooth follow? For MVP just snap or offset
-            const offset = new THREE.Vector3(0, 30, 20);
-            this.sceneManager.camera.position.copy(this.heroMesh.position).add(offset);
-            this.sceneManager.camera.lookAt(this.heroMesh.position);
-        }
+        this.sceneManager.add(this.heroMesh);
+
+        // Update controls target to hero if controls exist (optional, mostly let user control)
+        // if (this.sceneManager.controls) {
+        //     this.sceneManager.controls.target.copy(this.heroMesh.position);
+        // }
     }
 
     update() {

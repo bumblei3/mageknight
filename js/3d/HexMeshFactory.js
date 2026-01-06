@@ -103,28 +103,128 @@ export class HexMeshFactory {
     }
 
     addProps(parentMesh, terrain) {
-        // Simple visual differentiation using primitives for now
-        if (terrain === 'mountains') {
-            const coneGeo = new THREE.ConeGeometry(0.8, 2, 4);
-            const coneMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
-            const cone = new THREE.Mesh(coneGeo, coneMat);
-            cone.position.set(0, 1, 0);
-            parentMesh.add(cone);
-        } else if (terrain === 'forest') {
-            const boxGeo = new THREE.BoxGeometry(0.5, 1.5, 0.5);
-            const boxMat = new THREE.MeshStandardMaterial({ color: 0x0f3f20 });
-            const tree = new THREE.Mesh(boxGeo, boxMat);
-            tree.position.set(0, 0.75, 0);
-            parentMesh.add(tree);
+        switch (terrain) {
+            case 'mountains':
+                this.addMountainProp(parentMesh);
+                break;
+            case 'forest':
+                this.addForestProp(parentMesh);
+                break;
+            case 'hills':
+                this.addHillProp(parentMesh);
+                break;
         }
     }
 
-    addSiteMarker(parentMesh, _site) {
-        // Red sphere for enemies/sites
-        const geo = new THREE.SphereGeometry(0.5);
-        const mat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x440000 });
+    addMountainProp(parentMesh) {
+        const group = new THREE.Group();
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x6b7280, // Gray-500
+            roughness: 0.9,
+            flatShading: true
+        });
+
+        // Main peak
+        const mainPeak = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.2, 4), material);
+        mainPeak.position.set(0, 1.1, 0);
+        group.add(mainPeak);
+
+        // Side peaks
+        const sidePeak1 = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.5, 4), material);
+        sidePeak1.position.set(0.6, 0.75, 0.4);
+        sidePeak1.rotation.y = Math.PI / 4;
+        group.add(sidePeak1);
+
+        const sidePeak2 = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.2, 4), material);
+        sidePeak2.position.set(-0.5, 0.6, -0.5);
+        sidePeak2.rotation.y = -Math.PI / 6;
+        group.add(sidePeak2);
+
+        parentMesh.add(group);
+    }
+
+    addForestProp(parentMesh) {
+        const group = new THREE.Group();
+
+        // Define tree parts
+        const trunkGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.4, 6);
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4527a0 }); // Dark purple-ish brown
+        const foliageGeo = new THREE.ConeGeometry(0.4, 1.0, 6);
+        const foliageMat = new THREE.MeshStandardMaterial({
+            color: 0x166534, // Green-800
+            flatShading: true
+        });
+
+        const createTree = (x, z, scale = 1) => {
+            const tree = new THREE.Group();
+
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.y = 0.2;
+            tree.add(trunk);
+
+            const foliage = new THREE.Mesh(foliageGeo, foliageMat);
+            foliage.position.y = 0.8;
+            tree.add(foliage);
+
+            tree.position.set(x, 0, z);
+            tree.scale.set(scale, scale, scale);
+            group.add(tree);
+        };
+
+        // Cluster of trees
+        createTree(0, 0, 1.2);
+        createTree(0.6, 0.5, 0.9);
+        createTree(-0.5, 0.4, 0.85);
+        createTree(0.3, -0.6, 1.1);
+        createTree(-0.4, -0.5, 0.7);
+
+        parentMesh.add(group);
+    }
+
+    addHillProp(parentMesh) {
+        const geo = new THREE.SphereGeometry(0.8, 8, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+        const mat = new THREE.MeshStandardMaterial({
+            color: 0xd97706, // Amber-600
+            flatShading: true
+        });
+
+        const createHill = (x, z, scale) => {
+            const hill = new THREE.Mesh(geo, mat);
+            hill.position.set(x, 0.1, z);
+            hill.scale.set(scale, scale * 0.5, scale);
+            parentMesh.add(hill);
+        };
+
+        createHill(0.4, 0.3, 1.0);
+        createHill(-0.3, -0.4, 0.8);
+    }
+
+    updateSiteMarkers(parentMesh, site) {
+        // Clear old marker if any (though currently called during creation)
+        const markerGroup = new THREE.Group();
+        markerGroup.name = 'site-marker';
+
+        // Floating Diamond for Sites
+        const geo = new THREE.OctahedronGeometry(0.6);
+        const mat = new THREE.MeshStandardMaterial({
+            color: 0xef4444, // Red-500
+            emissive: 0x991b1b,
+            emissiveIntensity: 0.5,
+            metalness: 0.8,
+            roughness: 0.2
+        });
+
         const marker = new THREE.Mesh(geo, mat);
-        marker.position.set(0, 1.5, 0);
-        parentMesh.add(marker);
+        marker.position.set(0, 2.5, 0);
+
+        // Add subtle animation loop logic via Game3D later, but for now just static
+        markerGroup.add(marker);
+
+        // If it's a specific type, could add more detail
+        parentMesh.add(markerGroup);
+    }
+
+    addSiteMarker(parentMesh, site) {
+        this.updateSiteMarkers(parentMesh, site);
     }
 }

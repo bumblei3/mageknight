@@ -3,7 +3,7 @@
  * Cache-first strategy for static assets, network-first for dynamic content
  */
 
-const CACHE_NAME = 'mageknight-v11';
+const CACHE_NAME = 'mageknight-v16';
 const STATIC_ASSETS = [
     '/',
     '/index.html',

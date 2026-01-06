@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export class SceneManager3D {
     constructor(containerId) {
@@ -15,6 +16,7 @@ export class SceneManager3D {
         this.initCamera();
         this.initRenderer();
         this.initLighting();
+        this.initControls();
 
         // Group to hold all hexes and units
         this.worldGroup = new THREE.Group();
@@ -81,6 +83,22 @@ export class SceneManager3D {
         this.scene.add(pointLight);
     }
 
+    initControls() {
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true; // Smooth motion
+        this.controls.dampingFactor = 0.05;
+        this.controls.screenSpacePanning = false;
+
+        // Limits
+        this.controls.minDistance = 10;
+        this.controls.maxDistance = 100;
+        this.controls.maxPolarAngle = Math.PI / 2.2; // Limit so we don't look from below
+
+        // Initial target (center of board roughly)
+        // Assuming hex(0,0) is at 0,0,0
+        this.controls.target.set(0, 0, 0);
+    }
+
     onWindowResize() {
         if (!this.container) return;
         // Use window dimensions as fallback if container has no size yet
@@ -111,9 +129,44 @@ export class SceneManager3D {
 
         // Rotate atmosphere light slightly
         // const time = Date.now() * 0.001;
-        // Optional animations here
+
+        if (this.controls) this.controls.update();
 
         this.renderer.render(this.scene, this.camera);
+    }
+
+    initSelector() {
+        // Create a hexagonal selector cursor
+        const geometry = new THREE.CylinderGeometry(1.6, 1.6, 0.5, 6, 1);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.3,
+            side: THREE.DoubleSide
+        });
+        this.selector = new THREE.Mesh(geometry, material);
+        this.selector.visible = false;
+        this.selector.rotation.y = Math.PI / 6; // To align flat sides optionally, or point
+        // Cylinder is upright. Hexes are flat.
+        // If hexes are cylinders, this is fine.
+
+        // Add a wireframe outline
+        const edges = new THREE.EdgesGeometry(geometry);
+        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x00ffff }));
+        this.selector.add(line);
+
+        this.scene.add(this.selector);
+    }
+
+    setSelectorPosition(position) {
+        if (!this.selector) this.initSelector();
+        this.selector.position.copy(position);
+        this.selector.position.y += 0.5; // Slightly above terrain
+        this.selector.visible = true;
+    }
+
+    hideSelector() {
+        if (this.selector) this.selector.visible = false;
     }
 
     getIntersection(ndcX, ndcY) {

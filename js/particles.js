@@ -151,7 +151,7 @@ export class ParticleSystem {
     }
 
     // --- Floating Text Logic (Kept here or extract to UI helper?) ---
-    // Keeping here for now to avoid breaking too many things at once, 
+    // Keeping here for now to avoid breaking too many things at once,
     // but ideally this belongs in a text renderer.
 
     triggerShake(magnitude = 1.0, duration = 0.5) {

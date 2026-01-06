@@ -24,7 +24,8 @@ describe('Advanced Combat Abilities V2', () => {
         combat.phase = 'damage';
 
         const unit = { getName: () => 'Test Unit', takeWound: createSpy(), wounds: 0, isReady: () => true };
-        const result = combat.assignDamageToUnit(unit, assassin);
+        combat.damagePhase();
+        const result = combat.assignDamageToUnit(unit, assassin.id);
 
         expect(result.success).toBe(false);
         expect(result.message).toContain('Attentäter');
@@ -43,7 +44,8 @@ describe('Advanced Combat Abilities V2', () => {
         ];
 
         combat.phase = 'damage';
-        const result = combat.damagePhase();
+        combat.damagePhase();
+        const result = combat.resolveDamagePhase();
 
         // Attack 3 vs Armor 2 = 2 wounds
         expect(result.woundsReceived).toBe(2);
@@ -64,7 +66,8 @@ describe('Advanced Combat Abilities V2', () => {
         combat.phase = 'damage';
 
         const unit = { getName: () => 'Test Unit', takeWound: createSpy(), wounds: 0, destroyed: false };
-        const result = combat.assignDamageToUnit(unit, spider);
+        combat.damagePhase();
+        const result = combat.assignDamageToUnit(unit, spider.id);
 
         expect(result.success).toBe(true);
         expect(unit.destroyed).toBe(true);
@@ -76,7 +79,8 @@ describe('Advanced Combat Abilities V2', () => {
         combat = new Combat(hero, [vampire]);
         combat.phase = 'damage';
 
-        const result = combat.damagePhase();
+        combat.damagePhase();
+        const result = combat.resolveDamagePhase();
 
         // Hero takes 2 wounds
         expect(result.woundsReceived).toBe(2);
@@ -90,7 +94,8 @@ describe('Advanced Combat Abilities V2', () => {
         combat.phase = 'damage';
 
         const unit = { getName: () => 'Test Unit', takeWound: createSpy(), wounds: 0, destroyed: false };
-        combat.assignDamageToUnit(unit, vampire);
+        combat.damagePhase();
+        combat.assignDamageToUnit(unit, vampire.id);
 
         expect(vampire.armorBonus).toBeGreaterThan(0);
         expect(vampire.getCurrentArmor()).toBeGreaterThan(4);

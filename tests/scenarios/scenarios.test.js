@@ -68,7 +68,7 @@ describe('Scenario - Conquest and Progression', () => {
 
         // Block
         game.combat.blockEnemy(enemy, 3);
-        game.combat.endBlockPhase();
+        game.combat.endBlockPhase(); game.combat.resolveDamagePhase();
 
         // Attack
         game.combat.attackEnemies(3, 'physical');
@@ -115,7 +115,7 @@ describe('Scenario - Recovery and Persistence', () => {
 
         // Partial Block (only 3 block)
         game.combat.blockEnemy(boss, 3);
-        game.combat.endBlockPhase();
+        game.combat.endBlockPhase(); game.combat.resolveDamagePhase();
 
         // Should take damage. Attack 6. Armor 2 (default).
         // 6 damage. 

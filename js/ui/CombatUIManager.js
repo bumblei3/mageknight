@@ -137,9 +137,14 @@ export class CombatUIManager {
             } else if (phase === COMBAT_PHASES.BLOCK) {
                 executeAttackBtn.textContent = 'Blocken beenden -> Schaden';
                 executeAttackBtn.style.display = 'block';
+            } else if (phase === COMBAT_PHASES.DAMAGE) {
+                executeAttackBtn.textContent = 'Schaden akzeptieren (Rest auf Held)';
+                executeAttackBtn.style.display = 'block';
+                executeAttackBtn.classList.add('damage-phase-btn'); // Optional styling hook
             } else if (phase === COMBAT_PHASES.ATTACK) {
                 executeAttackBtn.textContent = 'Angriff ausführen';
                 executeAttackBtn.style.display = 'block';
+                executeAttackBtn.classList.remove('damage-phase-btn');
             } else {
                 executeAttackBtn.style.display = 'none';
             }
@@ -297,22 +302,64 @@ export class CombatUIManager {
         title.textContent = '🎖️ Deine Einheiten';
         container.appendChild(title);
 
+        // Add Context Hint for Damage Phase
+        if (phase === COMBAT_PHASES.DAMAGE) {
+            const hint = document.createElement('div');
+            hint.className = 'damage-assignment-hint';
+            hint.innerHTML = '<small>Klicke auf eine Einheit, um Schaden zuzuweisen (Schützt den Helden).</small>';
+            hint.style.color = '#ef4444';
+            hint.style.marginBottom = '10px';
+            container.appendChild(hint);
+        }
+
         const grid = document.createElement('div');
         grid.className = 'combat-units-grid';
 
         units.forEach(unit => {
             const isReady = typeof unit.isReady === 'function' ? unit.isReady() : true;
+            let canAct = false;
+            let actionText = '';
+
+            // Logic for Phase Actions
+            if (phase === COMBAT_PHASES.BLOCK) {
+                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(a => a.type === ACTION_TYPES.BLOCK);
+                canAct = isReady && abilities.length > 0;
+                actionText = abilities.map(a => a.text).join(', ');
+            } else if (phase === COMBAT_PHASES.ATTACK) {
+                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(a => a.type === ACTION_TYPES.ATTACK);
+                canAct = isReady && abilities.length > 0;
+                actionText = abilities.map(a => a.text).join(', ');
+            } else if (phase === COMBAT_PHASES.RANGED) {
+                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(a => a.type === ACTION_TYPES.RANGED || a.type === ACTION_TYPES.SIEGE);
+                canAct = isReady && abilities.length > 0;
+                actionText = abilities.map(a => a.text).join(', ');
+            } else if (phase === COMBAT_PHASES.DAMAGE) {
+                // In Damage Phase, ANY Ready (or unwounded?) unit can potentially take damage
+                // But generally only Ready units can be assigned to "Defend/Intercept"?
+                // MK Rule: You can assign damage to a Unit. It becomes Wounded.
+                // Does it need to be Ready? usually yes to "block", but to "take damage" instead of hero?
+                // Rule: "You may assign damage to one of your units." -> "The unit must be ready?" No explicit "Ready" requirement for taking a wound, BUT:
+                // "If you assign damage to a Unit, place a Wound on it. It is not exhausted, just wounded." (Actually if it survives).
+                // "If a unit takes damage equal to armor -> Wounded."
+                // Wait, if it's not exhausted, can I use it later? A Wounded unit is generally useless.
+                // Let's assume ANY unit (even spent) can be meat shield?
+                // Checking Standard Rules: "Assigning Damage to a Unit: You can choose to assign damage to an unspent Unit." -> MUST BE UNSPENT (Ready).
+                // So: `isReady` is required.
+                canAct = isReady;
+                actionText = 'Schaden nehmen (-1 Wunde)';
+            }
+
             const unitCard = document.createElement('div');
-            unitCard.className = `unit-combat-card ${isReady ? '' : 'not-ready'}`;
+            // Visual style for damage assignment target: clearer indication
+            const extraClass = (phase === COMBAT_PHASES.DAMAGE && canAct) ? 'damage-target' : '';
+            unitCard.className = `unit-combat-card ${canAct ? '' : 'not-ready'} ${extraClass}`;
 
-            const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(a => {
-                if (phase === COMBAT_PHASES.BLOCK) return a.type === ACTION_TYPES.BLOCK;
-                if (phase === COMBAT_PHASES.ATTACK) return a.type === ACTION_TYPES.ATTACK;
-                if (phase === COMBAT_PHASES.RANGED) return a.type === ACTION_TYPES.RANGED || a.type === ACTION_TYPES.SIEGE;
-                return false;
-            });
-
-            const hasRelevantAbility = abilities.length > 0;
+            // Helper to get ability text if not set above (fallback)
+            if (!actionText && canAct && phase !== COMBAT_PHASES.DAMAGE) {
+                actionText = 'Aktion verfügbar';
+            } else if (!actionText) {
+                actionText = 'Keine Aktion';
+            }
 
             unitCard.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -320,21 +367,36 @@ export class CombatUIManager {
                         <span style="font-size: 1.2rem;">${unit.getIcon()}</span>
                         <strong>${unit.getName()}</strong>
                     </div>
-                    <div style="font-size: 0.85rem; color: ${hasRelevantAbility ? '#10b981' : '#6b7280'};">
-                        ${abilities.map(a => a.text).join(', ') || 'Keine passende Fähigkeit'}
+                    <div style="font-size: 0.85rem; color: ${canAct ? '#10b981' : '#6b7280'};">
+                        ${actionText}
                     </div>
                 </div>
             `;
 
-            if (isReady && hasRelevantAbility && onUnitActivate) {
-                unitCard.addEventListener('click', () => onUnitActivate(unit));
+            if (phase === COMBAT_PHASES.DAMAGE && canAct) {
+                // Style adjustment for damage phase
+                unitCard.style.borderColor = '#ef4444';
+                unitCard.querySelector('strong').style.color = '#ef4444';
+            }
+
+            if (canAct && onUnitActivate) {
+                unitCard.addEventListener('click', () => {
+                    // If Damage Phase, confirm assignment? Or just do it.
+                    // The Orchestrator handles the logic.
+                    onUnitActivate(unit);
+                });
+
+                // Hover Effects
+                const hoverColor = phase === COMBAT_PHASES.DAMAGE ? 'rgba(239, 68, 68, 0.2)' : 'rgba(139, 92, 246, 0.2)';
+                const hoverBorder = phase === COMBAT_PHASES.DAMAGE ? 'rgba(239, 68, 68, 0.6)' : 'rgba(139, 92, 246, 0.6)';
+
                 unitCard.addEventListener('mouseenter', () => {
-                    unitCard.style.background = 'rgba(139, 92, 246, 0.2)';
-                    unitCard.style.borderColor = 'rgba(139, 92, 246, 0.6)';
+                    unitCard.style.background = hoverColor;
+                    unitCard.style.borderColor = hoverBorder;
                 });
                 unitCard.addEventListener('mouseleave', () => {
-                    unitCard.style.background = 'rgba(139, 92, 246, 0.1)';
-                    unitCard.style.borderColor = 'rgba(139, 92, 246, 0.3)';
+                    unitCard.style.background = phase === COMBAT_PHASES.DAMAGE ? 'none' : 'rgba(139, 92, 246, 0.1)';
+                    unitCard.style.borderColor = phase === COMBAT_PHASES.DAMAGE ? '#ef4444' : 'rgba(139, 92, 246, 0.3)';
                 });
             }
 

@@ -80,7 +80,7 @@ describe('Combat Coverage Tests', () => {
             expect(blockResult.blocked).toBe(false);
 
             // End block phase -> take damage
-            const damageResult = combat.endBlockPhase();
+            const damageResult = combat.endBlockPhase(); combat.resolveDamagePhase();
 
             // 5 damage -> armor 2 -> 5 wounds? No, wounds = attack / armor?
             // Mage knight rules: damage 5 vs armor 2 takes 5 damage. 

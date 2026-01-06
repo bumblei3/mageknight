@@ -114,6 +114,7 @@ export default {
     // Combat
     combat: {
         started: 'Combat started!',
+        summoning: '{summoner} summons {summoned}!',
         victory: 'Enemy defeated!',
         wounded: 'You took wounds!',
         blocked: 'Attack blocked!',

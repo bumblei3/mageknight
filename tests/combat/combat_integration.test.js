@@ -26,7 +26,7 @@ describe('Combat Integration Tests', () => {
         console.log('Block result:', blockResult.message, 'Blocked:', blockResult.blocked);
 
         // End block phase
-        const damageResult = combat.endBlockPhase();
+        const damageResult = combat.endBlockPhase(); combat.resolveDamagePhase();
         console.log('Damage phase:', damageResult.message, 'Wounds:', damageResult.woundsReceived);
         expect(combat.phase).toBe(COMBAT_PHASE.ATTACK);
 
@@ -71,7 +71,7 @@ describe('Combat Integration Tests', () => {
 
         // Move through phases to attack
         combat.endRangedPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
         expect(combat.phase).toBe(COMBAT_PHASE.ATTACK);
 
         // Find attack card
@@ -119,7 +119,7 @@ describe('Combat Integration Tests', () => {
         console.log('Blocked enemy1:', blockResult.blocked);
 
         // End block - should take damage from enemy2
-        const damageResult = combat.endBlockPhase();
+        const damageResult = combat.endBlockPhase(); combat.resolveDamagePhase();
         console.log('Damage from unblocked enemies:', damageResult.totalDamage, 'wounds');
 
         // Attack both enemies
@@ -162,7 +162,7 @@ describe('Combat Integration Tests', () => {
         console.log('Attempted attack in block phase:', earlyAttack.error);
 
         // End block phase
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
         expect(combat.phase).toBe(COMBAT_PHASE.ATTACK);
         console.log('Phase 3: ATTACK');
 

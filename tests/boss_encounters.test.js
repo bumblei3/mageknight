@@ -150,7 +150,7 @@ describe('Combat with Bosses', () => {
     describe('Attack Phase', () => {
         it('should damage boss instead of defeating outright', () => {
             combat.endRangedPhase();
-            combat.endBlockPhase();
+            combat.endBlockPhase(); combat.resolveDamagePhase();
 
             const result = combat.attackEnemies(10, 'physical');
 
@@ -163,7 +163,7 @@ describe('Combat with Bosses', () => {
 
         it('should defeat boss when health reaches 0', () => {
             combat.endRangedPhase();
-            combat.endBlockPhase();
+            combat.endBlockPhase(); combat.resolveDamagePhase();
 
             // 10 armor * 1/0.5 multiplier = 20 attack required per health point? 
             // Wait, armor is 10, fame is 50. 
@@ -181,7 +181,7 @@ describe('Combat with Bosses', () => {
 
         it('should report phase transitions', () => {
             combat.endRangedPhase();
-            combat.endBlockPhase();
+            combat.endBlockPhase(); combat.resolveDamagePhase();
 
             // Deal 40 damage (40 * 0.5 = 20 effective damage, to 10/30 health = 33%)
             const result = combat.attackEnemies(40, 'physical');

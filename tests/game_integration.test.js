@@ -59,7 +59,7 @@ describe('Game Integration', () => {
         }
 
         // Skip block (take wound)
-        game.combat.endBlockPhase();
+        game.combat.endBlockPhase(); game.combat.resolveDamagePhase();
         expect(game.combat.phase).toBe('attack');
         expect(game.hero.wounds.length).toBeGreaterThan(0);
 

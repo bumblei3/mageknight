@@ -2,6 +2,7 @@ import { Combat } from '../combat.js';
 import { eventBus } from '../eventBus.js';
 import { GAME_EVENTS, COMBAT_PHASES } from '../constants.js';
 import { t } from '../i18n/index.js';
+import Enemy, { ENEMY_DEFINITIONS } from '../enemy.js';
 
 export class CombatOrchestrator {
     constructor(game) {
@@ -98,6 +99,81 @@ export class CombatOrchestrator {
         if (this.game.actionManager) this.game.actionManager.clearHistory();
 
         const result = this.game.combat.endBlockPhase();
+
+        // INTERACTIVE DAMAGE PHASE:
+        // If we are waiting for assignment, just update UI and waiting state
+        if (result.waitingForAssignment) {
+            this.game.addLog(result.message, 'info');
+            this.combatBlockTotal = 0;
+            this.activeBlocks = [];
+
+            // Show new phase UI
+            this.game.updatePhaseIndicator();
+            this.updateCombatInfo();
+            // Force render units to make them potentially clickable (handled by UI logic)
+            this.renderUnitsInCombat();
+            return;
+        }
+
+        // If not waiting (skipped or auto-resolved?), handle immediate results
+        this.handleDamageResults(result);
+
+        this.combatBlockTotal = 0;
+        this.activeBlocks = [];
+        this.renderUnitsInCombat();
+        this.game.updatePhaseIndicator();
+        this.game.updateStats();
+        this.updateCombatTotals();
+    }
+
+    /**
+     * Assigns damage to a unit interactively
+     */
+    assignDamageToUnit(unit) {
+        if (!this.game.combat) return;
+
+        const result = this.game.combat.assignDamageToUnit(unit);
+
+        if (result.success) {
+            this.game.addLog(result.message, 'warning');
+
+            // Visual feedback on Unit
+            // Need pixel position? Units in Combat don't have grid pos, they are UI elements.
+            // But we can trigger a generic "Unit Hit" sound/effect or shake the UI card.
+            // Ideally UI handles the visual, here we trigger game state updates.
+
+            if (result.unitDestroyed) {
+                this.game.particleSystem.triggerShake(5, 0.5); // Big shake for death
+            }
+
+            this.updateCombatInfo();
+            this.renderUnitsInCombat(); // Update unit status (wounded/destroyed)
+            this.game.updateStats();
+        } else {
+            this.game.addLog(result.message, 'error');
+        }
+    }
+
+    /**
+     * Resolves the damage phase (Player confirms "Take remaining damage on Hero")
+     */
+    resolveDamagePhase() {
+        if (!this.game.combat) return;
+
+        const result = this.game.combat.resolveDamagePhase();
+        if (result) {
+            this.handleDamageResults(result);
+            this.updateCombatInfo();
+            this.game.updateStats();
+            this.game.updatePhaseIndicator();
+            this.renderUnitsInCombat();
+        }
+    }
+
+    /**
+     * Helper to process damage results (visuals, logs)
+     */
+    handleDamageResults(result) {
         if (result.woundsReceived > 0) {
             const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
             this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
@@ -105,15 +181,10 @@ export class CombatOrchestrator {
             this.game.particleSystem.triggerShake(result.woundsReceived * 2, 0.4);
             this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y, result.woundsReceived, true);
 
-            // Elemental Effects based on enemy attack type
-            const attackType = this.game.combat.enemy.attackType;
-            if (attackType === 'fire') {
-                this.game.particleSystem.fireAttackEffect(heroPixel.x, heroPixel.y);
-            } else if (attackType === 'ice' || attackType === 'cold') {
-                this.game.particleSystem.iceAttackEffect(heroPixel.x, heroPixel.y);
-            } else if (attackType === 'lightning') {
-                this.game.particleSystem.lightningAttackEffect(heroPixel.x, heroPixel.y);
-            }
+            // Elemental Effects based on enemy attack type (generic for now as multiple enemies might attack)
+            // But we can check one unblocked enemy from list if available
+            // const attackType = this.game.combat.enemy.attackType; // Warning: 'enemy' might be blocked one.
+            // Better to use generic effect or iterate.
         }
 
         // Handle Paralyze discard effect
@@ -132,12 +203,6 @@ export class CombatOrchestrator {
         }
 
         this.game.addLog(result.message, 'combat');
-        this.combatBlockTotal = 0;
-        this.activeBlocks = [];
-        this.renderUnitsInCombat();
-        this.game.updatePhaseIndicator();
-        this.game.updateStats();
-        this.updateCombatTotals();
     }
 
     /**
@@ -153,6 +218,11 @@ export class CombatOrchestrator {
 
         if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
             this.endBlockPhase();
+            return;
+        }
+
+        if (this.game.combat.phase === COMBAT_PHASES.DAMAGE) {
+            this.resolveDamagePhase();
             return;
         }
 
@@ -209,7 +279,44 @@ export class CombatOrchestrator {
     initiateCombat(enemyOrEnemies) {
         if (this.game.gameState !== 'playing' || this.game.combat) return;
 
-        const enemies = Array.isArray(enemyOrEnemies) ? enemyOrEnemies : [enemyOrEnemies];
+        let enemies = Array.isArray(enemyOrEnemies) ? enemyOrEnemies : [enemyOrEnemies];
+
+        // INFO: Handle Summoning (Herbeirufen)
+        // Rule: Summoner is replaced by a random enemy token
+        const processedEnemies = enemies.map(enemy => {
+            if (enemy.summoner) {
+                // Determine summon pool (Brown tokens usually: Orcs, etc.)
+                // For simplicity, we pick from a curated list of "Brown-ish" enemies
+                const summonPool = ['orc', 'robber', 'wolf', 'boar', 'orc_summoner_minion']; // logical keys
+                // Filter keys that exist in ENEMY_DEFINITIONS
+                // const validPool = summonPool.filter(k => ENEMY_DEFINITIONS[k] || (k === 'orc' && ENEMY_DEFINITIONS['orc']));
+                // Fallback to Orc if pool empty or issues
+                let summonKey = 'orc';
+
+                // Better: Pick any random definition that is NOT a boss, city, or summoner
+                const candidates = Object.keys(ENEMY_DEFINITIONS).filter(k => {
+                    const def = ENEMY_DEFINITIONS[k];
+                    return !def.summoner && !def.fortified && k !== 'weakling'; // simple enemies
+                });
+
+                if (candidates.length > 0) {
+                    summonKey = candidates[Math.floor(Math.random() * candidates.length)];
+                }
+
+                const summonDef = ENEMY_DEFINITIONS[summonKey] || ENEMY_DEFINITIONS['orc'];
+                const summonedEnemy = new Enemy({
+                    ...summonDef,
+                    id: `summoned_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                });
+
+                this.game.addLog(t('combat.summoning', { summoner: enemy.name, summoned: summonedEnemy.name }), 'warning');
+                return summonedEnemy;
+            }
+            return enemy;
+        });
+
+        enemies = processedEnemies; // Update reference
+
         const names = enemies.map(e => e.name).join(' & ');
 
         this.game.addLog(t('combat.fightAgainst', { enemy: names }), 'combat');

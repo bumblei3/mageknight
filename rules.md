@@ -12,15 +12,15 @@ This document serves as a reference for the official game rules (based on *Mage 
 | **Physical Resistance** | *Physischer Widerstand* | Physical attacks are halved. | ✅ Implemented |
 | **Fire Resistance** | *Feuer-Widerstand* | Fire attacks are halved. | ✅ Implemented |
 | **Ice Resistance** | *Eis-Widerstand* | Ice attacks are halved. | ✅ Implemented |
-| **Summon** | *Herbeirufen* | Draws a brown enemy token to **replace** the summoner in Block/Damage phase. Discarded after. | ❌ **Missing** (Currently only Boss summons implemented) |
+| **Summon** | *Herbeirufen* | Draws a brown enemy token to **replace** the summoner in Block/Damage phase. Discarded after. | ✅ **Implemented** (Replaces Summoner with random token) |
 | **Swift** | *Flink* | Requires **2x Block** value. | ✅ Implemented `getBlockRequirement` |
 | **Brutal** | *Brutal* | Deals **2x Damage** if unblocked. | ✅ Implemented `getEffectiveAttack` |
 | **Poison** | *Giftig* | Wounded units/heroes take **2 Wounds** (one to hand, one to discard) or units destroyed. | ⚠️ **Partial** (Basic poison check exists, explicitly double wounding needs verification) |
-| **Vampirism** | *Vampirismus* | Armor increases by +1 per wound dealt. | ❌ **Incorrect** (Currently heals HP) |
-| **Paralyze** | *Versteinern* | Destroy wounded unit instantly. Hero must discard non-wound cards for wounds taken. | ❌ **Missing** |
-| **Cumbersome** | *Schwerfällig* | Can spend Movement Points to reduce attack value in Block phase. | ❌ **Missing** |
-| **Assassinate** | *Attentäter* | Damage **cannot** be assigned to Units. Must hit Hero. | ❌ **Missing** |
-| **Elusive** | *Ausweichend* | Higher base armor. Armor drops only in Attack phase AND if fully blocked. | ❌ **Incorrect** (Currently static armor) |
+| **Vampirism** | *Vampirismus* | Armor increases by +1 per wound dealt. | ✅ **Verified** (Correctly increases armor on wounds) |
+| **Paralyze** | *Versteinern* | Destroy wounded unit instantly. Hero must discard non-wound cards for wounds taken. | ✅ **Implemented** (Auto-discard logic active) |
+| **Cumbersome** | *Schwerfällig* | Can spend Movement Points to reduce attack value in Block phase. | ✅ **Implemented** (Smart Auto-Spend UI) |
+| **Assassinate** | *Attentäter* | Damage **cannot** be assigned to Units. Must hit Hero. | ⚠️ **Partial** (Effectively active due to missing Unit Assignment) |
+| **Elusive** | *Ausweichend* | Higher base armor. Armor drops only in Attack phase AND if fully blocked. | ✅ **Verified** (Correctly handles dynamic armor) |
 | **Fortified** | *Befestigt* | Immune to Ranged (unless Siege) in Ranged Phase. | ✅ Implemented |
 
 ## 2. Combat Rules
@@ -47,10 +47,10 @@ This document serves as a reference for the official game rules (based on *Mage 
 *   **Full Conquest (Vollständige Eroberung)**: Capture all cities.
 *   **Quick Start (Erste Erkundung)**: Simplified introductory scenario.
 
-### Planned / Missing
-*   **Mines Liberation (Freiheit den Bergwerken)**: Conquer mines.
-*   **Druid Nights (Druidennächte)**: Activate magical glades.
-*   **Dungeon Lords**: Conquer Dungeons and Tombs.
+### Planned
+*   **Mines Liberation (Freiheit den Bergwerken)**: Conquer mines. (Concept: Light/Darkness mechanics in mines)
+*   **Druid Nights (Druidennächte)**: Activate magical glades. (Concept: Summoning mechanics)
+*   **Dungeon Lords**: Conquer Dungeons, Tombs, and Ruins.
 
 ## 4. Map & Movement
 
@@ -63,8 +63,16 @@ This document serves as a reference for the official game rules (based on *Mage 
     *   *Monasteries*: Train Advanced Actions. (✅ Implemented)
     *   *Mage Towers*: Recruit Spells. (✅ Implemented)
     *   *Keeps*: Recruit Units. (✅ Implemented)
-    *   *Dungeons/Tombs/Ruins*: Adventure sites. (⚠️ Partial implementation)
+    *   *Dungeons/Tombs/Ruins*: Adventure sites. (⚠️ Partial implementation - Reward rules needed)
+    *   *Spawning Grounds*: Brutstätten. (❌ Missing)
+    *   *Mazes/Labyrinths*: (❌ Missing)
+
+## 5. UI/UX Suggestions (Planned)
+
+*   **Combat Log**: More detailed breakdown of resistances and block efficiency.
+*   **Interactive Tooltips**: Mouseover enemy icons for exact rules.
+*   **Undo**: Allow taking back actions within a phase if no new info was revealed.
 
 ---
 
-*Last Updated: 2026-01-02*
+*Last Updated: 2026-01-06*

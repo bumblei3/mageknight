@@ -65,7 +65,8 @@ describe('Core Stability Tests', () => {
             const combat = new Combat(hero, [enemy]);
             combat.phase = 'damage';
 
-            const result = combat.damagePhase();
+            combat.damagePhase();
+            const result = combat.resolveDamagePhase();
             // 5 damage / 1 armor (safety) = 5 wounds
             expect(result.woundsReceived).toBe(5);
         });
@@ -80,7 +81,8 @@ describe('Core Stability Tests', () => {
             const combat = new Combat(hero, [enemy]);
             combat.phase = 'damage';
 
-            const result = combat.damagePhase();
+            combat.damagePhase();
+            const result = combat.resolveDamagePhase();
             expect(result.woundsReceived).toBe(0);
         });
     });

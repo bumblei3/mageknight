@@ -88,7 +88,7 @@ describe('Integration - Complete Game Workflow', () => {
         const blockResult = game.combat.blockEnemy(enemy, 3);
         expect(blockResult.success).toBe(true);
 
-        game.combat.endBlockPhase();
+        game.combat.endBlockPhase(); game.combat.resolveDamagePhase();
         expect(game.combat.phase).toBe('attack');
 
         // Attack phase
@@ -253,7 +253,7 @@ describe('Integration - Combat Scenarios', () => {
         combat.blockEnemy(enemy1, 3);
         expect(combat.blockedEnemies.has(enemy1.id)).toBe(true);
 
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Should take damage from 2 unblocked enemies (attack 4 + 2 = 6)
         const expectedWounds = Math.ceil(6 / hero.armor);
@@ -301,7 +301,7 @@ describe('Integration - Combat Scenarios', () => {
         const combat = new Combat(hero, poisonEnemy);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase(); // No block
+        combat.endBlockPhase(); combat.resolveDamagePhase(); // No block
 
         // Should take damage + poison wound
         expect(combat.woundsReceived).toBeGreaterThan(Math.ceil(3 / hero.armor));
@@ -446,7 +446,7 @@ describe('Integration - Performance and Stress', () => {
 
             combat.start();
             combat.endRangedPhase();
-            combat.endBlockPhase();
+            combat.endBlockPhase(); combat.resolveDamagePhase();
             combat.attackEnemies(2, 'physical');
             combat.endCombat();
         }

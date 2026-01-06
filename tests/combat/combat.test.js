@@ -65,6 +65,7 @@ describe('Combat', () => {
 
         // Skip block
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
 
         // Damage phase: 5 damage / 2 armor = 2.5 -> 3 wounds
         expect(combat.woundsReceived).toBe(3);
@@ -89,6 +90,7 @@ describe('Combat', () => {
 
         // End block phase - only enemy2 should deal damage
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
 
         const expectedWounds = Math.ceil(4 / hero.armor); // 4 / 2 = 2
         expect(combat.woundsReceived).toBe(expectedWounds);
@@ -120,6 +122,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase(); // No block
+        combat.resolveDamagePhase();
 
         // Base wounds + Poison wounds (equal to base wounds) = 2 * base wounds
         const baseWounds = Math.ceil(3 / hero.armor); // 2
@@ -136,6 +139,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase(); // Deals damage
+        combat.resolveDamagePhase();
 
         // New Logic: Vampiric increases Armor, does NOT heal
         expect(vampireEnemy.currentHealth).toBe(3); // Should NOT heal
@@ -164,6 +168,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
 
         combat.unitAttackPoints = 3;
 
@@ -203,6 +208,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
         combat.attackEnemies(5); // Defeats both (3+2=5)
 
         const result = combat.endCombat();
@@ -219,6 +225,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
         // Attack only enemy1 by targeting it specifically
         combat.attackEnemies(2, 'physical', [enemy1]); // Only target enemy1
 
@@ -238,6 +245,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
         combat.attackEnemies(5); // Defeats both
 
         expect(hero.fame).toBe(initialFame + 12);
@@ -254,6 +262,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
 
         // Fire attack needs double (8) due to resistance
         const result1 = combat.attackEnemies(4, 'fire');
@@ -335,6 +344,7 @@ describe('Combat', () => {
         combat.start();
         combat.endRangedPhase();
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
 
         // 3 / 10 = 0.3 -> rounds up to 1 wound minimum
         expect(combat.woundsReceived).toBeGreaterThan(0);
@@ -355,6 +365,7 @@ describe('Combat', () => {
         expect(combat.phase).toBe(COMBAT_PHASE.BLOCK);
 
         combat.endBlockPhase();
+        combat.resolveDamagePhase();
         expect(combat.phase).toBe(COMBAT_PHASE.ATTACK);
 
         combat.attackEnemies(3); // Defeat enemy

@@ -34,6 +34,7 @@ describe('Advanced Enemy Abilities', () => {
 
         // Damage Phase: Vampire hits for 4 vs Armor 2 -> 2 Wounds
         combat.damagePhase();
+        combat.resolveDamagePhase();
 
         expect(vampire.armorBonus).toBe(2);
         expect(vampire.getCurrentArmor()).toBe(5);

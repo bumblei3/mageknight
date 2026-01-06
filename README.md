@@ -24,6 +24,17 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 2. Das Spiel startet automatisch
 3. Du beginnst mit 5 Handkarten und Goldyx auf Position (0,0)
 
+## 📚 Dokumentation & Updates
+
+### Aktuelle Updates
+- **[Graphics Upgrade](GRAPHICS_UPGRADE.md)**: Details zum neuen Premium-Look, 3D-Effekten und Animationen.
+- **[UI Improvements](UI_IMPROVEMENTS.md)**: Keyboard Shortcuts, neue Indikatoren und UX-Verbesserungen.
+
+### Regeln & Entwicklung
+- **[Regeln & Status](rules.md)**: Detaillierte Übersicht der implementierten Regeln, Feindfähigkeiten und fehlenden Features.
+- **[Test Guide](TEST_WRITING_GUIDE.md)**: Anleitung zum Schreiben von Tests für dieses Projekt.
+- **[Hilfe System](HELP_SYSTEM.md)**: Dokumentation des Hilfesystems.
+
 ## 📖 Spielanleitung
 
 ### Grundlagen
@@ -79,6 +90,8 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 - 🗡️ **Schwächling**: Rüstung 2, Angriff 1
 - 👹 **Ork**: Rüstung 3, Angriff 2
 - 🛡️ **Wächter**: Rüstung 4, Angriff 3 (befestigt)
+ 
+*(Siehe [rules.md](rules.md) für Details zu Feindfähigkeiten wie Vampirismus, Flink, etc.)*
 
 ### Mana-System
 
@@ -114,8 +127,6 @@ Das Spiel ist modular aufgebaut:
 - `js/terrain.js` - Terrain-Definitionen
 - `js/ui.js` - UI-Rendering und Interaktion
 - `js/particles.js` - Leistungsstarkes Partikelsystem
-- `js/tooltip.js` - Tooltip-Management
-- `js/soundManager.js` - Sound-Effekte und Musik
 - `js/skills.js` - Fähigkeiten-System
 - `js/tutorialManager.js` - Erweitertes Tutorial-System
 
@@ -126,55 +137,9 @@ Das Spiel ist modular aufgebaut:
 - **JavaScript ES6+** - Spiellogik mit Modulen
 - **Canvas API** - Hex-Grid-Rendering
 
-## 🎨 Features der Basis-Version
-
-✅ **Implementiert**:
-- Hex-basiertes Spielfeld mit verschiedenen Terraintypen
-- Held mit Starter-Deck und Deck-Management
-- Bewegungssystem mit Terrainkosten und Tag/Nacht-Zyklus
-- Kampfsystem (Block, Schaden, Angriff, Resistenzen)
-- Mana-Quelle mit Würfeln und Kristallen
-- Verletzungen, Heilung und Rasten
-- Ruhm-Tracking und Level-Aufstieg
-- Spielplan-Erkundung (neue Tiles aufdecken)
-- Städte, Burgen, Magiertürme und Klöster
-- Einheiten-Rekrutierung in Siedlungen
-- Interaktives Tutorial und Hilfesystem
-- Robustes Speichern/Laden via LocalStorage
-- Partikeleffekte für alle Aktionen
-- **Undo-System**: Züge rückgängig machen mit Strg+Z oder Button (außer bei neuen Informationen und im Kampf)
-
-❌ **Nicht in Basis-Version**:
-- Fern-/Belagerungsangriffe (teilweise)
-- Fortgeschrittene Aktionen/Zauber (teilweise)
-- Multiplayer
-- Verschiedene Szenarien
-
-## ✨ Neue UI-Features
-
-- **Erweiterte Tooltips**: Detaillierte Infos zu Stats, Mana und Phasen via `TooltipManager`.
-- **Visuelles Feedback**: "Floating Text" für sofortiges Feedback bei Stat-Änderungen.
-- **Karten-UX**: Visuelle Hinweise für Rechtsklick-Aktionen (seitlich spielen).
-- **Polished UI**: Verbessertes Design für Modals und Interaktionen.
-- **Tag/Nacht-Visuals**: Dynamische Beleuchtung am Spielfeldrand und ein **Sichtweiten-System** (Vision Radius 2) bei Nacht, das Felder um den Helden herum beleuchtet.
-- **Smooth Transitions**: Weiche Farbübergänge beim Wechsel der Tageszeit.
-
-## 🧪 Testing & Qualitätssicherung
+## 🧪 Testing
 
 Das Projekt verfügt über eine hochmoderne Test-Suite mit **944 Tests** und **94.67% Global Statement Coverage**.
-
-### Test-Methodologien
-- **Unit & Integration Tests**: Vollständige Abdeckung aller Kernkomponenten.
-- **Deterministic Testing**: Implementierter seeded PRNG für 100% reproduzierbare Testläufe (`test-mocks.js`).
-- **UI Synchronization**: Verifikation der Bindung zwischen Spielstatus und UI-Elementen (`ui_sync.test.js`).
-- **Chaos Testing**: Überprüfung der Daten-Resilienz gegen korrupte Speicherstände (`chaos.test.js`).
-- **Long Session & Resilience**: Stabilitätsprüfung über viele Züge hinweg und Resilienz gegen ungültige Daten.
-- **Visual Validation**: Überprüfung der Rendering-Integrität via Canvas-API-Snapshots.
-- **Process Isolation**: Jede Testdatei wird in einem eigenen Node.js-Prozess ausgeführt, um maximale Speicherstabilität (Vermeidung von OOM) und Test-Isolation zu garantieren.
-- **Performance Benchmarking**: Stress-Tests für massive Hex-Grids (1000+) und Partikel-Systeme (5000+).
-- **Mutation Verification**: Automatisierte Sanity-Checks zur Verifikation der Test-Robustheit.
-
-### Tests ausführen
 
 ```bash
 # Alle Tests ausführen
@@ -182,35 +147,7 @@ npm test
 
 # Tests mit Coverage
 npm run test:coverage
-
-# Coverage-Report öffnen
-open coverage/index.html  # macOS
-xdg-open coverage/index.html  # Linux
 ```
-
-Siehe [COVERAGE_ANALYSIS.md](COVERAGE_ANALYSIS.md) für detaillierte Informationen.
-
-### Browser-Kompatibilität
-
-- Chrome/Edge: ✅
-- Firefox: ✅
-- Safari: ✅
-- Benötigt ES6 Module-Unterstützung
-
-## 📝 Bekannte Einschränkungen
-
-- Mana-Verstärkung von Karten noch nicht voll implementiert
-- Einige Feind-Fähigkeiten sind vereinfacht
-- KI ist deterministisch
-
-## 🚧 Zukünftige Erweiterungen
-
-Mögliche Features für zukünftige Versionen:
-- Vollständiges Mana-System mit Verstärkung
-- Mehr Helden zur Auswahl
-- Level-System
-- Städte und Interaktion
-- Verschiedene Szenarien
 
 ## 📜 Lizenz
 

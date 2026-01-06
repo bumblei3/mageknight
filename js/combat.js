@@ -1,6 +1,6 @@
 import { StatusEffectManager } from './statusEffects.js';
 // Enemy types imported as needed
-import { COMBAT_PHASES, ENEMY_DEFINITIONS, ACTION_TYPES } from './constants.js';
+import { COMBAT_PHASES } from './constants.js';
 import { logger } from './logger.js';
 import { t } from './i18n/index.js';
 import { BlockingEngine } from './combat/BlockingEngine.js';
@@ -170,12 +170,51 @@ export class Combat {
         }
 
         // Identify unblocked enemies
-        const unblockedEnemies = this.enemies.filter(e => !this.blockedEnemies.has(e.id));
+        // We filter out fully blocked enemies.
+        // Note: this.blockedEnemies contains IDs.
+        this.unblockedEnemies = this.enemies.filter(e => !this.blockedEnemies.has(e.id));
+
+        // If no unblocked enemies, skip to Attack
+        if (this.unblockedEnemies.length === 0) {
+            this.phase = COMBAT_PHASES.ATTACK;
+            return {
+                totalDamage: 0,
+                woundsReceived: 0,
+                unblockedEnemies: [],
+                message: t('combat.damageSkipped'),
+                nextPhase: COMBAT_PHASES.ATTACK
+            };
+        }
+
+        // Calculate potential total damage (for display)
+        this.totalDamage = this.unblockedEnemies.reduce((sum, e) => sum + e.getEffectiveAttack(), 0);
+
+        // We STAY in DAMAGE phase.
+        // We DO NOT auto-apply damage yet.
+        // The user must click "Continue/Confirm" to apply 'remaining' damage to Hero.
+
+        return {
+            totalDamage: this.totalDamage,
+            unblockedEnemies: this.unblockedEnemies,
+            message: t('combat.assignDamage'),
+            nextPhase: COMBAT_PHASES.DAMAGE, // Explicitly stay
+            waitingForAssignment: true
+        };
+    }
+
+    // Resolves the Damage Phase (applies remaining damage to hero)
+    resolveDamagePhase() {
+        if (this.phase !== COMBAT_PHASES.DAMAGE) return;
+
+        // Calculate wounds from REMAINING unblocked enemies (or partially blocked if we had partials, but we don't yet)
+        // Actually, assignDamageToUnit should have REMOVED enemies from this.unblockedEnemies or marked them as 'handled'.
+
+        const activeUnblocked = this.unblockedEnemies.filter(e => !e.damageAssigned);
 
         // Calculate wounds
-        const result = this.damageSystem.calculateDamage(this.hero, unblockedEnemies);
+        const result = this.damageSystem.calculateDamage(this.hero, activeUnblocked);
 
-        this.totalDamage = result.totalDamage;
+        this.totalDamage = result.totalDamage; // Updated total
         this.woundsReceived = result.woundsReceived;
         this.paralyzeTriggered = result.paralyzeTriggered;
 
@@ -184,7 +223,6 @@ export class Combat {
         return {
             totalDamage: this.totalDamage,
             woundsReceived: this.woundsReceived,
-            unblockedEnemies,
             paralyzeTriggered: this.paralyzeTriggered,
             message: result.message,
             nextPhase: COMBAT_PHASES.ATTACK
@@ -192,12 +230,49 @@ export class Combat {
     }
 
     // Assign damage to a unit from an enemy
-    assignDamageToUnit(unit, enemy) {
+    assignDamageToUnit(unit, enemyId = null) {
         if (this.phase !== COMBAT_PHASES.DAMAGE) {
             return { success: false, message: t('combat.phaseDamageOnly') };
         }
 
-        return this.damageSystem.assignDamageToUnit(unit, enemy);
+        // Find candidate enemy
+        // If enemyId provided, use that. Else pick 'best' one (highest damage non-assassin?)
+        let enemy = null;
+        if (enemyId) {
+            enemy = this.unblockedEnemies.find(e => e.id === enemyId);
+        } else {
+            // Auto-pick: First non-assassin that hasn't acted
+            enemy = this.unblockedEnemies.find(e => !e.damageAssigned && !e.assassin);
+        }
+
+        if (!enemy) {
+            if (this.unblockedEnemies.some(e => e.assassin && !e.damageAssigned)) {
+                return { success: false, message: t('combat.assassinateRestriction', { enemy: 'Assassin' }) };
+            }
+            return { success: false, message: t('combat.noEnemyToAssign') };
+        }
+
+        if (enemy.damageAssigned) {
+            return { success: false, message: t('combat.alreadyAssigned') };
+        }
+
+        // Unit Validation
+        if (unit.wounds > 0 && !unit.isResistantTo(enemy.attackType)) {
+            // Wounded units usually can't take another wound unless Resistant?
+            // MK Rule: Wounded unit takes wound -> Destroyed.
+            // We allow it, logic handles destruction.
+        }
+
+        const result = this.damageSystem.assignDamageToUnit(unit, enemy);
+
+        if (result.success) {
+            enemy.damageAssigned = true; // Mark enemy as handled
+            // Recalculate pending totals for UI
+            this.totalDamage -= enemy.getEffectiveAttack();
+            return { success: true, message: t('combat.damageAssignedTo', { unit: unit.getName(), enemy: enemy.name }), unitDestroyed: result.unitDestroyed };
+        } else {
+            return result;
+        }
     }
 
     /**

@@ -71,7 +71,7 @@ describe('Combat System', () => {
         it('should transition BLOCK -> DAMAGE', () => {
             combat.start();
             combat.endRangedPhase();
-            combat.endBlockPhase();
+            combat.endBlockPhase(); combat.resolveDamagePhase();
             expect(combat.phase).toBe(COMBAT_PHASE.ATTACK); // damagePhase returns nextPhase: ATTACK
         });
     });
@@ -160,7 +160,8 @@ describe('Combat System', () => {
 
         it('should calculate damage from unblocked enemies', () => {
             // No block
-            const result = combat.endBlockPhase(); // Triggers damagePhase
+            combat.endBlockPhase();
+            const result = combat.resolveDamagePhase();
 
             // Enemy attack 3, Hero Armor 3. 3/3 = 1 wound.
             expect(result.woundsReceived).toBe(1);
@@ -169,9 +170,10 @@ describe('Combat System', () => {
 
         it('should take no damage if blocked', () => {
             combat.blockEnemy(mockEnemy, 3);
-            const result = combat.endBlockPhase();
+            combat.endBlockPhase();
+            const result = combat.resolveDamagePhase();
 
-            expect(result.woundsReceived).toBe(0);
+            expect(combat.woundsReceived).toBe(0);
         });
     });
 
@@ -179,7 +181,7 @@ describe('Combat System', () => {
         beforeEach(() => {
             combat.start();
             combat.endRangedPhase();
-            combat.endBlockPhase(); // Transition to ATTACK
+            combat.endBlockPhase(); combat.resolveDamagePhase(); // Transition to ATTACK
         });
 
         it('should attack enemies', () => {

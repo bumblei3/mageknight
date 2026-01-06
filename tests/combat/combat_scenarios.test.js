@@ -27,7 +27,7 @@ describe('Combat Scenarios', () => {
         combat.blockEnemy(enemies[1], 2);
         combat.blockEnemy(enemies[2], 2);
 
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         expect(combat.woundsReceived).toBe(0);
 
@@ -55,7 +55,7 @@ describe('Combat Scenarios', () => {
         const combat = new Combat(hero, tank);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase(); // Take the hit (3 damage -> 2 wounds if armor 2)
+        combat.endBlockPhase(); combat.resolveDamagePhase(); // Take the hit (3 damage -> 2 wounds if armor 2)
 
         // Attack: Fortified means ranged/siege attacks are halved? 
         // Or just high armor? In standard MK, Fortified doubles armor vs Ranged.
@@ -88,7 +88,7 @@ describe('Combat Scenarios', () => {
         const blockResult = combat.blockEnemy(assassin, 4);
         expect(blockResult.blocked).toBe(false);
 
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Damage: 4 attack. Hero armor 2.
         // Normal: 4/2 = 2 wounds.
@@ -122,7 +122,7 @@ describe('Combat Scenarios', () => {
         const combat = new Combat(hero, [fireElemental, iceElemental]);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Attack Fire Elemental with Fire (Resistant)
         // Need 4 damage. Multiplier 0.5 -> Effective 2. Fail.
@@ -145,7 +145,7 @@ describe('Combat Scenarios', () => {
         const combat = new Combat(hero, enemy);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Attack with 0 damage
         const result = combat.attackEnemies(0);
@@ -160,7 +160,7 @@ describe('Combat Scenarios', () => {
         const combat = new Combat(hero, enemy);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Attack with excessive damage
         const result = combat.attackEnemies(9999);
@@ -187,7 +187,7 @@ describe('Combat Scenarios', () => {
         const blockResult = combat.blockEnemy(enemy, 5);
         expect(blockResult.blocked).toBe(false);
 
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Should receive extra wound from poison
         expect(combat.woundsReceived).toBeGreaterThan(1);
@@ -201,7 +201,7 @@ describe('Combat Scenarios', () => {
         // Or if no enemies, endCombat might be called immediately?
         // Let's check combat.start logic for empty array. It sets phase to RANGED.
         combat.endRangedPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         const result = combat.endCombat();
         expect(result.victory).toBe(true);
@@ -215,7 +215,7 @@ describe('Combat Scenarios', () => {
         const combat = new Combat(hero, enemy);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Attack with exactly the armor value
         const result = combat.attackEnemies(5);
@@ -230,7 +230,7 @@ describe('Combat Scenarios', () => {
         const combat = new Combat(hero, enemy);
         combat.start();
         combat.endRangedPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Attack with armor - 1
         const result = combat.attackEnemies(4);

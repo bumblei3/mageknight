@@ -40,7 +40,7 @@ describe('Combat Robustness & Edge Cases', () => {
 
         // Block phase
         combat.blockPhase();
-        combat.endBlockPhase(); // Take damage
+        combat.endBlockPhase(); combat.resolveDamagePhase(); // Take damage
 
         // Attack Phase
         combat.attackPhase();
@@ -98,7 +98,7 @@ describe('Combat Robustness & Edge Cases', () => {
 
         // Block Phase - No block
         combat.blockPhase();
-        combat.endBlockPhase();
+        combat.endBlockPhase(); combat.resolveDamagePhase();
 
         // Damage Phase executed in endBlockPhase
         const stats = hero.getStats();

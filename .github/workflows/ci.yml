@@ -46,6 +46,7 @@ jobs:
           path: coverage/
           retention-days: 7
 
+
       - name: Upload to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -76,10 +77,35 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: './lighthouserc.js'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, lighthouse]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     environment:
       name: github-pages
@@ -102,39 +128,11 @@ jobs:
       - name: Install Build Tools
         run: npm ci
 
-      - name: Prepare production build
+      - name: Build
+        run: npm run build
+          
+      - name: List deployed files for verification
         run: |
-          mkdir -p dist
-          # Core HTML and config
-          cp index.html dist/
-          cp manifest.json dist/
-          cp sw.js dist/
-          cp favicon.png dist/
-          
-          # All CSS files (root level and css/ folder)
-          cp combat-effects.css dist/
-          cp mobile.css dist/
-          cp styles-events.css dist/
-          cp time-effects.css dist/
-          cp -r css dist/
-          
-          # JavaScript (includes vendor dependencies)
-          cp -r js dist/
-          
-          # Icons for PWA
-          cp -r icons dist/ || true
-
-      - name: Minify assets
-        run: |
-          # Minify CSS
-          find dist -name "*.css" -exec npx cleancss -o {} {} \;
-          
-          # Minify JS (ES Modules)
-          # We skip vendor files if already minified, but here we just do all for simplicity
-          # Terser handles ES modules with --module
-          find dist/js -name "*.js" -exec npx terser {} --module -o {} \;
-          
-          # List deployed files for verification
           echo "=== Deployed files ==="
           find dist -type f | head -50
           

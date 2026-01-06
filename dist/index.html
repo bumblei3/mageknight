@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title data-i18n="game.title">Mage Knight - Base Game</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/tutorial.css">
+    <link rel="stylesheet" href="css/effects.css">
+    <link rel="stylesheet" href="styles-events.css">
+    <link rel="stylesheet" href="combat-effects.css">
+    <link rel="stylesheet" href="time-effects.css">
+    <link rel="stylesheet" href="css/tooltips.css">
+    <link rel="stylesheet" href="css/rewards.css">
+    <link rel="stylesheet" href="mobile.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="css/loading.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#a855f7">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./js/vendor/three.module.js",
+                "three/addons/": "./js/vendor/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    </head>
+
+    <body>
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-particles">
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+                <div class="loading-particle"></div>
+            </div>
+            <div class="loading-logo">Mage Knight</div>
+            <div class="loading-spinner-container">
+                <div class="loading-ring"></div>
+                <div class="loading-ring"></div>
+                <div class="loading-ring"></div>
+                <div class="loading-icon">⚔️</div>
+            </div>
+            <div class="loading-progress-container">
+                <div id="loading-progress" class="loading-progress-bar"></div>
+            </div>
+            <div id="loading-status" class="loading-status">Initialisiere...</div>
+            <div class="loading-tip"><strong>Tipp:</strong> Rechtsklick auf Karten spielt sie seitlich für +1 Effekt.
+            </div>
+        </div>
+
+        <div class="game-container" id="game-container">
+            <!-- Persistent Background Ambiance -->
+            <div class="background-aura"></div>
+            <div class="background-particles"></div>
+
+            <!-- Header -->
+            <!-- Immersive Background Canvas -->
+            <div class="canvas-layer">
+                <canvas id="game-board" width="1600" height="1200"></canvas>
+            </div>
+            <!-- 3D Layer -->
+            <div id="game-container-3d"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5;">
+            </div>
+
+            <!-- HUD Layer (Overlay) -->
+            <div class="hud-layer">
+                <!-- Top Bar -->
+                <header class="hud-top-bar">
+                    <div class="header-left">
+                        <div class="game-logo" data-i18n="game.title">Mage Knight</div>
+                        <div class="time-indicator-container">
+                            <span id="time-icon" class="time-icon">☀️</span>
+                            <span class="round-display"><span data-i18n="ui.labels.round">Runde</span> <span
+                                    id="round-number" class="round-number">1</span></span>
+                        </div>
+                    </div>
+                    <div class="header-center">
+                        <!-- Global Status / Messages could go here -->
+                    </div>
+                    <div class="header-right">
+                        <div class="stat-pill">
+                            <span class="stat-label" data-i18n="ui.labels.fame">Ruhm</span>
+                            <span class="stat-value" id="fame-value">0</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="stat-label" data-i18n="ui.labels.reputation">Ansehen</span>
+                            <span class="stat-value" id="reputation-value">0</span>
+                        </div>
+                        <div class="header-controls">
+                            <button class="btn-icon" id="toggle-3d-btn" title="3D Ansicht umschalten">🎲</button>
+                            <button class="btn-icon" id="language-btn" title="Sprache wechseln"
+                                data-i18n-title="ui.buttons.settings">🌐</button>
+                            <button class="btn-icon" id="new-game-btn" title="Neues Spiel"
+                                data-i18n-title="ui.buttons.newGame">🔄</button>
+                            <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)"
+                                data-i18n-title="ui.buttons.save">💾</button>
+                            <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)"
+                                data-i18n-title="ui.buttons.load">📂</button>
+                            <button class="btn-icon" id="undo-btn" title="Rückgängig (Ctrl+Z)">↩️</button>
+                            <button class="btn-help" id="help-btn" title="Hilfe anzeigen">❓</button>
+                            <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen">🏆</button>
+                            <button class="btn-icon" id="statistics-btn" title="Statistiken anzeigen">📊</button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Left HUD (Hero & Actions) -->
+                <aside class="hud-sidebar hud-left">
+                    <div class="panel hero-panel collapsed-check">
+                        <div class="panel-header">
+                            <h2 data-i18n="ui.labels.hero">Held</h2>
+                            <button class="panel-toggle">_</button>
+                        </div>
+                        <div class="hero-info">
+                            <div class="hero-avatar">🧙</div>
+                            <div class="hero-details">
+                                <div class="hero-name" id="hero-name">Goldyx</div>
+                                <div class="hero-stats-grid">
+                                    <div class="stat-item" title="Rüstung">🛡️ <span id="hero-armor">2</span></div>
+                                    <div class="stat-item" title="Handlimit">🎴 <span id="hero-handlimit">5</span></div>
+                                    <div class="stat-item" title="Verletzungen">💔 <span id="hero-wounds">0</span></div>
+                                </div>
+                                <div id="skill-list" class="skill-list-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel action-panel">
+                        <h2 data-i18n="ui.labels.actions">Aktionen</h2>
+                        <div class="action-grid">
+                            <button class="btn btn-primary" id="end-turn-btn" data-i18n="ui.buttons.endTurn">Zug
+                                beenden</button>
+                            <button class="btn btn-secondary" id="rest-btn" data-i18n="ui.buttons.rest">Rasten</button>
+                            <button class="btn btn-secondary" id="explore-btn" disabled
+                                data-i18n="ui.buttons.explore">Erkunden</button>
+                            <button class="btn btn-success" id="heal-btn" style="display: none;"
+                                data-i18n="ui.buttons.heal">Heilen</button>
+                            <button class="btn btn-primary" id="visit-btn" style="display: none;">Besuchen</button>
+                        </div>
+                    </div>
+
+                    <div class="panel movement-panel">
+                        <div class="movement-display">
+                            <span class="stat-icon">👣</span>
+                            <span class="stat-value" id="movement-points">0</span>
+                        </div>
+                        <div id="movement-preview" class="movement-preview" style="display: none;">
+                            <span class="preview-label">Kosten:</span>
+                            <span class="preview-value" id="movement-preview-value">0</span>
+                        </div>
+                    </div>
+
+                    <div class="panel units-panel">
+                        <h2 data-i18n="ui.labels.units">Einheiten</h2>
+                        <div class="units-container" id="hero-units"></div>
+                    </div>
+                </aside>
+
+                <!-- Right HUD (Log, Mana, Combat) -->
+                <aside class="hud-sidebar hud-right">
+                    <div class="panel phase-panel">
+                        <div class="phase-indicator" id="phase-indicator">
+                            <div class="phase-text">Erkundung</div>
+                            <div class="phase-hint" id="phase-hint">Spiele Karten...</div>
+                        </div>
+                    </div>
+
+                    <div class="panel mana-panel">
+                        <h2 data-i18n="ui.labels.manaSource">Mana-Quelle</h2>
+                        <div class="mana-dice" id="mana-source"></div>
+                    </div>
+
+                    <div class="panel combat-panel" id="combat-panel" style="display: none;">
+                        <h2 data-i18n="ui.phases.combat">Kampf</h2>
+                        <div class="combat-info" id="combat-info"></div>
+                        <div class="combat-units" id="combat-units"></div>
+                        <button class="btn btn-primary" id="execute-attack-btn" style="display: none;">⚔️
+                            Angriff</button>
+                    </div>
+
+                    <div class="panel log-panel minimized">
+                        <h2 data-i18n="ui.labels.log">Protokoll</h2>
+                        <div class="game-log" id="game-log">
+                            <div class="log-entry">Willkommen bei Mage Knight!</div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Bottom Dock (Cards) -->
+                <div class="bottom-dock">
+                    <div id="play-area" class="play-area" style="display: none;">
+                        <h3>Gespielt</h3>
+                        <div id="played-cards" class="played-cards-container"></div>
+                    </div>
+                    <div id="hand-cards" class="hand-cards-container"></div>
+                </div>
+            </div>
+
+            <!-- Keyboard Shortcuts Info -->
+            <div class="shortcuts-bar" id="shortcuts-bar">
+                <div class="shortcut-item">
+                    <kbd>1-5</kbd> Karten spielen
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Space</kbd> Zug beenden
+                </div>
+                <div class="shortcut-item">
+                    <kbd>R</kbd> Rasten
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl+S</kbd> Speichern
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Ctrl+L</kbd> Laden
+                </div>
+                <div class="shortcut-item">
+                    <kbd>T</kbd> Tutorial
+                </div>
+                <div class="shortcut-item">
+                    <kbd>H</kbd> Hilfe
+                </div>
+                <div class="shortcut-item">
+                    <kbd>Esc</kbd> Abbrechen
+                </div>
+            </div>
+
+            <!-- Hand Cards Area with integrated Play Area -->
+        </div>
+
+        <!-- Modal for card details -->
+        <div class="modal" id="card-modal">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <div id="modal-card-details"></div>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div class="modal" id="help-modal">
+            <div class="modal-content help-modal-content">
+                <span class="modal-close" id="help-close">&times;</span>
+                <h2>🗡️ Mage Knight Hilfe</h2>
+
+                <div class="help-tabs">
+                    <button class="help-tab active" data-tab="basics">Grundlagen</button>
+                    <button class="help-tab" data-tab="cards">Karten</button>
+                    <button class="help-tab" data-tab="movement">Bewegung</button>
+                    <button class="help-tab" data-tab="combat">Kampf</button>
+                    <button class="help-tab" data-tab="terrain">Terrain</button>
+                </div>
+
+                <div class="help-content">
+                    <!-- Basics Tab -->
+                    <div class="help-tab-content active" id="help-basics">
+                        <h3>Spielziel</h3>
+                        <p>Besiege alle Feinde auf der Karte, um zu gewinnen!</p>
+
+                        <h3>Spielablauf</h3>
+                        <ol>
+                            <li><strong>Karten spielen</strong> - Klicke auf Karten in deiner Hand</li>
+                            <li><strong>Bewegen</strong> - Klicke auf Hex-Felder um dich zu bewegen</li>
+                            <li><strong>Kämpfen</strong> - Betritt Felder mit Feinden</li>
+                            <li><strong>Zug beenden</strong> - Klicke "Zug beenden" für neue Karten</li>
+                        </ol>
+
+                        <h3>Wichtige Tastenbelegung</h3>
+                        <ul>
+                            <li><strong>Linksklick auf Karte</strong> - Spielt Basis-Wirkung</li>
+                            <li><strong>Rechtsklick auf Karte</strong> - Spielt Karte seitlich (+1)</li>
+                            <li><strong>Klick auf Hex</strong> - Bewegt Held oder wählt Feld aus</li>
+                            <li><strong>Strg+Z / ↩️ Button</strong> - Letzte Aktion rückgängig machen</li>
+                        </ul>
+
+                        <h3>Held Stats</h3>
+                        <ul>
+                            <li><strong>🛡️ Rüstung</strong> - Reduziert erhaltenen Schaden</li>
+                            <li><strong>🎴 Handlimit</strong> - Max. Karten auf der Hand</li>
+                            <li><strong>💔 Verletzungen</strong> - Blockieren Kartenslots</li>
+                            <li><strong>⭐ Ruhm</strong> - Punkte für besiegte Feinde</li>
+                            <li><strong>💬 Ansehen</strong> - Beeinflusst Interaktionen</li>
+                        </ul>
+                    </div>
+
+                    <!-- Cards Tab -->
+                    <div class="help-tab-content" id="help-cards">
+                        <h3>Kartentypen</h3>
+                        <div class="help-card-types">
+                            <div class="help-card-type">
+                                <span class="help-icon" style="color: #10b981;">🌿</span>
+                                <strong>Grüne Karten</strong>
+                                <p>Bewegungskarten - Geben Bewegungspunkte</p>
+                            </div>
+                            <div class="help-card-type">
+                                <span class="help-icon" style="color: #ef4444;">⚔️</span>
+                                <strong>Rote Karten</strong>
+                                <p>Angriffskarten - Fügen Feinden Schaden zu</p>
+                            </div>
+                            <div class="help-card-type">
+                                <span class="help-icon" style="color: #3b82f6;">🛡️</span>
+                                <strong>Blaue Karten</strong>
+                                <p>Block-Karten - Blocken Feindangriffe</p>
+                            </div>
+                            <div class="help-card-type">
+                                <span class="help-icon" style="color: #f3f4f6;">💬</span>
+                                <strong>Weiße Karten</strong>
+                                <p>Einfluss/Heilung - Für Interaktionen</p>
+                            </div>
+                        </div>
+
+                        <h3>Kartenwirkungen</h3>
+                        <ul>
+                            <li><strong>Basic</strong> - Grundwirkung ohne Mana</li>
+                            <li><strong>Strong</strong> - Verstärkte Wirkung mit Mana (in Entwicklung)</li>
+                            <li><strong>Seitlich spielen</strong> - Jede Karte kann für +1
+                                Bewegung/Angriff/Block/Einfluss
+                                gespielt werden</li>
+                        </ul>
+
+                        <h3>Kartenverwaltung</h3>
+                        <p>Am Ende deines Zugs:</p>
+                        <ul>
+                            <li>Gespielte Karten → Ablage</li>
+                            <li>Ziehe neue Karten bis Handlimit</li>
+                            <li>Wenn Deck leer: Ablage wird gemischt</li>
+                        </ul>
+                    </div>
+
+                    <!-- Movement Tab -->
+                    <div class="help-tab-content" id="help-movement">
+                        <h3>Bewegung Schritt für Schritt</h3>
+                        <ol>
+                            <li>Spiele eine oder mehrere <strong>grüne Bewegungskarten</strong></li>
+                            <li>Bewegungspunkte werden addiert (oben links im Panel)</li>
+                            <li>Erreichbare Felder werden <strong>violett hervorgehoben</strong></li>
+                            <li>Klicke auf ein hervorgehobenes Feld</li>
+                            <li>Dein Held bewegt sich dorthin</li>
+                            <li>Bewegungskosten werden abgezogen</li>
+                        </ol>
+
+                        <h3>Bewegungskosten</h3>
+                        <p>Jedes Terrain hat unterschiedliche Kosten:</p>
+                        <ul>
+                            <li>🌾 <strong>Ebenen</strong> - 2 Punkte</li>
+                            <li>🌲 <strong>Wald</strong> - 3 Punkte</li>
+                            <li>⛰️ <strong>Hügel</strong> - 3 Punkte</li>
+                            <li>🏔️ <strong>Berge</strong> - 5 Punkte</li>
+                            <li>🏜️ <strong>Wüste</strong> - 3 Punkte</li>
+                            <li>☠️ <strong>Ödland</strong> - 3 Punkte</li>
+                            <li>💧 <strong>Wasser</strong> - Unpassierbar</li>
+                        </ul>
+
+                        <h3>Tipps</h3>
+                        <ul>
+                            <li>Plane deine Route vorher durch</li>
+                            <li>Ebenen sind am günstigsten</li>
+                            <li>Vermeide Berge wenn möglich</li>
+                            <li>Du kannst mehrere Bewegungskarten kombinieren</li>
+                        </ul>
+                    </div>
+
+                    <!-- Combat Tab -->
+                    <div class="help-tab-content" id="help-combat">
+                        <h3>Kampf starten</h3>
+                        <p>Ein Kampf beginnt automatisch, wenn du ein Feld mit einem Feind betrittst.</p>
+
+                        <h3>Kampfphasen</h3>
+                        <div class="combat-phases">
+                            <div class="combat-phase">
+                                <strong>1️⃣ Block-Phase</strong>
+                                <ul>
+                                    <li>Spiele <strong>blaue Block-Karten</strong></li>
+                                    <li>Blocke den Feind-Angriff vollständig</li>
+                                    <li>Block ≥ Feind-Angriff → Feind geblockt</li>
+                                    <li>Klicke "Zug beenden" für nächste Phase</li>
+                                </ul>
+                            </div>
+                            <div class="combat-phase">
+                                <strong>2️⃣ Schadens-Phase</strong>
+                                <ul>
+                                    <li>Ungeblockte Feinde fügen Schaden zu</li>
+                                    <li>Schaden / Deine Rüstung = Verletzungen (aufgerundet)</li>
+                                    <li>Verletzungen kommen auf deine Hand</li>
+                                    <li>Phase läuft automatisch ab</li>
+                                </ul>
+                            </div>
+                            <div class="combat-phase">
+                                <strong>3️⃣ Angriffs-Phase</strong>
+                                <ul>
+                                    <li>Spiele <strong>rote Angriffs-Karten</strong></li>
+                                    <li>Angriff ≥ Feind-Rüstung → Feind besiegt</li>
+                                    <li>Erhalte Ruhm für besiegte Feinde</li>
+                                    <li>Kampf endet automatisch</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Feind-Stats</h3>
+                        <ul>
+                            <li><strong>🛡️ Rüstung</strong> - Muss überwunden werden</li>
+                            <li><strong>⚔️ Angriff</strong> - Schaden den der Feind zufügt</li>
+                            <li><strong>⭐ Ruhm</strong> - Belohnung für Sieg</li>
+                        </ul>
+
+                        <h3>Kampf-Tipps</h3>
+                        <ul>
+                            <li>Blocke starke Gegner wenn möglich</li>
+                            <li>Spare Angriffskarten für schwere Feinde auf</li>
+                            <li>Kombiniere mehrere Karten für große Wirkungen</li>
+                            <li>Verletzungen können nur durch Rasten/Heilung entfernt werden</li>
+                        </ul>
+                    </div>
+
+                    <!-- Terrain Tab -->
+                    <div class="help-tab-content" id="help-terrain">
+                        <h3>Terrain-Typen</h3>
+
+                        <div class="terrain-list">
+                            <div class="terrain-item">
+                                <span class="terrain-icon">🌾</span>
+                                <div>
+                                    <strong>Ebenen</strong>
+                                    <p>Kosten: 2 | Offenes Grasland, leicht zu durchqueren</p>
+                                </div>
+                            </div>
+
+                            <div class="terrain-item">
+                                <span class="terrain-icon">🌲</span>
+                                <div>
+                                    <strong>Wald</strong>
+                                    <p>Kosten: 3 | Dichter Wald, erschwert Bewegung</p>
+                                </div>
+                            </div>
+
+                            <div class="terrain-item">
+                                <span class="terrain-icon">⛰️</span>
+                                <div>
+                                    <strong>Hügel</strong>
+                                    <p>Kosten: 3 | Hügeliges Gelände</p>
+                                </div>
+                            </div>
+
+                            <div class="terrain-item">
+                                <span class="terrain-icon">🏔️</span>
+                                <div>
+                                    <strong>Berge</strong>
+                                    <p>Kosten: 5 | Hohe Berge, sehr schwer zu passieren</p>
+                                </div>
+                            </div>
+
+                            <div class="terrain-item">
+                                <span class="terrain-icon">🏜️</span>
+                                <div>
+                                    <strong>Wüste</strong>
+                                    <p>Kosten: 3 | Trockene Wüste</p>
+                                </div>
+                            </div>
+
+                            <div class="terrain-item">
+                                <span class="terrain-icon">☠️</span>
+                                <div>
+                                    <strong>Ödland</strong>
+                                    <p>Kosten: 3 | Verfluchtes, unwirtliches Land</p>
+                                </div>
+                            </div>
+
+                            <div class="terrain-item">
+                                <span class="terrain-icon">💧</span>
+                                <div>
+                                    <strong>Wasser</strong>
+                                    <p>Kosten: ∞ | <strong>Unpassierbar</strong></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3>Strategie-Tipps</h3>
+                        <ul>
+                            <li>Plane deine Route entlang von Ebenen wenn möglich</li>
+                            <li>Vermeide Berge außer in Notfällen</li>
+                            <li>Manchmal ist eine längere Route über Ebenen schneller</li>
+                            <li>Spare Bewegungspunkte für den Kampf</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="help-footer">
+                    <p><strong>Tipp:</strong> Drücke <kbd>Esc</kbd> oder klicke außerhalb, um die Hilfe zu schließen</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rest Modal -->
+        <div class="modal" id="rest-modal">
+            <div class="modal-content rest-modal-content">
+                <span class="modal-close" id="rest-close">&times;</span>
+                <h2>💤 Rasten</h2>
+
+                <p class="rest-explanation">
+                    Wähle Karten aus, die du ablegen möchtest. Du ziehst dann neue Karten bis zu deinem Handlimit.
+                    <strong>Hinweis:</strong> Beim Rasten erhältst du keine neuen Mana-Würfel.
+                </p>
+
+                <div class="rest-cards" id="rest-cards">
+                    <!-- Cards will be dynamically added here -->
+                </div>
+
+                <div class="rest-actions">
+                    <button class="btn btn-secondary" id="rest-cancel">Abbrechen</button>
+                    <button class="btn btn-primary" id="rest-confirm">Rasten bestätigen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Site Interaction Modal -->
+        <div class="modal" id="site-modal">
+            <div class="modal-content site-modal-content">
+                <span class="modal-close" id="site-close">&times;</span>
+                <div class="site-header">
+                    <div class="site-icon" id="site-modal-icon"></div>
+                    <h2 id="site-modal-title">Ort</h2>
+                </div>
+                <p id="site-modal-description" class="site-description"></p>
+
+                <div class="site-options" id="site-options">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- World Event Modal -->
+        <div class="modal" id="event-modal">
+            <div class="modal-content event-modal-content">
+                <span class="modal-close" id="event-close">&times;</span>
+                <div class="event-header">
+                    <h2 id="event-title">Event</h2>
+                </div>
+                <p id="event-description" class="event-description"></p>
+
+                <div class="event-options" id="event-options">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Play Modal (Mana Amplification) -->
+        <div class="modal" id="card-play-modal">
+            <div class="modal-content card-play-content">
+                <span class="modal-close" id="card-play-close">&times;</span>
+                <h2>Wirkung wählen</h2>
+                <div id="card-play-preview" class="card-play-preview"></div>
+
+                <div class="play-options">
+                    <button class="play-option-btn basic" id="play-basic-btn">
+                        <div class="option-header">Basis</div>
+                        <div class="option-effect" id="basic-effect-desc">Move 2</div>
+                        <div class="option-cost">Kostenlos</div>
+                    </button>
+
+                    <button class="play-option-btn strong" id="play-strong-btn">
+                        <div class="option-header">Verstärkt ✨</div>
+                        <div class="option-effect" id="strong-effect-desc">Move 4</div>
+                        <div class="option-cost" id="strong-cost-desc">-1 Blaues Mana</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Up Modal -->
+        <div id="level-up-modal" class="modal">
+            <div class="modal-content level-up-content">
+                <h2 class="modal-title">Stufenaufstieg!</h2>
+                <div class="level-up-message">Du hast Stufe <span id="new-level-display">2</span> erreicht!</div>
+
+                <div class="level-up-section">
+                    <h3>Wähle eine Fertigkeit:</h3>
+                    <div id="skill-choices" class="choices-grid">
+                        <!-- Skills will be rendered here -->
+                    </div>
+                </div>
+
+                <div class="level-up-section">
+                    <h3>Wähle eine Fortgeschrittene Aktion:</h3>
+                    <div id="card-choices" class="choices-grid">
+                        <!-- Cards will be rendered here -->
+                    </div>
+                </div>
+
+                <button id="confirm-level-up" class="btn btn-primary" disabled>Bestätigen</button>
+            </div>
+        </div>
+
+        <!-- Achievements Modal -->
+        <div class="modal" id="achievements-modal">
+            <div class="modal-content achievements-modal-content">
+                <span class="modal-close" id="achievements-close">&times;</span>
+                <h2>🏆 Erfolge</h2>
+                <div class="achievements-summary">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="achievements-progress-bar" style="width: 0%"></div>
+                    </div>
+                    <span id="achievements-progress-text">0/0 Freigeschaltet</span>
+                </div>
+                <div class="achievements-tabs">
+                    <button class="tab-btn active" data-category="all">Alle</button>
+                    <button class="tab-btn" data-category="combat">Kampf</button>
+                    <button class="tab-btn" data-category="exploration">Erkundung</button>
+                    <button class="tab-btn" data-category="progression">Fortschritt</button>
+                    <button class="tab-btn" data-category="mastery">Meisterschaft</button>
+                </div>
+                <div class="achievements-list" id="achievements-list">
+                    <!-- Achievements will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reward Selection Modal -->
+        <div id="reward-modal" class="modal">
+            <div class="modal-content reward-content">
+                <h2 class="modal-title" data-i18n="ui.labels.victoryReward">Belohnung wählen!</h2>
+                <div class="reward-message" data-i18n="ui.labels.artifactFound">Du hast einen uralten Schatz gefunden!
+                    Wähle
+                    ein Artefakt:</div>
+
+                <div id="reward-choices" class="choices-grid reward-grid">
+                    <!-- Artifact choices will be rendered here -->
+                </div>
+
+                <p class="reward-hint">Klicke auf ein Artefakt, um es deinem Deck hinzuzufügen.</p>
+            </div>
+        </div>
+
+        <!-- Statistics Modal -->
+        <div class="modal" id="statistics-modal">
+            <div class="modal-content statistics-modal-content">
+                <span class="modal-close" id="statistics-close">&times;</span>
+                <h2>📊 Statistiken</h2>
+                <div class="statistics-tabs">
+                    <button class="tab-btn active" data-category="global">Global</button>
+                    <button class="tab-btn" data-category="current">Aktuelles Spiel</button>
+                </div>
+                <div class="statistics-grid" id="statistics-grid">
+                    <!-- Statistics will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <!-- Day/Night Transition Overlay -->
+        <div id="day-night-overlay" class="day-night-overlay">
+            <div id="day-night-message" class="day-night-message">Nacht bricht herein...</div>
+        </div>
+
+        <!-- Reset Confirmation Modal -->
+        <div class="modal" id="reset-modal">
+            <div class="modal-content">
+                <span class="modal-close" id="close-reset-modal">&times;</span>
+                <div class="reset-modal-header">
+                    <h2>Neues Spiel starten</h2>
+                </div>
+                <div class="reset-modal-body">
+                    <p>Möchtest du wirklich ein neues Spiel starten?</p>
+                    <div class="scenario-selection">
+                        <label for="scenario-select">Szenario wählen:</label>
+                        <select id="scenario-select" class="scenario-dropdown">
+                            <option value="mines_freedom" selected>Freiheit für die Minen</option>
+                            <option value="druid_nights">Nächte der Druiden</option>
+                        </select>
+                    </div>
+                    <p class="warning-text">Der aktuelle Fortschritt geht unwiderruflich verloren!</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="cancel-reset-btn">Abbrechen</button>
+                        <button class="btn btn-danger" id="confirm-reset-btn">Neues Spiel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="js/main.js"></script>
+        <script>
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then((registration) => {
+                            console.log('[PWA] Service Worker registered:', registration.scope);
+                        })
+                        .catch((error) => {
+                            console.warn('[PWA] Service Worker registration failed:', error);
+                        });
+                });
+            }
+        </script>
+    </body>
+
+</html>

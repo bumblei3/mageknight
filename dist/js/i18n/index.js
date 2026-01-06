@@ -1,0 +1,1 @@
+import{registerLanguage,initI18n,t,setLanguage,getLanguage,getAvailableLanguages}from"./i18n.js";import de from"./de.js";import en from"./en.js";registerLanguage("de",de);registerLanguage("en",en);initI18n();export{t,setLanguage,getLanguage,getAvailableLanguages};export default{t:t,setLanguage:setLanguage,getLanguage:getLanguage,getAvailableLanguages:getAvailableLanguages};

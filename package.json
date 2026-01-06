@@ -6,7 +6,8 @@
         "test:coverage": "npx vitest run --coverage",
         "test:e2e": "playwright test",
         "lint": "eslint js/",
-        "lint:fix": "eslint js/ --fix"
+        "lint:fix": "eslint js/ --fix",
+        "build": "node build.js"
     },
     "devDependencies": {
         "@playwright/test": "^1.57.0",

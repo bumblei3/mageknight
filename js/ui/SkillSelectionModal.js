@@ -3,7 +3,6 @@ export class SkillSelectionModal {
     constructor() {
         this.overlay = null;
         this.onSelect = null;
-        this.createUI();
     }
 
     createUI() {
@@ -39,6 +38,7 @@ export class SkillSelectionModal {
     }
 
     show(skills) {
+        if (!this.overlay) this.createUI();
         return new Promise((resolve) => {
             this.onSelect = resolve;
             this.selectedSkill = null;

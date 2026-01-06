@@ -75,7 +75,7 @@ describe('Game Integration', () => {
         game.enemies = [enemy];
 
         // 1. Initiate
-        game.initiateCombat(enemy);
+        game.combatOrchestrator.initiateCombat(enemy);
         expect(game.combat).toBeDefined();
         // game.gameState remains 'playing' in current implementation, checking combat existence is enough
         expect(game.combat).not.toBeNull();
@@ -94,7 +94,7 @@ describe('Game Integration', () => {
         // 3. Attack Phase
         // Cheat: give hero huge attack via combat accumulator
         game.combatAttackTotal = 10;
-        game.executeAttackAction();
+        game.combatOrchestrator.executeAttackAction();
 
         // 4. End Combat (handled by executeAttackAction if enemies defeated)
         // But if executeAttackAction finishes combat, game.combat might be null already.

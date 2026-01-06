@@ -153,7 +153,7 @@ describe('Coverage Gap Fill', () => {
             ui.tooltipManager.hideTooltip = () => { tooltipContent = null; };
 
             // Trigger Mouse Move
-            game.handleCanvasMouseMove({ clientX: 10, clientY: 10 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 10, clientY: 10 });
 
             expect(tooltipContent).toBeDefined();
             expect(tooltipContent).toContain('Ork');
@@ -161,12 +161,12 @@ describe('Coverage Gap Fill', () => {
             // 2. Site (remove enemy)
             game.enemies = [];
             mockHex.site = { getName: () => 'Village', getInfo: () => ({ name: 'Village', description: 'Desc' }) };
-            game.handleCanvasMouseMove({ clientX: 10, clientY: 10 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 10, clientY: 10 });
             expect(tooltipContent).toContain('Village');
 
             // 3. Terrain (remove site)
             mockHex.site = null;
-            game.handleCanvasMouseMove({ clientX: 10, clientY: 10 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 10, clientY: 10 });
             expect(tooltipContent).toContain('Ebenen');
         });
 
@@ -277,7 +277,7 @@ describe('Coverage Gap Fill', () => {
             game.enemies = [enemy];
 
             let combatStarted = false;
-            game.initiateCombat = () => { combatStarted = true; };
+            game.combatOrchestrator.initiateCombat = () => { combatStarted = true; };
 
             const p3 = game.moveHero(1, 0);
             if (callbacks) callbacks.onComplete();
@@ -395,7 +395,7 @@ describe('Coverage Gap Fill', () => {
             game.hexGrid.getHex = () => ({ q: 5, r: 5, revealed: true });
             game.render = () => { }; // Mock render
 
-            game.handleCanvasClick({ clientX: 100, clientY: 100 });
+            game.interactionController.handleCanvasClick({ clientX: 100, clientY: 100 });
 
             expect(game.hero.position.q).toBe(5);
             expect(game.debugTeleport).toBe(false);
@@ -440,7 +440,7 @@ describe('Coverage Gap Fill', () => {
             // 2. Low MP Explore
             game.combat = false;
             game.hero.movementPoints = 1;
-            game.explore();
+            game.actionManager.explore();
             // Should warn
             expect(game.hero.movementPoints).toBe(1);
         });
@@ -649,7 +649,7 @@ describe('Coverage Gap Fill', () => {
             game.enterMovementMode = () => { movementModeEntered = true; };
 
             // Play
-            game.handleCardClick(0, { isWound: () => false });
+            game.interactionController.handleCardClick(0, { isWound: () => false });
 
             expect(movementModeEntered).toBe(true);
         });
@@ -657,7 +657,7 @@ describe('Coverage Gap Fill', () => {
         it('should handle card right click cancel', () => {
             game.combat = false;
             window.prompt = () => null; // Cancel
-            game.handleCardRightClick(0, { isWound: () => false });
+            game.interactionController.handleCardRightClick(0, { isWound: () => false });
             // Should not throw
         });
 
@@ -700,7 +700,7 @@ describe('Coverage Gap Fill', () => {
             let hidden = false;
             game.ui.tooltipManager.hideTooltip = () => { hidden = true; };
 
-            game.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 0, clientY: 0 });
 
             expect(hidden).toBe(true);
         });
@@ -719,7 +719,7 @@ describe('Coverage Gap Fill', () => {
                 };
             };
 
-            game.handleCardRightClick(0, { name: 'Card', isWound: () => false });
+            game.interactionController.handleCardRightClick(0, { name: 'Card', isWound: () => false });
 
             expect(played).toBe(true);
             expect(game.ui.elements.handCards.innerHTML).toBeDefined(); // renderHand called

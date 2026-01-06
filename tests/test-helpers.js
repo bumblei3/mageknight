@@ -381,7 +381,7 @@ export function simulateFullTurn(game, actions = {}) {
     // Combat
     if (combat) {
         const { enemy, block, attack } = combat;
-        game.initiateCombat(enemy);
+        game.combatOrchestrator.initiateCombat(enemy);
         if (block) {
             game.combat.blockEnemy(enemy, block);
         }

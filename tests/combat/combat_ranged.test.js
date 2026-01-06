@@ -74,7 +74,7 @@ describe('Combat Ranged Phase Integration', () => {
             triggerShake: createSpy()
         };
 
-        game.initiateCombat(enemy);
+        game.combatOrchestrator.initiateCombat(enemy);
     });
 
     afterEach(() => {
@@ -89,7 +89,7 @@ describe('Combat Ranged Phase Integration', () => {
     });
 
     it('should transition to BLOCK phase when executeAttackAction (End Phase) is called', () => {
-        game.executeAttackAction(); // In Ranged phase, this is "End Phase"
+        game.combatOrchestrator.executeAttackAction(); // In Ranged phase, this is "End Phase"
 
         expect(game.combat.phase).toBe(COMBAT_PHASE.BLOCK);
         expect(game.addLog.calls.some(c => c[0].includes('Block-Phase'))).toBe(true);

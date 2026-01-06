@@ -51,12 +51,12 @@ describe('Coverage Boost v4 - Game & UI & Touch', () => {
             game.hexGrid.pixelToAxial = () => ({ q: 1, r: 1 });
             game.hexGrid.axialToPixel = () => ({ x: 100, y: 100 });
             game.hexGrid.getHex = () => ({ revealed: true, site: { name: 'Village' } });
-            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
             expect(game.ui.tooltipManager.showTooltip.called).toBe(true);
 
             game.hexGrid.getHex = () => ({ revealed: true, terrain: 'forest' });
             game.ui.tooltipManager.showTooltip.reset();
-            game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+            game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
             expect(game.ui.tooltipManager.showTooltip.called).toBe(true);
         });
     });

@@ -45,7 +45,7 @@ export class KeepHandler extends BaseSiteHandler {
 
         const msg = `Kampf gegen ${site.getName()} gestartet! Du musst die Befestigung überwinden.`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemy);
+        this.game.combatOrchestrator.initiateCombat(enemy);
         return { success: true, message: 'Direkter Angriff!' };
     }
 }

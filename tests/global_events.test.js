@@ -53,6 +53,10 @@ describe('Global Events & Shortcuts', () => {
                 calls[m] = 0;
                 if (m === 'endTurn') {
                     game.turnManager.endTurn = () => { calls[m]++; };
+                } else if (m === 'rest') {
+                    game.phaseManager.rest = () => { calls[m]++; };
+                } else if (m === 'explore') {
+                    game.actionManager.explore = () => { calls[m]++; };
                 } else {
                     game[m] = () => { calls[m]++; };
                 }

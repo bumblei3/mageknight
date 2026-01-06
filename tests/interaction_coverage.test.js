@@ -145,7 +145,7 @@ describe('InteractionController Coverage', () => {
     });
 
     it('should play card in combat when combat is active', () => {
-        game.combat = {}; // Mock combat active
+        game.combat = { getState: () => ({}) }; // Mock combat active
         const card = {
             name: 'Attack Card',
             color: 'red',
@@ -155,7 +155,7 @@ describe('InteractionController Coverage', () => {
         game.hero.hand = [card];
 
         let playInCombatCalled = false;
-        game.playCardInCombat = () => { playInCombatCalled = true; };
+        game.combatOrchestrator.playCardInCombat = () => { playInCombatCalled = true; };
 
         controller.handleCardClick(0, card);
 
@@ -163,7 +163,7 @@ describe('InteractionController Coverage', () => {
     });
 
     it('should play strong card in combat when affordable', () => {
-        game.combat = {};
+        game.combat = { getState: () => ({}) };
         const card = {
             name: 'Strong Attack',
             color: 'red',
@@ -175,7 +175,7 @@ describe('InteractionController Coverage', () => {
         game.hero.manaInventory = { red: 1 };
 
         let playInCombatCalled = false;
-        game.playCardInCombat = (idx, c, strong) => { if (strong) playInCombatCalled = true; };
+        game.combatOrchestrator.playCardInCombat = (idx, c, strong) => { if (strong) playInCombatCalled = true; };
 
         controller.handleCardClick(0, card);
         document.getElementById('play-strong-btn').click();
@@ -190,7 +190,7 @@ describe('InteractionController Coverage', () => {
         game.hexGrid.distance = () => 0;
 
         let initiateCalled = false;
-        game.initiateCombat = (e) => { if (e === enemy) initiateCalled = true; };
+        game.combatOrchestrator.initiateCombat = (e) => { if (e === enemy) initiateCalled = true; };
 
         controller.selectHex(0, 0);
         expect(initiateCalled).toBe(true);

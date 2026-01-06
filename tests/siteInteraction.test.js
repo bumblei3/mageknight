@@ -19,6 +19,9 @@ const mockGame = {
     hero: mockHero,
     addLog: createSpy(),
     initiateCombat: createSpy(),
+    combatOrchestrator: {
+        initiateCombat: createSpy()
+    },
     updateStats: createSpy()
 };
 
@@ -170,7 +173,7 @@ describe('SiteInteractionManager', () => {
         manager.currentHex = {};
 
         manager.attackSite();
-        expect(mockGame.initiateCombat.called).toBe(true);
+        expect(mockGame.combatOrchestrator.initiateCombat.called).toBe(true);
     });
 
     it('should show conquered keep options', () => {

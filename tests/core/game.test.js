@@ -143,7 +143,7 @@ describe('Game Core', () => {
         };
         game.enemies = [enemy];
 
-        game.initiateCombat(enemy);
+        game.combatOrchestrator.initiateCombat(enemy);
 
         expect(game.combat).toBeDefined();
         expect(game.combat.enemies).toContain(enemy);

@@ -175,8 +175,8 @@ describe('MageKnightGame Coverage Boost v2', () => {
             .mockImplementation(() => { console.log('Mock handleCardClick called'); });
 
         const endTurnSpy = vi.spyOn(game.turnManager, 'endTurn').mockImplementation(() => { });
-        const restSpy = vi.spyOn(game, 'rest').mockImplementation(() => { });
-        const exploreSpy = vi.spyOn(game, 'explore').mockImplementation(() => { });
+        const restSpy = vi.spyOn(game.phaseManager, 'rest').mockImplementation(() => { });
+        const exploreSpy = vi.spyOn(game.actionManager, 'explore').mockImplementation(() => { });
         const showTutorialSpy = vi.spyOn(game, 'showTutorial').mockImplementation(() => { });
 
         // Mock sound explicitly for this test to prevent unhandled errors
@@ -241,7 +241,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
         game.enemies = [{ position: { q: 1, r: 0 }, isDefeated: () => false, name: 'Orc' }];
         game.hexGrid.getMovementCost = () => 1;
         game.hexGrid.distance = () => 1;
-        game.initiateCombat = vi.fn();
+        game.combatOrchestrator.initiateCombat = vi.fn();
         game.animator.animateHeroMove = () => Promise.resolve();
 
         // Mock visit button
@@ -260,12 +260,12 @@ describe('MageKnightGame Coverage Boost v2', () => {
         await game.moveHero(1, 0);
 
         // initiateCombat is called async after animation? No, in ActionManager it is immediate if enemy found.
-        expect(game.initiateCombat).toHaveBeenCalled();
+        expect(game.combatOrchestrator.initiateCombat).toHaveBeenCalled();
         expect(game.movementMode).toBe(false);
 
         // Move to site hex logic check
         game.movementMode = true;
-        game.initiateCombat.mockClear();
+        game.combatOrchestrator.initiateCombat.mockClear();
         game.enemies = [];
 
         // Setup site mock
@@ -311,7 +311,7 @@ describe('MageKnightGame Coverage Boost v2', () => {
             game.ui.elements.playedCards.getBoundingClientRect = () => ({ right: 100, top: 100 });
         }
 
-        game.playCardInCombat(0, game.hero.hand[0]);
+        game.combatOrchestrator.playCardInCombat(0, game.hero.hand[0]);
 
         expect(game.combatBlockTotal).toBe(3);
         expect(game.particleSystem.playCardEffect).toHaveBeenCalled();

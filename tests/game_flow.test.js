@@ -132,7 +132,7 @@ describe('Game Flow Coverage Boost', () => {
             // Set hero position to simulate being at site
             game.hero.position = { q: 0, r: 0 };
 
-            game.visitSite();
+            game.actionManager.visitSite();
 
             // Expect UI interactions
             expect(game.ui.showSiteModal.calls.length).toBeGreaterThan(0);
@@ -150,7 +150,7 @@ describe('Game Flow Coverage Boost', () => {
             // Should trigger site visit which might trigger combat if logic was there, 
             // but usually visitSite just returns data.
             // If we want to test combat flow from interaction:
-            game.visitSite();
+            game.actionManager.visitSite();
 
             expect(game.ui.showSiteModal.calls.length).toBeGreaterThan(0);
         });
@@ -244,7 +244,7 @@ describe('Game Flow Coverage Boost', () => {
             const enemy = { name: 'Orc', hp: 5 };
 
             // Trigger combat
-            game.initiateCombat(enemy);
+            game.combatOrchestrator.initiateCombat(enemy);
 
             expect(game.ui.showCombatPanel.calls.length).toBeGreaterThan(0);
             expect(game.combat).toBeDefined();

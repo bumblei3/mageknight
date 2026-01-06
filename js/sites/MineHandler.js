@@ -42,7 +42,7 @@ export class MineHandler extends BaseSiteHandler {
 
         const msg = `Du willst die Mine erobern... ${enemy.name} stellt sich dir in den Weg!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemy);
+        this.game.combatOrchestrator.initiateCombat(enemy);
         return { success: true, message: 'Angriff auf Mine!' };
     }
 

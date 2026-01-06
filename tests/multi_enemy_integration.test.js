@@ -45,9 +45,10 @@ describe('Multi-Enemy Encounters', () => {
 
     beforeEach(() => {
         game = new MockGame();
-        // We need to overwrite InitiateCombat on game because siteManager calls game.initiateCombat
-        game.initiateCombat = (enemies) => {
-            game.combatEnemies = enemies; // Capture what was passed
+        game.combatOrchestrator = {
+            initiateCombat: (enemies) => {
+                game.combatEnemies = enemies; // Capture what was passed
+            }
         };
 
         siteManager = new SiteInteractionManager(game);

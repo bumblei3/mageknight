@@ -86,7 +86,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Du betrittst das Dunkel... ${enemy.name} greift an!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemy);
+        this.game.combatOrchestrator.initiateCombat(enemy);
         return { success: true, message: 'Verlies betreten!' };
     }
 
@@ -114,7 +114,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Du untersuchst die Trümmer... ${enemy.name} erscheint!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemy);
+        this.game.combatOrchestrator.initiateCombat(enemy);
         return { success: true, message: 'Ruine betreten!' };
     }
 
@@ -213,7 +213,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Du betrittst das Labyrinth... ${enemies.length} Feinde blockieren den Weg!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemies);
+        this.game.combatOrchestrator.initiateCombat(enemies);
         return { success: true, message: 'Labyrinth betreten!' };
     }
 
@@ -260,7 +260,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Die Brutstätte ist voller Monster... Eine Welle von ${enemies.length} Gegnern greift an!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemies);
+        this.game.combatOrchestrator.initiateCombat(enemies);
         return { success: true, message: 'Brutstätte betreten!' };
     }
 }

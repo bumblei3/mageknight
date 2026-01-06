@@ -234,7 +234,7 @@ export class ActionManager {
         const enemy = this.game.enemies.find(e => !e.isDefeated() && e.position.q === q && e.position.r === r);
         if (enemy) {
             this.clearHistory(); // Combat started, cannot undo movement
-            this.game.initiateCombat(enemy);
+            this.game.combatOrchestrator.initiateCombat(enemy);
             this.exitMovementMode();
             this.game.render();
             return;
@@ -246,7 +246,7 @@ export class ActionManager {
         // Actually, entering a Keep/Tower triggers forced combat usually.
         // Assuming visitSite only opens modal -> Reversible? No, entering the modal might allow actions.
         // For safety, let's keep it reversible until they ACT inside the site.
-        this.game.visitSite();
+        this.visitSite();
 
         if (this.game.hero.movementPoints > 0 && !this.game.combat) {
             this.calculateReachableHexes();
@@ -315,7 +315,7 @@ export class ActionManager {
         if (this.game.combat) {
             // Combat actions are handled by CombatOrchestrator
             // We can't easily undo mid-combat actions yet without deep Combat state saving
-            this.game.playCardInCombat(index, this.game.hero.hand[index]);
+            this.game.combatOrchestrator.playCardInCombat(index, this.game.hero.hand[index]);
             return;
         }
 

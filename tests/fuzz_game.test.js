@@ -128,7 +128,7 @@ describe('Game Fuzzing', () => {
                         // Find an enemy to fight if not in combat
                         if (!game.combat && game.enemies.length > 0) {
                             const enemy = game.enemies[randomInt(game.enemies.length)];
-                            game.initiateCombat(enemy);
+                            game.combatOrchestrator.initiateCombat(enemy);
                         }
                         break;
 

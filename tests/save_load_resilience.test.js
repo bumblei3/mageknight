@@ -130,7 +130,7 @@ describe('MageKnightGame Coverage Boost v3', () => {
 
         game.hexGrid.getHex = () => ({ revealed: true });
         game.enemies = [{ position: { q: 1, r: 0 }, isDefeated: () => false, name: 'Orc' }];
-        game.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
+        game.interactionController.handleCanvasMouseMove({ clientX: 100, clientY: 100 });
         expect(mockUI.tooltipManager.showTooltip.called).toBe(true);
     });
 });

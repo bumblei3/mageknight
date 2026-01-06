@@ -229,7 +229,7 @@ export class ModalManager {
                         const enemy = game.enemyAI.generateEnemy(currentHex.terrain, game.hero.level);
                         enemy.position = { ...game.hero.position };
                         game.enemies.push(enemy);
-                        game.initiateCombat(enemy);
+                        game.combatOrchestrator.initiateCombat(enemy);
                     } else if (result.message) {
                         this.ui.showToast(result.message, 'error');
                     }

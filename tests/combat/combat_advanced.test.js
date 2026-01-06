@@ -35,7 +35,7 @@ describe('Advanced Combat Coverage', () => {
             game.hexGrid.axialToPixel = () => ({ x: 0, y: 0 });
             game.particleSystem.buffEffect = () => { };
 
-            game.activateUnitInCombat({ name: 'Unit' });
+            game.combatOrchestrator.activateUnitInCombat({ name: 'Unit' });
         });
 
         it('should handle endBlockPhase with enemy blocking', () => {
@@ -55,7 +55,7 @@ describe('Advanced Combat Coverage', () => {
             game.renderUnitsInCombat = () => { };
             game.updatePhaseIndicator = () => { };
             game.updateStats = () => { };
-            game.updateCombatTotals = () => { };
+            game.combatOrchestrator.updateCombatTotals = () => { };
             game.hexGrid.axialToPixel = () => ({ x: 0, y: 0 });
             game.particleSystem.damageSplatter = () => { };
             game.particleSystem.triggerShake = () => { };
@@ -65,7 +65,7 @@ describe('Advanced Combat Coverage', () => {
             game.particleSystem.lightningAttackEffect = () => { };
             game.combat.enemy = { attackType: 'physical' };
 
-            game.endBlockPhase();
+            game.combatOrchestrator.endBlockPhase();
 
             expect(game.combatBlockTotal).toBe(0);
         });
@@ -73,11 +73,11 @@ describe('Advanced Combat Coverage', () => {
         it('should handle executeAttackAction variants', () => {
             game.combat = { phase: 'ranged' };
             let rangedEnded = false;
-            game.endRangedPhase = () => { rangedEnded = true; return { message: 'Ended' }; };
+            game.combatOrchestrator.endRangedPhase = () => { rangedEnded = true; return { message: 'Ended' }; };
             game.combat.endRangedPhase = () => { rangedEnded = true; return { message: 'Ended' }; };
 
             // Case 1: Ranged skip
-            game.executeAttackAction();
+            game.combatOrchestrator.executeAttackAction();
             expect(rangedEnded).toBe(true);
 
             // Case 2: Attack execution
@@ -95,9 +95,9 @@ describe('Advanced Combat Coverage', () => {
 
             let attackExecuted = false;
             game.combat.attackEnemies = () => { attackExecuted = true; return { success: true, message: 'Victory', defeated: [] }; };
-            game.endCombat = () => { };
+            game.combatOrchestrator.onCombatEnd = () => { };
 
-            game.executeAttackAction();
+            game.combatOrchestrator.executeAttackAction();
             expect(attackExecuted).toBe(true);
         });
     });

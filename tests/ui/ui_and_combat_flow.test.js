@@ -74,7 +74,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             game.combat.phase = 'ranged';
 
             // Simulate click on enemy in ranged phase
-            game.handleEnemyClick(enemy);
+            game.combatOrchestrator.handleEnemyClick(enemy);
 
             expect(game.combatRangedTotal).toBe(0); // Should be reset
         });
@@ -108,7 +108,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             // Mock hexgrid behavior for revealed hex
             game.hexGrid.getHex = () => ({ revealed: true, terrain: 'plains' });
 
-            game.handleCanvasMouseMove(mockEvent);
+            game.interactionController.handleCanvasMouseMove(mockEvent);
             // Should not throw
         });
     });
@@ -394,7 +394,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
                 }
             });
 
-            game.handleCanvasMouseMove(mockEvent);
+            game.interactionController.handleCanvasMouseMove(mockEvent);
             // Verify tooltip. We'd check UI state if we could access the private tooltip element,
             // but ensuring it runs without error covers the code path.
 
@@ -417,13 +417,13 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
 
             game.hexGrid.getHex = () => ({ revealed: true, terrain: 'plains' });
 
-            game.handleCanvasMouseMove(mockEvent);
+            game.interactionController.handleCanvasMouseMove(mockEvent);
 
-            game.handleCanvasMouseMove(mockEvent);
+            game.interactionController.handleCanvasMouseMove(mockEvent);
 
             // 4. Revealed but no info (covers else block)
             game.hexGrid.getHex = () => ({ revealed: true }); // No site, no terrain
-            game.handleCanvasMouseMove(mockEvent);
+            game.interactionController.handleCanvasMouseMove(mockEvent);
         });
 
         it('should handle sound toggle and achievements close', () => {

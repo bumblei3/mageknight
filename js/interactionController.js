@@ -140,7 +140,7 @@ export class InteractionController {
 
             const distance = this.game.hexGrid.distance(this.game.hero.position.q, this.game.hero.position.r, q, r);
             if (distance === 0) {
-                this.game.initiateCombat(enemy);
+                this.game.combatOrchestrator.initiateCombat(enemy);
             }
         }
 
@@ -173,7 +173,7 @@ export class InteractionController {
 
         // Otherwise finish play
         if (this.game.combat) {
-            this.game.playCardInCombat(index, card, false);
+            this.game.combatOrchestrator.playCardInCombat(index, card, false);
         } else {
             this.finishCardPlay(index, false, isNight);
         }
@@ -185,7 +185,7 @@ export class InteractionController {
         logger.info(`Finalizing card play: ${card.name} (${useStrong ? 'Strong' : 'Basic'})`);
         if (this.game.combat) {
             const card = this.game.hero.hand[index];
-            this.game.playCardInCombat(index, card, useStrong);
+            this.game.combatOrchestrator.playCardInCombat(index, card, useStrong);
             return;
         }
 

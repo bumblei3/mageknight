@@ -44,7 +44,7 @@ describe('Reward System & Ruins', () => {
         game.updateStats = createSpy();
         game.render = createSpy();
         game.particleSystem = { buffEffect: createSpy() };
-        game.initiateCombat = createSpy();
+        game.combatOrchestrator.initiateCombat = createSpy();
 
         // Mock managers called in onCombatEnd to prevent crashes and ensure isolation
         game.entityManager = { removeEnemy: createSpy() };
@@ -81,8 +81,8 @@ describe('Reward System & Ruins', () => {
 
         siteInteraction.exploreRuin();
 
-        expect(game.initiateCombat.called).toBe(true);
-        const enemy = game.initiateCombat.calls[0][0];
+        expect(game.combatOrchestrator.initiateCombat.called).toBe(true);
+        const enemy = game.combatOrchestrator.initiateCombat.calls[0][0];
         const allowedNames = ['Ruinen-Beschwörer', 'Ruinen-Wächter'];
         expect(allowedNames.includes(enemy.name)).toBe(true);
     });

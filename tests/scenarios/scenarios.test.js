@@ -58,7 +58,7 @@ describe('Scenario - Conquest and Progression', () => {
         game.enemies.push(enemy);
 
         // 5. Combat
-        game.initiateCombat(enemy);
+        game.combatOrchestrator.initiateCombat(enemy);
         expect(game.combat).toBeDefined();
 
         // Ranged Phase (Skip)
@@ -106,7 +106,7 @@ describe('Scenario - Recovery and Persistence', () => {
             name: 'Dragon'
         });
 
-        game.initiateCombat(boss);
+        game.combatOrchestrator.initiateCombat(boss);
 
         // Ranged Phase (Skip)
         if (game.combat.phase === 'ranged') {

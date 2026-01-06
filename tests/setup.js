@@ -6,16 +6,19 @@ globalThis.isTestEnvironment = true;
 
 // Mock AudioContext if not present (JSDOM doesn't have it)
 if (typeof window !== 'undefined' && !window.AudioContext) {
-    window.AudioContext = vi.fn().mockImplementation(() => ({
-        createGain: vi.fn().mockReturnValue({ gain: { value: 1, setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), connect: vi.fn() }, connect: vi.fn() }),
-        createOscillator: vi.fn().mockReturnValue({ type: 'sine', frequency: { value: 0 }, connect: vi.fn(), start: vi.fn(), stop: vi.fn() }),
-        createBuffer: vi.fn().mockReturnValue({ getChannelData: vi.fn().mockReturnValue(new Float32Array(1024)) }),
-        createBufferSource: vi.fn().mockReturnValue({ buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn() }),
-        createBiquadFilter: vi.fn().mockReturnValue({ type: '', frequency: { value: 0 }, connect: vi.fn() }),
-        destination: {},
-        currentTime: 0,
-        sampleRate: 44100
-    }));
+    window.AudioContext = vi.fn().mockImplementation(function () {
+        return {
+            state: 'running',
+            createGain: vi.fn().mockReturnValue({ gain: { value: 1, setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), connect: vi.fn() }, connect: vi.fn() }),
+            createOscillator: vi.fn().mockReturnValue({ type: 'sine', frequency: { value: 0 }, connect: vi.fn(), start: vi.fn(), stop: vi.fn() }),
+            createBuffer: vi.fn().mockReturnValue({ getChannelData: vi.fn().mockReturnValue(new Float32Array(1024)) }),
+            createBufferSource: vi.fn().mockReturnValue({ buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn() }),
+            createBiquadFilter: vi.fn().mockReturnValue({ type: '', frequency: { value: 0 }, connect: vi.fn() }),
+            destination: {},
+            currentTime: 0,
+            sampleRate: 44100
+        };
+    });
     window.webkitAudioContext = window.AudioContext;
 }
 

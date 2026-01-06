@@ -20,12 +20,14 @@ export class PerformanceMonitor {
     }
 
     startMonitoring() {
+        if (typeof globalThis !== 'undefined' && globalThis.isTestEnvironment) return;
+
         // FPS counter loop
         this.measureFrame();
 
         // Memory sampling (every 2 seconds)
         if (performance.memory) {
-            setInterval(() => {
+            this.memoryInterval = setInterval(() => {
                 this.memoryUsage = Math.round(performance.memory.usedJSHeapSize / 1048576);
             }, 2000);
         }
@@ -33,7 +35,20 @@ export class PerformanceMonitor {
         logger.info('📊 Performance monitor initialized');
     }
 
+    stopMonitoring() {
+        this.isRunning = false;
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+        }
+        if (this.memoryInterval) {
+            clearInterval(this.memoryInterval);
+        }
+    }
+
     measureFrame() {
+        if (this.isRunning === false) return;
+        this.isRunning = true;
+
         const now = performance.now();
         this.frameCount++;
 
@@ -48,7 +63,7 @@ export class PerformanceMonitor {
             }
         }
 
-        requestAnimationFrame(() => this.measureFrame());
+        this.rafId = requestAnimationFrame(() => this.measureFrame());
     }
 
     recordFrameTime(duration) {

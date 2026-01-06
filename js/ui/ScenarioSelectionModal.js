@@ -24,12 +24,14 @@ export class ScenarioSelectionModal {
     }
 
     show() {
+        if (!this.modal) return;
         this.renderScenarios();
         this.modal.classList.add('show');
         logger.debug('Scenario Selection Modal shown');
     }
 
     hide() {
+        if (!this.modal) return;
         this.modal.classList.remove('show');
     }
 

@@ -134,12 +134,18 @@ export class MageKnightGame {
      */
     init() {
         this.initializeSystem();
-        // Start with a default game state so UI doesn't crash,
-        // then immediately show the selection modals
+
+        // Start default game so UI has valid state
         this.startNewGame(null, 'goldyx');
-        // TODO: For a full "start fresh" experience, uncomment the line below
-        // and comment out startNewGame above:
-        // this.stateManager.openScenarioSelection();
+
+        // Show scenario selection modal after a brief delay
+        this.setGameTimeout(() => {
+            if (this.stateManager &&
+                this.ui?.scenarioSelectionModal?.modal &&
+                this.scenarioManager) {
+                this.stateManager.openScenarioSelection();
+            }
+        }, 500);
     }
 
     /**

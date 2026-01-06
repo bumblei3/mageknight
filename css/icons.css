@@ -1,0 +1,179 @@
+/* HUD Icon System - Premium styled icons replacing emojis */
+
+:root {
+    --icon-size: 20px;
+    --icon-size-lg: 24px;
+    --icon-color: currentColor;
+    --icon-stroke-width: 2;
+}
+
+/* Icon base styles */
+.hud-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    fill: none;
+    stroke: var(--icon-color);
+    stroke-width: var(--icon-stroke-width);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: all 0.2s ease;
+}
+
+.hud-icon.lg {
+    width: var(--icon-size-lg);
+    height: var(--icon-size-lg);
+}
+
+/* Button icon styling */
+.btn-icon {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--color-text-secondary);
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
+}
+
+.btn-icon:active {
+    transform: translateY(0);
+}
+
+.btn-icon .hud-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Stat icons */
+.stat-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    stroke-width: 2.5;
+}
+
+.stat-icon.armor {
+    color: #60a5fa;
+}
+
+.stat-icon.hand {
+    color: #fbbf24;
+}
+
+.stat-icon.wounds {
+    color: #ef4444;
+}
+
+.stat-icon.movement {
+    color: #4ade80;
+}
+
+.stat-icon.attack {
+    color: #f87171;
+}
+
+.stat-icon.block {
+    color: #60a5fa;
+}
+
+.stat-icon.influence {
+    color: #a78bfa;
+}
+
+.stat-icon.healing {
+    color: #34d399;
+}
+
+/* Hero avatar styling */
+.hero-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3));
+    border: 2px solid var(--color-accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+    overflow: hidden;
+}
+
+.hero-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-avatar .hero-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--color-accent-gold);
+}
+
+/* Animated icon effects */
+@keyframes iconPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.btn-icon:hover .hud-icon {
+    animation: iconPulse 0.6s ease-in-out;
+}
+
+/* Resource panel icons */
+.resource-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+/* Panel header icons */
+.panel-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+    opacity: 0.8;
+}
+
+/* Combat icons */
+.combat-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.combat-icon.attack {
+    color: #ef4444;
+    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5));
+}
+
+.combat-icon.block {
+    color: #3b82f6;
+    filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+}
+
+.combat-icon.ranged {
+    color: #f59e0b;
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
+}

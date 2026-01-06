@@ -130,11 +130,16 @@ export class MageKnightGame {
     }
 
     /**
-     * Bootstraps the system and starts a new game.
+     * Bootstraps the system and shows the scenario selection.
      */
     init() {
         this.initializeSystem();
-        this.startNewGame();
+        // Start with a default game state so UI doesn't crash,
+        // then immediately show the selection modals
+        this.startNewGame(null, 'goldyx');
+        // TODO: For a full "start fresh" experience, uncomment the line below
+        // and comment out startNewGame above:
+        // this.stateManager.openScenarioSelection();
     }
 
     /**

@@ -45,8 +45,9 @@ export class GameFlow {
         try {
             if (await heroModal.isVisible({ timeout: 3000 })) {
                 console.log('GameFlow: Selecting hero...');
-                await this.page.locator('.hero-select-btn').first().click();
-                await expect(heroModal).toBeHidden();
+                // Click the "Wählen" button on first hero card
+                await this.page.locator('#hero-selection-modal button:has-text("Wählen")').first().click();
+                await expect(heroModal).toBeHidden({ timeout: 10000 });
             }
         } catch (e) { }
     }
@@ -59,8 +60,14 @@ export class GameFlow {
         await this.skipTutorial();
         await this.handleModals();
 
+        // Wait a bit for game reset after hero selection
+        await this.page.waitForTimeout(1000);
+
+        // Skip tutorial again if it reappears after new game
+        await this.skipTutorial();
+
         // Final verification that we are in-game
-        const board = this.page.locator('#game-board-wrapper');
-        await expect(board).toBeVisible();
+        const canvas = this.page.locator('canvas#game-board');
+        await expect(canvas).toBeVisible({ timeout: 15000 });
     }
 }

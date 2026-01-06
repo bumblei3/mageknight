@@ -207,7 +207,7 @@ export class MageKnightGame {
             this.ui.refreshTranslations();
         }
 
-        this.setupTimeListener();
+        this.phaseManager.setupTimeListener();
         this.setupVisualEffectsListeners(); // New listener cleanup
         this.inputController.setup();
 
@@ -264,7 +264,7 @@ export class MageKnightGame {
 
         // Reset Time
         this.timeManager.loadState({ round: 1, timeOfDay: TIME_OF_DAY.DAY });
-        this.updateTimeUI();
+        this.phaseManager.updateTimeUI();
 
         // Clear particles
         if (this.particleSystem) {
@@ -503,34 +503,6 @@ export class MageKnightGame {
 
 
 
-    /**
-     * Handles canvas click events via the interaction controller.
-     * @param {MouseEvent} e
-     */
-    handleCanvasClick(e) { this.interactionController.handleCanvasClick(e); }
-    /**
-     * Handles canvas mouse move events via the interaction controller.
-     * @param {MouseEvent} e
-     */
-    handleCanvasMouseMove(e) { this.interactionController.handleCanvasMouseMove(e); }
-    /**
-     * Selects a hex at the given axial coordinates.
-     * @param {number} q
-     * @param {number} r
-     */
-    selectHex(q, r) { this.interactionController.selectHex(q, r); }
-    /**
-     * Handles card click events.
-     * @param {number} index
-     * @param {Object} card
-     */
-    handleCardClick(index, card) { this.interactionController.handleCardClick(index, card); }
-    /**
-     * Handles card right-click events (sideways play).
-     * @param {number} index
-     * @param {Object} card
-     */
-    handleCardRightClick(index, card) { this.interactionController.handleCardRightClick(index, card); }
 
     /**
      * Enables movement mode for the hero.
@@ -599,7 +571,6 @@ export class MageKnightGame {
     /**
      * Executes the main attack action in combat.
      */
-    executeAttackAction() { this.combatOrchestrator.executeAttackAction(); }
 
     /**
      * Handles clicking an enemy in the combat panel.
@@ -656,12 +627,10 @@ export class MageKnightGame {
     /**
      * Executes a rest action.
      */
-    rest() { this.phaseManager.rest(); }
 
     /**
      * Explorates an adjacent unknown territory.
      */
-    explore() { this.actionManager.explore(); }
 
     /**
      * Renders the hero's hand in the UI.
@@ -721,7 +690,6 @@ export class MageKnightGame {
     /**
      * Visits a site at the hero's current location.
      */
-    visitSite() { this.actionManager.visitSite(); }
 
     /**
      * Renders the entire game state (map, heroes, enemies).
@@ -768,85 +736,6 @@ export class MageKnightGame {
      */
     openLoadDialog() { this.stateManager.openLoadDialog(); }
 
-    /**
-     * Sets up the listener for day/night cycle changes.
-     */
-    setupTimeListener() {
-        this.timeManager.addListener((state) => {
-            const isNight = state.timeOfDay === TIME_OF_DAY.NIGHT;
-
-            // Visual Transition
-            const overlay = document.getElementById('day-night-overlay');
-            const message = document.getElementById('day-night-message');
-
-            if (overlay && message) {
-                message.textContent = isNight ? 'Die Nacht bricht herein...' : 'Der Tag bricht an...';
-                overlay.classList.add('active');
-
-                // Play sound
-                // this.sound.playTone(isNight ? 200 : 600, 1.0, 'sine'); // Placeholder if sound not ready
-
-                this.setGameTimeout(() => {
-                    // Update Game State visuals behind curtain
-                    this.hexGrid.setTimeOfDay(isNight);
-                    if (document.body) {
-                        document.body.classList.toggle('night-mode', isNight);
-                    }
-
-                    // Update UI Icons
-                    const timeIcon = document.getElementById('time-icon');
-                    const roundNum = document.getElementById('round-number');
-                    if (timeIcon) {
-                        timeIcon.textContent = isNight ? '🌙' : '☀️';
-                        timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
-                    }
-                    if (roundNum) roundNum.textContent = state.round;
-
-                    this.render();
-
-                    this.setGameTimeout(() => {
-                        if (overlay) overlay.classList.remove('active');
-                    }, 1500);
-                }, 1000);
-            } else {
-                // Fallback if no overlay
-                this.hexGrid.setTimeOfDay(isNight);
-                this.render();
-            }
-
-            this.addLog(t('game.round', { round: state.round, time: isNight ? t('game.night') : t('game.day') }), 'info');
-
-            // Enemy Turn / World Update
-            const enemyLogs = this.enemyAI.updateEnemies(this.enemies, this.hero);
-            if (enemyLogs && enemyLogs.length > 0) {
-                enemyLogs.forEach(log => this.addLog(log, 'warning'));
-                this.showToast('Feinde haben sich bewegt!', 'warning');
-            }
-        });
-    }
-
-    /**
-     * Updates the Round and Time icons in the UI based on TimeManager state.
-     */
-    updateTimeUI() {
-        const state = this.timeManager.getState();
-        const isNight = state.timeOfDay === TIME_OF_DAY.NIGHT;
-
-        const timeIcon = document.getElementById('time-icon');
-        const roundNum = document.getElementById('round-number');
-
-        if (timeIcon) {
-            timeIcon.textContent = isNight ? '🌙' : '☀️';
-            timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
-        }
-        if (roundNum) {
-            roundNum.textContent = state.round;
-        }
-
-        document.body.classList.toggle('night-mode', isNight);
-        document.body.classList.toggle('night-mode', isNight);
-        this.hexGrid.setTimeOfDay(isNight);
-    }
 
     /**
      * Set up listeners for visual effects (Game Juice)

@@ -122,4 +122,85 @@ export class PhaseManager {
             }
         }
     }
+    /**
+     * Sets up the listener for day/night cycle changes.
+     */
+    setupTimeListener() {
+        this.game.timeManager.addListener((state) => {
+            const isNight = state.timeOfDay === 'night'; // Check string or const
+
+            // Visual Transition
+            const overlay = document.getElementById('day-night-overlay');
+            const message = document.getElementById('day-night-message');
+
+            if (overlay && message) {
+                // Determine text based on i18n or hardcoded fallback (keeping consistent with old logic)
+                const nightText = 'Die Nacht bricht herein...';
+                const dayText = 'Der Tag bricht an...';
+
+                message.textContent = isNight ? nightText : dayText;
+                overlay.classList.add('active');
+
+                this.game.setGameTimeout(() => {
+                    // Update Game State visuals behind curtain
+                    this.game.hexGrid.setTimeOfDay(isNight);
+                    if (document.body) {
+                        document.body.classList.toggle('night-mode', isNight);
+                    }
+
+                    // Update UI Icons
+                    const timeIcon = document.getElementById('time-icon');
+                    const roundNum = document.getElementById('round-number');
+                    if (timeIcon) {
+                        timeIcon.textContent = isNight ? '🌙' : '☀️';
+                        timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
+                    }
+                    if (roundNum) roundNum.textContent = state.round;
+
+                    this.game.render();
+
+                    this.game.setGameTimeout(() => {
+                        if (overlay) overlay.classList.remove('active');
+                    }, 1500);
+                }, 1000);
+            } else {
+                // Fallback if no overlay
+                this.game.hexGrid.setTimeOfDay(isNight);
+                this.game.render();
+            }
+
+            // this.game.addLog(t('game.round', { round: state.round, time: isNight ? t('game.night') : t('game.day') }), 'info');
+            // Simplified log for now to avoid t import issues without checking i18n
+            this.game.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
+
+            // Enemy Turn / World Update
+            const enemyLogs = this.game.enemyAI.updateEnemies(this.game.enemies, this.game.hero);
+            if (enemyLogs && enemyLogs.length > 0) {
+                enemyLogs.forEach(log => this.game.addLog(log, 'warning'));
+                this.game.showToast('Feinde haben sich bewegt!', 'warning');
+            }
+        });
+    }
+
+    /**
+     * Updates the Round and Time icons in the UI based on TimeManager state.
+     */
+    updateTimeUI() {
+        const state = this.game.timeManager.getState();
+        const isNight = state.timeOfDay === 'night'; // check const
+
+        const timeIcon = document.getElementById('time-icon');
+        const roundNum = document.getElementById('round-number');
+
+        if (timeIcon) {
+            timeIcon.textContent = isNight ? '🌙' : '☀️';
+            timeIcon.className = `time-icon ${isNight ? 'night' : ''}`;
+        }
+        if (roundNum) {
+            roundNum.textContent = state.round;
+        }
+
+        document.body.classList.toggle('night-mode', isNight);
+        this.game.hexGrid.setTimeOfDay(isNight);
+    }
 }

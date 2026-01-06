@@ -28,8 +28,8 @@ describe('Input Hardening', () => {
 
         let clickHandled = false;
         // Mock handleCanvasClick to set flag if it proceeds
-        const originalHandle = game.handleCanvasClick.bind(game);
-        game.handleCanvasClick = (e) => {
+        const originalHandle = game.interactionController.handleCanvasClick.bind(game.interactionController);
+        game.interactionController.handleCanvasClick = (e) => {
             // Internally it should check isUIBlocked or isModalOpen
             // If the game implementation relies on inputHandler.isUIBlocked(), 
             // ensure that method respects our mock state.
@@ -42,7 +42,7 @@ describe('Input Hardening', () => {
         // Mock isUIBlocked
         game.isUIBlocked = () => true;
 
-        game.handleCanvasClick({ clientX: 100, clientY: 100, preventDefault: () => { } });
+        game.interactionController.handleCanvasClick({ clientX: 100, clientY: 100, preventDefault: () => { } });
 
         expect(clickHandled).toBe(false);
     });
@@ -62,9 +62,9 @@ describe('Input Hardening', () => {
 
         // Assume hex at 100,100 is valid
         // We'll just call the handler directly
-        game.handleCanvasClick(clickEvent);
-        game.handleCanvasClick(clickEvent);
-        game.handleCanvasClick(clickEvent);
+        game.interactionController.handleCanvasClick(clickEvent);
+        game.interactionController.handleCanvasClick(clickEvent);
+        game.interactionController.handleCanvasClick(clickEvent);
 
         // If system handles queueing or movement, checking counts might be tricky without full mock.
         // But verifying no crash is good.
@@ -74,12 +74,12 @@ describe('Input Hardening', () => {
         game.gameState = 'victory';
 
         let interacted = false;
-        game.handleCanvasClick = () => {
+        game.interactionController.handleCanvasClick = () => {
             if (game.gameState !== 'playing') return;
             interacted = true;
         };
 
-        game.handleCanvasClick({ clientX: 100, clientY: 100 });
+        game.interactionController.handleCanvasClick({ clientX: 100, clientY: 100 });
         expect(interacted).toBe(false);
     });
 });

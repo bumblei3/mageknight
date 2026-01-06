@@ -95,7 +95,7 @@ describe('Game Fuzzing', () => {
                         break;
 
                     case 'clickCanvas':
-                        game.handleCanvasClick({
+                        game.interactionController.handleCanvasClick({
                             clientX: randomInt(800),
                             clientY: randomInt(600),
                             preventDefault: () => { }
@@ -113,14 +113,14 @@ describe('Game Fuzzing', () => {
                     case 'rest':
                         // Basic rest action if not in combat
                         if (!game.combat) {
-                            game.rest();
+                            game.phaseManager.rest();
                         }
                         break;
 
                     case 'explore':
                         // Attempt exploration
                         if (!game.combat) {
-                            game.explore();
+                            game.actionManager.explore();
                         }
                         break;
 

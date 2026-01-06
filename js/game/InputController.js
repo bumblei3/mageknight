@@ -38,10 +38,10 @@ export class InputController {
         }
 
         const visitBtn = document.getElementById('visit-btn');
-        if (visitBtn) visitBtn.addEventListener('click', () => this.game.visitSite(), { signal });
+        if (visitBtn) visitBtn.addEventListener('click', () => this.game.actionManager.visitSite(), { signal });
 
         const executeAttackBtn = document.getElementById('execute-attack-btn');
-        if (executeAttackBtn) executeAttackBtn.addEventListener('click', () => this.game.executeAttackAction(), { signal });
+        if (executeAttackBtn) executeAttackBtn.addEventListener('click', () => this.game.combatOrchestrator.executeAttackAction(), { signal });
 
         const saveBtn = document.getElementById('save-btn');
         const loadBtn = document.getElementById('load-btn');
@@ -182,44 +182,44 @@ export class InputController {
 
             // Commands
             switch (e.key.toLowerCase()) {
-            case ' ':
-            case 'space':
-                this.game.turnManager.endTurn();
-                e.preventDefault();
-                break;
-            case 'h': {
-                const helpBtn = document.getElementById('help-btn');
-                if (helpBtn) helpBtn.click();
-                e.preventDefault();
-                break;
-            }
-            case 'r':
-                this.game.rest();
-                e.preventDefault();
-                break;
-            case 'e':
-                this.game.explore();
-                e.preventDefault();
-                break;
-            case 't':
-                this.game.showTutorial();
-                e.preventDefault();
-                break;
-            case 'escape':
-                if (this.game.movementMode) {
-                    this.game.exitMovementMode();
-                    this.game.addLog('Bewegungsmodus abgebrochen', 'info');
+                case ' ':
+                case 'space':
+                    this.game.turnManager.endTurn();
+                    e.preventDefault();
+                    break;
+                case 'h': {
+                    const helpBtn = document.getElementById('help-btn');
+                    if (helpBtn) helpBtn.click();
+                    e.preventDefault();
+                    break;
                 }
-                break;
-            case 'm': {
-                const manaPanel = document.querySelector('.mana-panel');
-                if (manaPanel) {
-                    manaPanel.scrollIntoView({ behavior: 'smooth' });
-                    manaPanel.classList.add('highlight-pulse');
-                    setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
+                case 'r':
+                    this.game.phaseManager.rest();
+                    e.preventDefault();
+                    break;
+                case 'e':
+                    this.game.actionManager.explore();
+                    e.preventDefault();
+                    break;
+                case 't':
+                    this.game.showTutorial();
+                    e.preventDefault();
+                    break;
+                case 'escape':
+                    if (this.game.movementMode) {
+                        this.game.exitMovementMode();
+                        this.game.addLog('Bewegungsmodus abgebrochen', 'info');
+                    }
+                    break;
+                case 'm': {
+                    const manaPanel = document.querySelector('.mana-panel');
+                    if (manaPanel) {
+                        manaPanel.scrollIntoView({ behavior: 'smooth' });
+                        manaPanel.classList.add('highlight-pulse');
+                        setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
+                    }
+                    break;
                 }
-                break;
-            }
             }
 
             // Ctrl combinations

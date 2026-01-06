@@ -92,7 +92,7 @@ describe('Game Core', () => {
         game.hexGrid.pixelToAxial = () => ({ q: 0, r: 0 });
 
         // Should select hex at 0,0
-        game.handleCanvasClick(event);
+        game.interactionController.handleCanvasClick(event);
 
         expect(game.hexGrid.selectedHex).toBeDefined();
         expect(game.hexGrid.selectedHex.q).toBe(0);

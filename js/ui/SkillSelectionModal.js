@@ -25,12 +25,17 @@ export class SkillSelectionModal {
             </div>
         `;
 
+        // Append to body first to ensure it's in the document context if needed
         document.body.appendChild(this.overlay);
 
         this.container = this.overlay.querySelector('#skill-choices-container');
         this.confirmBtn = this.overlay.querySelector('#confirm-skill-btn');
 
-        this.confirmBtn.onclick = () => this.handleConfirm();
+        if (this.confirmBtn) {
+            this.confirmBtn.onclick = () => this.handleConfirm();
+        } else {
+            console.error('SkillSelectionModal: confirm-skill-btn not found in innerHTML');
+        }
     }
 
     show(skills) {

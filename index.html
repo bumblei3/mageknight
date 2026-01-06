@@ -12,16 +12,29 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/hud.css">
-    <link rel="stylesheet" href="css/cards.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/tutorial.css">
-    <link rel="stylesheet" href="css/effects.css">
-    <link rel="stylesheet" href="css/icons.css">
-    <link rel="stylesheet" href="css/floating-text.css">
-    <link rel="stylesheet" href="css/tooltips.css">
-    <link rel="stylesheet" href="css/rewards.css">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="css/loading.css">
+
+    <!-- Defer non-critical CSS -->
+    <link rel="stylesheet" href="css/cards.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/modals.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/tutorial.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/effects.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/icons.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/floating-text.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/tooltips.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/rewards.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/loading.css" media="print" onload="this.media='all'">
+
+    <noscript>
+        <link rel="stylesheet" href="css/cards.css">
+        <link rel="stylesheet" href="css/modals.css">
+        <link rel="stylesheet" href="css/tutorial.css">
+        <link rel="stylesheet" href="css/effects.css">
+        <link rel="stylesheet" href="css/icons.css">
+        <link rel="stylesheet" href="css/floating-text.css">
+        <link rel="stylesheet" href="css/tooltips.css">
+        <link rel="stylesheet" href="css/rewards.css">
+        <link rel="stylesheet" href="css/loading.css">
+    </noscript>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#a855f7">
     <link rel="apple-touch-icon" href="icons/icon-192.png">

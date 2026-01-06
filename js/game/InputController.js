@@ -182,44 +182,44 @@ export class InputController {
 
             // Commands
             switch (e.key.toLowerCase()) {
-                case ' ':
-                case 'space':
-                    this.game.turnManager.endTurn();
-                    e.preventDefault();
-                    break;
-                case 'h': {
-                    const helpBtn = document.getElementById('help-btn');
-                    if (helpBtn) helpBtn.click();
-                    e.preventDefault();
-                    break;
+            case ' ':
+            case 'space':
+                this.game.turnManager.endTurn();
+                e.preventDefault();
+                break;
+            case 'h': {
+                const helpBtn = document.getElementById('help-btn');
+                if (helpBtn) helpBtn.click();
+                e.preventDefault();
+                break;
+            }
+            case 'r':
+                this.game.rest();
+                e.preventDefault();
+                break;
+            case 'e':
+                this.game.explore();
+                e.preventDefault();
+                break;
+            case 't':
+                this.game.showTutorial();
+                e.preventDefault();
+                break;
+            case 'escape':
+                if (this.game.movementMode) {
+                    this.game.exitMovementMode();
+                    this.game.addLog('Bewegungsmodus abgebrochen', 'info');
                 }
-                case 'r':
-                    this.game.rest();
-                    e.preventDefault();
-                    break;
-                case 'e':
-                    this.game.explore();
-                    e.preventDefault();
-                    break;
-                case 't':
-                    this.game.showTutorial();
-                    e.preventDefault();
-                    break;
-                case 'escape':
-                    if (this.game.movementMode) {
-                        this.game.exitMovementMode();
-                        this.game.addLog('Bewegungsmodus abgebrochen', 'info');
-                    }
-                    break;
-                case 'm': {
-                    const manaPanel = document.querySelector('.mana-panel');
-                    if (manaPanel) {
-                        manaPanel.scrollIntoView({ behavior: 'smooth' });
-                        manaPanel.classList.add('highlight-pulse');
-                        setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
-                    }
-                    break;
+                break;
+            case 'm': {
+                const manaPanel = document.querySelector('.mana-panel');
+                if (manaPanel) {
+                    manaPanel.scrollIntoView({ behavior: 'smooth' });
+                    manaPanel.classList.add('highlight-pulse');
+                    setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
                 }
+                break;
+            }
             }
 
             // Ctrl combinations

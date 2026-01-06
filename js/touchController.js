@@ -13,6 +13,9 @@ export class TouchController {
         this.isLongPress = false;
         this.swipeThreshold = 50; // pixels
 
+        // Bind resize handler for cleanup
+        this.resizeHandler = this.handleResize.bind(this);
+
         this.setupTouchEvents();
         this.setupViewportResize();
     }
@@ -20,6 +23,14 @@ export class TouchController {
     destroy() {
         if (this.longPressTimer) clearTimeout(this.longPressTimer);
         if (this.cardLongPressTimer) clearTimeout(this.cardLongPressTimer);
+        if (this.resizeTimer) {
+            clearTimeout(this.resizeTimer);
+            this.resizeTimer = null;
+        }
+
+        window.removeEventListener('resize', this.resizeHandler);
+        window.removeEventListener('orientationchange', this.resizeHandler);
+
         this.abortController.abort();
     }
 
@@ -330,8 +341,8 @@ export class TouchController {
 
     setupViewportResize() {
         // Handle viewport changes (e.g., screen rotation)
-        window.addEventListener('resize', () => this.handleResize());
-        window.addEventListener('orientationchange', () => this.handleResize());
+        window.addEventListener('resize', this.resizeHandler);
+        window.addEventListener('orientationchange', this.resizeHandler);
 
         // Initial resize
         this.handleResize();
@@ -386,14 +397,7 @@ export class TouchController {
         }
     }
 
-    destroy() {
-        if (this.resizeTimer) {
-            clearTimeout(this.resizeTimer);
-            this.resizeTimer = null;
-        }
-        window.removeEventListener('resize', this.handleResize);
-        window.removeEventListener('orientationchange', this.handleResize);
-    }
+
 
     // Utility: Check if device is touch-enabled
     static isTouchDevice() {

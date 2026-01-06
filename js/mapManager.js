@@ -179,44 +179,44 @@ export class MapManager {
 
     getRandomSiteForTerrain(terrain) {
         switch (terrain) {
-            case TERRAIN_TYPES.PLAINS:
-                return Math.random() < 0.7 ? SITE_TYPES.VILLAGE : null;
-            case TERRAIN_TYPES.HILLS: {
-                // Hills can have Keeps, Monasteries, or Mines
-                const roll = Math.random();
-                if (roll < 0.3) return SITE_TYPES.KEEP;
-                if (roll < 0.6) return SITE_TYPES.MONASTERY;
-                if (roll < 0.8) return SITE_TYPES.MINE;
-                return null;
-            }
-            case TERRAIN_TYPES.FOREST: {
-                const roll = Math.random();
-                if (roll < 0.2) return SITE_TYPES.SPAWNING_GROUNDS;
-                if (roll < 0.4) return SITE_TYPES.KEEP; // Adjusted chance
-                return null;
-            }
-            case TERRAIN_TYPES.WASTELAND: {
-                // Wastelands usually Mage Towers, Dungeons, Ruins, or Labyrinths
-                const wRoll = Math.random();
-                if (wRoll < 0.2) return SITE_TYPES.LABYRINTH;
-                if (wRoll < 0.4) return SITE_TYPES.MAGE_TOWER;
-                if (wRoll < 0.6) return SITE_TYPES.TOMB;
-                if (wRoll < 0.8) return SITE_TYPES.DUNGEON;
-                return SITE_TYPES.RUIN;
-            }
-            case TERRAIN_TYPES.DESERT: {
-                const dRoll = Math.random();
-                if (dRoll < 0.3) return SITE_TYPES.LABYRINTH;
-                if (dRoll < 0.6) return SITE_TYPES.MAGE_TOWER;
-                return null;
-            }
-            case TERRAIN_TYPES.MOUNTAINS:
-                // Mountains are prime for Mines
-                return Math.random() < 0.7 ? SITE_TYPES.MINE : SITE_TYPES.DUNGEON;
-            case TERRAIN_TYPES.WATER:
-                return null;
-            default:
-                return null;
+        case TERRAIN_TYPES.PLAINS:
+            return Math.random() < 0.7 ? SITE_TYPES.VILLAGE : null;
+        case TERRAIN_TYPES.HILLS: {
+            // Hills can have Keeps, Monasteries, or Mines
+            const roll = Math.random();
+            if (roll < 0.3) return SITE_TYPES.KEEP;
+            if (roll < 0.6) return SITE_TYPES.MONASTERY;
+            if (roll < 0.8) return SITE_TYPES.MINE;
+            return null;
+        }
+        case TERRAIN_TYPES.FOREST: {
+            const roll = Math.random();
+            if (roll < 0.2) return SITE_TYPES.SPAWNING_GROUNDS;
+            if (roll < 0.4) return SITE_TYPES.KEEP; // Adjusted chance
+            return null;
+        }
+        case TERRAIN_TYPES.WASTELAND: {
+            // Wastelands usually Mage Towers, Dungeons, Ruins, or Labyrinths
+            const wRoll = Math.random();
+            if (wRoll < 0.2) return SITE_TYPES.LABYRINTH;
+            if (wRoll < 0.4) return SITE_TYPES.MAGE_TOWER;
+            if (wRoll < 0.6) return SITE_TYPES.TOMB;
+            if (wRoll < 0.8) return SITE_TYPES.DUNGEON;
+            return SITE_TYPES.RUIN;
+        }
+        case TERRAIN_TYPES.DESERT: {
+            const dRoll = Math.random();
+            if (dRoll < 0.3) return SITE_TYPES.LABYRINTH;
+            if (dRoll < 0.6) return SITE_TYPES.MAGE_TOWER;
+            return null;
+        }
+        case TERRAIN_TYPES.MOUNTAINS:
+            // Mountains are prime for Mines
+            return Math.random() < 0.7 ? SITE_TYPES.MINE : SITE_TYPES.DUNGEON;
+        case TERRAIN_TYPES.WATER:
+            return null;
+        default:
+            return null;
         }
     }
 

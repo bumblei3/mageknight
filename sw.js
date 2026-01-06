@@ -5,23 +5,23 @@
 
 const CACHE_NAME = 'mageknight-v16';
 const STATIC_ASSETS = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/favicon.png',
-    '/css/reset.css',
-    '/css/layout.css',
-    '/css/hud.css',
-    '/css/cards.css',
-    '/css/modals.css',
-    '/css/tutorial.css',
-    '/css/effects.css',
-    '/css/loading.css',
-    '/styles-events.css',
-    '/combat-effects.css',
-    '/time-effects.css',
-    '/mobile.css',
-    '/js/main.js'
+    './',
+    './index.html',
+    './manifest.json',
+    './favicon.png',
+    './css/reset.css',
+    './css/layout.css',
+    './css/hud.css',
+    './css/cards.css',
+    './css/modals.css',
+    './css/tutorial.css',
+    './css/effects.css',
+    './css/loading.css',
+    './styles-events.css',
+    './combat-effects.css',
+    './time-effects.css',
+    './mobile.css',
+    './js/main.js'
 ];
 
 // Install event - cache static assets

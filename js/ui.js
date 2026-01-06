@@ -13,6 +13,7 @@ import { store, ACTIONS } from './game/Store.js';
 import { eventBus } from './eventBus.js';
 import { GAME_EVENTS } from './constants.js';
 import { ParticleSystem } from './particles.js';
+import { SaveLoadModal } from './ui/SaveLoadModal.js';
 
 /**
  * User Interface Controller (Orchestrator)
@@ -34,6 +35,7 @@ export class UI {
         this.unitRenderer = new UnitRenderer(this.elements, this);
         this.handRenderer = new HandRenderer(this.elements, this.tooltipManager, this);
         this.skillRenderer = new SkillRenderer(this);
+        this.saveLoadModal = new SaveLoadModal(this);
 
         this.setupEventListeners();
         this.setupTooltips();

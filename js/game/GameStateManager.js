@@ -107,44 +107,24 @@ export class GameStateManager {
     /**
      * Opens the save file dialog (Slot-based)
      */
-    openSaveDialog() {
-        let message = '💾 SPIEL SPEICHERN\n\nWähle einen Slot (1-5):\n';
+    async openSaveDialog() {
+        if (!this.game.ui || !this.game.ui.saveLoadModal) return;
 
-        for (let i = 0; i < 5; i++) {
-            const meta = SaveManager.getSaveMeta(`slot_${i}`);
-            if (meta) {
-                message += `Slot ${i + 1}: ${new Date(meta.timestamp).toLocaleString()}\n`;
-            } else {
-                message += `Slot ${i + 1}: [Leer]\n`;
-            }
-        }
-
-        const slot = prompt(message);
-        if (slot && slot >= 1 && slot <= 5) {
-            this.saveGame(parseInt(slot) - 1);
+        const slot = await this.game.ui.saveLoadModal.show('save');
+        if (slot !== null) {
+            this.saveGame(slot);
         }
     }
 
     /**
      * Opens the load file dialog (Slot-based)
      */
-    openLoadDialog() {
-        let message = '📂 SPIELSTAND LADEN\n\n';
+    async openLoadDialog() {
+        if (!this.game.ui || !this.game.ui.saveLoadModal) return;
 
-        for (let i = 0; i < 5; i++) {
-            const meta = SaveManager.getSaveMeta(`slot_${i}`);
-            if (meta) {
-                message += `Slot ${i + 1}: ${new Date(meta.timestamp).toLocaleString()}\n`;
-            } else {
-                message += `Slot ${i + 1}: [Leer]\n`;
-            }
-        }
-
-        message += '\nWähle Slot (1-5) oder Abbrechen:';
-        const slot = prompt(message);
-
-        if (slot && slot >= 1 && slot <= 5) {
-            const state = SaveManager.loadGame(`slot_${parseInt(slot) - 1}`);
+        const slot = await this.game.ui.saveLoadModal.show('load');
+        if (slot !== null) {
+            const state = SaveManager.loadGame(`slot_${slot}`);
             if (state) {
                 this.loadGameState(state);
                 this.game.showToast('Spiel geladen!', 'success');

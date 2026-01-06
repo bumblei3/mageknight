@@ -13,6 +13,11 @@ export class SaveManager {
             const data = JSON.stringify({
                 timestamp: Date.now(),
                 version: '1.0',
+                meta: {
+                    heroName: gameState.hero ? gameState.hero.name : 'Unknown',
+                    heroLevel: gameState.hero ? gameState.hero.level : 1,
+                    turn: gameState.turn ? gameState.turn.turnNumber : 1
+                },
                 state: gameState
             });
             localStorage.setItem(key, data);
@@ -66,7 +71,8 @@ export class SaveManager {
             const parsed = JSON.parse(data);
             return {
                 timestamp: parsed.timestamp,
-                version: parsed.version
+                version: parsed.version,
+                ...parsed.meta
             };
         } catch (_e) {
             return null;

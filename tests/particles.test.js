@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ParticleSystem, Particle } from '../js/particles.js';
 import { createMockContext } from './test-mocks.js';
 
@@ -15,6 +15,10 @@ describe('Particle System', () => {
             height: 600
         };
         particleSystem = new ParticleSystem(mockCanvas);
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     it('should initialize correctly', () => {
@@ -59,10 +63,10 @@ describe('Particle System', () => {
             // We need to advance time for performance.now()
             const start = performance.now();
 
-            // Stub performance.now to advance time
-            const originalNow = performance.now;
+            // Stub performance.now behavior
+            const perfSpy = vi.spyOn(performance, 'now');
             let time = 1000;
-            global.performance = { now: () => time };
+            perfSpy.mockImplementation(() => time);
 
             particleSystem.lastTime = 1000;
             time = 1016; // +16ms
@@ -70,9 +74,6 @@ describe('Particle System', () => {
             particleSystem.update();
 
             expect(particleSystem.shakeTime).toBeLessThan(initialTime);
-
-            // Restore
-            global.performance.now = originalNow;
         });
 
         it('should apply translation during draw when shaking', () => {
@@ -109,8 +110,8 @@ describe('Particle System', () => {
             text.life = -0.1; // Kill it
 
             // Stub performance.now needed for update
-            const originalNow = performance.now;
-            global.performance = { now: () => 1000 };
+            const perfSpy = vi.spyOn(performance, 'now');
+            perfSpy.mockImplementation(() => 1000);
             particleSystem.lastTime = 900;
 
             // Ensure update removes it.
@@ -121,8 +122,6 @@ describe('Particle System', () => {
             particleSystem.update();
 
             expect(particleSystem.floatingTexts.length).toBe(0);
-
-            global.performance.now = originalNow;
         });
 
         it('should draw floating text', () => {

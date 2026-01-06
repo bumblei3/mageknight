@@ -46,6 +46,15 @@ jobs:
           path: coverage/
           retention-days: 7
 
+      # Cache Playwright browsers for faster E2E
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
@@ -80,19 +89,32 @@ jobs:
       - name: Prepare production build
         run: |
           mkdir -p dist
+          # Core HTML and config
           cp index.html dist/
           cp manifest.json dist/
           cp sw.js dist/
           cp favicon.png dist/
-          cp *.css dist/
-          cp -r js dist/
+          
+          # All CSS files (root level and css/ folder)
+          cp combat-effects.css dist/
+          cp mobile.css dist/
+          cp styles-events.css dist/
+          cp time-effects.css dist/
           cp -r css dist/
+          
+          # JavaScript (includes vendor dependencies)
+          cp -r js dist/
+          
+          # Icons for PWA
           cp -r icons dist/ || true
+          
+          # List deployed files for verification
+          echo "=== Deployed files ==="
+          find dist -type f | head -50
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload only dist directory
           path: 'dist/'
           
       - name: Deploy to GitHub Pages

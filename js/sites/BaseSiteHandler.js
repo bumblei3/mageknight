@@ -6,7 +6,7 @@ export class BaseSiteHandler {
         this.game = game;
     }
 
-    getOptions(site) {
+    getOptions(_site) {
         return [];
     }
 

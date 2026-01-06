@@ -2,7 +2,7 @@ import { BaseSiteHandler } from './BaseSiteHandler.js';
 import { SAMPLE_ADVANCED_ACTIONS } from '../card.js';
 
 export class MonasteryHandler extends BaseSiteHandler {
-    getOptions(site) {
+    getOptions(_site) {
         const options = [];
 
         // Healing (Cheaper)

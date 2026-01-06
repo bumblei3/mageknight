@@ -3,7 +3,7 @@ import { SITE_TYPES } from '../sites.js';
 import { getUnitsForLocation } from '../unit.js';
 
 export class VillageHandler extends BaseSiteHandler {
-    getOptions(site) {
+    getOptions(_site) {
         const options = [];
 
         // Healing

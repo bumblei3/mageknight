@@ -4,7 +4,7 @@ import { getUnitsForLocation } from '../unit.js';
 import { SAMPLE_SPELLS } from '../card.js';
 
 export class CityHandler extends BaseSiteHandler {
-    getOptions(site) {
+    getOptions(_site) {
         const options = [];
 
         // Expensive Healing

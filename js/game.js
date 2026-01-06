@@ -138,8 +138,8 @@ export class MageKnightGame {
 
     /**
      * Safe wrapper for setTimeout that tracks active timeouts for cleanup.
-     * @param {Function} callback 
-     * @param {number} delay 
+     * @param {Function} callback
+     * @param {number} delay
      */
     setGameTimeout(callback, delay) {
         const id = setTimeout(() => {

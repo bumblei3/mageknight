@@ -287,9 +287,7 @@ export class CombatOrchestrator {
             if (enemy.summoner) {
                 // Determine summon pool (Brown tokens usually: Orcs, etc.)
                 // For simplicity, we pick from a curated list of "Brown-ish" enemies
-                const summonPool = ['orc', 'robber', 'wolf', 'boar', 'orc_summoner_minion']; // logical keys
                 // Filter keys that exist in ENEMY_DEFINITIONS
-                // const validPool = summonPool.filter(k => ENEMY_DEFINITIONS[k] || (k === 'orc' && ENEMY_DEFINITIONS['orc']));
                 // Fallback to Orc if pool empty or issues
                 let summonKey = 'orc';
 

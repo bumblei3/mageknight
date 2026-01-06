@@ -199,7 +199,7 @@ export class HexMeshFactory {
         createHill(-0.3, -0.4, 0.8);
     }
 
-    updateSiteMarkers(parentMesh, site) {
+    updateSiteMarkers(parentMesh, _site) {
         // Clear old marker if any (though currently called during creation)
         const markerGroup = new THREE.Group();
         markerGroup.name = 'site-marker';

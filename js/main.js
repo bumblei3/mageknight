@@ -1,5 +1,5 @@
 import { MageKnightGame } from './game.js';
-import { Game3D } from './3d/Game3D.js';
+// Game3D is now lazy-loaded via dynamic import when 3D mode is first activated
 import i18n from './i18n/index.js';
 import { ErrorHandler } from './errorHandler.js';
 
@@ -56,35 +56,48 @@ const startMageKnight = async () => {
 
         window.game = new MageKnightGame();
 
-        // Initialize 3D View
-        try {
-            window.game3D = new Game3D(window.game);
-            window.game3D.init('game-container-3d');
+        // 3D View - Lazy loaded on first toggle
+        let game3DModule = null;
+        const toggle3DBtn = document.getElementById('toggle-3d-btn');
 
-            // Toggle Button
-            document.getElementById('toggle-3d-btn').addEventListener('click', () => {
+        toggle3DBtn.addEventListener('click', async () => {
+            try {
+                // Lazy load 3D module on first click
+                if (!window.game3D) {
+                    toggle3DBtn.disabled = true;
+                    toggle3DBtn.style.opacity = '0.5';
+
+                    // Dynamic import - only loads Three.js when needed
+                    const { Game3D } = await import('./3d/Game3D.js');
+                    window.game3D = new Game3D(window.game);
+                    window.game3D.init('game-container-3d');
+
+                    // Hook into updateStats to refresh 3D view
+                    const originalUpdateStats = window.game.updateStats.bind(window.game);
+                    window.game.updateStats = () => {
+                        originalUpdateStats();
+                        if (window.game3D && window.game3D.enabled) {
+                            window.game3D.update();
+                        }
+                    };
+
+                    toggle3DBtn.disabled = false;
+                    toggle3DBtn.style.opacity = '';
+                }
+
                 const isEnabled = window.game3D.toggle();
-                const btn = document.getElementById('toggle-3d-btn');
-                btn.classList.toggle('active', isEnabled);
+                toggle3DBtn.classList.toggle('active', isEnabled);
                 if (isEnabled) {
-                    btn.style.backgroundColor = 'var(--primary-color)';
+                    toggle3DBtn.style.backgroundColor = 'var(--primary-color)';
                 } else {
-                    btn.style.backgroundColor = '';
+                    toggle3DBtn.style.backgroundColor = '';
                 }
-            });
-
-            // Hook into updateStats to refresh 3D view
-            const originalUpdateStats = window.game.updateStats.bind(window.game);
-            window.game.updateStats = () => {
-                originalUpdateStats();
-                if (window.game3D && window.game3D.enabled) {
-                    window.game3D.update();
-                }
-            };
-
-        } catch (e) {
-            console.warn('3D initialization failed:', e);
-        }
+            } catch (e) {
+                console.warn('3D initialization failed:', e);
+                toggle3DBtn.disabled = false;
+                toggle3DBtn.style.opacity = '';
+            }
+        });
 
         updateLoading(70, 'Lade Karten und Einheiten...');
         await new Promise(r => setTimeout(r, 150));

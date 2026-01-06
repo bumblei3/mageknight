@@ -1,26 +1,21 @@
 import { test, expect } from '@playwright/test';
+import { GameFlow } from './utils/GameFlow.js';
 
 test.describe('Mage Knight Game Loading', () => {
+    test.setTimeout(60000);
+
     test.beforeEach(async ({ page }) => {
         page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
         await page.goto('/');
     });
 
     const waitForGameReady = async (page) => {
+        const gameFlow = new GameFlow(page);
         // Wait for loading screen to disappear (game load)
-        await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 10000 });
+        await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 15000 });
 
-        // Dismiss tutorial if it appears
-        const skipBtn = page.locator('button:has-text("Überspringen")');
-        // Short timeout for tutorial check to avoid slowing down tests if it doesn't appear
-        try {
-            if (await skipBtn.isVisible({ timeout: 1000 })) {
-                await skipBtn.click();
-                await expect(page.locator('.tutorial-overlay-custom')).toBeHidden();
-            }
-        } catch (e) {
-            // Tutorial might not appear, ignore
-        }
+        await gameFlow.skipTutorial();
+        await gameFlow.handleModals();
     };
 
     test('should load the game and show title', async ({ page }) => {

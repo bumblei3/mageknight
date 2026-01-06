@@ -1,50 +1,12 @@
 import { test, expect } from '@playwright/test';
+import { GameFlow } from './utils/GameFlow.js';
 
 test.describe('Mage Knight Gameplay', () => {
     test.setTimeout(60000);
 
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
-        // Wait for game to load
-        await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 15000 });
-
-        // Skip tutorial if active
-        // The tutorial overlay blocks interactions, so we must dismiss it.
-        const skipBtn = page.locator('#tutorial-skip-btn');
-        try {
-            await skipBtn.waitFor({ state: 'visible', timeout: 5000 });
-            await skipBtn.click();
-            await expect(page.locator('#tutorial-overlay-custom')).toBeHidden();
-        } catch (e) {
-            // Tutorial might not appear or was already skipped
-            console.log('Tutorial skip button not found or not needed.');
-        }
-
-        // Handle Scenario Selection Modal if present
-        const scenarioModal = page.locator('#scenario-selection-modal');
-        // Wait briefly to see if it pops up
-        try {
-            await scenarioModal.waitFor({ state: 'visible', timeout: 2000 });
-            if (await scenarioModal.isVisible()) {
-                console.log('Selecting scenario to proceed...');
-                // Click the first scenario card
-                await page.locator('.scenario-card').first().click();
-                await expect(scenarioModal).toBeHidden();
-            }
-        } catch (e) {
-            // Modal didn't appear, carry on
-        }
-
-        // Handle Hero Selection Modal if present
-        const heroModal = page.locator('#hero-selection-modal');
-        try {
-            await heroModal.waitFor({ state: 'visible', timeout: 2000 });
-            if (await heroModal.isVisible()) {
-                console.log('Selecting hero to proceed...');
-                await page.locator('.hero-select-btn').first().click();
-                await expect(heroModal).toBeHidden();
-            }
-        } catch (e) { }
+        const gameFlow = new GameFlow(page);
+        await gameFlow.ensureGameStarted();
     });
 
     test('should allow toggling debug panel', async ({ page }) => {

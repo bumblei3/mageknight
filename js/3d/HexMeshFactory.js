@@ -43,27 +43,93 @@ export class HexMeshFactory {
 
     getMaterial(terrainType) {
         if (!this.materials.has(terrainType)) {
-            // Define colors/textures based on terrain
-            let color = 0x888888;
-            switch (terrainType) {
-            case 'plains': color = 0x4ade80; break;     // Green
-            case 'forest': color = 0x166534; break;     // Dark Green
-            case 'hills': color = 0xd97706; break;      // Orange-ish Brown
-            case 'mountains': color = 0x57534e; break;  // Grey
-            case 'water': color = 0x3b82f6; break;      // Blue
-            case 'wasteland': color = 0x7f1d1d; break;  // Dark Red
-            case 'desert': color = 0xfde047; break;     // Yellow
-            }
+            let material;
 
-            const material = new THREE.MeshStandardMaterial({
-                color: color,
-                roughness: 0.8,
-                metalness: 0.1,
-                flatShading: true
-            });
+            if (terrainType === 'water') {
+                material = this.getWaterMaterial();
+            } else {
+                // Define colors/textures based on terrain
+                let color = 0x888888;
+                switch (terrainType) {
+                case 'plains': color = 0x4ade80; break;     // Green-400
+                case 'forest': color = 0x14532d; break;     // Green-900 (Darker)
+                case 'hills': color = 0x92400e; break;      // Amber-800
+                case 'mountains': color = 0x44403c; break;  // Stone-700
+                case 'wasteland': color = 0x7f1d1d; break;  // Red-900
+                case 'desert': color = 0xfacc15; break;     // Yellow-400
+                }
+
+                material = new THREE.MeshStandardMaterial({
+                    color: color,
+                    roughness: 0.9,
+                    metalness: 0.1,
+                    flatShading: true
+                });
+            }
             this.materials.set(terrainType, material);
         }
         return this.materials.get(terrainType);
+    }
+
+    getWaterMaterial() {
+        // Simple Low-Poly Water Shader
+        const vertexShader = `
+            uniform float uTime;
+            varying vec2 vUv;
+            varying float vElevation;
+
+            void main() {
+                vUv = uv;
+                vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                
+                // Simple wave
+                float elevation = sin(modelPosition.x * 2.0 + uTime) * 0.1;
+                elevation += sin(modelPosition.z * 1.5 + uTime * 0.8) * 0.1;
+                
+                modelPosition.y += elevation;
+                vElevation = elevation;
+
+                vec4 viewPosition = viewMatrix * modelPosition;
+                vec4 projectedPosition = projectionMatrix * viewPosition;
+                gl_Position = projectedPosition;
+            }
+        `;
+
+        const fragmentShader = `
+            uniform vec3 uColorWaterDeep;
+            uniform vec3 uColorWaterSurface;
+            uniform float uOpacity;
+            varying float vElevation;
+
+            void main() {
+                float mixStrength = (vElevation + 0.2) * 2.0; // Adjust for wave height
+                vec3 color = mix(uColorWaterDeep, uColorWaterSurface, mixStrength);
+                gl_FragColor = vec4(color, uOpacity);
+            }
+        `;
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            uniforms: {
+                uTime: { value: 0 },
+                uColorWaterDeep: { value: new THREE.Color('#1e3a8a') }, // Blue-900
+                uColorWaterSurface: { value: new THREE.Color('#60a5fa') }, // Blue-400
+                uOpacity: { value: 0.8 }
+            },
+            transparent: true,
+            // flatShading removed as it is not a property of ShaderMaterial
+            // ShaderMaterial handles lights differently, usually need to add lighting logic or use CustomShaderMaterial
+            // For now, emissive-style or simple logic.
+            // NOTE: ShaderMaterial doesn't react to scene lights by default.
+            // To keep it simple and consistent with StandardMaterials,
+            // we could stick to MeshStandardMaterial but animate vertices in User-Land or use onBeforeCompile.
+            // BUT: For this task, a simple shader is fine if we accept it's "unlit" or we just simulate basic directional light.
+        });
+
+        // Let's stick to the Plan: simple shader.
+        // We will update uTime in Game3D.
+        return material;
     }
 
     createHexMesh(hex) {
@@ -226,5 +292,14 @@ export class HexMeshFactory {
 
     addSiteMarker(parentMesh, site) {
         this.updateSiteMarkers(parentMesh, site);
+    }
+
+    updateMaterials(time) {
+        if (this.materials.has('water')) {
+            const waterMat = this.materials.get('water');
+            if (waterMat.uniforms) {
+                waterMat.uniforms.uTime.value = time;
+            }
+        }
     }
 }

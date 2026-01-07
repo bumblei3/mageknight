@@ -16,6 +16,7 @@ export class SceneManager3D {
         this.initCamera();
         this.initRenderer();
         this.initLighting();
+        this.initAtmosphere();
         this.initControls();
 
         // Group to hold all hexes and units
@@ -83,6 +84,39 @@ export class SceneManager3D {
         this.scene.add(pointLight);
     }
 
+    initAtmosphere() {
+        // Simple clouds
+        const cloudGroup = new THREE.Group();
+        const cloudGeo = new THREE.DodecahedronGeometry(1.0, 0); // Low poly blobs
+        const cloudMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8,
+            flatShading: true
+        });
+
+        for (let i = 0; i < 15; i++) {
+            const cloud = new THREE.Mesh(cloudGeo, cloudMat);
+            // Random position above board
+            const x = (Math.random() - 0.5) * 60;
+            const z = (Math.random() - 0.5) * 60;
+            const y = 8 + Math.random() * 5;
+
+            cloud.position.set(x, y, z);
+
+            const scale = 1 + Math.random() * 2;
+            cloud.scale.set(scale, scale * 0.6, scale);
+
+            cloud.castShadow = true; // Clouds cast shadows!
+
+            cloudGroup.add(cloud);
+        }
+
+        // Slightly animate clouds in update loop if we want, but static is fine for now
+        this.scene.add(cloudGroup);
+        this.clouds = cloudGroup;
+    }
+
     initControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true; // Smooth motion
@@ -127,8 +161,10 @@ export class SceneManager3D {
     animate() {
         this.requestAnimationFrameId = requestAnimationFrame(this.animate);
 
-        // Rotate atmosphere light slightly
-        // const time = Date.now() * 0.001;
+        const time = performance.now() * 0.001;
+        if (this.onUpdate) {
+            this.onUpdate(time);
+        }
 
         if (this.controls) this.controls.update();
 

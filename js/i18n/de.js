@@ -302,7 +302,8 @@ export default {
         mountains: { name: 'Berge', desc: 'Hohe Berge. Nur schwer passierbar.', cost: '5' },
         desert: { name: 'Wüste', desc: 'Trockene Wüste. Tagsüber sehr anstrengend.', cost: '5' },
         wasteland: { name: 'Ödland', desc: 'Verfluchtes Ödland. Gefährliches Terrain.', cost: '4' },
-        water: { name: 'Wasser', desc: 'Tiefes Wasser. Ohne Boot oder Magie unpassierbar.', cost: '∞' }
+        water: { name: 'Wasser', desc: 'Tiefes Wasser. Ohne Boot oder Magie unpassierbar.', cost: '∞' },
+        unknown: { name: 'Unbekannt', desc: 'Unbekanntes Terrain.', cost: '?' }
     },
 
     // Sites

@@ -707,22 +707,41 @@ describe('Coverage Gap Fill', () => {
 
         it('should handle card right click valid option', () => {
             game.combat = false;
-            window.prompt = () => '1'; // Option 1: Movement
 
-            // Mock playCardSideways
-            let played = false;
-            game.hero.playCardSideways = (idx, type) => {
-                played = true;
-                return {
-                    card: { name: 'Card', color: 'blue' },
-                    effect: { movement: 1, sideways: true }
-                };
+            // Mock modal details
+            // We just want to see if it OPENS the modal, which means it processed the right click
+            // properly.
+
+            // Mock document.getElementById for modal
+            const modal = {
+                style: { display: 'none' },
+                classList: { add: () => { }, remove: () => { } },
+                querySelector: () => ({ onclick: null }),
+                onclick: null
+            };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = (id) => {
+                if (id === 'sideways-modal') return modal;
+                if (id === 'sideways-cancel') return { onclick: null };
+                if (id === 'sideways-close') return { onclick: null };
+                if (id === 'sideways-card-preview') return { innerHTML: '', appendChild: () => { } };
+                return originalGetElementById(id);
+            };
+
+            // Also mock querySelectorAll for buttons
+            const originalQuerySelectorAll = document.querySelectorAll;
+            document.querySelectorAll = (sel) => {
+                if (sel === '.sideways-options button') return [];
+                return originalQuerySelectorAll(sel);
             };
 
             game.interactionController.handleCardRightClick(0, { name: 'Card', isWound: () => false });
 
-            expect(played).toBe(true);
-            expect(game.ui.elements.handCards.innerHTML).toBeDefined(); // renderHand called
+            expect(modal.style.display).toBe('flex');
+
+            // Cleanup
+            document.getElementById = originalGetElementById;
+            document.querySelectorAll = originalQuerySelectorAll;
         });
 
         it('should handle full state load', () => {

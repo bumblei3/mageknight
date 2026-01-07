@@ -18,10 +18,30 @@ export class Game3D {
     init(containerId) {
         this.sceneManager = new SceneManager3D(containerId);
 
+        // Link update loop
+        this.sceneManager.onUpdate = (time) => {
+            if (this.meshFactory) {
+                this.meshFactory.updateMaterials(time);
+            }
+            // We could also animate the selector pulse here later
+            this.updateSelectorAnimation(time);
+        };
+
         // Input Handling
         const container = document.getElementById(containerId);
         container.addEventListener('pointerdown', (e) => this.onClick(e));
         container.addEventListener('pointermove', (e) => this.onPointerMove(e));
+    }
+
+    updateSelectorAnimation(time) {
+        if (this.sceneManager && this.sceneManager.selector && this.sceneManager.selector.visible) {
+            const scale = 1.0 + Math.sin(time * 3.0) * 0.05;
+            this.sceneManager.selector.scale.set(scale, 1, scale);
+            // Pulse opacity if material supports it
+            if (this.sceneManager.selector.material) {
+                // this.sceneManager.selector.material.opacity = 0.3 + Math.sin(time * 3.0) * 0.1;
+            }
+        }
     }
 
     onPointerMove(event) {

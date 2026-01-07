@@ -109,7 +109,9 @@ export class DebugManager {
             `;
 
             container.appendChild(item);
-            container.scrollTop = container.scrollHeight;
+            requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight;
+            });
 
             if (container.children && container.children.length > 50) {
                 const first = container.firstElementChild || container.firstChild;

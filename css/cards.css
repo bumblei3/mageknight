@@ -506,7 +506,8 @@
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
-    min-height: 180px;
+    min-height: 260px;
+    /* Reserved space for 220px cards + padding to prevent CLS */
     align-items: center;
     pointer-events: auto;
     /* Rail captures clicks */

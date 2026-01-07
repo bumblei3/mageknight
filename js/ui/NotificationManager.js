@@ -60,7 +60,9 @@ export class NotificationManager {
                 countBadge.textContent = `×${count}`;
                 countBadge.style.display = 'inline';
             }
-            logContainer.scrollTop = logContainer.scrollHeight;
+            requestAnimationFrame(() => {
+                logContainer.scrollTop = logContainer.scrollHeight;
+            });
             return;
         }
 
@@ -139,7 +141,9 @@ export class NotificationManager {
             logContainer.removeChild(logContainer.firstElementChild);
         }
 
-        logContainer.scrollTop = logContainer.scrollHeight;
+        requestAnimationFrame(() => {
+            logContainer.scrollTop = logContainer.scrollHeight;
+        });
     }
 
     /**

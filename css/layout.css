@@ -112,6 +112,8 @@ body {
     z-index: 100;
     pointer-events: none;
     /* Container passes clicks */
+    min-height: 280px;
+    /* Reserve space to prevent CLS when cards load */
 }
 
 .game-board-container {

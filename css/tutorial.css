@@ -5,7 +5,8 @@
 :root {
     --tutorial-bg: rgba(15, 15, 30, 0.95);
     --tutorial-accent: var(--color-accent-gold, #fbbf24);
-    --tutorial-primary: var(--color-accent-primary, #8b5cf6);
+    --tutorial-primary: #5b21b6;
+    /* Hardcoded for >4.5:1 contrast against white text */
 }
 
 .tutorial-overlay-custom {
@@ -117,9 +118,9 @@
 
 .tutorial-navigation .btn-primary {
     background: var(--tutorial-primary);
-    color: white;
+    color: #ffffff;
     border: none;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
 }
 
 .tutorial-navigation .btn-primary:hover {

@@ -56,7 +56,7 @@ export class ScenarioSelectionModal {
         card.innerHTML = `
             <div class="scenario-difficulty ${difficulty.toLowerCase()}">${difficulty}</div>
             <div class="scenario-image-container">
-                <img src="${imagePath}" alt="${scenario.name}" class="scenario-image" width="300" height="160" loading="lazy" onerror="this.src='assets/scenarios/placeholder.png'">
+                <img src="${imagePath}" alt="${scenario.name}" class="scenario-image" width="300" height="160" fetchpriority="high" onerror="this.src='assets/scenarios/placeholder.png'">
             </div>
             <div class="scenario-card-content">
                 <h3>${scenario.name}</h3>

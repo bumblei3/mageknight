@@ -300,7 +300,12 @@ export class MageKnightGame {
         if (overlayParticles) this.particleSystem = overlayParticles;
 
         // Handle Window Resize
-        window.addEventListener('resize', () => this.handleResize());
+        // Handle Window Resize - Debounced to prevent layout thrashing
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => this.handleResize(), 100);
+        });
         this.handleResize(); // Initial resize
     }
 

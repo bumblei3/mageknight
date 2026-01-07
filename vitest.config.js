@@ -9,8 +9,9 @@ export default defineConfig({
         include: ['tests/**/*.test.js'],
         exclude: ['node_modules', 'dist'],
         coverage: {
-            provider: 'v8', // or 'c8'
+            provider: 'v8', // Node 24+ supports node:inspector/promises
             reporter: ['text', 'json', 'html'],
+            reportsDirectory: './coverage',
         },
     },
 });

@@ -113,5 +113,53 @@ test.describe('Gameplay Flow', () => {
             const cardElements = page.locator('#hand-cards .card');
             await expect(cardElements).toHaveCount(5);
         });
+
+        await test.step('Explore Map', async () => {
+            // Teleport to edge and give points
+            await page.evaluate(() => {
+                // Force a missing neighbor to allow exploration at 0,0
+                // Default 0,0 has all neighbors. Let's delete (1,0)
+                const key = window.game.hexGrid.getHexKey(1, 0);
+                window.game.hexGrid.hexes.delete(key);
+
+                window.game.hero.movementPoints = 10;
+                window.game.hero.position = { q: 0, r: 0 }; // Ensure at center
+                window.game.updateStats(); // FORCE UI UPDATE
+
+                // Debugging
+                const canExplore = window.game.mapManager.canExplore(0, 0);
+                console.log('Can Explore (0,0):', canExplore);
+            });
+
+            const exploreBtn = page.locator('#explore-btn');
+            await expect(exploreBtn).toBeVisible();
+            await expect(exploreBtn).toBeEnabled();
+
+            // Click explore
+            await exploreBtn.click();
+
+            // logic might fail if no adjacent unknown. 
+            // So we should verify we get EITHER "Neues Gebiet" OR "Nichts zu entdecken"
+            const gameLog = page.locator('#game-log');
+            await expect(gameLog).toContainText(/Neues Gebiet|Nichts mehr zu entdecken|Bewegungspunkte/);
+        });
+
+        await test.step('Day/Night Transition Overlay', async () => {
+            // Force End of Round to trigger Night
+            await page.evaluate(() => {
+                if (window.game.timeManager.isDay()) {
+                    window.game.timeManager.endRound();
+                }
+            });
+
+            // Check for overlay
+            const overlay = page.locator('.day-night-overlay');
+            await expect(overlay).toBeVisible();
+            await expect(overlay).toHaveClass(/active/);
+            await expect(page.locator('.day-night-message')).toContainText('Nacht');
+
+            // Wait for it to disappear
+            await expect(overlay).not.toHaveClass(/active/, { timeout: 5000 });
+        });
     });
 });

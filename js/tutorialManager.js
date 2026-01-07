@@ -33,6 +33,7 @@ export class TutorialManager {
      * Create tutorial UI elements
      */
     createTutorialUI() {
+        if (typeof document === 'undefined') return;
         // Check if already exists
         if (document.getElementById('tutorial-overlay-custom')) {
             this.overlay = document.getElementById('tutorial-overlay-custom');
@@ -99,6 +100,8 @@ export class TutorialManager {
 
         this.currentStep = stepIndex;
         const step = this.steps[stepIndex];
+
+        if (typeof document === 'undefined') return;
 
         // Update UI
         const counter = document.getElementById('tutorial-step-counter');
@@ -227,7 +230,11 @@ export class TutorialManager {
                 const result = this.originalHandlers.playCard.call(this.game, index, card);
                 if (card) {
                     this.game.addLog('Perfekt! Karte gespielt.', 'success');
-                    setTimeout(() => this.nextStep(), 500);
+                    if (this.game.setGameTimeout) {
+                        this.game.setGameTimeout(() => this.nextStep(), 500);
+                    } else {
+                        setTimeout(() => this.nextStep(), 500);
+                    }
                 }
                 return result;
             };
@@ -236,7 +243,11 @@ export class TutorialManager {
             this.game.moveHero = (q, r) => {
                 const result = this.originalHandlers.moveHero.call(this.game, q, r);
                 this.game.addLog('Sehr gut! Du hast dich bewegt.', 'success');
-                setTimeout(() => this.nextStep(), 500);
+                if (this.game.setGameTimeout) {
+                    this.game.setGameTimeout(() => this.nextStep(), 500);
+                } else {
+                    setTimeout(() => this.nextStep(), 500);
+                }
                 return result;
             };
         }

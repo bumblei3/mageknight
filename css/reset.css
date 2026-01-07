@@ -19,18 +19,19 @@
     --color-bg-secondary: hsl(30, 20%, 8%);
     --color-bg-tertiary: hsl(30, 30%, 12%);
 
-    --color-accent-primary: hsl(var(--h-gold), 50%, 65%);
-    /* Antique Gold */
-    --color-accent-secondary: hsl(var(--h-crimson), 60%, 50%);
-    /* Deep Crimson */
-    --color-accent-cyan: hsl(var(--h-teal), 40%, 45%);
-    /* Muted Teal */
-    --color-accent-gold: hsl(var(--h-gold), 80%, 50%);
-    /* Goldenrod */
+    --color-accent-primary: hsl(var(--h-gold), 60%, 70%);
+    /* Antique Gold - Lighter */
+    --color-accent-secondary: hsl(var(--h-crimson), 70%, 60%);
+    /* Deep Crimson - Lighter */
+    --color-accent-cyan: hsl(var(--h-teal), 50%, 55%);
+    /* Muted Teal - Lighter */
+    --color-accent-gold: hsl(var(--h-gold), 90%, 60%);
+    /* Goldenrod - Lighter/Brighter */
 
     /* Glassmorphism - Premium Fantasy */
-    --glass-bg: hsla(30, 20%, 8%, 0.85);
-    --glass-bg-hover: hsla(30, 30%, 12%, 0.9);
+    --glass-bg: hsla(30, 20%, 5%, 0.9);
+    /* Darker background for better contrast */
+    --glass-bg-hover: hsla(30, 30%, 10%, 0.95);
     --glass-border: hsla(var(--h-gold), 50%, 65%, 0.3);
     --glass-border-highlight: hsla(var(--h-gold), 80%, 50%, 0.6);
     --glass-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 0, 0, 0.5);
@@ -41,17 +42,20 @@
     --parchment-border: 2px solid hsla(30, 50%, 40%, 0.5);
 
     /* Mana Colors */
-    --color-mana-red: hsl(0, 80%, 50%);
-    --color-mana-blue: hsl(210, 80%, 50%);
+    --color-mana-red: hsl(0, 85%, 60%);
+    --color-mana-blue: hsl(210, 85%, 60%);
     --color-mana-white: hsl(0, 0%, 100%);
-    --color-mana-green: hsl(150, 80%, 40%);
-    --color-mana-gold: hsl(45, 90%, 50%);
-    --color-mana-black: hsl(220, 20%, 10%);
+    --color-mana-green: hsl(150, 85%, 50%);
+    --color-mana-gold: hsl(45, 95%, 60%);
+    --color-mana-black: hsl(220, 20%, 15%);
 
     /* Text Colors - WCAG AA compliant contrast on dark backgrounds */
-    --color-text-primary: hsl(210, 20%, 98%);
-    --color-text-secondary: hsl(210, 15%, 90%);
-    --color-text-muted: hsl(210, 10%, 85%);
+    --color-text-primary: hsl(0, 0%, 100%);
+    /* White */
+    --color-text-secondary: hsl(210, 20%, 92%);
+    /* Lighter Grey */
+    --color-text-muted: hsl(210, 15%, 80%);
+    /* Lighter Muted */
 
     /* Spacing */
     --spacing-xs: 0.25rem;

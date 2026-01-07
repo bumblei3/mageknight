@@ -144,7 +144,7 @@ export class PhaseManager {
                 this.game.setGameTimeout(() => {
                     // Update Game State visuals behind curtain
                     this.game.hexGrid.setTimeOfDay(isNight);
-                    if (document.body) {
+                    if (typeof document !== 'undefined' && document.body) {
                         document.body.classList.toggle('night-mode', isNight);
                     }
 

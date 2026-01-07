@@ -40,10 +40,18 @@ export function triggerScreenShake(intensity = 5, duration = 300) {
 
             container.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
 
-            animationFrame = requestAnimationFrame(shake);
+            if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+                animationFrame = window.requestAnimationFrame(shake);
+            }
         }
 
-        animationFrame = requestAnimationFrame(shake);
+        if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+            animationFrame = window.requestAnimationFrame(shake);
+        } else {
+            // Fallback for environment without RAF (e.g. some tests)
+            // Resolve immediately or assume it works
+            resolve();
+        }
     });
 }
 

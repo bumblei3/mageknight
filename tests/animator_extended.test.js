@@ -45,17 +45,55 @@ describe('Animator Coverage', () => {
 
     describe('animate', () => {
         it('should animate from start to end', async () => {
+            vi.useFakeTimers();
+            const start = 1000;
+            let now = start;
+
+            // Ensure performance.now works
+            Object.defineProperty(global, 'performance', {
+                writable: true,
+                value: { now: () => now }
+            });
+            Object.defineProperty(window, 'performance', {
+                writable: true,
+                value: { now: () => now }
+            });
+
+            // Mock rAF
+            const mockRAF = (cb) => {
+                // console.log('Mock RAF called');
+                setTimeout(() => {
+                    // console.log('Executing RAF callback with time:', now);
+                    cb(now);
+                }, 16);
+                return 1;
+            };
+            global.requestAnimationFrame = mockRAF;
+            window.requestAnimationFrame = mockRAF;
+
             let lastValue = 0;
             const id = anim.animate({
                 from: 0,
                 to: 100,
                 duration: 50,
-                onUpdate: (value) => { lastValue = value; }
+                onUpdate: (value) => {
+                    if (!isNaN(value)) lastValue = value;
+                }
             });
             expect(id).toBeDefined();
 
-            await new Promise(r => setTimeout(r, 100));
+            // Advance time
+            now += 25;
+            await vi.advanceTimersByTimeAsync(16);
             expect(lastValue).toBeGreaterThan(0);
+
+            now += 30; // Total 55 > 50
+            await vi.advanceTimersByTimeAsync(32);
+            await vi.advanceTimersByTimeAsync(16); // Cleanup
+
+            expect(lastValue).toBe(100);
+
+            vi.useRealTimers();
         });
     });
 

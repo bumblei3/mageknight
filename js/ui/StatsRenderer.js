@@ -61,6 +61,8 @@ export class StatsRenderer {
             if (!img) {
                 img = document.createElement('img');
                 img.className = 'hero-avatar-img';
+                img.width = 48;
+                img.height = 48;
                 this.elements.heroAvatar.appendChild(img);
             }
             if (img.src !== hero.portrait) {

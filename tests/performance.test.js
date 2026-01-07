@@ -61,6 +61,7 @@ describe('Performance Tests', () => {
             game.hero.drawCards();
             game.hero.gainFame(10);
             game.hero.levelUp();
+            game.destroy(); // Fix: Clean up to prevent leaks and stray timers
         }
         const totalTime = performance.now() - start;
         console.log(`Completed 50 full game resets in ${totalTime.toFixed(2)}ms`);

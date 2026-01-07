@@ -37,9 +37,13 @@ describe('Visual Rendering Snapshots', () => {
     });
 
     it('should call fillRect and stroke during hex rendering', () => {
-        // Override rAF to sync
+        // Override rAF to run once to avoid infinite recursion with sync callback
         const originalRAF = window.requestAnimationFrame;
-        window.requestAnimationFrame = (cb) => cb();
+        window.requestAnimationFrame = (cb) => {
+            // Do NOT call cb() synchronously if it re-schedules itself
+            // Just simulate one frame for this specific test
+            return setTimeout(cb, 0);
+        };
 
         // Access the mock context through game.ctx (which was captured during construction)
         const gameCtx = game.ctx;

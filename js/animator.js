@@ -42,19 +42,31 @@ export class Animator {
                 onUpdate(currentValue, progress);
             }
 
-            if (progress < 1) {
-                const rafId = requestAnimationFrame(animate);
-                this.activeAnimations.set(id, rafId);
-            } else {
-                this.activeAnimations.delete(id);
+            if (progress >= 1) {
                 if (onComplete) {
                     onComplete();
                 }
+                this.activeAnimations.delete(id);
+                return;
+            }
+
+            if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+                const rafId = window.requestAnimationFrame(animate);
+                this.activeAnimations.set(id, rafId);
+            } else {
+                // Fallback for non-browser environments
+                const rafId = setTimeout(() => animate(Date.now() + 16), 16);
+                this.activeAnimations.set(id, rafId);
             }
         };
 
-        const rafId = requestAnimationFrame(animate);
-        this.activeAnimations.set(id, rafId);
+        if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+            const rafId = window.requestAnimationFrame(animate);
+            this.activeAnimations.set(id, rafId);
+        } else {
+            const rafId = setTimeout(() => animate(Date.now() + 16), 16);
+            this.activeAnimations.set(id, rafId);
+        }
 
         return id;
     }
@@ -156,7 +168,16 @@ export class Animator {
     cancel(id) {
         const rafId = this.activeAnimations.get(id);
         if (rafId) {
-            cancelAnimationFrame(rafId);
+            try {
+                if (typeof window !== 'undefined' && window.cancelAnimationFrame) {
+                    window.cancelAnimationFrame(rafId);
+                } else {
+                    clearTimeout(rafId);
+                }
+            } catch (_e) {
+                // Fallback if cancelAnimationFrame fails (e.g. ID was from setTimeout)
+                clearTimeout(rafId);
+            }
             this.activeAnimations.delete(id);
         }
     }
@@ -166,7 +187,15 @@ export class Animator {
      */
     cancelAll() {
         this.activeAnimations.forEach(rafId => {
-            cancelAnimationFrame(rafId);
+            try {
+                if (typeof window !== 'undefined' && window.cancelAnimationFrame) {
+                    window.cancelAnimationFrame(rafId);
+                } else {
+                    clearTimeout(rafId);
+                }
+            } catch (_e) {
+                clearTimeout(rafId);
+            }
         });
         this.activeAnimations.clear();
     }

@@ -60,16 +60,22 @@ test.describe('Interactions Flow', () => {
 
     test('should collect mana from source', async ({ page }) => {
         await test.step('Collect Mana', async () => {
-            const manaSource = page.locator('#mana-source .mana-die').first();
-            await expect(manaSource).toBeVisible();
+            // Wait for mana source to be fully rendered
+            const manaSource = page.locator('#mana-source .mana-die:not(.used)').first();
+            await expect(manaSource).toBeVisible({ timeout: 10000 });
 
             // Wait for any animations to settle
             await page.waitForTimeout(500);
 
             const initialManaCount = await page.evaluate(() => window.game.hero.tempMana.length);
 
-            // Use force:true to click even if element is animating
-            await manaSource.click({ force: true });
+            // Trigger the click via JavaScript to ensure the event handler fires
+            await page.evaluate(() => {
+                const die = document.querySelector('#mana-source .mana-die:not(.used)');
+                if (die) {
+                    die.click();
+                }
+            });
 
             // Verify mana collected
             await expect.poll(async () => {

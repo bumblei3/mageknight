@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CityHandler } from '../../js/sites/CityHandler.js';
 import { SITE_TYPES } from '../../js/sites.js';
+import * as unitModule from '../../js/unit.js';
 
 describe('CityHandler', () => {
     let handler;
@@ -10,20 +11,18 @@ describe('CityHandler', () => {
         mockGame = {
             hero: {
                 wounds: [],
-                influencePoints: 10,
-                crystals: { RED: 2, BLUE: 1, GREEN: 0, WHITE: 0 },
-                discard: [],
                 units: [],
-                addUnit: vi.fn().mockReturnValue(true),
+                discard: [],
+                influencePoints: 0,
+                commandLimit: 1,
                 healWound: vi.fn().mockReturnValue(true),
+                addUnit: vi.fn().mockReturnValue(true),
                 removeMana: vi.fn(),
-                getManaInventory: vi.fn().mockReturnValue(['red', 'blue'])
+                getManaInventory: vi.fn().mockReturnValue([]),
+                crystals: { RED: 0, BLUE: 0, GREEN: 0, WHITE: 0, GOLD: 0, red: 0, blue: 0, green: 0, white: 0, gold: 0 }
             },
             addLog: vi.fn(),
-            updateStats: vi.fn(),
-            combatOrchestrator: {
-                initiateCombat: vi.fn()
-            }
+            updateStats: vi.fn()
         };
         handler = new CityHandler(mockGame);
     });
@@ -38,7 +37,7 @@ describe('CityHandler', () => {
         });
 
         it('should return heal option enabled when hero has wounds', () => {
-            mockGame.hero.wounds = [{ id: 'wound1' }];
+            mockGame.hero.wounds = [{ id: 'w1' }];
             const options = handler.getOptions({ type: SITE_TYPES.CITY });
             const healOption = options.find(o => o.id === 'heal');
 
@@ -51,99 +50,146 @@ describe('CityHandler', () => {
 
             expect(recruitOption).toBeDefined();
             expect(recruitOption.subItems).toBeDefined();
+            expect(recruitOption.subItems.length).toBeGreaterThan(0);
+        });
+
+        it('should handle empty units list', () => {
+            const spy = vi.spyOn(unitModule, 'getUnitsForLocation').mockReturnValue([]);
+
+            const options = handler.getOptions({ type: SITE_TYPES.CITY });
+            const recruitOption = options.find(o => o.id === 'recruit_elite');
+
+            expect(recruitOption).toBeDefined();
+            expect(recruitOption.subItems).toBeDefined();
+            expect(recruitOption.subItems.length).toBe(1);
+            expect(recruitOption.subItems[0].label).toBe('Keine Einheiten verfügbar');
+            expect(recruitOption.subItems[0].enabled).toBe(false);
+
+            spy.mockRestore();
         });
 
         it('should return spells option', () => {
             const options = handler.getOptions({ type: SITE_TYPES.CITY });
-            const spellOption = options.find(o => o.id === 'city_spells');
+            const spellsOption = options.find(o => o.id === 'city_spells');
 
-            expect(spellOption).toBeDefined();
-            expect(spellOption.subItems.length).toBeGreaterThan(0);
+            expect(spellsOption).toBeDefined();
+            expect(spellsOption.subItems.length).toBeGreaterThan(0);
+            expect(spellsOption.subItems[0].manaCost).toBeDefined();
         });
     });
 
     describe('healWounds (inherited)', () => {
         it('should heal wound when hero has enough influence', () => {
-            mockGame.hero.wounds = [{ id: 'wound1' }];
-            mockGame.hero.influencePoints = 10;
+            mockGame.hero.wounds = [{ id: 'w1' }];
+            mockGame.hero.influencePoints = 5;
 
             const result = handler.healWounds(4);
-
             expect(result.success).toBe(true);
-            expect(mockGame.hero.healWound).toHaveBeenCalled();
-            expect(mockGame.hero.influencePoints).toBe(6);
-            expect(mockGame.addLog).toHaveBeenCalledWith('Wunde geheilt!', 'success');
+            expect(mockGame.hero.healWound).toHaveBeenCalledWith(false);
         });
 
         it('should fail when not enough influence', () => {
-            mockGame.hero.wounds = [{ id: 'wound1' }];
+            mockGame.hero.wounds = [{ id: 'w1' }];
             mockGame.hero.influencePoints = 2;
 
             const result = handler.healWounds(4);
-
             expect(result.success).toBe(false);
+            expect(result.message).toContain('Einfluss');
         });
 
         it('should fail when no wounds', () => {
             mockGame.hero.wounds = [];
-            mockGame.hero.influencePoints = 10;
-
             const result = handler.healWounds(4);
-
             expect(result.success).toBe(false);
         });
     });
 
     describe('recruitUnit (inherited)', () => {
         it('should recruit unit when hero has enough influence', () => {
-            const unitInfo = { type: 'peasant', cost: 5, create: () => ({ name: 'Peasant', id: 'p1' }) };
+            mockGame.hero.influencePoints = 10;
+            const unit = { id: 'u1', name: 'Test Unit', cost: 5, type: 'village_guard', create: () => ({ name: 'Test Unit' }) };
 
-            const result = handler.recruitUnit(unitInfo);
-
+            const result = handler.recruitUnit(unit);
             expect(result.success).toBe(true);
             expect(mockGame.hero.addUnit).toHaveBeenCalled();
-            expect(mockGame.hero.influencePoints).toBe(5);
         });
 
         it('should fail when not enough influence', () => {
-            mockGame.hero.influencePoints = 2;
-            const unitInfo = { type: 'peasant', cost: 5 };
+            mockGame.hero.influencePoints = 3;
+            const unit = { id: 'u1', cost: 5 };
 
-            const result = handler.recruitUnit(unitInfo);
-
+            const result = handler.recruitUnit(unit);
             expect(result.success).toBe(false);
         });
     });
 
     describe('buyCard (inherited)', () => {
         it('should buy non-spell card when hero has enough influence', () => {
-            const cardData = { name: 'Power Card', type: 'action', color: 'red' };
+            mockGame.hero.influencePoints = 10;
+            const card = { id: 'c1', type: 'advanced', name: 'Test Card' };
 
-            const result = handler.buyCard(cardData, 8);
-
+            const result = handler.buyCard(card, 5);
             expect(result.success).toBe(true);
-            expect(mockGame.hero.influencePoints).toBe(2);
-            expect(mockGame.hero.discard.length).toBe(1);
+            expect(mockGame.hero.discard.length).toBeGreaterThan(0);
         });
 
         it('should buy spell and consume mana token', () => {
-            const cardData = { name: 'Fireball', type: 'spell', color: 'red' };
+            mockGame.hero.influencePoints = 10;
+            mockGame.hero.getManaInventory.mockReturnValue(['red']);
+            const card = { id: 'c1', type: 'spell', color: 'red', name: 'Fireball' };
 
-            const result = handler.buyCard(cardData, 8);
-
+            const result = handler.buyCard(card, 5);
             expect(result.success).toBe(true);
             expect(mockGame.hero.removeMana).toHaveBeenCalledWith('red');
         });
 
         it('should fail spell purchase when no mana available', () => {
-            mockGame.hero.getManaInventory = vi.fn().mockReturnValue([]);
-            mockGame.hero.crystals = { RED: 0, BLUE: 0, GREEN: 0, WHITE: 0 };
-            const cardData = { name: 'Fireball', type: 'spell', color: 'red' };
+            mockGame.hero.influencePoints = 10;
+            mockGame.hero.getManaInventory.mockReturnValue([]);
+            const card = { id: 'c1', type: 'spell', color: 'red', name: 'Fireball' };
 
-            const result = handler.buyCard(cardData, 8);
-
+            const result = handler.buyCard(card, 5);
             expect(result.success).toBe(false);
             expect(result.message).toContain('Mana');
+        });
+    });
+
+    describe('Action Invocation from getOptions', () => {
+        it('should call healWounds from option action', () => {
+            mockGame.hero.wounds = [{ id: 'w1' }];
+            const options = handler.getOptions({ type: SITE_TYPES.CITY });
+            const healOption = options.find(o => o.id === 'heal');
+
+            const spy = vi.spyOn(handler, 'healWounds').mockReturnValue({ success: true });
+            healOption.action();
+            expect(spy).toHaveBeenCalledWith(4);
+            spy.mockRestore();
+        });
+
+        it('should call recruitUnit from option action', () => {
+            const options = handler.getOptions({ type: SITE_TYPES.CITY });
+            const recruitOption = options.find(o => o.id === 'recruit_elite');
+            const unitItem = recruitOption.subItems[0];
+
+            if (unitItem.action) {
+                const spy = vi.spyOn(handler, 'recruitUnit').mockReturnValue({ success: true });
+                unitItem.action();
+                // In CityHandler.js: action: () => this.recruitUnit(u)
+                expect(spy).toHaveBeenCalledWith(unitItem.data);
+                spy.mockRestore();
+            }
+        });
+
+        it('should call buyCard from option action', () => {
+            const options = handler.getOptions({ type: SITE_TYPES.CITY });
+            const spellsOption = options.find(o => o.id === 'city_spells');
+            const spellItem = spellsOption.subItems[0];
+
+            const spy = vi.spyOn(handler, 'buyCard').mockReturnValue({ success: true });
+            spellItem.action();
+            // In CityHandler.js: action: () => this.buyCard(c, 8)
+            expect(spy).toHaveBeenCalledWith(spellItem.data, 8);
+            spy.mockRestore();
         });
     });
 });

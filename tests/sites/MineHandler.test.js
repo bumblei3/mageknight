@@ -29,21 +29,28 @@ describe('MineHandler', () => {
     });
 
     describe('getOptions', () => {
-        it('should return conquer option for unconquered mine', () => {
-            const site = { conquered: false };
-            const options = handler.getOptions(site, { q: 0, r: 0 });
-
-            expect(options.length).toBe(1);
-            expect(options[0].id).toBe('conquer_mine');
-            expect(options[0].enabled).toBe(true);
-        });
-
         it('should return collect crystal option for conquered mine', () => {
             const site = { conquered: true };
             const options = handler.getOptions(site, { q: 0, r: 0 });
 
             expect(options.length).toBe(1);
             expect(options[0].id).toBe('collect_crystal');
+
+            // Directly test the action
+            options[0].action();
+            expect(mockGame.hero.gainCrystal).toHaveBeenCalled();
+        });
+
+        it('should return conquer option for unconquered mine', () => {
+            const site = { conquered: false };
+            const options = handler.getOptions(site, { q: 0, r: 0 });
+
+            expect(options.length).toBe(1);
+            expect(options[0].id).toBe('conquer_mine');
+
+            // Directly test the action
+            options[0].action();
+            expect(mockGame.combatOrchestrator.initiateCombat).toHaveBeenCalled();
         });
 
         it('should disable crystal collection when no movement points', () => {

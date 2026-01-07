@@ -24,7 +24,8 @@ export class StatsRenderer {
         // Compatibility wrapper for existing updateHeroStats logic
         const mockHero = {
             getStats: () => heroState,
-            healingPoints: heroState.healingPoints
+            healingPoints: heroState.healingPoints,
+            portrait: heroState.portrait
         };
         this.updateHeroStats(mockHero);
     }
@@ -53,6 +54,20 @@ export class StatsRenderer {
     updateHeroStats(hero) {
         const stats = hero.getStats();
         if (this.elements.heroName) this.elements.heroName.textContent = stats.name;
+
+        // Render Portrait
+        if (this.elements.heroAvatar && hero.portrait) {
+            let img = this.elements.heroAvatar.querySelector('img');
+            if (!img) {
+                img = document.createElement('img');
+                img.className = 'hero-avatar-img';
+                this.elements.heroAvatar.appendChild(img);
+            }
+            if (img.src !== hero.portrait) {
+                img.src = hero.portrait;
+                img.alt = stats.name;
+            }
+        }
 
         // Animate numeric values (with null checks)
         if (this.elements.heroArmor) {

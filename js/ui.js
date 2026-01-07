@@ -262,6 +262,7 @@ export class UI {
             fameValue: document.getElementById('fame-value'),
             reputationValue: document.getElementById('reputation-value'),
             heroName: document.getElementById('hero-name'),
+            heroAvatar: document.getElementById('hero-avatar'),
             heroArmor: document.getElementById('hero-armor'),
             heroHandLimit: document.getElementById('hero-handlimit'),
             heroWounds: document.getElementById('hero-wounds'),

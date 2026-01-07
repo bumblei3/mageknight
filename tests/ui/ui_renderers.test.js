@@ -292,6 +292,7 @@ describe('StatsRenderer', () => {
             fameValue: document.createElement('span'),
             reputationValue: document.createElement('span'),
             movementPoints: document.createElement('span'),
+            heroAvatar: document.createElement('div'),
             healBtn: document.createElement('button')
         };
 
@@ -370,6 +371,19 @@ describe('StatsRenderer', () => {
             };
             statsRenderer.updateHeroStats(hero);
             expect(mockElements.healBtn.style.display).toBe('none');
+        });
+
+        it('should render hero portrait image', () => {
+            const hero = {
+                getStats: () => ({ name: 'Goldyx', armor: 2, handLimit: 5, wounds: 0, fame: 0, reputation: 0 }),
+                healingPoints: 0,
+                portrait: 'assets/heroes/goldyx_portrait.webp'
+            };
+            statsRenderer.updateHeroStats(hero);
+            const img = mockElements.heroAvatar.querySelector('img');
+            expect(img).not.toBeNull();
+            expect(img.src).toContain('assets/heroes/goldyx_portrait.webp');
+            expect(img.alt).toBe('Goldyx');
         });
     });
 

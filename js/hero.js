@@ -84,6 +84,7 @@ export class Hero {
 
         store.dispatch(ACTIONS.SET_HERO_STATS, {
             name: this.name,
+            portrait: this.config.portrait,
             level: this.level,
             fame: this.fame,
             reputation: this.reputation,

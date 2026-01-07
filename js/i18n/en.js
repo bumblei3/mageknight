@@ -359,5 +359,9 @@ export default {
                 boss: 'Boss: A powerful enemy with multiple phases and unique mechanics.'
             }
         }
+    },
+    // PWA
+    pwa: {
+        ready_offline: 'Game is now available offline! 🚀'
     }
 };

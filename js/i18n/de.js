@@ -385,5 +385,9 @@ export default {
         siege: { name: 'Belagerung', desc: 'Starker Angriff, der befestigte Feinde ignorieren kann.' },
         day: { name: 'Tag', desc: 'Goldenes Mana ist nutzbar. Bewegungskosten normal.' },
         night: { name: 'Nacht', desc: 'Schwarzes Mana ist nutzbar. Zauberkarten sind stärker. Sichtweite im Dungeon reduziert.' }
+    },
+    // PWA
+    pwa: {
+        ready_offline: 'Spiel ist jetzt offline verfügbar! 🚀'
     }
 };

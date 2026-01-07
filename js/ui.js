@@ -317,6 +317,12 @@ export class UI {
     }
 
     setupEventListeners() {
+        // Global hover sounds for buttons
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest('button, .clickable, .card-item')) {
+                if (this.game && this.game.sound) this.game.sound.hover();
+            }
+        }, { passive: true });
         // Event listeners will be set from game.js
         if (this.elements.siteClose) {
             this.elements.siteClose.addEventListener('click', () => {

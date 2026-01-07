@@ -63,7 +63,7 @@ export class MageKnightGame {
         this.abortController = new AbortController();
         this.activeTimeouts = new Set();
         this.gameState = 'playing';
-        this.isTestEnvironment = !!(typeof window !== 'undefined' && (window.isTest || window.__playwright__));
+        this.isTestEnvironment = !!(typeof window !== 'undefined' && (window.isTest || window.__playwright__ || navigator.webdriver));
 
         // Managers
         this.ui = new UI();
@@ -75,9 +75,10 @@ export class MageKnightGame {
             autoSave: () => this.stateManager.saveGame('auto')
         };
         this.timeManager = new TimeManager();
-        this.achievementManager = new AchievementManager();
-        this.statisticsManager = new StatisticsManager();
-        this.sound = new SoundManager();
+        this._sound = null;
+        this._achievementManager = null;
+        this._statisticsManager = null;
+        this._tutorial = null;
         this.animator = animator; // Initialize animator reference
         this.levelUpManager = new LevelUpManager(this);
         this.rewardManager = new RewardManager(this);
@@ -121,7 +122,6 @@ export class MageKnightGame {
         this.renderController = new RenderController(this);
 
         // UI Helpers
-        this.tutorial = new TutorialManager(this);
         this.touchController = new TouchController(this);
 
         // Core Game Managers (Phase 2 Refactor)
@@ -181,7 +181,61 @@ export class MageKnightGame {
     /**
      * @param {number} value The turn number to set.
      */
-    set turnNumber(value) { if (this.turnManager) this.turnManager.turnNumber = value; }
+    set turnNumber(value) {
+        if (this.turnManager) this.turnManager.turnNumber = value;
+    }
+
+    // Lazy Getters for heavy systems
+    get sound() {
+        if (!this._sound) {
+            this._sound = new SoundManager();
+            console.log('[Lazy] SoundManager initialized');
+        }
+        return this._sound;
+    }
+
+    set sound(value) {
+        this._sound = value;
+    }
+
+    get achievementManager() {
+        if (!this._achievementManager) {
+            this._achievementManager = new AchievementManager();
+            if (this._achievementManager && typeof this._achievementManager.setGame === 'function') {
+                this._achievementManager.setGame(this);
+            }
+            console.log('[Lazy] AchievementManager initialized');
+        }
+        return this._achievementManager;
+    }
+
+    set achievementManager(value) {
+        this._achievementManager = value;
+    }
+
+    get statisticsManager() {
+        if (!this._statisticsManager) {
+            this._statisticsManager = new StatisticsManager();
+            console.log('[Lazy] StatisticsManager initialized');
+        }
+        return this._statisticsManager;
+    }
+
+    set statisticsManager(value) {
+        this._statisticsManager = value;
+    }
+
+    get tutorial() {
+        if (!this._tutorial) {
+            this._tutorial = new TutorialManager(this);
+            console.log('[Lazy] TutorialManager initialized');
+        }
+        return this._tutorial;
+    }
+
+    set tutorial(value) {
+        this._tutorial = value;
+    }
 
     // Combat Totals compatibility getters for UI and Tests
     /**
@@ -355,7 +409,7 @@ export class MageKnightGame {
         logger.debug('Initial game state rendered.');
 
         // Show interactive tutorial on first visit
-        if (!TutorialManager.hasCompleted()) {
+        if (!this.isTestEnvironment && !TutorialManager.hasCompleted()) {
             setTimeout(() => this.tutorial.start(), 1500);
         }
 

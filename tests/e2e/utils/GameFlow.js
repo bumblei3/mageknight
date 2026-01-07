@@ -10,6 +10,11 @@ export class GameFlow {
 
     async loadGame() {
         await this.page.goto('/');
+        // Disable tutorial for all E2E tests to prevent UI blocking
+        await this.page.evaluate(() => {
+            localStorage.setItem('mageKnightTutorialCompleted', 'true');
+        });
+        await this.page.reload(); // Reload to apply localStorage if needed, or just let it be
         await expect(this.page.locator('#loading-screen')).toBeHidden({ timeout: 15000 });
     }
 

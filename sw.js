@@ -69,14 +69,32 @@ self.addEventListener('fetch', (event) => {
     // Skip chrome-extension and other non-http(s) protocols
     if (!url.protocol.startsWith('http')) return;
 
-    // Cache-first strategy for static assets
-    if (isStaticAsset(url.pathname)) {
+    // Use Stale-While-Revalidate for script and style files
+    if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+        event.respondWith(staleWhileRevalidate(request));
+    } else if (isStaticAsset(url.pathname)) {
+        // Cache-first for other static assets (images, fonts)
         event.respondWith(cacheFirst(request));
     } else {
         // Network-first for everything else
         event.respondWith(networkFirst(request));
     }
 });
+
+// Stale-While-Revalidate strategy
+async function staleWhileRevalidate(request) {
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(request);
+
+    const networkFetch = fetch(request).then(async (networkResponse) => {
+        if (networkResponse.ok) {
+            cache.put(request, networkResponse.clone());
+        }
+        return networkResponse;
+    });
+
+    return cachedResponse || networkFetch;
+}
 
 // Check if request is for a static asset
 function isStaticAsset(pathname) {

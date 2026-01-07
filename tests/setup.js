@@ -87,7 +87,7 @@ if (typeof URL.createObjectURL === 'undefined') {
 }
 
 // Mock requestAnimationFrame
-const raf = vi.fn((cb) => setTimeout(cb, 16));
+const raf = vi.fn((cb) => setTimeout(() => cb(performance.now()), 16));
 const cancelRaf = vi.fn((id) => clearTimeout(id));
 
 global.requestAnimationFrame = raf;
@@ -142,4 +142,32 @@ if (typeof Element !== 'undefined' && !Element.prototype.getBoundingClientRect) 
         y: 0,
         toJSON: () => { }
     }));
+}
+
+// Mock Web Worker
+if (typeof window !== 'undefined' && !window.Worker) {
+    window.Worker = class {
+        constructor(url) {
+            this.url = url;
+            this.onmessage = null;
+            this.onerror = null;
+        }
+        postMessage(data) {
+            // Default: do nothing or simulate async response if needed in specific tests
+        }
+        terminate() { }
+        addEventListener() { }
+        removeEventListener() { }
+    };
+}
+
+// Mock getComputedStyle (sometimes missing in JSDOM or specific test runs)
+if (typeof window !== 'undefined' && !window.getComputedStyle) {
+    window.getComputedStyle = vi.fn().mockImplementation((el) => {
+        return {
+            position: el.style.position || 'static',
+            display: el.style.display || 'block',
+            getPropertyValue: vi.fn((prop) => el.style[prop] || '')
+        };
+    });
 }

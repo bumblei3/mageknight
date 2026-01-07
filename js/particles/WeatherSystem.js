@@ -37,16 +37,21 @@ export class WeatherSystem {
         const height = this.canvas.height;
         const spawnCount = Math.ceil(this.intensity * 2); // Particles per frame
 
+        // Ground usually at bottom for screen-space weather
+        const groundLevel = height - 20;
+
         if (this.currentWeather === 'rain') {
             for (let i = 0; i < spawnCount; i++) {
                 this.engine.addParticle(Math.random() * width, -10, {
                     type: 'rain',
                     color: '#a5b4fc', // Light Indigo
                     vx: 1 + (Math.random() - 0.5), // Slight wind
-                    vy: 10 + Math.random() * 5, // Fast fall
+                    vy: 12 + Math.random() * 5, // Fast fall
                     size: 2,
-                    life: 1.5,
-                    decay: 0.01
+                    life: 2.0,
+                    decay: 0.005,
+                    ground: groundLevel,
+                    onGroundHit: (x, y) => this.createSplash(x, y, '#a5b4fc')
                 });
             }
         }
@@ -55,11 +60,13 @@ export class WeatherSystem {
                 this.engine.addParticle(Math.random() * width, -10, {
                     type: 'snow',
                     color: '#ffffff',
-                    vx: Math.sin(Date.now() / 1000) + (Math.random() - 0.5), // Drifting
-                    vy: 2 + Math.random() * 2, // Slow fall
+                    vx: Math.sin(Date.now() / 1000 + i) * 2, // Drifting
+                    vy: 1.5 + Math.random() * 2, // Slow fall
                     size: 3,
-                    life: 4.0,
-                    decay: 0.005
+                    life: 5.0,
+                    decay: 0.002,
+                    ground: groundLevel + 10,
+                    onGroundHit: (x, y) => this.createSplash(x, y, '#ffffff', 2)
                 });
             }
         }
@@ -75,5 +82,15 @@ export class WeatherSystem {
                 decay: 0.01
             });
         }
+    }
+
+    createSplash(x, y, color, count = 3) {
+        this.engine.burst(x, y, count, {
+            color: color,
+            speed: 2,
+            size: 1.5,
+            decay: 0.1,
+            gravity: 0.2
+        });
     }
 }

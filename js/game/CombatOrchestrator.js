@@ -146,7 +146,8 @@ export class CombatOrchestrator {
             // Ideally UI handles the visual, here we trigger game state updates.
 
             if (result.unitDestroyed) {
-                this.game.particleSystem.triggerShake(5, 0.5); // Big shake for death
+                this.game.particleSystem.triggerShake(8, 0.4); // Big shake for death
+                this.game.particleSystem.freeze(0.1); // Impact freeze
             }
 
             this.updateCombatInfo();
@@ -177,25 +178,27 @@ export class CombatOrchestrator {
      * Helper to process damage results (visuals, logs)
      */
     handleDamageResults(result) {
-        if (result.woundsReceived > 0) {
-            // const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
-            // this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
-            // Visual Polish: Screen Shake and Damage Numbers
-            // this.game.particleSystem.triggerShake(result.woundsReceived * 2, 0.4);
-            // this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y, result.woundsReceived, true);
+        const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+        this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
 
-            eventBus.emit(GAME_EVENTS.COMBAT_DAMAGE, {
-                targetPos: this.game.hero.position,
-                amount: result.woundsReceived,
-                targetType: 'hero'
-            });
+        // Visual Polish: Screen Shake based on severity
+        const shakeIntensty = Math.min(15, result.woundsReceived * 3);
+        this.game.particleSystem.triggerShake(shakeIntensty, 0.4);
+        this.game.particleSystem.freeze(0.05); // Subtle hit-stop
+
+        this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y - 20, result.woundsReceived, result.woundsReceived > 1);
+
+        eventBus.emit(GAME_EVENTS.COMBAT_DAMAGE, {
+            targetPos: this.game.hero.position,
+            amount: result.woundsReceived,
+            targetType: 'hero'
+        });
 
 
-            // Elemental Effects based on enemy attack type (generic for now as multiple enemies might attack)
-            // But we can check one unblocked enemy from list if available
-            // const attackType = this.game.combat.enemy.attackType; // Warning: 'enemy' might be blocked one.
-            // Better to use generic effect or iterate.
-        }
+        // Elemental Effects based on enemy attack type (generic for now as multiple enemies might attack)
+        // But we can check one unblocked enemy from list if available
+        // const attackType = this.game.combat.enemy.attackType; // Warning: 'enemy' might be blocked one.
+        // Better to use generic effect or iterate.
 
         // Handle Paralyze discard effect
         if (result.paralyzeTriggered) {
@@ -249,10 +252,13 @@ export class CombatOrchestrator {
 
         // Visual Polish: Enemy taking damage
         if (this.combatAttackTotal > 0) {
-            // this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal);
-            // if (this.combatAttackTotal >= 4) {
-            //    this.game.particleSystem.triggerShake(3, 0.3);
-            // }
+            this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal, this.combatAttackTotal >= 5);
+
+            if (this.combatAttackTotal >= 4) {
+                this.game.particleSystem.triggerShake(Math.min(10, this.combatAttackTotal), 0.3);
+                this.game.particleSystem.freeze(0.05); // Tactical freeze
+            }
+
             eventBus.emit(GAME_EVENTS.COMBAT_DAMAGE, {
                 targetPos: this.game.combat.enemy.position,
                 amount: this.combatAttackTotal,

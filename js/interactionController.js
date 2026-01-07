@@ -179,6 +179,18 @@ export class InteractionController {
         }
     }
 
+    handleCardDrop(index, x, y) {
+        const axial = this.game.hexGrid.pixelToAxial(x, y);
+        const card = this.game.hero.hand[index];
+        if (!card) return;
+
+        logger.info(`Card dropped at ${axial.q},${axial.r}: ${card.name}`);
+
+        // For now, dragging to a hex just plays the card normally
+        // Future improvement: if it's a movement card, move to that hex immediately if possible
+        this.handleCardClick(index, card);
+    }
+
     // New helper to finalize play (Basic or Strong)
     finishCardPlay(index, useStrong, isNight) {
         const card = this.game.hero.hand[index];

@@ -1,7 +1,5 @@
-/**
- * HexGridLogic - Pure logic functions for hex grid operations
- * Handles coordinates, pathfinding, neighbors - NO canvas/rendering
- */
+import * as HexUtils from '../utils/hexUtils.js';
+
 export class HexGridLogic {
     constructor(hexSize = 40) {
         this.hexSize = hexSize;
@@ -37,50 +35,25 @@ export class HexGridLogic {
      * Rounds floating point axial coordinates to the nearest valid hex.
      */
     roundAxial(q, r) {
-        const s = -q - r;
-        let rq = Math.round(q);
-        let rr = Math.round(r);
-        let rs = Math.round(s);
-
-        const q_diff = Math.abs(rq - q);
-        const r_diff = Math.abs(rr - r);
-        const s_diff = Math.abs(rs - s);
-
-        if (q_diff > r_diff && q_diff > s_diff) {
-            rq = -rr - rs;
-        } else if (r_diff > s_diff) {
-            rr = -rq - rs;
-        }
-
-        return { q: rq, r: rr };
+        return HexUtils.roundAxial(q, r);
     }
 
     // ========== Spatial Queries ==========
 
     getHexKey(q, r) {
-        return `${q},${r}`;
+        return HexUtils.getHexKey(q, r);
     }
 
     getNeighbors(q, r) {
-        const directions = [
-            { q: 1, r: 0 }, { q: 1, r: -1 }, { q: 0, r: -1 },
-            { q: -1, r: 0 }, { q: -1, r: 1 }, { q: 0, r: 1 }
-        ];
-        return directions.map(dir => ({ q: q + dir.q, r: r + dir.r }));
+        return HexUtils.getNeighbors(q, r);
     }
 
     distance(q1, r1, q2, r2) {
-        return (Math.abs(q1 - q2) + Math.abs(q1 + r1 - q2 - r2) + Math.abs(r1 - r2)) / 2;
+        return HexUtils.distance(q1, r1, q2, r2);
     }
 
     getHexesInRange(q, r, range) {
-        const results = [];
-        for (let dq = -range; dq <= range; dq++) {
-            for (let dr = Math.max(-range, -dq - range); dr <= Math.min(range, -dq + range); dr++) {
-                results.push({ q: q + dq, r: r + dr });
-            }
-        }
-        return results;
+        return HexUtils.getHexesInRange(q, r, range);
     }
 
     // ========== Hex Data Management ==========

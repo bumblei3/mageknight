@@ -98,7 +98,7 @@ export class MageKnightGame {
         this.hero = new Hero('GOLDYX');
         this.enemies = [];
         this.manaSource = new ManaSource();
-        this.enemyAI = new EnemyAI(this.hexGrid);
+        this.enemyAI = new EnemyAI(this);
         this.particleSystem = new ParticleSystem(this.canvas);
         this.weatherSystem = new WeatherSystem(this.particleSystem, this.canvas);
         this.particleSystem.registerSystem(this.weatherSystem);

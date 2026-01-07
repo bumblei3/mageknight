@@ -297,6 +297,8 @@ export class ActionManager {
                 this.game.hexGrid.getScreenPos(this.game.hero.position.q, this.game.hero.position.r).x,
                 this.game.hexGrid.getScreenPos(this.game.hero.position.q, this.game.hero.position.r).y
             );
+            this.game.particleSystem.triggerShake(4, 0.4);
+            this.game.particleSystem.freeze(0.05);
 
             this.game.entityManager.createEnemies();
 

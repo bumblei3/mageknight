@@ -32,6 +32,8 @@ export class ParticleSystem {
         // Shake state for backward compatibility
         this.shakeMagnitude = 0;
         this.shakeTime = 0;
+        this.totalShakeTime = 0;
+        this.freezeTime = 0;
         this.shakeOffsetX = 0;
         this.shakeOffsetY = 0;
         this.lastTime = performance.now();
@@ -97,14 +99,21 @@ export class ParticleSystem {
 
         this.engine.update();
 
-        // Update shake
+        // Update shake with decay
         if (this.shakeTime > 0) {
             this.shakeTime -= deltaTime;
-            this.shakeOffsetX = (Math.random() - 0.5) * 2 * this.shakeMagnitude;
-            this.shakeOffsetY = (Math.random() - 0.5) * 2 * this.shakeMagnitude;
+            const currentMag = (this.shakeTime / this.totalShakeTime) * this.shakeMagnitude;
+            this.shakeOffsetX = (Math.random() - 0.5) * 2 * currentMag;
+            this.shakeOffsetY = (Math.random() - 0.5) * 2 * currentMag;
         } else {
             this.shakeOffsetX = 0;
             this.shakeOffsetY = 0;
+        }
+
+        // Handle Hit-stop (Freeze frames)
+        if (this.freezeTime > 0) {
+            this.freezeTime -= deltaTime;
+            return; // Skip particle/text updates while frozen
         }
 
         // Update Floating Texts
@@ -167,9 +176,18 @@ export class ParticleSystem {
     // Keeping here for now to avoid breaking too many things at once,
     // but ideally this belongs in a text renderer.
 
-    triggerShake(magnitude = 1.0, duration = 0.5) {
+    triggerShake(magnitude = 5, duration = 0.3) {
         this.shakeMagnitude = magnitude;
         this.shakeTime = duration;
+        this.totalShakeTime = duration;
+    }
+
+    /**
+     * Briefly freezes the visual state to emphasize impact
+     * @param {number} duration In seconds
+     */
+    freeze(duration = 0.05) {
+        this.freezeTime = duration;
     }
 
     createFloatingText(x, y, text, color = '#ffffff') {

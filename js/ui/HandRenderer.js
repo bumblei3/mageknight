@@ -77,6 +77,25 @@ export class HandRenderer {
                 CardAnimations.reset3DTilt(cardEl);
             });
 
+            // Drag and Drop
+            if (!isWound) {
+                cardEl.draggable = true;
+                cardEl.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', index);
+                    e.dataTransfer.effectAllowed = 'copyMove';
+                    cardEl.classList.add('dragging');
+                    this.tooltipManager.hideTooltip();
+
+                    // Add subtle scale down during drag
+                    setTimeout(() => cardEl.style.opacity = '0.5', 0);
+                });
+
+                cardEl.addEventListener('dragend', () => {
+                    cardEl.classList.remove('dragging');
+                    cardEl.style.opacity = '1';
+                });
+            }
+
             // Add tooltip events
             if (!isWound) {
                 cardEl.addEventListener('mouseenter', () => {
@@ -133,7 +152,7 @@ export class HandRenderer {
             <div class="card-effects">
                 <div class="card-effect"><strong>${t('cards.basic')}:</strong> ${basicEffect}</div>
                 ${strongEffect && strongEffect !== t('cards.none') ?
-        `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
+                `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
             </div>
             <div class="card-hint">${t('cards.sidewaysAction')}</div>
         `;

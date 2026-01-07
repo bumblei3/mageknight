@@ -174,11 +174,12 @@ export class PhaseManager {
             this.game.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
 
             // Enemy Turn / World Update
-            const enemyLogs = this.game.enemyAI.updateEnemies(this.game.enemies, this.game.hero);
-            if (enemyLogs && enemyLogs.length > 0) {
-                enemyLogs.forEach(log => this.game.addLog(log, 'warning'));
-                this.game.showToast('Feinde haben sich bewegt!', 'warning');
-            }
+            this.game.enemyAI.updateEnemies(this.game.enemies, this.game.hero).then(enemyLogs => {
+                if (enemyLogs && enemyLogs.length > 0) {
+                    enemyLogs.forEach(log => this.game.addLog(log, 'warning'));
+                    this.game.showToast('Feinde haben sich bewegt!', 'warning');
+                }
+            });
         });
     }
 

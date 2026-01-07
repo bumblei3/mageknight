@@ -1,60 +1,46 @@
-
 import { Animator } from '../js/animator.js';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { createSpy } from './test-mocks.js';
-import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('Animator Stress Tests', () => {
     let animator;
-    let mockRAF;
     let mockCancelRAF;
-    let time;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         animator = new Animator();
-        time = 1000;
-
-        // Mock Performance and RAF
-        global.performance = { now: () => time };
-
-        // Manual RAF control
-        mockRAF = (cb) => {
-            // Store callback to call manually
-            setTimeout(() => {
-                time += 16;
-                cb(time);
-            }, 1);
-            return 123; // Dummy ID
-        };
         mockCancelRAF = createSpy('cancelAnimationFrame');
-
-        global.requestAnimationFrame = mockRAF;
         global.cancelAnimationFrame = mockCancelRAF;
     });
 
-    it('should animate value correctly', async () => {
-        return new Promise(resolve => {
-            let lastVal = 0;
-            animator.animate({
-                from: 0,
-                to: 100,
-                duration: 100,
-                onUpdate: (val) => lastVal = val,
-                onComplete: () => {
-                    expect(lastVal).toBe(100);
-                    resolve();
-                }
-            });
+    afterEach(() => {
+        vi.useRealTimers();
+    });
 
-            // Fast forward time
-            const step = () => {
-                time += 50; // Halfway
-                // Since mockRAF uses setTimeout, we wait
-            };
-            // In real test env with fake timers this is easier.
-            // Here we rely on the implementation's RAF behavior.
-            // Actually, my mock RAF above uses setTimeout(1ms).
-            // So time must advance.
+    it('should animate value correctly', async () => {
+        let lastVal = 0;
+        let completed = false;
+
+        animator.animate({
+            from: 0,
+            to: 100,
+            duration: 100,
+            onUpdate: (val) => lastVal = val,
+            onComplete: () => {
+                completed = true;
+            }
         });
+
+        // Advance 50ms
+        await vi.advanceTimersByTimeAsync(50);
+        expect(lastVal).toBeGreaterThan(0);
+        expect(lastVal).toBeLessThan(100);
+        expect(completed).toBe(false);
+
+        // Advance enough to complete (total 100ms+, with 16ms step it might need slightly more)
+        await vi.advanceTimersByTimeAsync(66);
+        expect(lastVal).toBe(100);
+        expect(completed).toBe(true);
     });
 
     it('should cancel active animation', () => {
@@ -76,15 +62,22 @@ describe('Animator Stress Tests', () => {
     });
 
     it('should clean up map after completion', async () => {
-        // Similar to first test but checking map size
-        return new Promise(resolve => {
-            const id = animator.animate({
-                from: 0, to: 1, duration: 10,
-                onComplete: () => {
-                    expect(animator.activeAnimations.has(id)).toBe(false);
-                    resolve();
-                }
-            });
+        let completed = false;
+        const id = animator.animate({
+            from: 0,
+            to: 1,
+            duration: 10,
+            onComplete: () => {
+                completed = true;
+            }
         });
+
+        expect(animator.activeAnimations.has(id)).toBe(true);
+
+        // Advance enough time to trigger all RAF frames and completion
+        await vi.advanceTimersByTimeAsync(20);
+
+        expect(completed).toBe(true);
+        expect(animator.activeAnimations.has(id)).toBe(false);
     });
 });

@@ -5,10 +5,11 @@ export class CombatEffects {
 
     impactEffect(x, y, color = '#ff4444') {
         this.engine.burst(x, y, 15, {
+            type: 'spark',
             color: color,
-            speed: 4,
-            size: 4,
-            decay: 0.05
+            speed: 5,
+            size: 2,
+            decay: 0.08
         });
     }
 
@@ -21,13 +22,15 @@ export class CombatEffects {
         };
 
         const palette = colors[attackType] || colors.physical;
+        const speed = 7;
 
         for (let i = 0; i < 25; i++) {
             this.engine.addParticle(x, y, {
+                type: 'spark',
                 color: palette[Math.floor(Math.random() * palette.length)],
-                speed: 6,
-                size: Math.random() * 5 + 2,
-                decay: 0.03 + Math.random() * 0.03
+                speed: speed,
+                size: Math.random() * 3 + 1,
+                decay: 0.04 + Math.random() * 0.04
             });
         }
     }

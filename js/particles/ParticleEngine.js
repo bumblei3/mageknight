@@ -49,6 +49,8 @@ export class ParticleEngine {
         particle.color = options.color || '#ffffff';
         particle.size = options.size || 3;
         particle.gravity = options.gravity || 0;
+        particle.ground = options.ground || 0;
+        particle.onGroundHit = options.onGroundHit || null;
 
         // Advanced Overrides
         if (options.vx !== undefined) particle.vx = options.vx;

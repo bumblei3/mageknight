@@ -79,20 +79,24 @@ describe('Enemy AI Movement', () => {
         }
     });
 
-    it('should update enemies list', () => {
+    it('should update enemies list', async () => {
         const enemy = {
             type: ENEMY_TYPES.ORC,
             position: { q: 2, r: 0 },
             name: 'Orc',
             currentHealth: 2,
-            maxHealth: 5
+            maxHealth: 5,
+            isDefeated: () => false
         };
         const enemies = [enemy];
         const hero = { position: { q: 0, r: 0 } };
 
         mockHexGrid.setHex(1, 0, { terrain: 'plains' });
 
-        const logs = enemyAI.updateEnemies(enemies, hero);
+        // Ensure we use the sync fallback for this test by disabling worker
+        enemyAI.worker = null;
+
+        const logs = await enemyAI.updateEnemies(enemies, hero);
 
         // Check health regen
         expect(enemy.currentHealth).toBe(3);

@@ -19,6 +19,36 @@ export class EnemyAI {
     constructor(game) {
         this.game = game;
         this.difficulty = 1; // 1-10 scale
+
+        // Initialize Worker
+        this.worker = null;
+        this.pendingResolve = null;
+
+        try {
+            this.worker = new Worker('./js/workers/aiWorker.js', { type: 'module' });
+            this.worker.onmessage = this.handleWorkerMessage.bind(this);
+            console.log('AI Worker initialized');
+        } catch (e) {
+            console.error('Failed to initialize AI Worker:', e);
+        }
+    }
+
+    handleWorkerMessage(e) {
+        const { action, payload } = e.data;
+        if (action === 'movesCalculated' && this.pendingResolve) {
+            const { newPositions, moveLog } = payload;
+
+            // Apply new positions
+            newPositions.forEach(p => {
+                const enemy = this.game.enemies.find(e => e.id === p.id);
+                if (enemy) {
+                    enemy.position = p.position;
+                }
+            });
+
+            this.pendingResolve(moveLog);
+            this.pendingResolve = null;
+        }
     }
 
     /**
@@ -88,34 +118,74 @@ export class EnemyAI {
      */
     applyAbility(ability, target, source) {
         switch (ability) {
-        case ENEMY_ABILITIES.POISON:
-            // Add extra wound to hand
-            return { effect: 'wound', count: 1, message: 'Vergiftet! +1 Verletzung' };
-        case ENEMY_ABILITIES.FIRE:
-            // Double damage calculation handled in combat
-            return { effect: 'damage_boost', message: 'Feuerangriff! Doppelter Schaden' };
-        case ENEMY_ABILITIES.VAMPIRIC: {
-            // Heal source
-            const heal = 1;
-            source.currentHealth = Math.min(source.maxHealth, source.currentHealth + heal);
-            return { effect: 'heal', value: heal, message: 'Lebensraub! Feind heilt sich' };
-        }
-        default:
-            return null;
+            case ENEMY_ABILITIES.POISON:
+                // Add extra wound to hand
+                return { effect: 'wound', count: 1, message: 'Vergiftet! +1 Verletzung' };
+            case ENEMY_ABILITIES.FIRE:
+                // Double damage calculation handled in combat
+                return { effect: 'damage_boost', message: 'Feuerangriff! Doppelter Schaden' };
+            case ENEMY_ABILITIES.VAMPIRIC: {
+                // Heal source
+                const heal = 1;
+                source.currentHealth = Math.min(source.maxHealth, source.currentHealth + heal);
+                return { effect: 'heal', value: heal, message: 'Lebensraub! Feind heilt sich' };
+            }
+            default:
+                return null;
         }
     }
 
     /**
      * Update all enemies (movement, regeneration, etc.)
-     * Called at end of round
+     * Called at end of round - NOW ASYNCHRONOUS
      * @param {Array} enemies
      * @param {Object} hero
      */
-    updateEnemies(enemies, hero) {
+    async updateEnemies(enemies, hero) {
+        if (!this.worker) {
+            // Fallback to synchronous logic if worker failed
+            return this.updateEnemiesSync(enemies, hero);
+        }
+
+        return new Promise((resolve) => {
+            this.pendingResolve = resolve;
+
+            // Prepare state to send to worker
+            // We need to pass serializable data
+            const hexesMap = {};
+            this.game.hexGrid.hexes.forEach((val, key) => {
+                hexesMap[key] = { terrain: val.terrain };
+            });
+
+            const enemyData = enemies.map(e => ({
+                id: e.id,
+                name: e.name,
+                type: e.type,
+                position: e.position ? { q: e.position.q, r: e.position.r } : null,
+                isDefeated: typeof e.isDefeated === 'function' ? e.isDefeated() : !!e.isDefeated
+            }));
+
+            this.worker.postMessage({
+                action: 'calculateMoves',
+                payload: {
+                    enemies: enemyData,
+                    heroPos: { q: hero.position.q, r: hero.position.r },
+                    hexes: hexesMap,
+                    difficulty: this.difficulty
+                }
+            });
+        });
+    }
+
+    /**
+     * Legacy synchronous update for fallback
+     */
+    updateEnemiesSync(enemies, hero) {
         const moveLog = [];
 
         enemies.forEach(enemy => {
-            if (enemy.isDefeated) return;
+            const isDefeated = typeof enemy.isDefeated === 'function' ? enemy.isDefeated() : !!enemy.isDefeated;
+            if (isDefeated) return;
 
             // Simple regeneration
             if (enemy.currentHealth < enemy.maxHealth) {

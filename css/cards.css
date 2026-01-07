@@ -244,6 +244,14 @@
     }
 }
 
+/* Dragging State */
+.card.dragging {
+    opacity: 0.4;
+    transform: scale(0.8) rotate(0);
+    box-shadow: 0 0 40px var(--color-accent-secondary);
+    z-index: 1000;
+}
+
 .card-header {
     display: flex;
     justify-content: space-between;

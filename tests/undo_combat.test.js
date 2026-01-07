@@ -26,7 +26,14 @@ class MockGame {
             elements: { playedCards: { getBoundingClientRect: () => ({ top: 0, left: 0, right: 0, bottom: 0 }) } }
         };
         this.hexGrid = { axialToPixel: () => ({ x: 0, y: 0 }) };
-        this.particleSystem = { playCardEffect: () => { }, impactEffect: () => { }, createDamageNumber: () => { } };
+        this.particleSystem = {
+            playCardEffect: () => { },
+            impactEffect: () => { },
+            createDamageNumber: () => { },
+            damageSplatter: () => { },
+            triggerShake: () => { },
+            freeze: () => { }
+        };
         this.addLog = () => { };
         this.renderHand = () => { };
         this.renderMana = () => { };

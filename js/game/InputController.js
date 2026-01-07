@@ -68,6 +68,27 @@ export class InputController {
             this.game.ui.tooltipManager.hideTooltip();
         }, { signal });
 
+        // --- Drag and Drop Over Canvas ---
+        this.canvas.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Required to allow drop
+            e.dataTransfer.dropEffect = 'copy';
+
+            // Optional: Highlight hex under cursor during drag
+            this.game.interactionController.handleCanvasMouseMove(e);
+        }, { signal });
+
+        this.canvas.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const cardIndex = parseInt(e.dataTransfer.getData('text/plain'));
+            if (isNaN(cardIndex)) return;
+
+            const rect = this.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            this.game.interactionController.handleCardDrop(cardIndex, x, y);
+        }, { signal });
+
         // Keyboard Shortcuts
         this.setupKeyboardShortcuts(signal);
 
@@ -185,43 +206,43 @@ export class InputController {
             const action = this.game.shortcutManager.getAction(e);
 
             switch (action) {
-            case 'END_TURN':
-                this.game.turnManager.endTurn();
-                e.preventDefault();
-                break;
-            case 'HELP': {
-                const helpBtn = document.getElementById('help-btn');
-                if (helpBtn) helpBtn.click();
-                e.preventDefault();
-                break;
-            }
-            case 'REST':
-                this.game.phaseManager.rest();
-                e.preventDefault();
-                break;
-            case 'EXPLORE':
-                this.game.actionManager.explore();
-                e.preventDefault();
-                break;
-            case 'TUTORIAL':
-                this.game.showTutorial();
-                e.preventDefault();
-                break;
-            case 'CANCEL':
-                if (this.game.movementMode) {
-                    this.game.exitMovementMode();
-                    this.game.addLog('Bewegungsmodus abgebrochen', 'info');
+                case 'END_TURN':
+                    this.game.turnManager.endTurn();
+                    e.preventDefault();
+                    break;
+                case 'HELP': {
+                    const helpBtn = document.getElementById('help-btn');
+                    if (helpBtn) helpBtn.click();
+                    e.preventDefault();
+                    break;
                 }
-                break;
-            case 'MANA_PANEL': {
-                const manaPanel = document.querySelector('.mana-panel');
-                if (manaPanel) {
-                    manaPanel.scrollIntoView({ behavior: 'smooth' });
-                    manaPanel.classList.add('highlight-pulse');
-                    setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
+                case 'REST':
+                    this.game.phaseManager.rest();
+                    e.preventDefault();
+                    break;
+                case 'EXPLORE':
+                    this.game.actionManager.explore();
+                    e.preventDefault();
+                    break;
+                case 'TUTORIAL':
+                    this.game.showTutorial();
+                    e.preventDefault();
+                    break;
+                case 'CANCEL':
+                    if (this.game.movementMode) {
+                        this.game.exitMovementMode();
+                        this.game.addLog('Bewegungsmodus abgebrochen', 'info');
+                    }
+                    break;
+                case 'MANA_PANEL': {
+                    const manaPanel = document.querySelector('.mana-panel');
+                    if (manaPanel) {
+                        manaPanel.scrollIntoView({ behavior: 'smooth' });
+                        manaPanel.classList.add('highlight-pulse');
+                        setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
+                    }
+                    break;
                 }
-                break;
-            }
             }
 
             // Ctrl combinations

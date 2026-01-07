@@ -53,10 +53,12 @@ export class EnvironmentEffects {
 
     discoveryEffect(x, y) {
         this.engine.burst(x, y, 20, {
-            color: '#facc15', // Yellow
-            speed: 3,
-            size: 3,
-            decay: 0.03
+            type: 'star',
+            color: '#fbbf24', // Gold
+            speed: 4,
+            size: 5,
+            decay: 0.02,
+            gravity: 0.1
         });
     }
 

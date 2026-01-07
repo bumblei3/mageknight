@@ -69,7 +69,10 @@ describe('UI Synchronization Tests', () => {
             id: 'e1',
             name: 'Orc',
             icon: '👹',
+            armor: 2,
             getEffectiveAttack: () => 3,
+            getResistanceMultiplier: () => 1,
+            getCurrentArmor: () => 2,
             currentHealth: 5,
             maxHealth: 5
         };

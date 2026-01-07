@@ -19,34 +19,36 @@ test.describe('Mage Knight Game Loading', () => {
     };
 
     test('should load the game and show title', async ({ page }) => {
-        await expect(page).toHaveTitle(/Mage Knight/);
+        await test.step('Check Title', async () => {
+            await expect(page).toHaveTitle(/Mage Knight/);
+        });
     });
 
     test('should show loading screen and then game board', async ({ page }) => {
-        // Check loading screen appears
-        const loadingScreen = page.locator('#loading-screen');
+        await test.step('Check Loading Screen', async () => {
+            const loadingScreen = page.locator('#loading-screen');
+            await expect(loadingScreen).toBeVisible();
+        });
 
-        // It should be visible initially
-        await expect(loadingScreen).toBeVisible();
+        await test.step('Wait for Game Ready', async () => {
+            await waitForGameReady(page);
+        });
 
-        // Wait for it to disappear
-        await waitForGameReady(page);
-
-        // Check for HUD elements
-        await expect(page.locator('.hud-top-bar')).toBeVisible();
-        await expect(page.locator('.bottom-dock')).toBeVisible();
-
-        // Check for canvas
-        await expect(page.locator('canvas#game-board')).toBeVisible();
+        await test.step('Verify HUD and Board', async () => {
+            await expect(page.locator('.hud-top-bar')).toBeVisible();
+            await expect(page.locator('.bottom-dock')).toBeVisible();
+            await expect(page.locator('canvas#game-board')).toBeVisible();
+        });
     });
 
     test('should show map and hero', async ({ page }) => {
-        // Wait for game load
-        await waitForGameReady(page);
+        await test.step('Wait for Game Load', async () => {
+            await waitForGameReady(page);
+        });
 
-        // Check if debug tools are available (initialized)
-        const debugBtn = page.locator('.debug-toggle');
-        // Might be visible if debug.js is loaded
-        await expect(debugBtn).toBeAttached();
+        await test.step('Check Debug Tools Availability', async () => {
+            const debugBtn = page.locator('.debug-toggle');
+            await expect(debugBtn).toBeAttached();
+        });
     });
 });

@@ -345,6 +345,7 @@ export class CombatOrchestrator {
 
         // UI Updates - Pass array
         this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e) => this.handleEnemyClick(e));
+        this.updateCombatTotals(); // Ensure button visibility
         this.game.updatePhaseIndicator();
 
         // Emit event for other systems

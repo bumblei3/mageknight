@@ -144,7 +144,9 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
                 name: 'Target',
                 armor: 2,
                 attack: 1,
-                // Add missing method needed for Combat.getState()
+                getEffectiveAttack: () => 1,
+                getResistanceMultiplier: () => 1,
+                getCurrentArmor: () => 2,
                 getState: () => ({ name: 'Target', armor: 2 })
             };
             game.initiateCombat(enemy);
@@ -319,7 +321,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
 
     describe('Additional Coverage: Combat & Tooltips', () => {
         it('should handle combat phases and boss transition abilities', () => {
-            game.initiateCombat({ name: 'Dummy', armor: 1, attack: 1 });
+            game.initiateCombat({ name: 'Dummy', armor: 1, attack: 1, getEffectiveAttack: () => 1, getResistanceMultiplier: () => 1, getCurrentArmor: () => 1 });
             game.combat.phase = 'ranged'; // Not ATTACK
             const res = game.combat.attackPhase();
             expect(res.error).toBeDefined();
@@ -502,7 +504,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
         });
 
         it('should handle combo detection null checks', () => {
-            game.initiateCombat({ name: 'Dummy', armor: 1, attack: 1 });
+            game.initiateCombat({ name: 'Dummy', armor: 1, attack: 1, getEffectiveAttack: () => 1, getResistanceMultiplier: () => 1, getCurrentArmor: () => 1 });
             const result = game.combat.detectCombo([]);
             expect(result).toBeNull();
         });

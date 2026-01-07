@@ -10,44 +10,44 @@ test.describe('Mage Knight Gameplay', () => {
     });
 
     test('should allow toggling debug panel', async ({ page }) => {
-        const toggleBtn = page.locator('.debug-toggle');
-        await expect(toggleBtn).toBeVisible();
+        await test.step('Open Debug Panel', async () => {
+            const toggleBtn = page.locator('.debug-toggle');
+            await expect(toggleBtn).toBeVisible();
+            await toggleBtn.click();
+        });
 
-        await toggleBtn.click();
-        const panel = page.locator('.debug-panel');
-        await expect(panel).toBeVisible();
+        await test.step('Verify Content and Close', async () => {
+            const panel = page.locator('.debug-panel');
+            await expect(panel).toBeVisible();
+            await expect(page.locator('h3:has-text("Debug Tools")')).toBeVisible();
 
-        // Check for debug sections
-        await expect(page.locator('h3:has-text("Debug Tools")')).toBeVisible();
-
-        // Close it
-        await page.locator('.close-btn').click();
-        await expect(panel).toBeHidden();
+            await page.locator('.debug-panel .close-btn').click();
+            await expect(panel).toBeHidden();
+        });
     });
 
     test('should allow opening unit hiring modal', async ({ page }) => {
-        // Find a site (village/etc) or use debug to teleport?
-        // Basic interaction: Click Unit Display (if empty) or just use Debug to add unit
+        await test.step('Open Debug and Add Unit', async () => {
+            await page.locator('.debug-toggle').click();
+            await page.locator('button:has-text("Add Unit")').click();
+        });
 
-        // Open Debug first
-        await page.locator('.debug-toggle').click();
-
-        // Add a Unit
-        await page.locator('button:has-text("Add Unit")').click();
-
-        // Check log
-        const log = page.locator('#debug-log-container');
-        await expect(log).toContainText('Debug: Added');
-
-        // Check unit display
-        await expect(page.locator('.unit-card')).toBeVisible();
+        await test.step('Verify Log and Unit Display', async () => {
+            const log = page.locator('#debug-log-container');
+            await expect(log).toContainText('Debug: Added');
+            await expect(page.locator('.unit-card')).toBeVisible();
+        });
     });
 
     test('should display FPS counter when toggled', async ({ page }) => {
-        await page.locator('.debug-toggle').click();
-        await page.locator('button:has-text("Toggle FPS")').click();
+        await test.step('Enable FPS Counter', async () => {
+            await page.locator('.debug-toggle').click();
+            await page.locator('button:has-text("Toggle FPS")').click();
+        });
 
-        await expect(page.locator('#perf-overlay')).toBeVisible();
-        await expect(page.locator('#perf-overlay')).toContainText('FPS:');
+        await test.step('Verify Overlay', async () => {
+            await expect(page.locator('#perf-overlay')).toBeVisible();
+            await expect(page.locator('#perf-overlay')).toContainText('FPS:');
+        });
     });
 });

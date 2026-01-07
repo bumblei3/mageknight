@@ -24,7 +24,8 @@ export class ShortcutManager {
                 // Merge stored with defaults to ensure all actions exist
                 // Users might have old config, so we only override keys
                 const parsed = JSON.parse(stored);
-                const combined = { ...this.defaultBindings };
+                // Deep clone defaults to avoid mutation
+                const combined = JSON.parse(JSON.stringify(this.defaultBindings));
 
                 Object.keys(parsed).forEach(action => {
                     if (combined[action]) {
@@ -36,7 +37,8 @@ export class ShortcutManager {
         } catch (e) {
             console.error('Failed to load shortcuts', e);
         }
-        return { ...this.defaultBindings };
+        // Deep clone to avoid shared references
+        return JSON.parse(JSON.stringify(this.defaultBindings));
     }
 
     saveBindings() {
@@ -87,7 +89,8 @@ export class ShortcutManager {
     }
 
     resetDefaults() {
-        this.bindings = { ...this.defaultBindings };
+        // Deep clone to avoid shared references
+        this.bindings = JSON.parse(JSON.stringify(this.defaultBindings));
         this.saveBindings();
     }
 }

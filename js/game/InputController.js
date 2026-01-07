@@ -206,43 +206,43 @@ export class InputController {
             const action = this.game.shortcutManager.getAction(e);
 
             switch (action) {
-                case 'END_TURN':
-                    this.game.turnManager.endTurn();
-                    e.preventDefault();
-                    break;
-                case 'HELP': {
-                    const helpBtn = document.getElementById('help-btn');
-                    if (helpBtn) helpBtn.click();
-                    e.preventDefault();
-                    break;
+            case 'END_TURN':
+                this.game.turnManager.endTurn();
+                e.preventDefault();
+                break;
+            case 'HELP': {
+                const helpBtn = document.getElementById('help-btn');
+                if (helpBtn) helpBtn.click();
+                e.preventDefault();
+                break;
+            }
+            case 'REST':
+                this.game.phaseManager.rest();
+                e.preventDefault();
+                break;
+            case 'EXPLORE':
+                this.game.actionManager.explore();
+                e.preventDefault();
+                break;
+            case 'TUTORIAL':
+                this.game.showTutorial();
+                e.preventDefault();
+                break;
+            case 'CANCEL':
+                if (this.game.movementMode) {
+                    this.game.exitMovementMode();
+                    this.game.addLog('Bewegungsmodus abgebrochen', 'info');
                 }
-                case 'REST':
-                    this.game.phaseManager.rest();
-                    e.preventDefault();
-                    break;
-                case 'EXPLORE':
-                    this.game.actionManager.explore();
-                    e.preventDefault();
-                    break;
-                case 'TUTORIAL':
-                    this.game.showTutorial();
-                    e.preventDefault();
-                    break;
-                case 'CANCEL':
-                    if (this.game.movementMode) {
-                        this.game.exitMovementMode();
-                        this.game.addLog('Bewegungsmodus abgebrochen', 'info');
-                    }
-                    break;
-                case 'MANA_PANEL': {
-                    const manaPanel = document.querySelector('.mana-panel');
-                    if (manaPanel) {
-                        manaPanel.scrollIntoView({ behavior: 'smooth' });
-                        manaPanel.classList.add('highlight-pulse');
-                        setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
-                    }
-                    break;
+                break;
+            case 'MANA_PANEL': {
+                const manaPanel = document.querySelector('.mana-panel');
+                if (manaPanel) {
+                    manaPanel.scrollIntoView({ behavior: 'smooth' });
+                    manaPanel.classList.add('highlight-pulse');
+                    setTimeout(() => manaPanel.classList.remove('highlight-pulse'), 1000);
                 }
+                break;
+            }
             }
 
             // Ctrl combinations

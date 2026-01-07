@@ -152,7 +152,7 @@ export class HandRenderer {
             <div class="card-effects">
                 <div class="card-effect"><strong>${t('cards.basic')}:</strong> ${basicEffect}</div>
                 ${strongEffect && strongEffect !== t('cards.none') ?
-                `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
+        `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
             </div>
             <div class="card-hint">${t('cards.sidewaysAction')}</div>
         `;

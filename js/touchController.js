@@ -18,6 +18,13 @@ export class TouchController {
 
         this.setupTouchEvents();
         this.setupViewportResize();
+
+        this.canvasRect = null;
+        this.updateRect = this.updateRect.bind(this);
+        if (typeof window !== 'undefined') {
+            window.addEventListener('scroll', this.updateRect);
+            setTimeout(this.updateRect, 100);
+        }
     }
 
     destroy() {
@@ -125,7 +132,8 @@ export class TouchController {
 
         // Show tooltip on touch move (for hex/enemy hover)
         const touch = e.touches[0];
-        const rect = this.game.canvas.getBoundingClientRect();
+        if (!this.canvasRect) this.updateRect();
+        const rect = this.canvasRect || this.game.canvas.getBoundingClientRect();
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
 
@@ -147,7 +155,8 @@ export class TouchController {
 
     handleTap(touch) {
         // Simulate click event
-        const rect = this.game.canvas.getBoundingClientRect();
+        if (!this.canvasRect) this.updateRect();
+        const rect = this.canvasRect || this.game.canvas.getBoundingClientRect();
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
 
@@ -171,7 +180,8 @@ export class TouchController {
 
     handleLongPress(touch) {
         // Long press = right click alternative
-        const rect = this.game.canvas.getBoundingClientRect();
+        if (!this.canvasRect) this.updateRect();
+        const rect = this.canvasRect || this.game.canvas.getBoundingClientRect();
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
 
@@ -394,6 +404,15 @@ export class TouchController {
             }
 
             console.log(`Canvas resized to ${width}x${height}`);
+        }
+
+        // Update cached rect
+        this.updateRect();
+    }
+
+    updateRect() {
+        if (this.game && this.game.canvas) {
+            this.canvasRect = this.game.canvas.getBoundingClientRect();
         }
     }
 

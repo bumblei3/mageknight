@@ -4,10 +4,27 @@ import { ACTION_TYPES } from './constants.js';
 export class InteractionController {
     constructor(game) {
         this.game = game;
+        this.cachedRect = null;
+
+        // Cache rect on resize/scroll to avoid layout thrashing on every frame
+        this.updateRect = this.updateRect.bind(this);
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', this.updateRect);
+            window.addEventListener('scroll', this.updateRect);
+            // Initial cache
+            setTimeout(this.updateRect, 100);
+        }
+    }
+
+    updateRect() {
+        if (this.game && this.game.canvas) {
+            this.cachedRect = this.game.canvas.getBoundingClientRect();
+        }
     }
 
     handleCanvasClick(e) {
-        const rect = this.game.canvas.getBoundingClientRect();
+        if (!this.cachedRect) this.updateRect();
+        const rect = this.cachedRect || this.game.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
@@ -42,7 +59,8 @@ export class InteractionController {
     handleCanvasMouseMove(e) {
         if (!this.game.hexGrid || !this.game.ui.tooltipManager) return;
 
-        const rect = this.game.canvas.getBoundingClientRect();
+        if (!this.cachedRect) this.updateRect();
+        const rect = this.cachedRect || this.game.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 

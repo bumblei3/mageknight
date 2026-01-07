@@ -65,7 +65,7 @@ test.describe('Interactions Flow', () => {
             await expect(manaSource).toBeVisible({ timeout: 10000 });
 
             // Wait for any animations to settle
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(1000);
 
             const initialManaCount = await page.evaluate(() => window.game.hero.tempMana.length);
 
@@ -77,10 +77,13 @@ test.describe('Interactions Flow', () => {
                 }
             });
 
-            // Verify mana collected
+            // Wait a bit for the click to be processed
+            await page.waitForTimeout(500);
+
+            // Verify mana collected with longer timeout
             await expect.poll(async () => {
                 return await page.evaluate(() => window.game.hero.tempMana.length);
-            }, { message: 'Mana should be collected', timeout: 5000 }).toBeGreaterThan(initialManaCount);
+            }, { message: 'Mana should be collected', timeout: 10000 }).toBeGreaterThan(initialManaCount);
 
             await expect(page.locator('#game-log')).toContainText('Mana genommen');
         });

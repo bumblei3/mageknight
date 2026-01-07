@@ -52,9 +52,9 @@
     /* Text Colors - WCAG AA compliant contrast on dark backgrounds */
     --color-text-primary: hsl(0, 0%, 100%);
     /* White */
-    --color-text-secondary: hsl(210, 20%, 94%);
+    --color-text-secondary: hsl(210, 20%, 98%);
     /* Lighter Grey for better readability */
-    --color-text-muted: hsl(210, 15%, 90%);
+    --color-text-muted: hsl(210, 15%, 95%);
     /* Lighter Muted */
 
     /* Spacing */

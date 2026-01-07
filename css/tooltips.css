@@ -5,7 +5,7 @@
     --tooltip-border: 1px solid rgba(251, 191, 36, 0.4);
     --tooltip-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(251, 191, 36, 0.1);
     --tooltip-text-primary: #f3f4f6;
-    --tooltip-text-secondary: #9ca3af;
+    --tooltip-text-secondary: #e2e8f0;
     --tooltip-header-bg: linear-gradient(90deg, rgba(251, 191, 36, 0.1), transparent);
     --tooltip-divider: linear-gradient(90deg, rgba(251, 191, 36, 0.5), transparent);
     --z-tooltip: 10000;

@@ -51,7 +51,7 @@ export class HeroSelectionModal {
         card.innerHTML = `
             <div class="hero-card-inner">
                 <div class="hero-portrait-container">
-                    <img src="${hero.portrait}" alt="${hero.name}" class="hero-portrait" width="200" height="300" loading="lazy" onerror="this.src='assets/heroes/placeholder.png'">
+                    <img src="${hero.portrait.replace('.webp', '_medium.webp')}" alt="${hero.name}" class="hero-portrait" width="200" height="300" loading="lazy" onerror="this.src='assets/heroes/placeholder.png'">
                     <div class="hero-tag">${hero.title}</div>
                 </div>
                 <div class="hero-info">

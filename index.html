@@ -21,9 +21,10 @@
     <link rel="preload" as="image" href="assets/scenarios/mines_freedom_medium.webp" fetchpriority="high">
     <link rel="preload" as="image" href="assets/scenarios/mining_expedition_medium.webp" fetchpriority="high">
 
-    <!-- Fonts (Blocking to prevent layout shift) -->
+    <!-- Fonts (Async to prevent blocking) -->
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap">
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
+        media="print" onload="this.media='all'">
 
     <!-- Critical CSS Inlined -->
     <style>
@@ -43,6 +44,55 @@
             --glass-bg: hsla(30, 20%, 5%, 0.9);
             --glass-border: hsla(var(--h-gold), 50%, 65%, 0.3);
             --backdrop-blur: blur(16px) saturate(180%);
+        }
+
+        /* Critical layout to prevent CLS */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            grid-template-rows: 1fr;
+            background: #050510;
+        }
+
+        .canvas-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .hud-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: grid;
+            grid-template-rows: 64px 1fr auto;
+        }
+
+        .hud-layer>* {
+            pointer-events: auto;
+        }
+
+        .bottom-dock {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 280px;
+            z-index: 100;
         }
 
         body {
@@ -131,11 +181,11 @@
         }
     </style>
 
-    <!-- Preload critical assets -->
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/hud.css">
-    <link rel="stylesheet" href="css/cards.css">
+    <!-- Defer ALL external CSS to eliminate render-blocking -->
+    <link rel="stylesheet" href="css/reset.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/hud.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/cards.css" media="print" onload="this.media='all'">
 
     <!-- Defer truly non-critical CSS -->
     <link rel="stylesheet" href="css/modals.css" media="print" onload="this.media='all'">

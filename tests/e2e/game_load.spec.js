@@ -51,4 +51,68 @@ test.describe('Mage Knight Game Loading', () => {
             await expect(debugBtn).toBeAttached();
         });
     });
+
+    test('should persist state after save and reload', async ({ page }) => {
+        const gameFlow = new GameFlow(page);
+        await gameFlow.ensureGameStarted();
+
+        await test.step('Modify Game State', async () => {
+            // Play a card to change hand size
+            const cards = page.locator('#hand-cards .card');
+            const initialCount = await cards.count();
+            expect(initialCount).toBeGreaterThan(0);
+
+            await cards.first().click();
+
+            // Handle mana modal if it appears
+            const playModal = page.locator('#card-play-modal');
+            if (await playModal.isVisible({ timeout: 1000 })) {
+                await page.locator('#play-basic-btn').click();
+            }
+
+            // Verify card played
+            await expect(cards).toHaveCount(initialCount - 1);
+
+            // Move hero
+            await page.evaluate(() => {
+                window.game.hero.movementPoints = 5;
+                window.game.hero.position = { q: 2, r: 1 };
+            });
+        });
+
+        await test.step('Save Game', async () => {
+            await page.evaluate(() => {
+                window.game.stateManager.saveGame('e2e_test_slot');
+            });
+        });
+
+        // Get expected values before reload
+        const expectedPos = await page.evaluate(() => window.game.hero.position);
+        const expectedHandSize = await page.evaluate(() => window.game.hero.hand.length);
+
+        await test.step('Reload Page', async () => {
+            await page.reload();
+            await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 15000 });
+            await gameFlow.skipTutorial();
+            await gameFlow.handleModals();
+        });
+
+        await test.step('Load Game', async () => {
+            await page.evaluate(() => {
+                window.game.stateManager.loadGame('e2e_test_slot');
+            });
+
+            // Wait for state to be applied
+            await page.waitForTimeout(500);
+        });
+
+        await test.step('Verify Restored State', async () => {
+            const pos = await page.evaluate(() => window.game.hero.position);
+            const handSize = await page.evaluate(() => window.game.hero.hand.length);
+
+            expect(pos.q).toBe(expectedPos.q);
+            expect(pos.r).toBe(expectedPos.r);
+            expect(handSize).toBe(expectedHandSize);
+        });
+    });
 });

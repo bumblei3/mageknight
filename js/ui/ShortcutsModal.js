@@ -40,16 +40,20 @@ export class ShortcutsModal {
         // Open button - we need to hook this into SettingsModal or main UI
         // Close
         const closeBtn = this.modal.querySelector('#shortcuts-close');
-        closeBtn.addEventListener('click', () => this.hide());
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hide());
+        }
 
         // Reset
         const resetBtn = this.modal.querySelector('#shortcuts-reset');
-        resetBtn.addEventListener('click', () => {
-            if (confirm('Wirklich alle Kürzel zurücksetzen?')) {
-                this.ui.game.shortcutManager.resetDefaults();
-                this.renderList();
-            }
-        });
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (typeof window !== 'undefined' && window.confirm && window.confirm('Wirklich alle Kürzel zurücksetzen?')) {
+                    this.ui.game.shortcutManager.resetDefaults();
+                    this.renderList();
+                }
+            });
+        }
 
         // Close on outside click
         window.addEventListener('click', (e) => {

@@ -56,15 +56,61 @@ test.describe('Gameplay Flow', () => {
             }
         });
 
-        await test.step('End Turn', async () => {
-            const endTurnBtn = page.locator('#end-turn-btn');
-            await expect(endTurnBtn).toBeVisible();
-            await endTurnBtn.click();
+        await test.step('Play Card Sideways for Movement', async () => {
+            const cards = page.locator('#hand-cards .card');
+            const firstCard = cards.first();
+
+            // Set up dialog handler to accept the prompt
+            page.once('dialog', dialog => {
+                // Choice '1' is movement (+1)
+                dialog.accept('1');
+            });
+
+            // Right-click to play sideways
+            await firstCard.click({ button: 'right' });
+
+            // Wait for log to confirm sideways play
+            await expect(page.locator('#game-log')).toContainText('seitlich gespielt');
         });
 
-        await test.step('Verify Round Transition', async () => {
-            await expect(page.locator('#game-board')).toBeVisible();
-            // Optional: Check for "Runde Beendet" or similar notification
+        await test.step('Move Hero', async () => {
+            // Give movement points via console if needed to ensure we can move
+            await page.evaluate(() => {
+                window.game.hero.movementPoints = 5;
+                window.game.enterMovementMode();
+            });
+
+            // Get screen position of an adjacent hex (1,0)
+            const screenPos = await page.evaluate(() => {
+                const hex = window.game.hexGrid.axialToPixel(1, 0);
+                const rect = window.game.canvas.getBoundingClientRect();
+                return { x: rect.left + hex.x, y: rect.top + hex.y };
+            });
+
+            // Click to move
+            await page.mouse.click(screenPos.x, screenPos.y);
+
+            // Verify position updated
+            // Normalize -0 to 0 for strict equality check
+            const pos = await page.evaluate(() => {
+                const p = window.game.hero.position;
+                return { q: p.q + 0, r: p.r + 0 };
+            });
+            expect(pos.q).toBe(1);
+            expect(pos.r).toBe(0);
+        });
+
+        await test.step('End Turn and Verify Hand Refresh', async () => {
+            const endTurnBtn = page.locator('#end-turn-btn');
+            await endTurnBtn.click();
+
+            // Hand should be refilled to 5
+            await expect.poll(async () => {
+                return await page.evaluate(() => window.game.hero.hand.length);
+            }, { message: 'Hand should be refilled to 5', timeout: 5000 }).toBe(5);
+
+            const cardElements = page.locator('#hand-cards .card');
+            await expect(cardElements).toHaveCount(5);
         });
     });
 });

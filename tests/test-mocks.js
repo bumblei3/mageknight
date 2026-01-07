@@ -832,7 +832,12 @@ export function createMockWindow(width = 1024, height = 768) {
         webkitAudioContext: MockAudioContext,
         _clearListeners: () => {
             Object.keys(listeners).forEach(key => delete listeners[key]);
-        }
+        },
+        getComputedStyle: () => ({
+            getPropertyValue: () => '',
+            opacity: '1',
+            display: 'block'
+        })
     };
 
     return mockWindow;

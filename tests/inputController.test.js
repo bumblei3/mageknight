@@ -61,7 +61,25 @@ describe('UI Healing & Input Blocking', () => {
             applyHealing: createSpy(),
             turnManager: { endTurn: createSpy() },
             rest: createSpy(),
-            explore: createSpy(),
+            explore: createSpy(), // Legacy check
+            actionManager: {
+                explore: createSpy(),
+                visitSite: createSpy(),
+                undoLastAction: createSpy()
+            },
+            combatOrchestrator: {
+                executeAttackAction: createSpy()
+            },
+            openSaveDialog: createSpy(),
+            openLoadDialog: createSpy(),
+            reset: createSpy(),
+            showTutorial: createSpy(),
+            shortcutManager: {
+                getAction: createSpy(() => null)
+            },
+            phaseManager: {
+                rest: createSpy()
+            },
             ui: ui,
             canvas: createMockElement('canvas'),
             interactionController: {
@@ -72,8 +90,8 @@ describe('UI Healing & Input Blocking', () => {
             setupUIListeners: createSpy(),
             isUIBlocked: () => false,
             sound: { enabled: true, toggle: createSpy() },
-            addLog: createSpy(), // Added for sound toggle
-            renderController: { renderAchievements: createSpy(), renderStatistics: createSpy() } // Mock renderController
+            addLog: createSpy(),
+            renderController: { renderAchievements: createSpy(), renderStatistics: createSpy() }
         };
     });
 
@@ -116,11 +134,7 @@ describe('UI Healing & Input Blocking', () => {
         });
 
         it('should NOT call applyHealing when UI IS blocked', () => {
-            // Mock isUIBlocked to return true
-            // In the actual class, it checks modal visibility
-            // We can mock the function directly on the instance for this test
             handler.isUIBlocked = () => true;
-
             mockElements.healBtn.click();
             expect(mockGame.applyHealing.called).toBe(false);
         });
@@ -129,6 +143,13 @@ describe('UI Healing & Input Blocking', () => {
             handler.isUIBlocked = () => true;
             mockElements.endTurnBtn.click();
             expect(mockGame.turnManager.endTurn.called).toBe(false);
+        });
+
+        it('should call actionManager.explore when exploreBtn is clicked', () => {
+            handler.isUIBlocked = () => false;
+            mockElements.exploreBtn.click();
+            expect(mockGame.actionManager.explore.called).toBe(true);
+            expect(mockGame.explore.called).toBe(false); // Ensure legacy method is NOT called
         });
     });
 });

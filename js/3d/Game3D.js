@@ -1,6 +1,7 @@
 import { SceneManager3D } from './SceneManager3D.js';
 import { HexMeshFactory } from './HexMeshFactory.js';
-import * as THREE from 'three';
+import { HeroMeshFactory } from './HeroMeshFactory.js';
+
 
 export class Game3D {
     constructor(game) {
@@ -10,6 +11,7 @@ export class Game3D {
         // Components
         this.sceneManager = null;
         this.meshFactory = new HexMeshFactory();
+        this.heroFactory = new HeroMeshFactory();
 
         // Track Hero Mesh
         this.heroMesh = null;
@@ -25,6 +27,13 @@ export class Game3D {
             }
             // We could also animate the selector pulse here later
             this.updateSelectorAnimation(time);
+
+            // Animate Hero
+            if (this.heroMesh) {
+                // Bobbing effect
+                const bob = Math.sin(time * 2) * 0.1;
+                this.heroMesh.position.y = 0.3 + bob; // Base Y offset + bob
+            }
 
             // Sync Day/Night cycle
             if (this.game && this.game.timeManager) {
@@ -146,10 +155,21 @@ export class Game3D {
     renderHero() {
         if (!this.game.hero) return;
 
-        // Simple Hero Mesh (Gold Cylinder for Goldyx)
-        const geo = new THREE.CylinderGeometry(0.3, 0.3, 1.5, 8);
-        const mat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 });
-        this.heroMesh = new THREE.Mesh(geo, mat);
+        // Use Factory
+        if (this.heroMesh) {
+            this.sceneManager.scene.remove(this.heroMesh);
+            // Note: SceneManager doesn't expose scene directly usually, but logic in line 163 used sceneManager.add
+            // Wait, SceneManager has add(), but remove()?
+            // SceneManager3D.js likely has .scene property public based on usage.
+            // Let's check SceneManager.add implementation in my mind or usage.
+            // Usage: this.sceneManager.add(mesh).
+            // I should probably check if remove matches.
+            // Assuming sceneManager.scene is accessible or I should add remove method.
+            // SceneManager3D.js Line 34: this.scene = ... (public prop)
+            this.sceneManager.scene.remove(this.heroMesh);
+        }
+
+        this.heroMesh = this.heroFactory.createHeroMesh(this.game.hero);
 
         // Position on current hex
         const hex = this.game.hexGrid.getHex(this.game.hero.q, this.game.hero.r);
@@ -157,10 +177,8 @@ export class Game3D {
             const size = this.meshFactory.radius * 1.05;
             const x = size * 1.5 * hex.q;
             const z = size * Math.sqrt(3) * (hex.r + hex.q / 2);
-            this.heroMesh.position.set(x, 1, z);
+            this.heroMesh.position.set(x, 1, z); // Initial Y
         }
-
-        this.sceneManager.add(this.heroMesh);
 
         this.sceneManager.add(this.heroMesh);
 

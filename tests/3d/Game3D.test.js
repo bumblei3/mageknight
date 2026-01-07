@@ -1,6 +1,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { HexMeshFactory } from '../../js/3d/HexMeshFactory.js';
+import { HeroMeshFactory } from '../../js/3d/HeroMeshFactory.js';
 import * as THREE from 'three';
 
 // Mock Three.js dependencies if needed, but often we can test logic with real Three objects in Node logic if canvas is mocked
@@ -30,5 +31,23 @@ describe('HexMeshFactory', () => {
 
         factory.updateMaterials(1.5);
         expect(mat.uniforms.uTime.value).toBe(1.5);
+    });
+});
+
+describe('HeroMeshFactory', () => {
+    const heroFactory = new HeroMeshFactory();
+
+    it('should create default hero mesh group', () => {
+        const mesh = heroFactory.createHeroMesh('unknown');
+        expect(mesh).toBeDefined();
+        expect(mesh.isGroup).toBe(true);
+        expect(mesh.children.length).toBeGreaterThan(0);
+    });
+
+    it('should create Goldyx specifics', () => {
+        const mesh = heroFactory.createHeroMesh({ id: 'goldyx' });
+        expect(mesh).toBeDefined();
+        // Check for wings/horns logic via children count or material color
+        expect(mesh.children.length).toBeGreaterThan(3);
     });
 });

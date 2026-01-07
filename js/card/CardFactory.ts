@@ -7,6 +7,11 @@ export interface CardEffect {
     type?: string;
     value?: number;
     description?: string;
+    movement?: number;
+    attack?: number;
+    block?: number;
+    influence?: number;
+    healing?: number;
     [key: string]: unknown;
 }
 

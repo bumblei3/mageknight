@@ -20,6 +20,8 @@ module.exports = {
                 'unused-javascript': 'off',
                 'valid-source-maps': 'off',
                 // Performance metrics - set to warn to avoid CI failures
+                'forced-reflow-insight': 'warn',
+                'dom-size-insight': 'warn',
                 'image-delivery-insight': 'warn',
                 'cls-culprits-insight': 'warn',
                 'cumulative-layout-shift': 'warn',

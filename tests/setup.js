@@ -87,8 +87,18 @@ if (typeof URL.createObjectURL === 'undefined') {
 }
 
 // Mock requestAnimationFrame
-global.requestAnimationFrame = vi.fn((cb) => setTimeout(cb, 16));
-global.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));
+const raf = vi.fn((cb) => setTimeout(cb, 16));
+const cancelRaf = vi.fn((id) => clearTimeout(id));
+
+global.requestAnimationFrame = raf;
+global.cancelAnimationFrame = cancelRaf;
+globalThis.requestAnimationFrame = raf;
+globalThis.cancelAnimationFrame = cancelRaf;
+
+if (typeof window !== 'undefined') {
+    window.requestAnimationFrame = raf;
+    window.cancelAnimationFrame = cancelRaf;
+}
 
 // Mock localStorage if not present
 if (typeof localStorage === 'undefined') {

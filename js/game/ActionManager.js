@@ -228,6 +228,10 @@ export class ActionManager {
 
         eventBus.emit(GAME_EVENTS.HERO_MOVED, { from: oldPos, to: { q, r }, cost });
 
+        // Visual Polish Override
+        eventBus.emit(GAME_EVENTS.HERO_MOVE_STEP, { from: oldPos, to: { q, r } });
+
+
         this.game.updateStats();
 
         // Check for enemies/sites - IF TRIGGERED, CLEAR HISTORY

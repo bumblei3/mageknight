@@ -23,6 +23,17 @@ export class SettingsModal {
             this.hide();
         });
 
+        // Shortcuts button
+        const shortcutsBtn = document.getElementById('settings-shortcuts-btn');
+        if (shortcutsBtn) {
+            shortcutsBtn.addEventListener('click', () => {
+                if (this.ui.shortcutsModal) {
+                    this.ui.shortcutsModal.show();
+                    // Optionally hide settings? Keeping it open might be better context.
+                }
+            });
+        }
+
         // Tab switching
         this.tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {

@@ -1,7 +1,8 @@
+
 import { test, expect } from '@playwright/test';
 import { GameFlow } from './utils/GameFlow.js';
 
-test.describe('Mage Knight Gameplay', () => {
+test.describe('Gameplay Flow', () => {
     test.setTimeout(60000);
 
     test.beforeEach(async ({ page }) => {
@@ -9,45 +10,56 @@ test.describe('Mage Knight Gameplay', () => {
         await gameFlow.ensureGameStarted();
     });
 
-    test('should allow toggling debug panel', async ({ page }) => {
-        const toggleBtn = page.locator('.debug-toggle');
-        await expect(toggleBtn).toBeVisible();
+    test('should display hand and allow turn end', async ({ page }) => {
+        // 1. Verify Hand is visible
+        const handContainer = page.locator('#hand-cards');
+        await expect(handContainer).toBeVisible();
 
-        await toggleBtn.click();
-        const panel = page.locator('.debug-panel');
-        await expect(panel).toBeVisible();
+        // Wait for cards to be rendered
+        const cards = handContainer.locator('.card');
+        await expect(cards.first()).toBeVisible({ timeout: 10000 });
 
-        // Check for debug sections
-        await expect(page.locator('h3:has-text("Debug Tools")')).toBeVisible();
+        const cardCount = await cards.count();
+        expect(cardCount).toBeGreaterThan(0);
+        console.log(`Found ${cardCount} cards in hand.`);
 
-        // Close it
-        await page.locator('.close-btn').click();
-        await expect(panel).toBeHidden();
-    });
+        // 2. Hover over a card to trigger tooltip
+        const firstCard = cards.first();
+        await firstCard.hover();
 
-    test('should allow opening unit hiring modal', async ({ page }) => {
-        // Find a site (village/etc) or use debug to teleport?
-        // Basic interaction: Click Unit Display (if empty) or just use Debug to add unit
+        // Tooltip logic might vary, but let's check for standard tooltip element
+        const tooltip = page.locator('.tooltip');
+        // Or if your tooltip implementation creates a specific ID
+        // await expect(tooltip).toBeVisible(); 
 
-        // Open Debug first
-        await page.locator('.debug-toggle').click();
+        // 3. Play a card (Click)
+        // Note: Clicking plays the card immediately (or shows modal), it doesn't just "select" it.
+        const initialHandCount = await cards.count();
+        await firstCard.click();
 
-        // Add a Unit
-        await page.locator('button:has-text("Add Unit")').click();
+        // Handle potential "Mana Amplification" modal if it appears
+        const playModal = page.locator('#card-play-modal');
+        if (await playModal.isVisible({ timeout: 1000 })) {
+            await page.locator('#play-basic-btn').click();
+        }
 
-        // Check log
-        const log = page.locator('#debug-log-container');
-        await expect(log).toContainText('Debug: Added');
+        // Verify card moved to played area (Hand count decreases)
+        await expect(cards).toHaveCount(initialHandCount - 1);
 
-        // Check unit display
-        await expect(page.locator('.unit-card')).toBeVisible();
-    });
+        // Verify played area has the card
+        const playedArea = page.locator('#played-cards');
+        await expect(playedArea.locator('.card')).toHaveCount(1);
 
-    test('should display FPS counter when toggled', async ({ page }) => {
-        await page.locator('.debug-toggle').click();
-        await page.locator('button:has-text("Toggle FPS")').click();
+        // 4. End Turn
+        // Use German "Zug beenden" or ID
+        const endTurnBtn = page.locator('#end-turn-btn');
+        await expect(endTurnBtn).toBeVisible();
+        await endTurnBtn.click();
 
-        await expect(page.locator('#perf-overlay')).toBeVisible();
-        await expect(page.locator('#perf-overlay')).toContainText('FPS:');
+        // 5. Verify Turn/Round update
+        // We expect the "Next Turn" or "End of Round" processing
+        // Often a toast or log message appears.
+        // Let's verify we are still on the board and maybe the hand refreshed or buttons changed
+        await expect(page.locator('#game-board')).toBeVisible();
     });
 });

@@ -15,6 +15,8 @@ import { TimeManager } from './timeManager.js';
 import { MapManager } from './mapManager.js';
 import { WorldEventManager } from './worldEvents.js';
 import ParticleSystem from './particles.js';
+import { WeatherSystem } from './particles/WeatherSystem.js';
+
 import { animator } from './animator.js';
 import { SiteInteractionManager } from './siteInteraction.js';
 import { DebugManager } from './debug.js';
@@ -38,6 +40,7 @@ import { CombatOrchestrator } from './game/CombatOrchestrator.js';
 import { HeroController } from './game/HeroController.js';
 import { InputController } from './game/InputController.js';
 import { RenderController } from './game/RenderController.js';
+import { ShortcutManager } from './game/ShortcutManager.js';
 import { HeroManager } from './game/HeroManager.js';
 import { store } from './game/Store.js';
 
@@ -96,7 +99,14 @@ export class MageKnightGame {
         this.manaSource = new ManaSource();
         this.enemyAI = new EnemyAI(this.hexGrid);
         this.particleSystem = new ParticleSystem(this.canvas);
+        this.weatherSystem = new WeatherSystem(this.particleSystem, this.canvas);
+        this.particleSystem.registerSystem(this.weatherSystem);
+
+        // Default weather for testing
+        // this.weatherSystem.setWeather('rain', 0.5); 
+
         this.mapManager = new MapManager(this.hexGrid);
+
         this.worldEventManager = new WorldEventManager(this);
         this.mapManager.setWorldEventManager(this.worldEventManager);
 
@@ -106,6 +116,7 @@ export class MageKnightGame {
         // New Refactored Controllers
         this.turnManager = new TurnManager(this);
         this.interactionController = new InteractionController(this);
+        this.shortcutManager = new ShortcutManager();
         this.inputController = new InputController(this);
         this.renderController = new RenderController(this);
 
@@ -644,9 +655,32 @@ export class MageKnightGame {
         eventBus.on(GAME_EVENTS.LOG_ADDED, (data) => {
             if (data.type === 'error' && (data.message.includes('Verletzung') || data.message.includes('Damage'))) {
                 this.particleSystem.triggerShake(5, 0.4);
-                // Add visual redness?
             }
         });
+
+        // --- VISUAL POLISH HOOKS ---
+        eventBus.on(GAME_EVENTS.HERO_MOVE_STEP, (data) => {
+            // Dust cloud at previous position
+            const pixel = this.hexGrid.axialToPixel(data.from.q, data.from.r);
+            this.particleSystem.dustCloudEffect(pixel.x, pixel.y);
+            // Trail at new position
+            const newPixel = this.hexGrid.axialToPixel(data.to.q, data.to.r);
+            this.particleSystem.trailEffect(newPixel.x, newPixel.y, '#8b5cf6');
+        });
+
+        eventBus.on(GAME_EVENTS.COMBAT_BLOCK, (data) => {
+            const pixel = this.hexGrid.axialToPixel(data.enemyPos.q, data.enemyPos.r);
+            this.particleSystem.shieldBlockEffect(pixel.x, pixel.y);
+            this.particleSystem.createFloatingText(pixel.x, pixel.y - 30, "BLOCK!", "#60a5fa");
+        });
+
+        eventBus.on(GAME_EVENTS.COMBAT_DAMAGE, (data) => {
+            const pixel = this.hexGrid.axialToPixel(data.targetPos.q, data.targetPos.r);
+            this.particleSystem.damageSplatter(pixel.x, pixel.y, data.amount);
+            this.particleSystem.createDamageNumber(pixel.x, pixel.y, data.amount, data.amount >= 5);
+            if (data.amount >= 3) this.particleSystem.triggerShake(data.amount, 0.3);
+        });
+
 
         // If we want floating numbers for damage, we need to intercept the moments damage is dealt.
         // We can expose a method 'triggerDamageVisuals(target, amount)' or listen to an event.

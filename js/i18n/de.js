@@ -108,6 +108,10 @@ export default {
                 title: 'Aktuelle Phase',
                 desc: 'Zeigt an, was du gerade tun kannst. Beachte den Hinweis darunter.'
             }
+        },
+        settings: {
+            shortcuts: 'Tastaturkürzel',
+            reset: 'Zurücksetzen'
         }
     },
 

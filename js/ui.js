@@ -17,6 +17,8 @@ import { SaveLoadModal } from './ui/SaveLoadModal.js';
 import { ScenarioSelectionModal } from './ui/ScenarioSelectionModal.js';
 import { HeroSelectionModal } from './ui/HeroSelectionModal.js';
 import { SettingsModal } from './ui/SettingsModal.js';
+import { ShortcutsModal } from './ui/ShortcutsModal.js';
+
 
 /**
  * User Interface Controller (Orchestrator)
@@ -42,6 +44,8 @@ export class UI {
         this.scenarioSelectionModal = new ScenarioSelectionModal(this);
         this.heroSelectionModal = new HeroSelectionModal(this);
         this.settingsModal = new SettingsModal(this);
+        this.shortcutsModal = new ShortcutsModal(this);
+
 
         // Visual effects
         // Only initialize if game board exists (skips in some tests)

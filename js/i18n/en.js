@@ -108,6 +108,10 @@ export default {
                 title: 'Current Phase',
                 desc: 'Shows what you can do right now.'
             }
+        },
+        settings: {
+            shortcuts: 'Shortcuts',
+            reset: 'Reset Defaults'
         }
     },
 

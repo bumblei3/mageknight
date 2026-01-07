@@ -411,10 +411,15 @@ export class TooltipManager {
      * @returns {string} HTML string
      */
     createStatTooltipHTML(statType, description) {
+        // If description looks like HTML (contains <), render as is, otherwise wrap in p
+        const isHtml = description.includes('<');
         return `
             <div class="tooltip-stat">
-                <strong>${statType}</strong>
-                <p>${description}</p>
+                <div class="tooltip-header">
+                    <span class="tooltip-name">${statType}</span>
+                </div>
+                <div class="tooltip-divider"></div>
+                ${isHtml ? description : `<div class="tooltip-description">${description}</div>`}
             </div>
         `;
     }

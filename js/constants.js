@@ -81,7 +81,11 @@ export const GAME_EVENTS = {
     HAND_UPDATED: 'hand_updated',
     UNIT_UPDATED: 'unit_updated',
     TURN_STARTED: 'turn_started',
-    TIME_CHANGED: 'time_changed'
+    TIME_CHANGED: 'time_changed',
+    // Visual Polish Events
+    COMBAT_DAMAGE: 'combat_damage',
+    COMBAT_BLOCK: 'combat_block',
+    HERO_MOVE_STEP: 'hero_move_step'
 };
 
 export const TIME_OF_DAY = {

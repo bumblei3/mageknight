@@ -40,6 +40,14 @@ export class ParticleSystem {
     get particles() { return this.engine.particles; }
     get isRunning() { return this.running || this.particles.length > 0 || this.floatingTexts.length > 0 || this.shakeTime > 0; }
 
+    // External systems that need to be updated (e.g. Weather)
+    externalSystems = [];
+
+    registerSystem(system) {
+        this.externalSystems.push(system);
+    }
+
+
     addParticle(x, y, options) {
         this.engine.addParticle(x, y, options);
     }
@@ -107,6 +115,11 @@ export class ParticleSystem {
                 this.floatingTexts.splice(i, 1);
             }
         }
+
+        // Update External Systems
+        this.externalSystems.forEach(sys => {
+            if (typeof sys.update === 'function') sys.update(deltaTime);
+        });
     }
 
     draw() {

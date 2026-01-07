@@ -179,10 +179,17 @@ export class CombatOrchestrator {
     handleDamageResults(result) {
         if (result.woundsReceived > 0) {
             const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
-            this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
+            // this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
             // Visual Polish: Screen Shake and Damage Numbers
-            this.game.particleSystem.triggerShake(result.woundsReceived * 2, 0.4);
-            this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y, result.woundsReceived, true);
+            // this.game.particleSystem.triggerShake(result.woundsReceived * 2, 0.4);
+            // this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y, result.woundsReceived, true);
+
+            eventBus.emit(GAME_EVENTS.COMBAT_DAMAGE, {
+                targetPos: this.game.hero.position,
+                amount: result.woundsReceived,
+                targetType: 'hero'
+            });
+
 
             // Elemental Effects based on enemy attack type (generic for now as multiple enemies might attack)
             // But we can check one unblocked enemy from list if available
@@ -242,11 +249,17 @@ export class CombatOrchestrator {
 
         // Visual Polish: Enemy taking damage
         if (this.combatAttackTotal > 0) {
-            this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal);
-            if (this.combatAttackTotal >= 4) {
-                this.game.particleSystem.triggerShake(3, 0.3);
-            }
+            // this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal);
+            // if (this.combatAttackTotal >= 4) {
+            //    this.game.particleSystem.triggerShake(3, 0.3);
+            // }
+            eventBus.emit(GAME_EVENTS.COMBAT_DAMAGE, {
+                targetPos: this.game.combat.enemy.position,
+                amount: this.combatAttackTotal,
+                targetType: 'enemy'
+            });
         }
+
 
         this.game.addLog(attackResult.message, attackResult.success ? 'success' : 'warning');
 
@@ -397,7 +410,13 @@ export class CombatOrchestrator {
 
                 // Particle Effect for successful block
                 const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
-                this.game.particleSystem.shieldBlockEffect(pixelPos.x, pixelPos.y);
+                // this.game.particleSystem.shieldBlockEffect(pixelPos.x, pixelPos.y); // Moved to event listener
+
+                eventBus.emit(GAME_EVENTS.COMBAT_BLOCK, {
+                    enemyPos: enemy.position,
+                    blocked: true
+                });
+
             }
 
             // Reset for next block attempt

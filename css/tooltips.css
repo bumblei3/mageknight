@@ -20,7 +20,8 @@
     box-shadow: var(--tooltip-shadow);
     padding: 0;
     max-width: 320px;
-    pointer-events: none; /* Allows mouse to pass through to underlying elements if needed, but important for custom cursor feels */
+    pointer-events: none;
+    /* Allows mouse to pass through to underlying elements if needed, but important for custom cursor feels */
     color: var(--tooltip-text-primary);
     font-family: 'Outfit', sans-serif;
     font-size: 0.9rem;
@@ -46,7 +47,8 @@
 
 .game-tooltip .tooltip-name {
     font-weight: 700;
-    color: #fbbf24; /* Amber-400 */
+    color: #fbbf24;
+    /* Amber-400 */
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-size: 0.95rem;
@@ -58,11 +60,30 @@
     font-size: 1rem;
 }
 
-.game-tooltip .tooltip-card-color.red { color: #ef4444; text-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
-.game-tooltip .tooltip-card-color.blue { color: #3b82f6; text-shadow: 0 0 8px rgba(59, 130, 246, 0.6); }
-.game-tooltip .tooltip-card-color.green { color: #10b981; text-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
-.game-tooltip .tooltip-card-color.white { color: #f3f4f6; text-shadow: 0 0 8px rgba(255, 255, 255, 0.6); }
-.game-tooltip .tooltip-card-color.gold { color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+.game-tooltip .tooltip-card-color.red {
+    color: #ef4444;
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.game-tooltip .tooltip-card-color.blue {
+    color: #3b82f6;
+    text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+.game-tooltip .tooltip-card-color.green {
+    color: #10b981;
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+.game-tooltip .tooltip-card-color.white {
+    color: #f3f4f6;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.game-tooltip .tooltip-card-color.gold {
+    color: #fbbf24;
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+}
 
 /* Divider */
 .game-tooltip .tooltip-divider {
@@ -103,7 +124,7 @@
 
 .game-tooltip .tooltip-hint {
     font-style: italic;
-    color: #94a3b8;
+    color: #cbd5e1;
     font-size: 0.8rem;
     margin-top: 2px;
 }
@@ -139,7 +160,8 @@
 
 /* Site Specifics */
 .game-tooltip .tooltip-site {
-    border-left: 3px solid transparent; /* Set via JS inline style */
+    border-left: 3px solid transparent;
+    /* Set via JS inline style */
 }
 
 .game-tooltip .tooltip-status {
@@ -150,8 +172,13 @@
     background: rgba(0, 0, 0, 0.2);
 }
 
-.game-tooltip .status-conquered { color: #fbbf24; }
-.game-tooltip .status-visited { color: #10b981; }
+.game-tooltip .status-conquered {
+    color: #fbbf24;
+}
+
+.game-tooltip .status-visited {
+    color: #10b981;
+}
 
 .game-tooltip .tooltip-actions {
     display: flex;
@@ -166,7 +193,7 @@
     padding: 2px 6px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
-    color: #d1d5db;
+    color: #e2e8f0;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -185,7 +212,7 @@
 
 /* Glossary Terms in Description */
 .game-tooltip .glossary-term {
-    color: #c084fc;
+    color: #d8b4fe;
     border-bottom: 1px dotted #c084fc;
 }
 

@@ -17,14 +17,16 @@
     <link rel="preload" as="style"
         href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap">
 
-    <!-- Load fonts non-blocking -->
+    <!-- Fonts (Blocking to prevent layout shift) -->
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
-        media="print" onload="this.media='all'">
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap">
 
-    <!-- Defer all CSS -->
-    <link rel="stylesheet" href="css/reset.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'">
+    <!-- Critical CSS (Blocking) -->
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <!-- Loading screen styles must be blocking -->
+    <link rel="stylesheet" href="css/loading.css">
+
     <!-- Defer HUD styles since loading screen shows first -->
     <link rel="stylesheet" href="css/hud.css" media="print" onload="this.media='all'">
 
@@ -37,7 +39,6 @@
     <link rel="stylesheet" href="css/floating-text.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/tooltips.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/rewards.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/loading.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/mobile.css" media="print" onload="this.media='all'">
 
     <noscript>
@@ -702,7 +703,7 @@
             <span class="modal-close" id="sideways-close">&times;</span>
             <h2 data-i18n="cards.sidewaysModal.title">Karte seitlich spielen</h2>
             <p class="modal-subtitle" data-i18n="cards.sidewaysModal.subtitle">Wähle einen Effekt (+1)</p>
-            
+
             <div id="sideways-card-preview" class="sideways-card-preview"></div>
 
             <div class="sideways-options">
@@ -724,7 +725,8 @@
                 </button>
             </div>
 
-            <button class="btn btn-secondary sideways-cancel" id="sideways-cancel" data-i18n="cards.sidewaysModal.cancel">Abbrechen</button>
+            <button class="btn btn-secondary sideways-cancel" id="sideways-cancel"
+                data-i18n="cards.sidewaysModal.cancel">Abbrechen</button>
         </div>
     </div>
 

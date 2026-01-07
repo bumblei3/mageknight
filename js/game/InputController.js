@@ -69,11 +69,17 @@ export class InputController {
         }, { signal });
 
         // --- Drag and Drop Over Canvas ---
+        this.canvas.addEventListener('dragenter', () => {
+            // Cache rect when drag starts entering the canvas
+            this.game.interactionController.updateRect();
+        }, { signal });
+
         this.canvas.addEventListener('dragover', (e) => {
             e.preventDefault(); // Required to allow drop
             e.dataTransfer.dropEffect = 'copy';
 
             // Optional: Highlight hex under cursor during drag
+            // Note: handleCanvasMouseMove uses its own cached rect logic in InteractionController
             this.game.interactionController.handleCanvasMouseMove(e);
         }, { signal });
 
@@ -82,7 +88,12 @@ export class InputController {
             const cardIndex = parseInt(e.dataTransfer.getData('text/plain'));
             if (isNaN(cardIndex)) return;
 
-            const rect = this.canvas.getBoundingClientRect();
+            // Use cached rect from InteractionController for consistency and performance
+            if (!this.game.interactionController.cachedRect) {
+                this.game.interactionController.updateRect();
+            }
+            const rect = this.game.interactionController.cachedRect || this.canvas.getBoundingClientRect();
+
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 

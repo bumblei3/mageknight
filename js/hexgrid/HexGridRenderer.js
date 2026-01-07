@@ -61,6 +61,9 @@ export class HexGridRenderer {
     // ========== Core Rendering ==========
 
     clear() {
+        // Use width/height to clear if already matching, technically clearRect is fine but sometimes resetting width is faster? 
+        // Actually clearRect is standard. Let's just ensure we don't read width/height unnecessarily if we can cache it.
+        // But for now clearRect is standard.
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
@@ -313,11 +316,11 @@ export class HexGridRenderer {
         this.ctx.clip();
 
         switch (terrain) {
-        case 'water': this.drawWaterTexture(pos); break;
-        case 'forest': this.drawForestTexture(pos); break;
-        case 'mountains': this.drawMountainTexture(pos); break;
-        case 'desert': this.drawDesertTexture(pos); break;
-        case 'plains': this.drawPlainsTexture(pos); break;
+            case 'water': this.drawWaterTexture(pos); break;
+            case 'forest': this.drawForestTexture(pos); break;
+            case 'mountains': this.drawMountainTexture(pos); break;
+            case 'desert': this.drawDesertTexture(pos); break;
+            case 'plains': this.drawPlainsTexture(pos); break;
         }
         this.ctx.restore();
     }

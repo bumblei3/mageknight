@@ -129,8 +129,18 @@ const startMageKnight = async () => {
 
 // Handle both normal loading and deferred/module loading
 if (document.readyState === 'loading') {
-    window.addEventListener('load', startMageKnight, { once: true });
+    window.addEventListener('load', () => {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => startMageKnight(), { timeout: 2000 });
+        } else {
+            setTimeout(startMageKnight, 100);
+        }
+    }, { once: true });
 } else {
-    // Use requestAnimationFrame to ensure DOM is fully ready and painted if readyState is already 'complete'
-    requestAnimationFrame(startMageKnight);
+    // Use requestIdleCallback to ensure DOM is fully ready and painted if readyState is already 'complete'
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => startMageKnight(), { timeout: 2000 });
+    } else {
+        requestAnimationFrame(startMageKnight);
+    }
 }

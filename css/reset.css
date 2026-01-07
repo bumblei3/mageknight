@@ -50,8 +50,8 @@
 
     /* Text Colors - WCAG AA compliant contrast on dark backgrounds */
     --color-text-primary: hsl(210, 20%, 98%);
-    --color-text-secondary: hsl(210, 15%, 88%);
-    --color-text-muted: hsl(210, 10%, 80%);
+    --color-text-secondary: hsl(210, 15%, 90%);
+    --color-text-muted: hsl(210, 10%, 85%);
 
     /* Spacing */
     --spacing-xs: 0.25rem;

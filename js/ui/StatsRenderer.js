@@ -65,8 +65,9 @@ export class StatsRenderer {
                 img.height = 48;
                 this.elements.heroAvatar.appendChild(img);
             }
-            if (img.src !== hero.portrait) {
-                img.src = hero.portrait;
+            const thumbPath = hero.portrait.replace(/\.(png|jpg|jpeg|webp)$/, '_thumb.webp');
+            if (img.src !== thumbPath) {
+                img.src = thumbPath;
                 img.alt = stats.name;
             }
         }

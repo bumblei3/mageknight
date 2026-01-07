@@ -48,10 +48,10 @@
     --color-mana-gold: hsl(45, 90%, 50%);
     --color-mana-black: hsl(220, 20%, 10%);
 
-    /* Text Colors */
+    /* Text Colors - WCAG AA compliant contrast on dark backgrounds */
     --color-text-primary: hsl(210, 20%, 98%);
-    --color-text-secondary: hsl(210, 15%, 85%);
-    --color-text-muted: hsl(210, 10%, 75%);
+    --color-text-secondary: hsl(210, 15%, 88%);
+    --color-text-muted: hsl(210, 10%, 80%);
 
     /* Spacing */
     --spacing-xs: 0.25rem;

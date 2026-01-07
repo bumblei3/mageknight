@@ -45,6 +45,8 @@
     gap: var(--spacing-md);
     overflow-y: auto;
     max-height: calc(100vh - 100px);
+    min-height: 200px;
+    /* Prevent CLS by reserving space */
     padding-right: 4px;
     /* Space for scrollbar */
     pointer-events: none;

@@ -93,8 +93,10 @@ export class GameStateManager {
             if (state.turn) this.game.turnManager.loadState(state.turn);
 
             this.game.updateStats();
-            this.game.updateTimeUI();
-            this.game.updatePhaseIndicator();
+            if (this.game.phaseManager) {
+                this.game.phaseManager.updateTimeUI();
+                this.game.phaseManager.updatePhaseIndicator();
+            }
             this.game.render();
 
             return true;

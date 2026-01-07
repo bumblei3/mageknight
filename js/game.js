@@ -103,7 +103,7 @@ export class MageKnightGame {
         this.particleSystem.registerSystem(this.weatherSystem);
 
         // Default weather for testing
-        // this.weatherSystem.setWeather('rain', 0.5); 
+        // this.weatherSystem.setWeather('rain', 0.5);
 
         this.mapManager = new MapManager(this.hexGrid);
 
@@ -278,7 +278,7 @@ export class MageKnightGame {
 
     /**
      * Called when a scenario is selected. Triggers hero selection.
-     * @param {string} scenarioId 
+     * @param {string} scenarioId
      */
     selectScenario(scenarioId) {
         this.stateManager.openHeroSelection(scenarioId);
@@ -286,8 +286,8 @@ export class MageKnightGame {
 
     /**
      * Finalizes game setup after hero and scenario are chosen.
-     * @param {string} scenarioId 
-     * @param {string} heroId 
+     * @param {string} scenarioId
+     * @param {string} heroId
      */
     finishGameSetup(scenarioId, heroId) {
         this.startNewGame(scenarioId, heroId);
@@ -671,7 +671,7 @@ export class MageKnightGame {
         eventBus.on(GAME_EVENTS.COMBAT_BLOCK, (data) => {
             const pixel = this.hexGrid.axialToPixel(data.enemyPos.q, data.enemyPos.r);
             this.particleSystem.shieldBlockEffect(pixel.x, pixel.y);
-            this.particleSystem.createFloatingText(pixel.x, pixel.y - 30, "BLOCK!", "#60a5fa");
+            this.particleSystem.createFloatingText(pixel.x, pixel.y - 30, 'BLOCK!', '#60a5fa');
         });
 
         eventBus.on(GAME_EVENTS.COMBAT_DAMAGE, (data) => {

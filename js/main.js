@@ -57,7 +57,7 @@ const startMageKnight = async () => {
         window.game = new MageKnightGame();
 
         // 3D View - Lazy loaded on first toggle
-        let game3DModule = null;
+        // 3D View - Lazy loaded on first toggle
         const toggle3DBtn = document.getElementById('toggle-3d-btn');
 
         toggle3DBtn.addEventListener('click', async () => {

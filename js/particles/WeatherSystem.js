@@ -1,7 +1,7 @@
 /**
  * WeatherSystem - Manages environmental effects like rain, snow, fog.
  */
-import { Particle } from './Particle.js';
+// import { Particle } from './Particle.js';
 
 export class WeatherSystem {
     constructor(particleEngine, canvas) {
@@ -25,7 +25,7 @@ export class WeatherSystem {
         }
     }
 
-    update(deltaTime) {
+    update(_deltaTime) {
         if (!this.active) return;
 
         // Spawn new particles based on weather type

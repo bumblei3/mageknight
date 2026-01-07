@@ -62,21 +62,21 @@ export class FloatingTextManager {
      * Requires the HexGrid from the game to convert coordinates.
      * @param {Object} hexGrid - The game hexGrid instance
      * @param {Object} hex - {q, r} object
-     * @param {string} text 
-     * @param {string} type 
+     * @param {string} text
+     * @param {string} type
      */
     spawnOnHex(hexGrid, hex, text, type) {
         if (!hexGrid || !hex) return;
 
         const pixel = hexGrid.hexToPixel(hex);
 
-        // Adjust for canvas offset? 
+        // Adjust for canvas offset?
         // Assuming hexToPixel returns canvas-relative coords.
         // We need to verify if the container is overlaying properly.
         // For now, assume container overlays the canvas perfectly.
 
         // Center text on hex (roughly)
-        // Hex center is roughly 0,0 relative to hex origin in CSS if we had that, 
+        // Hex center is roughly 0,0 relative to hex origin in CSS if we had that,
         // but here we get absolute pixels usually.
 
         // Assuming pixel is {x, y} relative to container

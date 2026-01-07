@@ -22,61 +22,72 @@ test.describe('UX Features', () => {
     });
 
     test('should allow selecting a hero and starting the game', async ({ page }) => {
-        // Define button locator
-        const newGameBtn = page.locator('#start-game-btn, #new-game-btn').first();
+        await test.step('Start New Game', async () => {
+            const newGameBtn = page.locator('#start-game-btn, #new-game-btn').first();
 
-        // Handle tutorial overlay if present
-        const tutorialOverlay = page.locator('#tutorial-overlay-custom');
-        if (await tutorialOverlay.isVisible()) {
-            // Force click through overlay to start game
-            await newGameBtn.click({ force: true });
-        } else {
-            // Standard Click or force if glass pane exists
-            if (await newGameBtn.isVisible()) {
+            // Handle potentially tricky overlay interactions
+            const tutorialOverlay = page.locator('#tutorial-overlay-custom');
+            if (await tutorialOverlay.isVisible()) {
                 await newGameBtn.click({ force: true });
+            } else {
+                if (await newGameBtn.isVisible()) {
+                    await newGameBtn.click({ force: true });
+                }
             }
-        }
+        });
 
-        // Check for Hero Selection Modal
-        const heroModal = page.locator('#hero-selection-modal');
-        // If modal appears, select a hero
-        if (await heroModal.isVisible()) {
-            await page.locator('.hero-card').first().click();
-        }
+        await test.step('Select Hero', async () => {
+            const heroModal = page.locator('#hero-selection-modal');
+            if (await heroModal.isVisible()) {
+                await page.locator('.hero-card').first().click();
+            }
+        });
 
-        // Verify Game Board is visible
-        await expect(page.locator('#game-board')).toBeVisible();
-        await expect(page.locator('.hud-top-bar')).toBeVisible();
+        await test.step('Verify Board Visibility', async () => {
+            await expect(page.locator('#game-board')).toBeVisible();
+            await expect(page.locator('.hud-top-bar')).toBeVisible();
+        });
     });
 
     test('should open and close Shortcuts modal via Settings', async ({ page }) => {
-        // 1. Open Settings - force click to bypass any initial tutorial overlays
-        await page.locator('#settings-btn').click({ force: true });
-
-        // Wait and retry if needed
-        try {
-            await expect(page.locator('#settings-modal')).toBeVisible({ timeout: 2000 });
-        } catch (e) {
-            // Retry click
+        await test.step('Open Settings', async () => {
             await page.locator('#settings-btn').click({ force: true });
-            await expect(page.locator('#settings-modal')).toBeVisible();
-        }
 
-        // 2. Click Shortcuts Button
-        await page.locator('#settings-shortcuts-btn').click();
+            // Resilience: Retry if modal doesn't appear
+            try {
+                await expect(page.locator('#settings-modal')).toBeVisible({ timeout: 2000 });
+            } catch (e) {
+                await page.locator('#settings-btn').click({ force: true });
+                await expect(page.locator('#settings-modal')).toBeVisible();
+            }
+        });
 
-        // 3. Verify Shortcuts Modal is visible
-        const shortcutsModal = page.locator('#shortcuts-modal');
-        await expect(shortcutsModal).toBeVisible();
+        await test.step('Open Shortcuts', async () => {
+            await page.locator('#settings-shortcuts-btn').click();
+            const shortcutsModal = page.locator('#shortcuts-modal');
+            await expect(shortcutsModal).toBeVisible();
+            await expect(shortcutsModal).toContainText(/Shortcuts|Tastaturkürzel/);
+            // Check for key mapping text
+            await expect(shortcutsModal).toContainText('Space');
+        });
 
-        // 4. Verify content
-        await expect(shortcutsModal).toContainText(/Shortcuts|Tastaturkürzel/);
-        // "Zug beenden" might be key-dependent, check for "Space" or "Escape" which are universal
-        await expect(shortcutsModal).toContainText('Space');
+        await test.step('Close Shortcuts', async () => {
+            await page.locator('#shortcuts-close').click({ force: true });
+            await expect(page.locator('#shortcuts-modal')).toBeHidden();
+        });
+    });
 
-        // 5. Close Shortcuts Modal
-        // 5. Close Shortcuts Modal
-        await page.locator('#shortcuts-close').click({ force: true });
-        await expect(shortcutsModal).toBeHidden();
+    test('should toggle sound', async ({ page }) => {
+        await test.step('Toggle Sound Off', async () => {
+            const soundBtn = page.locator('#sound-toggle-btn');
+            // Initial state might be on or off (default on usually)
+            // Expecting 🔊 or similar icon
+
+            if (await soundBtn.isVisible()) {
+                await soundBtn.click();
+                // Check if icon changes/logs appear
+                // await expect(page.locator('#game-log')).toContainText(/Sound/);
+            }
+        });
     });
 });

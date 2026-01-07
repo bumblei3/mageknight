@@ -178,7 +178,7 @@ export class CombatOrchestrator {
      */
     handleDamageResults(result) {
         if (result.woundsReceived > 0) {
-            const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+            // const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
             // this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
             // Visual Polish: Screen Shake and Damage Numbers
             // this.game.particleSystem.triggerShake(result.woundsReceived * 2, 0.4);
@@ -409,7 +409,7 @@ export class CombatOrchestrator {
                 }
 
                 // Particle Effect for successful block
-                const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+                // const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
                 // this.game.particleSystem.shieldBlockEffect(pixelPos.x, pixelPos.y); // Moved to event listener
 
                 eventBus.emit(GAME_EVENTS.COMBAT_BLOCK, {

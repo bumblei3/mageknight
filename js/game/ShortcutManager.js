@@ -53,7 +53,7 @@ export class ShortcutManager {
 
     /**
      * Get the action ID for a given key event
-     * @param {KeyboardEvent} event 
+     * @param {KeyboardEvent} event
      * @returns {string|null} Action ID or null
      */
     getAction(event) {

@@ -25,6 +25,18 @@ export class Game3D {
             }
             // We could also animate the selector pulse here later
             this.updateSelectorAnimation(time);
+
+            // Sync Day/Night cycle
+            if (this.game && this.game.timeManager) {
+                const isNight = this.game.timeManager.isNight();
+                // Simple check if state changed.
+                // We rely on SceneManager to handle repeated calls efficiently or we check here.
+                // Checking here is better.
+                if (this._lastIsNight !== isNight) {
+                    this.sceneManager.updateEnvironment(isNight);
+                    this._lastIsNight = isNight;
+                }
+            }
         };
 
         // Input Handling

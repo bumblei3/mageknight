@@ -58,30 +58,62 @@ export class SceneManager3D {
 
     initLighting() {
         // Ambient Light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        this.scene.add(ambientLight);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(this.ambientLight);
 
-        // Directional Light (Sun)
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(20, 50, 20);
-        dirLight.castShadow = true;
+        // Directional Light (Sun/Moon)
+        this.dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        this.dirLight.position.set(20, 50, 20);
+        this.dirLight.castShadow = true;
 
         // Shadow properties
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 100;
-        dirLight.shadow.camera.left = -50;
-        dirLight.shadow.camera.right = 50;
-        dirLight.shadow.camera.top = 50;
-        dirLight.shadow.camera.bottom = -50;
+        this.dirLight.shadow.mapSize.width = 2048;
+        this.dirLight.shadow.mapSize.height = 2048;
+        this.dirLight.shadow.camera.near = 0.5;
+        this.dirLight.shadow.camera.far = 100;
+        this.dirLight.shadow.camera.left = -50;
+        this.dirLight.shadow.camera.right = 50;
+        this.dirLight.shadow.camera.top = 50;
+        this.dirLight.shadow.camera.bottom = -50;
 
-        this.scene.add(dirLight);
+        this.scene.add(this.dirLight);
 
-        // Point light for atmosphere
-        const pointLight = new THREE.PointLight(0xa855f7, 0.5, 50);
-        pointLight.position.set(0, 10, 0);
-        this.scene.add(pointLight);
+        // Point light for atmosphere (optional, kept for magical feel)
+        this.pointLight = new THREE.PointLight(0xa855f7, 0.5, 50);
+        this.pointLight.position.set(0, 10, 0);
+        this.scene.add(this.pointLight);
+    }
+
+    updateEnvironment(isNight) {
+        if (isNight) {
+            // Night Mode
+            this.scene.background = new THREE.Color(0x0a0a10); // Very dark blue/black
+            this.scene.fog.color.set(0x0a0a10);
+
+            this.ambientLight.color.set(0x5555aa); // Cool blue ambient
+            this.ambientLight.intensity = 0.4;
+
+            this.dirLight.color.set(0xaaccff); // Moon-ish
+            this.dirLight.intensity = 0.4;
+            this.dirLight.position.set(-20, 50, -20); // Move "moon" to other side?
+
+            if (this.pointLight) this.pointLight.intensity = 0.8; // Magical light pops more
+        } else {
+            // Day Mode
+            this.scene.background = new THREE.Color(0x202025); // Original dark or lighter sky
+            // Let's make day a bit brighter sky ?
+            this.scene.background = new THREE.Color(0x87ceeb); // Sky blue
+            this.scene.fog.color.set(0x87ceeb);
+
+            this.ambientLight.color.set(0xffffff);
+            this.ambientLight.intensity = 0.6;
+
+            this.dirLight.color.set(0xffffff);
+            this.dirLight.intensity = 0.8;
+            this.dirLight.position.set(20, 50, 20);
+
+            if (this.pointLight) this.pointLight.intensity = 0.3;
+        }
     }
 
     initAtmosphere() {

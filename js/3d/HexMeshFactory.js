@@ -132,6 +132,55 @@ export class HexMeshFactory {
         return material;
     }
 
+    getParticleMaterial() {
+        const vertexShader = `
+            uniform float uTime;
+            varying float vScale;
+
+            void main() {
+                vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                
+                // Orbit/Bobbing
+                float offset = modelPosition.x + modelPosition.z;
+                float angle = uTime * 2.0 + offset;
+                
+                modelPosition.y += sin(angle) * 0.3;
+                modelPosition.x += cos(angle) * 0.2;
+                
+                vec4 viewPosition = viewMatrix * modelPosition;
+                vec4 projectedPosition = projectionMatrix * viewPosition;
+                gl_Position = projectedPosition;
+                
+                vScale = (sin(angle) + 1.0) * 0.5; // for fragment use
+            }
+        `;
+
+        const fragmentShader = `
+            uniform vec3 uColor;
+            varying float vScale;
+
+            void main() {
+                // Pulse alpha
+                float alpha = 0.5 + vScale * 0.5;
+                gl_FragColor = vec4(uColor, alpha);
+            }
+        `;
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms: {
+                uTime: { value: 0 },
+                uColor: { value: new THREE.Color(0xd8b4fe) } // Purple-300
+            },
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        return material;
+    }
+
     createHexMesh(hex) {
         const material = this.getMaterial(hex.terrain);
         const mesh = new THREE.Mesh(this.geometry, material);
@@ -212,12 +261,20 @@ export class HexMeshFactory {
     addForestProp(parentMesh) {
         const group = new THREE.Group();
 
-        // Define tree parts
-        const trunkGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.4, 6);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4527a0 }); // Dark purple-ish brown
-        const foliageGeo = new THREE.ConeGeometry(0.4, 1.0, 6);
+        // Enhanced Tree Generation
+        const trunkGeo = new THREE.CylinderGeometry(0.08, 0.12, 0.4, 5);
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 1.0 }); // Dark Brown
+
+        const foliageGeo = new THREE.ConeGeometry(0.35, 0.8, 5);
         const foliageMat = new THREE.MeshStandardMaterial({
             color: 0x166534, // Green-800
+            flatShading: true,
+            roughness: 0.8
+        });
+
+        const foliageTopGeo = new THREE.ConeGeometry(0.25, 0.6, 5);
+        const foliageTopMat = new THREE.MeshStandardMaterial({
+            color: 0x22c55e, // Green-500 (lighter top)
             flatShading: true
         });
 
@@ -226,23 +283,38 @@ export class HexMeshFactory {
 
             const trunk = new THREE.Mesh(trunkGeo, trunkMat);
             trunk.position.y = 0.2;
+            trunk.castShadow = true;
             tree.add(trunk);
 
-            const foliage = new THREE.Mesh(foliageGeo, foliageMat);
-            foliage.position.y = 0.8;
-            tree.add(foliage);
+            // Tier 1 Foliage (Bottom)
+            const f1 = new THREE.Mesh(foliageGeo, foliageMat);
+            f1.position.y = 0.5;
+            f1.castShadow = true;
+            tree.add(f1);
+
+            // Tier 2 Foliage (Top)
+            const f2 = new THREE.Mesh(foliageTopGeo, foliageTopMat);
+            f2.position.y = 0.9;
+            f2.castShadow = true;
+            tree.add(f2);
 
             tree.position.set(x, 0, z);
             tree.scale.set(scale, scale, scale);
+
+            // Random Y rotation for variety
+            tree.rotation.y = Math.random() * Math.PI * 2;
+
             group.add(tree);
         };
 
-        // Cluster of trees
+        // Denser Forest Cluster
         createTree(0, 0, 1.2);
         createTree(0.6, 0.5, 0.9);
         createTree(-0.5, 0.4, 0.85);
-        createTree(0.3, -0.6, 1.1);
+        createTree(0.3, -0.6, 1.0);
         createTree(-0.4, -0.5, 0.7);
+        createTree(0.7, -0.2, 0.6); // Extra tree
+        createTree(-0.2, 0.7, 0.7); // Extra tree
 
         parentMesh.add(group);
     }
@@ -265,7 +337,7 @@ export class HexMeshFactory {
         createHill(-0.3, -0.4, 0.8);
     }
 
-    updateSiteMarkers(parentMesh, _site) {
+    updateSiteMarkers(parentMesh, site) {
         // Clear old marker if any (though currently called during creation)
         const markerGroup = new THREE.Group();
         markerGroup.name = 'site-marker';
@@ -283,8 +355,29 @@ export class HexMeshFactory {
         const marker = new THREE.Mesh(geo, mat);
         marker.position.set(0, 2.5, 0);
 
-        // Add subtle animation loop logic via Game3D later, but for now just static
+        // Add subtle animation loop logic via Game3D later
         markerGroup.add(marker);
+
+        // Add Magical Particles
+        const isMagical = ['mageTower', 'monastery', 'spawningGrounds'].includes(site?.type) || site?.type === 'glade'; // Assuming types
+        if (isMagical) { // Let's add particles to all sites for visual flair for now, or filter
+            const particleGeo = new THREE.DodecahedronGeometry(0.15, 0);
+            // Cache particle material
+            if (!this.materials.has('particle')) {
+                this.materials.set('particle', this.getParticleMaterial());
+            }
+            const partMat = this.materials.get('particle');
+
+            for (let i = 0; i < 5; i++) {
+                const p = new THREE.Mesh(particleGeo, partMat);
+                p.position.set(
+                    (Math.random() - 0.5) * 1.5,
+                    1.5 + Math.random() * 2,
+                    (Math.random() - 0.5) * 1.5
+                );
+                markerGroup.add(p);
+            }
+        }
 
         // If it's a specific type, could add more detail
         parentMesh.add(markerGroup);
@@ -301,5 +394,12 @@ export class HexMeshFactory {
                 waterMat.uniforms.uTime.value = time;
             }
         }
+        if (this.materials.has('particle')) {
+            const partMat = this.materials.get('particle');
+            if (partMat.uniforms) {
+                partMat.uniforms.uTime.value = time;
+            }
+        }
     }
 }
+

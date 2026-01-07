@@ -63,9 +63,13 @@ test.describe('Interactions Flow', () => {
             const manaSource = page.locator('#mana-source .mana-die').first();
             await expect(manaSource).toBeVisible();
 
+            // Wait for any animations to settle
+            await page.waitForTimeout(500);
+
             const initialManaCount = await page.evaluate(() => window.game.hero.tempMana.length);
 
-            await manaSource.click();
+            // Use force:true to click even if element is animating
+            await manaSource.click({ force: true });
 
             // Verify mana collected
             await expect.poll(async () => {

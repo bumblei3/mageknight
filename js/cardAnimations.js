@@ -110,8 +110,8 @@ export function animateCardDiscard(cardElement) {
  * @param {number} mouseX - Mouse X position
  * @param {number} mouseY - Mouse Y position
  */
-export function animate3DTilt(cardElement, mouseX, mouseY) {
-    const rect = cardElement.getBoundingClientRect();
+export function animate3DTilt(cardElement, mouseX, mouseY, cachedRect = null) {
+    const rect = cachedRect || cardElement.getBoundingClientRect();
     const cardCenterX = rect.left + rect.width / 2;
     const cardCenterY = rect.top + rect.height / 2;
 

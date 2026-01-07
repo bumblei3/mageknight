@@ -70,16 +70,24 @@ export class TooltipManager {
 
         this.currentTarget = element;
         this.tooltip.innerHTML = htmlContent;
+
+        // Use visibility hidden to prevent FOUC while waiting for layout
+        this.tooltip.style.visibility = 'hidden';
         this.tooltip.style.display = 'block';
 
-        // Position tooltip
-        this.positionTooltip(element);
+        // Defer positioning to next frame to avoid forced reflow (layout thrashing)
+        requestAnimationFrame(() => {
+            if (!this.currentTarget) return; // Mouse left before frame
 
-        // Add fade-in animation
-        this.tooltip.style.opacity = '0';
-        setTimeout(() => {
-            this.tooltip.style.opacity = '1';
-        }, 10);
+            this.positionTooltip(element);
+            this.tooltip.style.visibility = 'visible';
+
+            // Add fade-in animation
+            this.tooltip.style.opacity = '0';
+            requestAnimationFrame(() => {
+                this.tooltip.style.opacity = '1';
+            });
+        });
     }
 
     /**

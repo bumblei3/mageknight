@@ -59,8 +59,10 @@ export class HandRenderer {
 
             // Add 3D tilt on mouse move
             let isHovering = false;
+            let cachedRect = null;
             cardEl.addEventListener('mouseenter', () => {
                 isHovering = true;
+                cachedRect = cardEl.getBoundingClientRect(); // Cache layout once
                 if (this.ui && this.ui.game && this.ui.game.sound) {
                     this.ui.game.sound.hover();
                 }
@@ -68,7 +70,8 @@ export class HandRenderer {
 
             cardEl.addEventListener('mousemove', (e) => {
                 if (isHovering && !isWound) {
-                    CardAnimations.animate3DTilt(cardEl, e.clientX, e.clientY);
+                    // Pass cached rect to avoid forced reflow
+                    CardAnimations.animate3DTilt(cardEl, e.clientX, e.clientY, cachedRect);
                 }
             });
 
@@ -152,7 +155,7 @@ export class HandRenderer {
             <div class="card-effects">
                 <div class="card-effect"><strong>${t('cards.basic')}:</strong> ${basicEffect}</div>
                 ${strongEffect && strongEffect !== t('cards.none') ?
-        `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
+                `<div class="card-effect"><strong>${t('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
             </div>
             <div class="card-hint">${t('cards.sidewaysAction')}</div>
         `;

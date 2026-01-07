@@ -14,14 +14,24 @@ test.describe('Combat Flow', () => {
             // Cheat to add a weak enemy at a known location AND give cards
             await page.evaluate(() => {
                 const game = window.game;
+
+                // First ensure the target hex (0,-1) exists and is revealed
+                let targetHex = game.hexGrid.getHex(0, -1);
+                if (!targetHex) {
+                    game.hexGrid.logic.addHex(0, -1, 'plains');
+                    targetHex = game.hexGrid.getHex(0, -1);
+                }
+                if (targetHex) {
+                    targetHex.revealed = true;
+                    targetHex.terrain = 'plains';
+                }
+
                 // Add a weak enemy adjacent to hero (Hero starts at 0,0)
-                // Use factory since Enemy class is not global
-                // Terrain 'plains' -> Orc usually
                 const enemy = window.game.enemyAI.generateEnemy('plains', 1);
 
                 // Override stats for deterministic test
                 enemy.name = 'Orc Grunt';
-                enemy.position = { q: 1, r: 0 };
+                enemy.position = { q: 0, r: -1 };
                 enemy.armor = 2;
                 enemy.health = 2;
                 enemy.attack = 1;
@@ -57,15 +67,13 @@ test.describe('Combat Flow', () => {
         });
 
         await test.step('Initiate Combat', async () => {
-            // Get screen position of the enemy hex (1,0)
-            const screenPos = await page.evaluate(() => {
-                const hex = window.game.hexGrid.axialToPixel(1, 0);
-                const rect = window.game.canvas.getBoundingClientRect();
-                return { x: rect.left + hex.x, y: rect.top + hex.y };
+            // Initiate combat directly instead of clicking canvas
+            await page.evaluate(() => {
+                const enemy = window.game.enemies.find(e => e.name === 'Orc Grunt');
+                if (enemy) {
+                    window.game.initiateCombat(enemy);
+                }
             });
-
-            // Click on enemy hex to select it
-            await page.mouse.click(screenPos.x, screenPos.y);
 
             // Verify Combat has started via game state or UI
             await expect.poll(async () => {

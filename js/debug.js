@@ -27,7 +27,7 @@ export class DebugManager {
         toggleBtn.className = 'debug-toggle';
         toggleBtn.style.zIndex = '100000'; // Higher than loading screen (99999)
         toggleBtn.style.position = 'fixed';
-        toggleBtn.style.top = '10px';
+        toggleBtn.style.bottom = '300px';
         toggleBtn.style.left = '10px';
         toggleBtn.onclick = () => this.togglePanel();
         // Always append to body to avoid stacking context issues with HUD

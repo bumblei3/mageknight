@@ -7,6 +7,9 @@
     backdrop-filter: var(--backdrop-blur);
     -webkit-backdrop-filter: var(--backdrop-blur);
     padding: 0.75rem 2rem;
+    height: 64px;
+    /* Fixed height to prevent CLS */
+    box-sizing: border-box;
     border-radius: var(--radius-md);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);

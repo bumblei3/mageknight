@@ -2,6 +2,8 @@
  * HexGridRenderer - Rendering functions for hex grid
  * Handles all canvas drawing, textures, highlighting, and visual effects
  */
+import { SITE_INFO } from '../sites.js';
+
 export class HexGridRenderer {
     constructor(canvas, logic) {
         this.canvas = canvas;
@@ -95,7 +97,10 @@ export class HexGridRenderer {
 
             if (hexData.terrain) {
                 if (hexData.site) {
-                    this.drawHexIcon(hexData.q, hexData.r, hexData.site.getIcon(), -10);
+                    const icon = typeof hexData.site.getIcon === 'function'
+                        ? hexData.site.getIcon()
+                        : (SITE_INFO[hexData.site.type]?.icon || '❓');
+                    this.drawHexIcon(hexData.q, hexData.r, icon, -10);
                 } else {
                     this.drawHexIcon(hexData.q, hexData.r, this.getTerrainIcon(hexData.terrain), -10);
                 }
@@ -316,11 +321,11 @@ export class HexGridRenderer {
         this.ctx.clip();
 
         switch (terrain) {
-        case 'water': this.drawWaterTexture(pos); break;
-        case 'forest': this.drawForestTexture(pos); break;
-        case 'mountains': this.drawMountainTexture(pos); break;
-        case 'desert': this.drawDesertTexture(pos); break;
-        case 'plains': this.drawPlainsTexture(pos); break;
+            case 'water': this.drawWaterTexture(pos); break;
+            case 'forest': this.drawForestTexture(pos); break;
+            case 'mountains': this.drawMountainTexture(pos); break;
+            case 'desert': this.drawDesertTexture(pos); break;
+            case 'plains': this.drawPlainsTexture(pos); break;
         }
         this.ctx.restore();
     }

@@ -63,6 +63,9 @@
     -webkit-text-fill-color: transparent;
     animation: shimmer 3s linear infinite;
     margin-bottom: 2rem;
+    height: 4.5rem;
+    /* Explicit height to prevent layout shift */
+    line-height: normal;
     z-index: 1;
     text-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
     letter-spacing: 0.1em;

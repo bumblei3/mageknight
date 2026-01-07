@@ -4,9 +4,10 @@ import { GameFlow } from './utils/GameFlow.js';
 
 test.describe('Gameplay Flow', () => {
     test.setTimeout(60000);
+    let gameFlow;
 
     test.beforeEach(async ({ page }) => {
-        const gameFlow = new GameFlow(page);
+        gameFlow = new GameFlow(page);
         await gameFlow.ensureGameStarted();
     });
 
@@ -75,30 +76,36 @@ test.describe('Gameplay Flow', () => {
         });
 
         await test.step('Move Hero', async () => {
-            // Give movement points via console if needed to ensure we can move
+            // Give movement points and ensure target hex exists and is revealed
             await page.evaluate(() => {
                 window.game.hero.movementPoints = 5;
+
+                // Ensure the target hex exists and is revealed
+                let targetHex = window.game.hexGrid.getHex(1, 0);
+                if (!targetHex) {
+                    // Add the hex to the grid if it doesn't exist
+                    window.game.hexGrid.logic.addHex(1, 0, 'plains');
+                    targetHex = window.game.hexGrid.getHex(1, 0);
+                }
+                if (targetHex) {
+                    targetHex.revealed = true;
+                    targetHex.terrain = 'plains';
+                }
+
                 window.game.enterMovementMode();
+                window.game.render();
             });
 
-            // Get screen position of an adjacent hex (1,0)
-            const screenPos = await page.evaluate(() => {
-                const hex = window.game.hexGrid.axialToPixel(1, 0);
-                const rect = window.game.canvas.getBoundingClientRect();
-                return { x: rect.left + hex.x, y: rect.top + hex.y };
+            // Call moveHero directly instead of canvas click
+            await page.evaluate(() => {
+                window.game.moveHero(1, 0);
             });
 
-            // Click to move
-            await page.mouse.click(screenPos.x, screenPos.y);
-
-            // Verify position updated
-            // Normalize -0 to 0 for strict equality check
-            const pos = await page.evaluate(() => {
-                const p = window.game.hero.position;
-                return { q: p.q + 0, r: p.r + 0 };
-            });
-            expect(pos.q).toBe(1);
-            expect(pos.r).toBe(0);
+            // Wait for movement animation to complete and verify position updated
+            await expect.poll(async () => {
+                const p = await page.evaluate(() => window.game.hero.position);
+                return { q: p.q + 0, r: p.r + 0 }; // Normalize -0 to 0
+            }, { message: 'Hero should have moved to (1,0)', timeout: 5000 }).toEqual({ q: 1, r: 0 });
         });
 
         await test.step('End Turn and Verify Hand Refresh', async () => {

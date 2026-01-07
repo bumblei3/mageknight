@@ -75,4 +75,29 @@ export class GameFlow {
         const canvas = this.page.locator('canvas#game-board');
         await expect(canvas).toBeVisible({ timeout: 15000 });
     }
+
+    /**
+     * Get the screen position of a hex as DOM viewport coordinates,
+     * correctly accounting for canvas vs display size scaling.
+     * @param {number} q Axial Q
+     * @param {number} r Axial R
+     */
+    async getHexScreenPos(q, r) {
+        return await this.page.evaluate(({ q, r }) => {
+            const canvas = window.game.canvas;
+            const rect = canvas.getBoundingClientRect();
+            const hexPixel = window.game.hexGrid.axialToPixel(q, r);
+
+            // Important: Handle CSS scaling!
+            // axialToPixel returns results in "canvas pixels" (usually 1600x1200)
+            // rect.width/height is the "display size" in the browser (e.g. 1280x720)
+            const scaleX = rect.width / canvas.width;
+            const scaleY = rect.height / canvas.height;
+
+            return {
+                x: rect.left + (hexPixel.x * scaleX),
+                y: rect.top + (hexPixel.y * scaleY)
+            };
+        }, { q, r });
+    }
 }

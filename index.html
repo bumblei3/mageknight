@@ -77,6 +77,9 @@
             font-weight: 700;
             color: #fbbf24;
             margin-bottom: 2rem;
+            height: 4.5rem;
+            /* Explicit height to prevent shift */
+            line-height: normal;
         }
 
         .loading-spinner-container {
@@ -129,12 +132,12 @@
     </style>
 
     <!-- Preload critical assets -->
-    <link rel="stylesheet" href="css/reset.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/hud.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/cards.css">
 
-    <!-- Defer non-critical CSS -->
-    <link rel="stylesheet" href="css/cards.css" media="print" onload="this.media='all'">
+    <!-- Defer truly non-critical CSS -->
     <link rel="stylesheet" href="css/modals.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/tutorial.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/effects.css" media="print" onload="this.media='all'">
@@ -421,15 +424,15 @@
                     </div>
                 </div>
             </aside>
+        </div>
 
-            <!-- Bottom Dock (Cards) -->
-            <div class="bottom-dock">
-                <div id="play-area" class="play-area" style="display: none;">
-                    <h3>Gespielt</h3>
-                    <div id="played-cards" class="played-cards-container"></div>
-                </div>
-                <div id="hand-cards" class="hand-cards-container"></div>
+        <!-- Bottom Dock (Cards) - Moved outside hud-layer for absolute isolation -->
+        <div class="bottom-dock">
+            <div id="play-area" class="play-area" style="display: none;">
+                <h3>Gespielt</h3>
+                <div id="played-cards" class="played-cards-container"></div>
             </div>
+            <div id="hand-cards" class="hand-cards-container"></div>
         </div>
 
         <!-- Keyboard Shortcuts Info -->

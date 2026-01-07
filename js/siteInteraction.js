@@ -45,8 +45,8 @@ export class SiteInteractionManager {
             type: site.type,
             name: site.getName(),
             icon: site.getIcon(),
-            color: site.getColor(),
-            description: site.getInfo().description,
+            color: site.getColor ? site.getColor() : '#ffffff',
+            description: site.getInfo ? site.getInfo().description : 'Ort erkundet.',
             options: []
         };
 

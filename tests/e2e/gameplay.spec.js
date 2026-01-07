@@ -60,14 +60,15 @@ test.describe('Gameplay Flow', () => {
             const cards = page.locator('#hand-cards .card');
             const firstCard = cards.first();
 
-            // Set up dialog handler to accept the prompt
-            page.once('dialog', dialog => {
-                // Choice '1' is movement (+1)
-                dialog.accept('1');
-            });
-
             // Right-click to play sideways
             await firstCard.click({ button: 'right' });
+
+            // Wait for Sideways Modal
+            const sidewaysModal = page.locator('#sideways-modal');
+            await expect(sidewaysModal).toBeVisible();
+
+            // Click Movement option
+            await sidewaysModal.locator('button[data-type="movement"]').click();
 
             // Wait for log to confirm sideways play
             await expect(page.locator('#game-log')).toContainText('seitlich gespielt');

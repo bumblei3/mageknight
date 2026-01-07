@@ -47,7 +47,7 @@ Das Modal enthält 5 Tabs mit umfassenden Informationen:
 Für neue Spieler gibt es ein interaktives Tutorial mit 5 Schritten:
 
 1. **Willkommen** - Begrüßung und Überspringen-Option
-2. **Karten spielen** - Links-/Rechtsklick Erklärung
+2. **Karten spielen** - Links-/Rechtsklick (Modal) Erklärung
 3. **Bewegung** - Grüne Karten und Hex-Auswahl
 4. **Kampf** - Block- und Angriffskarten
 5. **Ziel** - Feinde besiegen

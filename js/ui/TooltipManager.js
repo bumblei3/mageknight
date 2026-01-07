@@ -317,39 +317,35 @@ export class TooltipManager {
      * @returns {string} HTML string
      */
     createTerrainTooltipHTML(terrainType, _terrainData) {
-        /*
-        const info = {
-            icon: t(`terrain.${terrainType}.icon`) || (terrainType === 'water' ? '💧' : '❓'),
-            name: t(`terrain.${terrainType}.name`),
-            desc: t(`terrain.${terrainType}.desc`),
-            cost: terrainType === 'water' ? '∞' : (t(`terrain.${terrainType}.cost`) || '?')
-        };
-        */
-
-        // For simplicity, we'll keep hardcoded icons/costs in the manager or move them to constants
-        // but the NAMES and DESCRIPTIONS must be localized.
+        // Icons mapping
         const icons = { 'plains': '🌾', 'forest': '🌲', 'hills': '⛰️', 'mountains': '🏔️', 'desert': '🏜️', 'wasteland': '☠️', 'water': '💧' };
-        const costs = { 'plains': 2, 'forest': 3, 'hills': 3, 'mountains': 5, 'desert': 5, 'wasteland': 3, 'water': '∞' };
 
+        // Fetch data from i18n
         const nameKey = `terrain.${terrainType}.name`;
         const descKey = `terrain.${terrainType}.desc`;
-        const name = t(nameKey) !== nameKey ? t(nameKey) : (terrainType === 'unknown' ? 'Unbekannt' : terrainType);
-        const desc = t(descKey) !== descKey ? t(descKey) : '';
+        const costKey = `terrain.${terrainType}.cost`;
+
+        const name = t(nameKey);
+        const desc = t(descKey);
+        const cost = t(costKey) || '?';
         const icon = icons[terrainType] || '❓';
-        const cost = costs[terrainType] || '?';
+
+        // Check if translations were found, otherwise fallback nicely
+        const displayName = (name !== nameKey) ? name : (terrainType.charAt(0).toUpperCase() + terrainType.slice(1));
+        const displayDesc = (desc !== descKey) ? desc : '';
 
         return `
             <div class="tooltip-terrain">
                 <div class="tooltip-header">
                     <span class="tooltip-icon">${icon}</span>
-                    <span class="tooltip-name">${name}</span>
+                    <span class="tooltip-name">${displayName}</span>
                 </div>
                 <div class="tooltip-divider"></div>
                 <div class="tooltip-stat-row">
                     <span>👣 ${t('ui.labels.movement')}:</span>
                     <span class="value">${cost}</span>
                 </div>
-                <div class="tooltip-description">${desc}</div>
+                <div class="tooltip-description">${displayDesc}</div>
             </div>
         `;
     }

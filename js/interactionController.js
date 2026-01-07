@@ -304,15 +304,39 @@ export class InteractionController {
             return;
         }
 
-        const options = [ACTION_TYPES.MOVEMENT, ACTION_TYPES.ATTACK, ACTION_TYPES.BLOCK, ACTION_TYPES.INFLUENCE];
-        const chosen = prompt(`${card.name} seitlich spielen für: \n1: +1 Bewegung\n2: +1 Angriff\n3: +1 Block\n4: +1 Einfluss\n\nWähle Option (1-4):`);
+        // --- NEW SIDEWAYS MODAL ---
+        const modal = document.getElementById('sideways-modal');
+        const cancelBtn = document.getElementById('sideways-cancel');
+        const closeBtn = document.getElementById('sideways-close');
 
-        const chosenNum = parseInt(chosen, 10);
-        if (chosenNum >= 1 && chosenNum <= 4) {
-            const effectType = options[chosenNum - 1];
+        if (!modal) return;
 
+        // Populate Preview (Optional visual enhancement)
+        const previewContainer = document.getElementById('sideways-card-preview');
+        if (previewContainer) {
+            previewContainer.innerHTML = '';
+            // We can clone the card visual or create a simple preview
+            const cardEl = this.game.ui.createCardElement(card);
+            cardEl.style.transform = 'scale(0.8)';
+            cardEl.style.position = 'static';
+            previewContainer.appendChild(cardEl);
+        }
+
+        const cleanup = () => {
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+            // Remove event listeners
+            document.querySelectorAll('.sideways-options button').forEach(btn => {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+            });
+            cancelBtn.onclick = null;
+            closeBtn.onclick = null;
+        };
+
+        const handleChoice = (type) => {
             // Use ActionManager for Undo support
-            const result = this.game.actionManager.playCardSideways(index, effectType);
+            const result = this.game.actionManager.playCardSideways(index, type);
 
             if (result) {
                 this.game.sound.cardPlaySideways();
@@ -332,7 +356,27 @@ export class InteractionController {
                     this.game.enterMovementMode();
                 }
             }
-        }
+            cleanup();
+        };
+
+        // Bind buttons
+        document.querySelectorAll('.sideways-options button').forEach(btn => {
+            btn.onclick = () => {
+                const type = btn.dataset.type; // movement, attack, block, influence
+                handleChoice(type);
+            };
+        });
+
+        cancelBtn.onclick = cleanup;
+        closeBtn.onclick = cleanup;
+
+        modal.onclick = (e) => {
+            if (e.target === modal) cleanup();
+        };
+
+        modal.style.display = 'flex';
+        // Add timeout for fade-in class if we use CSS transitions
+        setTimeout(() => modal.classList.add('show'), 10);
     }
 
     handleManaClick(index, color) {

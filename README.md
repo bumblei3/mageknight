@@ -49,7 +49,7 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 
 1. **Karten spielen**:
    - **Linksklick** auf Karte: Spielt die Basis-Wirkung
-   - **Rechtsklick** auf Karte: Spielt die Karte seitlich (+1 Bewegung/Angriff/Block/Einfluss)
+   - **Rechtsklick** auf Karte: Öffnet Modal für seitliches Spielen (+1 Bewegung/Angriff/Block/Einfluss)
 
 2. **Bewegung**:
    - Spiele Bewegungskarten (grüne Karten)

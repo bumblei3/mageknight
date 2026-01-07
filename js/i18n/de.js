@@ -218,7 +218,12 @@ export default {
         sidewaysAction: 'Rechtsklick: Seitlich (+1)',
         none: 'Keine',
         basic: 'Basis',
-        strong: 'Stark'
+        strong: 'Stark',
+        sidewaysModal: {
+            title: 'Karte seitlich spielen',
+            subtitle: 'Wähle einen Effekt (+1)',
+            cancel: 'Abbrechen'
+        }
     },
 
     // Achievements
@@ -291,13 +296,13 @@ export default {
 
     // Terrain
     terrain: {
-        plains: { name: 'Ebenen', desc: 'Offenes Grasland' },
-        forest: { name: 'Wald', desc: 'Dichter Wald' },
-        hills: { name: 'Hügel', desc: 'Hügeliges Gelände' },
-        mountains: { name: 'Berge', desc: 'Hohe Berge' },
-        desert: { name: 'Wüste', desc: 'Trockene Wüste' },
-        wasteland: { name: 'Ödland', desc: 'Verfluchtes Ödland' },
-        water: { name: 'Wasser', desc: 'Wasser (unpassierbar)' }
+        plains: { name: 'Ebenen', desc: 'Offenes Grasland. Leicht zu durchqueren.', cost: '2' },
+        forest: { name: 'Wald', desc: 'Dichter Wald. Erschwert die Bewegung.', cost: '3' },
+        hills: { name: 'Hügel', desc: 'Hügeliges Gelände. Bietet gute Übersicht.', cost: '3' },
+        mountains: { name: 'Berge', desc: 'Hohe Berge. Nur schwer passierbar.', cost: '5' },
+        desert: { name: 'Wüste', desc: 'Trockene Wüste. Tagsüber sehr anstrengend.', cost: '5' },
+        wasteland: { name: 'Ödland', desc: 'Verfluchtes Ödland. Gefährliches Terrain.', cost: '4' },
+        water: { name: 'Wasser', desc: 'Tiefes Wasser. Ohne Boot oder Magie unpassierbar.', cost: '∞' }
     },
 
     // Sites

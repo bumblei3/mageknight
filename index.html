@@ -696,6 +696,38 @@
         </div>
     </div>
 
+    <!-- Sideways Play Modal -->
+    <div class="modal" id="sideways-modal">
+        <div class="modal-content sideways-content">
+            <span class="modal-close" id="sideways-close">&times;</span>
+            <h2 data-i18n="cards.sidewaysModal.title">Karte seitlich spielen</h2>
+            <p class="modal-subtitle" data-i18n="cards.sidewaysModal.subtitle">Wähle einen Effekt (+1)</p>
+            
+            <div id="sideways-card-preview" class="sideways-card-preview"></div>
+
+            <div class="sideways-options">
+                <button class="sideways-btn movement" data-type="movement">
+                    <span class="btn-icon">👣</span>
+                    <span class="btn-label">+1 Bewegung</span>
+                </button>
+                <button class="sideways-btn attack" data-type="attack">
+                    <span class="btn-icon">⚔️</span>
+                    <span class="btn-label">+1 Angriff</span>
+                </button>
+                <button class="sideways-btn block" data-type="block">
+                    <span class="btn-icon">🛡️</span>
+                    <span class="btn-label">+1 Block</span>
+                </button>
+                <button class="sideways-btn influence" data-type="influence">
+                    <span class="btn-icon">💬</span>
+                    <span class="btn-label">+1 Einfluss</span>
+                </button>
+            </div>
+
+            <button class="btn btn-secondary sideways-cancel" id="sideways-cancel" data-i18n="cards.sidewaysModal.cancel">Abbrechen</button>
+        </div>
+    </div>
+
     <!-- Level Up Modal -->
     <div id="level-up-modal" class="modal">
         <div class="modal-content level-up-content">

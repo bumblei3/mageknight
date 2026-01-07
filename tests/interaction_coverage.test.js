@@ -38,6 +38,17 @@ describe('InteractionController Coverage', () => {
                 <button id="play-strong-btn"></button>
                 <button id="card-play-close"></button>
             </div>
+            <div id="sideways-modal" style="display: none;" class="modal">
+                 <button id="sideways-close">&times;</button>
+                 <button id="sideways-cancel">Cancel</button>
+                 <div class="sideways-options">
+                    <button class="sideways-btn movement" data-type="movement"></button>
+                    <button class="sideways-btn attack" data-type="attack"></button>
+                    <button class="sideways-btn block" data-type="block"></button>
+                    <button class="sideways-btn influence" data-type="influence"></button>
+                 </div>
+                 <div id="sideways-card-preview"></div>
+            </div>
             <div class="board-wrapper"></div>
         `;
         game = new MageKnightGame();
@@ -236,7 +247,7 @@ describe('InteractionController Coverage', () => {
         expect(controller.handleCardRightClick(0, normal)).toBeUndefined();
     });
 
-    it('should handle sideways card play via prompt', () => {
+    it('should handle sideways card play via modal', () => {
         const card = {
             isWound: () => false,
             name: 'Normal',
@@ -246,21 +257,23 @@ describe('InteractionController Coverage', () => {
         };
         game.hero.hand = [card];
 
-        // Mock prompt to return '1' (Movement)
-        const originalPrompt = global.prompt;
-        global.prompt = () => '1';
-
         let sidewaysCalled = false;
         game.actionManager.playCardSideways = (index, type) => {
             if (type === 'movement') sidewaysCalled = true;
-            return { card, effect: { movement: 1 } };
+            return { card, effect: { movement: 1, color: 'white' } }; // Mock result
         };
 
-        try {
-            controller.handleCardRightClick(0, card);
-            expect(sidewaysCalled).toBe(true);
-        } finally {
-            global.prompt = originalPrompt;
-        }
+        // Open modal
+        controller.handleCardRightClick(0, card);
+
+        const modal = document.getElementById('sideways-modal');
+        expect(modal.style.display).toBe('flex');
+
+        // Simulate clicking movement button
+        const movementBtn = modal.querySelector('.sideways-btn.movement');
+        movementBtn.click(); // This should trigger handleChoice('movement')
+
+        expect(sidewaysCalled).toBe(true);
+        expect(modal.style.display).toBe('none'); // Should close after choice
     });
 });

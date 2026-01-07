@@ -258,6 +258,32 @@ updatePhaseIndicator() {
 💬 Visuelles Feedback bei Hover  
 
 ---
+ 
+ ### 5. Sideways Play Modal 🃏
+ 
+ **Premium-Modal statt Browser-Dialog:**
+ 
+ - Ersetzt das alte `prompt()` Fenster
+ - Visuelle Vorschau der Karte
+ - 4 klare Buttons für die Aktionen
+ - Voll im neuen Design-System (Glassmorphism)
+ 
+ **Funktionen:**
+ - Zeigt +1 Effekt-Optionen (Bewegung, Angriff, Block, Einfluss)
+ - Keyboard Support (Esc zum Schließen)
+ - Visuelles Feedback beim Hover
+ - Sound-Integration
+ 
+ ### 6. Lokalisierte Tooltips 🌍
+ 
+ **Dynamisches Tooltip-System:**
+ 
+ - Terrain-Daten kommen jetzt aus `i18n` (de.js)
+ - Zeigt lokalisierte Namen & Beschreibungen
+ - Bewegungskosten werden korrekt angezeigt
+ - Fallback-System für fehlende Übersetzungen
+ 
+ ---
 
 ## 🎯 Zukünftige Erweiterungen
 

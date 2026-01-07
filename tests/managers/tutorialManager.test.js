@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { TutorialManager } from '../../js/tutorialManager.js';
+import TutorialManager from '../../js/tutorialManager.js';
 import { setLanguage } from '../../js/i18n/index.js';
 import { store } from '../../js/game/Store.js';
 
@@ -12,6 +12,7 @@ describe('TutorialManager', () => {
         document.body.innerHTML = '';
         game = {
             addLog: vi.fn(),
+            showToast: vi.fn(),
             ui: { showToast: vi.fn() }
         };
         tutorial = new TutorialManager(game);

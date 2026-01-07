@@ -136,9 +136,9 @@ describe('Advanced UI Interaction Coverage', () => {
             const modal = document.getElementById('achievements-modal');
             const closeBtn = document.getElementById('achievements-close');
 
-            modal.style.display = 'block';
+            modal.classList.add('active');
             closeBtn.click();
-            expect(modal.style.display).toBe('none');
+            expect(modal.classList.contains('active')).toBe(false);
 
             const tab = document.createElement('button');
             tab.className = 'tab-btn';
@@ -155,9 +155,9 @@ describe('Advanced UI Interaction Coverage', () => {
             const modal = document.getElementById('statistics-modal');
             const closeBtn = document.getElementById('statistics-close');
 
-            modal.style.display = 'block';
+            modal.classList.add('active');
             closeBtn.click();
-            expect(modal.style.display).toBe('none');
+            expect(modal.classList.contains('active')).toBe(false);
 
             const tab = document.createElement('button');
             tab.className = 'tab-btn';
@@ -174,18 +174,18 @@ describe('Advanced UI Interaction Coverage', () => {
             const achievementsModal = document.getElementById('achievements-modal');
             const statsModal = document.getElementById('statistics-modal');
 
-            achievementsModal.style.display = 'block';
-            statsModal.style.display = 'block';
+            achievementsModal.classList.add('active');
+            statsModal.classList.add('active');
 
             const event = new MouseEvent('click');
             Object.defineProperty(event, 'target', { value: achievementsModal });
             window.dispatchEvent(event);
-            expect(achievementsModal.style.display).toBe('none');
+            expect(achievementsModal.classList.contains('active')).toBe(false);
 
             const event2 = new MouseEvent('click');
             Object.defineProperty(event2, 'target', { value: statsModal });
             window.dispatchEvent(event2);
-            expect(statsModal.style.display).toBe('none');
+            expect(statsModal.classList.contains('active')).toBe(false);
         });
     });
 
@@ -260,7 +260,7 @@ describe('Advanced UI Interaction Coverage', () => {
             game.inputController.setup();
 
             btn.click();
-            expect(modal.style.display).toBe('block');
+            expect(modal.classList.contains('active')).toBe(true);
         });
     });
 });

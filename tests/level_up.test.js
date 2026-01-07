@@ -1,9 +1,21 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
 import { setupGlobalMocks, createMockUI } from './test-mocks.js';
 import { LevelUpManager } from '../js/game/LevelUpManager.js';
 import { SKILLS } from '../js/skills.js';
 import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
+
+// Mock Store to prevent external dependencies
+vi.mock('../js/game/Store.js', () => ({
+    store: {
+        dispatch: () => { },
+        subscribe: () => { },
+        getState: () => ({ hero: {} }),
+        clearListeners: () => { },
+        reset: () => { }
+    },
+    ACTIONS: {}
+}));
 
 describe('Level Up System', () => {
     let game;
@@ -36,6 +48,10 @@ describe('Level Up System', () => {
         document.getElementById = (id) => {
             if (id === 'new-level-display') return { textContent: '' };
             return {};
+        };
+        // Mock RewardManager to avoid uninitialized decks issue
+        game.rewardManager = {
+            getAdvancedActionOffer: (count) => Array(count).fill({ id: 'mock_card', name: 'Mock Card' })
         };
     });
 
@@ -101,6 +117,8 @@ describe('Level Up System', () => {
 
         const initialHandLimit = game.hero.handLimit;
         const initialDeckSize = game.hero.deck.length;
+        console.log('Test Diff - testCard:', testCard);
+        console.log('Test Diff - initialDeckSize:', initialDeckSize);
 
         levelUpManager.confirmSelection();
 

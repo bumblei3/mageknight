@@ -54,8 +54,9 @@ describe('SaveManager Extended Coverage', () => {
     describe('hasSave', () => {
         it('should check if save exists', () => {
             SaveManager.saveGame(1, {});
-            expect(SaveManager.hasSave(1)).toBe(true);
-            expect(SaveManager.hasSave(99)).toBe(false);
+            // Should check for explicit strings since localStorage keys are strings
+            expect(SaveManager.hasSave('1')).toBe(true);
+            expect(SaveManager.hasSave('99')).toBe(false);
         });
     });
 });

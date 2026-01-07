@@ -1,35 +1,34 @@
 // Mana system for Mage Knight
 
-import { MANA_COLORS, ManaColor } from './constants.js';
+export const MANA_COLORS = {
+    RED: 'red',
+    BLUE: 'blue',
+    WHITE: 'white',
+    GREEN: 'green',
+    GOLD: 'gold',
+    BLACK: 'black'
+} as const;
 
-// Re-export for backward compatibility
-export { MANA_COLORS };
+export type ManaColor = typeof MANA_COLORS[keyof typeof MANA_COLORS];
 
-export interface ManaDie {
+export interface DieState {
     index: number;
-    color: ManaColor;
+    color: string;
     available: boolean;
-}
-
-export interface ManaSourceState {
-    dice: ManaColor[];
-    usedDice: number[];
 }
 
 export class ManaSource {
     private playerCount: number;
-    private dice: ManaColor[];
-    private usedDice: Set<number>;
+    private dice: string[] = [];
+    private usedDice: Set<number> = new Set();
 
-    constructor(playerCount = 1) {
+    constructor(playerCount: number = 1) {
         this.playerCount = playerCount;
-        this.dice = [];
-        this.usedDice = new Set();
         this.initialize();
     }
 
     // Initialize mana source with dice
-    initialize(): void {
+    public initialize(): void {
         const diceCount = this.playerCount + 2; // Player count + 2
         this.dice = [];
         this.usedDice.clear();
@@ -44,8 +43,8 @@ export class ManaSource {
     }
 
     // Roll a single die
-    private rollDie(): ManaColor {
-        const colors: ManaColor[] = [
+    public rollDie(): string {
+        const colors = [
             MANA_COLORS.RED,
             MANA_COLORS.BLUE,
             MANA_COLORS.WHITE,
@@ -59,12 +58,12 @@ export class ManaSource {
 
     // Ensure at least half of dice show basic colors
     private ensureBasicColors(): void {
-        const basicColors: ManaColor[] = [MANA_COLORS.RED, MANA_COLORS.BLUE, MANA_COLORS.WHITE, MANA_COLORS.GREEN];
+        const basicColors = [MANA_COLORS.RED, MANA_COLORS.BLUE, MANA_COLORS.WHITE, MANA_COLORS.GREEN];
         const basicIndices: number[] = [];
         const nonBasicIndices: number[] = [];
 
         this.dice.forEach((color, idx) => {
-            if (basicColors.includes(color)) {
+            if (basicColors.includes(color as any)) {
                 basicIndices.push(idx);
             } else {
                 nonBasicIndices.push(idx);
@@ -91,7 +90,7 @@ export class ManaSource {
     }
 
     // Take a die from the source
-    takeDie(index: number, isNight = false): ManaColor | null {
+    public takeDie(index: number, isNight: boolean = false): string | null {
         if (this.isDieAvailable(index, isNight)) {
             this.usedDice.add(index);
             return this.dice[index];
@@ -100,7 +99,7 @@ export class ManaSource {
     }
 
     // Check if a die is available
-    isDieAvailable(index: number, isNight = false): boolean {
+    public isDieAvailable(index: number, isNight: boolean = false): boolean {
         if (index < 0 || index >= this.dice.length || this.usedDice.has(index)) {
             return false;
         }
@@ -115,7 +114,7 @@ export class ManaSource {
     }
 
     // Return dice to source and re-roll
-    returnDice(): void {
+    public returnDice(): void {
         // Re-roll all used dice
         this.usedDice.forEach(index => {
             this.dice[index] = this.rollDie();
@@ -125,8 +124,12 @@ export class ManaSource {
         this.ensureBasicColors();
     }
 
+    public recharge(): void {
+        this.returnDice();
+    }
+
     // Get available dice
-    getAvailableDice(isNight = false): ManaDie[] {
+    public getAvailableDice(isNight: boolean = false): DieState[] {
         return this.dice.map((color, index) => ({
             index,
             color,
@@ -135,19 +138,19 @@ export class ManaSource {
     }
 
     // Get dice by color
-    getDiceByColor(color: ManaColor): { color: ManaColor; index: number }[] {
+    public getDiceByColor(color: string): { color: string, index: number }[] {
         return this.dice
             .map((c, index) => ({ color: c, index }))
             .filter(d => d.color === color && !this.usedDice.has(d.index));
     }
 
     // Check if color is available
-    hasColor(color: ManaColor): boolean {
+    public hasColor(color: string): boolean {
         return this.getDiceByColor(color).length > 0;
     }
 
     // Get full state for persistence
-    getState(): ManaSourceState {
+    public getState(): any {
         return {
             dice: [...this.dice],
             usedDice: Array.from(this.usedDice)
@@ -155,19 +158,17 @@ export class ManaSource {
     }
 
     // Load state from object
-    loadState(state: ManaSourceState | null): void {
+    public loadState(state: any): void {
         if (!state) return;
         this.dice = [...(state.dice || [])];
         this.usedDice = new Set(state.usedDice || []);
     }
 }
 
-type BasicManaColor = 'red' | 'blue' | 'white' | 'green';
-
 // Crystal storage for players
 export class CrystalStorage {
-    private crystals: Record<BasicManaColor, number>;
-    private maxPerColor: number;
+    private crystals: Record<string, number>;
+    private maxPerColor: number = 3;
 
     constructor() {
         this.crystals = {
@@ -176,11 +177,10 @@ export class CrystalStorage {
             [MANA_COLORS.WHITE]: 0,
             [MANA_COLORS.GREEN]: 0
         };
-        this.maxPerColor = 3;
     }
 
     // Add a crystal
-    addCrystal(color: BasicManaColor): boolean {
+    public addCrystal(color: string): boolean {
         if (this.crystals[color] !== undefined && this.crystals[color] < this.maxPerColor) {
             this.crystals[color]++;
             return true;
@@ -189,7 +189,7 @@ export class CrystalStorage {
     }
 
     // Use a crystal (convert to mana)
-    useCrystal(color: BasicManaColor): boolean {
+    public useCrystal(color: string): boolean {
         if (this.crystals[color] > 0) {
             this.crystals[color]--;
             return true;
@@ -198,17 +198,17 @@ export class CrystalStorage {
     }
 
     // Get crystal count
-    getCount(color: BasicManaColor): number {
+    public getCount(color: string): number {
         return this.crystals[color] || 0;
     }
 
     // Check if color is available
-    hasColor(color: BasicManaColor): boolean {
+    public hasColor(color: string): boolean {
         return this.getCount(color) > 0;
     }
 
     // Get all crystals
-    getAll(): Record<BasicManaColor, number> {
+    public getAll(): Record<string, number> {
         return { ...this.crystals };
     }
 }

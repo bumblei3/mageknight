@@ -1,8 +1,7 @@
 /**
  * Lightweight Global Event Bus for Mage Knight
  */
-
-type EventCallback<T = unknown> = (data: T) => void;
+export type EventCallback = (data?: any) => void;
 
 class EventBus {
     private listeners: Map<string, EventCallback[]>;
@@ -13,21 +12,25 @@ class EventBus {
 
     /**
      * Subscribe to an event
+     * @param {string} event - Event name
+     * @param {Function} callback - Callback function
      */
-    on<T = unknown>(event: string, callback: EventCallback<T>): void {
+    on(event: string, callback: EventCallback): void {
         if (!this.listeners.has(event)) {
             this.listeners.set(event, []);
         }
-        this.listeners.get(event)!.push(callback as EventCallback);
+        this.listeners.get(event)!.push(callback);
     }
 
     /**
      * Unsubscribe from an event
+     * @param {string} event - Event name
+     * @param {Function} callback - Callback function to remove
      */
-    off<T = unknown>(event: string, callback: EventCallback<T>): void {
+    off(event: string, callback: EventCallback): void {
         if (!this.listeners.has(event)) return;
         const callbacks = this.listeners.get(event)!;
-        const index = callbacks.indexOf(callback as EventCallback);
+        const index = callbacks.indexOf(callback);
         if (index > -1) {
             callbacks.splice(index, 1);
         }
@@ -35,8 +38,10 @@ class EventBus {
 
     /**
      * Emit an event
+     * @param {string} event - Event name
+     * @param {any} data - Data to pass to callbacks
      */
-    emit<T = unknown>(event: string, data?: T): void {
+    emit(event: string, data?: any): void {
         if (!this.listeners.has(event)) return;
         this.listeners.get(event)!.forEach(callback => {
             try {

@@ -991,3 +991,29 @@ export function resetMocks() {
         global.window._clearListeners();
     }
 }
+
+/**
+ * Creates a mock HexGrid
+ */
+export function createMockHexGrid() {
+    return {
+        getHex: createSpy(() => ({ q: 0, r: 0 })),
+        hasHex: createSpy(() => false),
+        setHex: createSpy(),
+        getNeighbors: createSpy(() => []),
+        getHexesInRange: createSpy(() => []),
+        getRing: createSpy(() => []),
+        axialToPixel: createSpy(() => ({ x: 0, y: 0 })),
+        pixelToAxial: createSpy(() => ({ q: 0, r: 0 })),
+        getAllHexes: createSpy(() => []),
+        logic: {
+            hexes: new Map(),
+            getHex: createSpy(),
+            hasHex: createSpy(),
+            setHex: createSpy(),
+        },
+        renderer: {
+            render: createSpy(),
+        }
+    };
+}

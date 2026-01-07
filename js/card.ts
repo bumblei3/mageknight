@@ -4,14 +4,18 @@
  */
 
 // Re-export definitions
+// Re-export definitions
 export {
-    CARD_COLORS,
-    CARD_TYPES,
     GOLDYX_STARTER_DECK,
     SAMPLE_SPELLS,
     SAMPLE_ARTIFACTS,
     SAMPLE_ADVANCED_ACTIONS
-} from './card/CardDefinitions.js';
+} from './card/CardDefinitions';
+
+export {
+    CARD_COLORS,
+    CARD_TYPES
+} from './constants';
 
 // Re-export factory functions and Card class
 export {
@@ -19,7 +23,7 @@ export {
     createDeck,
     shuffleDeck,
     createWoundCard
-} from './card/CardFactory.js';
+} from './card/CardFactory';
 
 // Re-export types separately
-export type { CardData, CardEffect } from './card/CardFactory.js';
+export type { CardData, CardEffect } from './card/CardFactory';

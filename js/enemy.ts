@@ -1,7 +1,7 @@
 // Enemy system for Mage Knight
 
-import { ENEMY_TYPES, BOSS_PHASES, ENEMY_DEFINITIONS, BOSS_DEFINITIONS, EnemyDefinition } from './constants.js';
-import { t } from './i18n/index.js';
+import { ENEMY_TYPES, BOSS_PHASES, ENEMY_DEFINITIONS, BOSS_DEFINITIONS, EnemyDefinition } from './constants';
+import { t } from './i18n/index';
 
 export { ENEMY_TYPES, BOSS_PHASES, ENEMY_DEFINITIONS, BOSS_DEFINITIONS };
 
@@ -81,6 +81,10 @@ export class Enemy {
     color: string;
     attackType: string;
     isBoss?: boolean;
+    level?: number;
+    maxHealth?: number;
+    currentHealth?: number;
+    abilities?: string[];
 
     constructor(data: EnemyData) {
         this.id = data.id || `enemy_${Date.now()}`;
@@ -255,8 +259,8 @@ export interface BossEnemyState extends EnemyState {
 
 export class BossEnemy extends Enemy {
     override isBoss: boolean = true;
-    maxHealth: number;
-    currentHealth: number;
+    declare maxHealth: number;
+    declare currentHealth: number;
     phases: BossPhase[];
     currentPhase: number | string;
     enraged: boolean;

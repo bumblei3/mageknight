@@ -1,57 +1,55 @@
-import { TERRAIN_COSTS, TERRAIN_VISUALS, TerrainType, TerrainCost, TerrainVisual } from './constants.js';
+import { TERRAIN_COSTS, TERRAIN_VISUALS } from './constants';
 
-interface HeroLike {
-    hasSkill?(skill: string): boolean;
-}
+export type TerrainType = string;
 
 export class Terrain {
-    private terrainData: Record<TerrainType, TerrainVisual>;
+    private terrainData: any;
 
     constructor() {
         this.terrainData = TERRAIN_VISUALS;
     }
 
-    getTerrainInfo(terrainType: TerrainType): TerrainVisual | null {
-        return this.terrainData[terrainType] || null;
+    public getTerrainInfo(terrainType: string): any {
+        return (this.terrainData as any)[terrainType] || null;
     }
 
-    getMovementCost(terrainType: TerrainType, isNight = false, hero: HeroLike | null = null): number {
-        const costs = TERRAIN_COSTS[terrainType];
+    public getMovementCost(terrainType: string, isNight: boolean = false, hero: any = null): number {
+        const costs = (TERRAIN_COSTS as any)[terrainType];
         if (!costs) return 2;
 
         let cost = isNight ? costs.night : costs.day;
 
         // Flight skill: all terrain costs 2
-        if (hero?.hasSkill?.('flight')) {
+        if (hero && typeof hero.hasSkill === 'function' && hero.hasSkill('flight')) {
             cost = Math.min(cost, 2);
         }
 
         // Forward March skill: movement costs -1 (min 1)
-        if (hero?.hasSkill?.('forward_march') && cost > 1) {
+        if (hero && typeof hero.hasSkill === 'function' && hero.hasSkill('forward_march') && cost > 1) {
             cost -= 1;
         }
 
         return cost;
     }
 
-    isPassable(terrainType: TerrainType): boolean {
-        const costs = TERRAIN_COSTS[terrainType];
+    public isPassable(terrainType: string): boolean {
+        const costs = (TERRAIN_COSTS as any)[terrainType];
         if (!costs) return true;
         return costs.day < 999;
     }
 
-    getName(terrainType: TerrainType): string {
-        const terrain = this.terrainData[terrainType];
+    public getName(terrainType: string): string {
+        const terrain = (this.terrainData as any)[terrainType];
         return terrain ? terrain.name : 'Unknown';
     }
 
-    getIcon(terrainType: TerrainType): string {
-        const terrain = this.terrainData[terrainType];
+    public getIcon(terrainType: string): string {
+        const terrain = (this.terrainData as any)[terrainType];
         return terrain ? terrain.icon : '';
     }
 
-    getColor(terrainType: TerrainType): string {
-        const terrain = this.terrainData[terrainType];
+    public getColor(terrainType: string): string {
+        const terrain = (this.terrainData as any)[terrainType];
         return terrain ? terrain.color : '#1a1a2e';
     }
 }

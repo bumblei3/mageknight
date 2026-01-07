@@ -15,7 +15,8 @@ describe('WorldEventManager', () => {
             manaSource: {
                 addCrystalToInventory: () => { }
             },
-            renderMana: () => { }
+            renderMana: () => { },
+            addLog: () => { }
         };
         worldEvents = new WorldEventManager(mockGame);
     });

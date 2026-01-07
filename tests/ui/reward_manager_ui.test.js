@@ -26,6 +26,10 @@ describe('RewardManager UI', () => {
             },
             particleSystem: {
                 buffEffect: vi.fn()
+            },
+            cardFactory: {
+                createRandomSpells: (n) => Array(n).fill({ name: 'Spell', type: 'spell', color: 'red' }),
+                createRandomArtifacts: (n) => Array(n).fill({ name: 'Artifact', type: 'artifact', color: 'gold' })
             }
         };
 

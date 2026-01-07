@@ -1,0 +1,94 @@
+import { createUnit } from '../unit';
+import { createDeck } from '../card';
+
+export interface SiteOption {
+    id: string;
+    label: string;
+    action?: () => any;
+    enabled?: boolean;
+    subItems?: SiteOption[];
+    type?: 'unit' | 'card' | 'action';
+    data?: any;
+    cost?: number;
+}
+
+export class BaseSiteHandler {
+    protected game: any;
+
+    constructor(game: any) {
+        this.game = game;
+    }
+
+    public getOptions(_site: any, _context?: any): SiteOption[] {
+        return [];
+    }
+
+    public healWounds(costPerWound: number): { success: boolean, message: string } {
+        if (this.game.hero.influencePoints >= costPerWound && this.game.hero.wounds.length > 0) {
+            if (this.game.hero.healWound(false)) {
+                this.game.hero.influencePoints -= costPerWound;
+                const msg = 'Wunde geheilt!';
+                this.game.addLog(msg, 'success');
+                return { success: true, message: msg };
+            }
+        }
+        return { success: false, message: 'Nicht genug Einfluss oder keine Wunden.' };
+    }
+
+    public recruitUnit(unitInfo: any): { success: boolean, message: string } {
+        if (this.game.hero.influencePoints >= unitInfo.cost) {
+            const instance = unitInfo.create ? unitInfo.create() : createUnit(unitInfo.type);
+
+            if (!instance) {
+                return { success: false, message: 'Einheiten-Typ unbekannt.' };
+            }
+
+            // Ensure ID is unique
+            instance.id = `${unitInfo.type}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+            if (this.game.hero.addUnit(instance)) {
+                this.game.hero.influencePoints -= unitInfo.cost;
+                const msg = `Einheit ${instance.name || instance.getName()} rekrutiert!`;
+                this.game.addLog(msg, 'success');
+                this.game.updateStats();
+                return { success: true, message: msg };
+            } else {
+                return { success: false, message: 'Kein Platz für weitere Einheiten (Command Limit).' };
+            }
+        }
+        return { success: false, message: 'Nicht genug Einfluss.' };
+    }
+
+    public buyCard(cardData: any, cost: number): { success: boolean, message: string } {
+        // Check Mana cost for Spells
+        let manaColor = cardData.color;
+        const isSpell = cardData.type === 'spell';
+
+        if (isSpell) {
+            const inventory = this.game.hero.getManaInventory();
+            const hasToken = inventory.includes(manaColor);
+            const hasCrystal = this.game.hero.crystals[manaColor.toUpperCase()] > 0 || this.game.hero.crystals[manaColor.toLowerCase()] > 0;
+
+            if (!hasToken && !hasCrystal) {
+                return { success: false, message: `Du benötigst ein ${manaColor}-Mana (oder Kristall) zum Lernen!` };
+            }
+
+            if (hasToken) {
+                this.game.hero.removeMana(manaColor);
+            } else {
+                const cryKey = this.game.hero.crystals[manaColor.toUpperCase()] !== undefined ? manaColor.toUpperCase() : manaColor.toLowerCase();
+                this.game.hero.crystals[cryKey]--;
+            }
+        }
+
+        if (this.game.hero.influencePoints >= cost) {
+            const card = createDeck([cardData])[0];
+            this.game.hero.discard.push(card);
+            this.game.hero.influencePoints -= cost;
+            const msg = `Karte ${card.name} gelernt!`;
+            this.game.addLog(msg, 'success');
+            return { success: true, message: msg };
+        }
+        return { success: false, message: 'Nicht genug Einfluss.' };
+    }
+}

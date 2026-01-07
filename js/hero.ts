@@ -1,10 +1,10 @@
 // Hero class for Mage Knight
 
-import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_ARTIFACTS, Card, CardData } from './card.js';
-import { MANA_COLORS, ManaColor } from './constants.js';
-import { HeroInventory } from './hero/HeroInventory.js';
-import { HeroSkills } from './hero/HeroSkills.js';
-import { store, ACTIONS } from './game/Store.js';
+import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_ARTIFACTS, Card, CardData } from './card';
+import { MANA_COLORS, ManaColor } from './constants';
+import { HeroInventory } from './hero/HeroInventory';
+import { HeroSkills } from './hero/HeroSkills';
+import { store, ACTIONS } from './game/Store';
 
 // Fame thresholds for levels
 export interface LevelEntry {
@@ -175,7 +175,7 @@ export class Hero {
         this.skills = this._skills.skills;
         this.usedSkills = this._skills.usedSkills;
         this.crystals = this._inventory.crystals;
-        this.tempMana = this._inventory.tempMana;
+        this.tempMana = this._inventory.tempMana as ManaColor[];
 
         this.deck = [];
         this.hand = [];

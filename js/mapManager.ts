@@ -1,0 +1,134 @@
+import { HexGridLogic } from './hexgrid/HexGridLogic';
+import { Terrain, TerrainType } from './terrain';
+import { TERRAIN_TYPES } from './constants';
+
+export interface MapData {
+    hexes: Array<{ q: number; r: number; terrain: TerrainType; site?: any }>;
+}
+
+export class MapManager {
+    private game: any;
+    private hexGrid: HexGridLogic;
+    public tilesDeck: TerrainType[][] = [];
+
+    constructor(game: any) {
+        this.game = game;
+        this.hexGrid = game.hexGrid;
+        this.initializeDeck();
+    }
+
+    initializeDeck() {
+        // Create a dummy deck for testing/placeholder logic
+        // 10 tiles, each with 7 hexes
+        for (let i = 0; i < 10; i++) {
+            const tile = new Array(7).fill(TERRAIN_TYPES.PLAINS);
+            // Vary terrains slightly
+            if (i % 2 === 0) tile[1] = TERRAIN_TYPES.FOREST;
+            this.tilesDeck.push(tile);
+        }
+    }
+
+    private worldEventManager: any;
+
+    setWorldEventManager(manager: any) {
+        this.worldEventManager = manager;
+    }
+
+    /**
+     * Initializes the map with a predefined scenario layout or empty
+     */
+    createStartingMap(scenarioData: MapData | null = null): void {
+        console.log('Initializing Map...');
+
+        if (scenarioData && scenarioData.hexes) {
+            this.loadMapFromData(scenarioData);
+        } else {
+            this.generateDefaultMap();
+        }
+
+        // Reveal starting area
+        this.revealStartingArea();
+    }
+
+    /**
+     * Generates a default starter map (wedge shape)
+     */
+    generateDefaultMap(): void {
+        // Center - Portal
+        this.hexGrid.setHex(0, 0, { terrain: TERRAIN_TYPES.PLAINS });
+
+        // Immediate surroundings (Radius 1) - Safe terrain
+        const radius1 = this.hexGrid.getRing(0, 0, 1);
+        radius1.forEach(hex => {
+            // Mix of plains, forests, and hills
+            const rand = Math.random();
+            let terrain: any = TERRAIN_TYPES.PLAINS;
+            if (rand > 0.6) terrain = TERRAIN_TYPES.FOREST;
+            else if (rand > 0.8) terrain = TERRAIN_TYPES.HILLS;
+
+            this.hexGrid.setHex(hex.q, hex.r, { terrain });
+        });
+
+        // Radius 2-3 - Exploration zone
+        for (let r = 2; r <= 3; r++) {
+            const ring = this.hexGrid.getRing(0, 0, r);
+            ring.forEach(hex => {
+                // Procedural generation logic here
+                // For now, simpler patterns
+                this.hexGrid.setHex(hex.q, hex.r, { terrain: TERRAIN_TYPES.PLAINS }); // Placeholder, real logic handles tiles
+            });
+        }
+    }
+
+    /**
+     * Loads map from a save or scenario definition
+     */
+    loadMapFromData(data: MapData): void {
+        data.hexes.forEach(hex => {
+            this.hexGrid.setHex(hex.q, hex.r, { terrain: hex.terrain }, hex.site);
+        });
+    }
+
+    /**
+     * Reveals the area around the hero's start position
+     */
+    revealStartingArea(): void {
+        // Radius 2 is usually revealed at start (depending on rules/day)
+        const startQ = 0;
+        const startR = 0;
+
+        // Reveal center
+        const center = this.hexGrid.getHex(startQ, startR);
+        if (center) center.revealed = true;
+
+        // Reveal neighbors
+        const neighbors = this.hexGrid.getNeighbors(startQ, startR);
+        neighbors.forEach(n => {
+            const hex = this.hexGrid.getHex(n.q, n.r);
+            if (hex) hex.revealed = true;
+        });
+    }
+
+    /**
+     * Adds a new map tile (group of 7 hexes) at the specified coordinate
+     * Logic for map tiles would go here (Core Tiles vs Countryside Tiles)
+     */
+    addMapTile(centerQ: number, centerR: number, tileType: 'countryside' | 'core'): void {
+        // TODO: Implement actual tile deck logic
+        // For now, just filling hexes
+        const hexes = this.hexGrid.getHexesInRange(centerQ, centerR, 1);
+        hexes.forEach(h => {
+            // If empty, fill
+            if (!this.hexGrid.hasHex(h.q, h.r)) {
+                this.hexGrid.setHex(h.q, h.r, { terrain: TERRAIN_TYPES.PLAINS });
+            }
+        });
+    }
+    /**
+     * Checks if exploration is possible from the given position
+     */
+    canExplore(q: number, r: number): boolean {
+        const neighbors = this.hexGrid.getNeighbors(q, r);
+        return neighbors.some(n => !this.hexGrid.hasHex(n.q, n.r));
+    }
+}

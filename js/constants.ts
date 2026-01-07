@@ -99,6 +99,7 @@ export const GAME_EVENTS = {
     UNIT_UPDATED: 'unit_updated',
     TURN_STARTED: 'turn_started',
     TIME_CHANGED: 'time_changed',
+    CARD_PLAYED: 'card_played',
     // Visual Polish Events
     COMBAT_DAMAGE: 'combat_damage',
     COMBAT_BLOCK: 'combat_block',
@@ -238,3 +239,26 @@ export const BOSS_DEFINITIONS: Record<string, BossDefinition> = {
         phaseAbilities: { 1: 'summon', 2: 'heal', 3: 'summon', enraged: 'double_attack' }
     }
 };
+
+export const CARD_TYPES = {
+    ACTION: 'action',
+    SPELL: 'spell',
+    UNIT: 'unit',
+    ARTIFACT: 'artifact',
+    WOUND: 'wound',
+    TACTIC: 'tactic'
+} as const;
+
+export type CardType = typeof CARD_TYPES[keyof typeof CARD_TYPES];
+
+export const CARD_COLORS = {
+    RED: 'red',
+    BLUE: 'blue',
+    GREEN: 'green',
+    WHITE: 'white',
+    GOLD: 'gold',
+    BLACK: 'black',
+    GREY: 'grey'
+} as const;
+
+export type CardColor = typeof CARD_COLORS[keyof typeof CARD_COLORS];

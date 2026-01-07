@@ -1,17 +1,17 @@
-import { StatusEffectManager } from './statusEffects.js';
-import { COMBAT_PHASES } from './constants.js';
-import { logger } from './logger.js';
-import { t } from './i18n/index.js';
-import { BlockingEngine } from './combat/BlockingEngine.js';
-import { DamageSystem } from './combat/DamageSystem.js';
-import { CombatCombos } from './combat/CombatCombos.js';
-import { CombatPredictor } from './combat/CombatPredictor.js';
-import { CombatUnitManager } from './combat/CombatUnitManager.js';
-import { RangedPhase } from './combat/RangedPhase.js';
-import { AttackPhase } from './combat/AttackPhase.js';
-import { Hero } from './hero.js';
-import { Enemy } from './enemy.js';
-import { Card } from './card.js';
+import { StatusEffectManager } from './statusEffects';
+import { COMBAT_PHASES } from './constants';
+import { logger } from './logger';
+import { t } from './i18n/index';
+import { BlockingEngine } from './combat/BlockingEngine';
+import { DamageSystem } from './combat/DamageSystem';
+import { CombatCombos } from './combat/CombatCombos';
+import { CombatPredictor } from './combat/CombatPredictor';
+import { CombatUnitManager } from './combat/CombatUnitManager';
+import { RangedPhase } from './combat/RangedPhase';
+import { AttackPhase } from './combat/AttackPhase';
+import { Hero } from './hero';
+import { Enemy } from './enemy';
+import { Card } from './card';
 
 // For backward compatibility
 export const COMBAT_PHASE = COMBAT_PHASES;
@@ -85,10 +85,12 @@ export class Combat {
     attackPhaseController: any;
 
     summonedEnemies: Map<string, Enemy>;
+    onComplete?: (result: PhaseResult) => void;
 
-    constructor(hero: Hero, enemies: Enemy | Enemy[]) {
+    constructor(hero: Hero, enemies: Enemy | Enemy[], onComplete?: (result: PhaseResult) => void) {
         this.hero = hero;
         this.enemies = Array.isArray(enemies) ? enemies : [enemies];
+        this.onComplete = onComplete;
         this.enemy = this.enemies[0];
         this.phase = COMBAT_PHASES.NOT_IN_COMBAT;
         this.defeatedEnemies = [];
@@ -404,9 +406,8 @@ export class Combat {
 
         this.statusEffects.clear();
         this.phase = COMBAT_PHASES.COMPLETE;
-
         const allDefeated = this.enemies.length === 0;
-        return {
+        const result: PhaseResult = {
             victory: allDefeated,
             defeatedEnemies: this.defeatedEnemies,
             remainingEnemies: this.enemies,
@@ -415,6 +416,12 @@ export class Combat {
             poisonWounds: endResult.wounds,
             message: allDefeated ? t('game.victory') : t('combat.combatEnded')
         };
+
+        if (this.onComplete) {
+            this.onComplete(result);
+        }
+
+        return result;
     }
 
     getPredictedOutcome(currentAttack = 0, currentBlock = 0): any {

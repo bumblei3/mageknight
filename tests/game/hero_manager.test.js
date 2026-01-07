@@ -37,15 +37,15 @@ describe('HeroManager', () => {
 
             // Check that decks have different lengths or different cards
             // Norowas has unique influence cards
-            const norowasUniqueCards = norowasDeck.filter(c => c.id === 'inf_2' || c.id === 'unit_1');
+            const norowasUniqueCards = norowasDeck.filter(id => id === 'inf_2' || id === 'unit_1');
             expect(norowasUniqueCards.length).toBeGreaterThan(0);
 
             // Arythea has unique chaos cards
-            const arytheaUniqueCards = arytheaDeck.filter(c => c.id === 'atk_cha' || c.id === 'chaos_1');
+            const arytheaUniqueCards = arytheaDeck.filter(id => id === 'atk_cha' || id === 'chaos_1');
             expect(arytheaUniqueCards.length).toBeGreaterThan(0);
 
             // Tovak has unique tactical cards
-            const tovakUniqueCards = tovakDeck.filter(c => c.id === 'blk_tac' || c.id === 'tac_1');
+            const tovakUniqueCards = tovakDeck.filter(id => id === 'blk_tac' || id === 'tac_1');
             expect(tovakUniqueCards.length).toBeGreaterThan(0);
         });
 

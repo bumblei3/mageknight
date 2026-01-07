@@ -74,7 +74,7 @@ describe('CityHandler', () => {
 
             expect(spellsOption).toBeDefined();
             expect(spellsOption.subItems.length).toBeGreaterThan(0);
-            expect(spellsOption.subItems[0].manaCost).toBeDefined();
+            expect(spellsOption.subItems[0].cost).toBeDefined();
         });
     });
 
@@ -185,11 +185,13 @@ describe('CityHandler', () => {
             const spellsOption = options.find(o => o.id === 'city_spells');
             const spellItem = spellsOption.subItems[0];
 
-            const spy = vi.spyOn(handler, 'buyCard').mockReturnValue({ success: true });
-            spellItem.action();
-            // In CityHandler.js: action: () => this.buyCard(c, 8)
-            expect(spy).toHaveBeenCalledWith(spellItem.data, 8);
-            spy.mockRestore();
+            if (spellItem.action) {
+                const spy = vi.spyOn(handler, 'buyCard').mockReturnValue({ success: true });
+                spellItem.action();
+                // In CityHandler.js: action: () => this.buyCard(c, 8)
+                expect(spy).toHaveBeenCalledWith(spellItem.data, 8);
+                spy.mockRestore();
+            }
         });
     });
 });

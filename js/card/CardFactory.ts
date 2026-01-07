@@ -1,7 +1,8 @@
 /**
  * CardFactory - Card creation functions and Card class
  */
-import { CARD_TYPES } from './CardDefinitions.js';
+import { CARD_TYPES } from '../constants';
+import { CARD_DEFINITIONS } from './CardDefinitions';
 
 export interface CardEffect {
     type?: string;
@@ -74,13 +75,31 @@ export class Card {
 }
 
 // Create a deck from card definitions
-export function createDeck(cardDefinitions: Partial<CardData>[]): Card[] {
-    return cardDefinitions.map((def, index) => new Card({
-        ...def,
-        id: def.id || `card_${index}`,
-        name: def.name || 'Unknown',
-        color: def.color ?? null
-    }));
+// Create a deck from card definitions
+
+// ... (Card Class above stays same)
+
+// Create a deck from card definitions or IDs
+export function createDeck(cardDefinitions: (Partial<CardData> | string)[]): Card[] {
+    return cardDefinitions.map((def, index) => {
+        let data: Partial<CardData>;
+        if (typeof def === 'string') {
+            data = CARD_DEFINITIONS[def];
+            if (!data) {
+                console.warn(`Card definition not found for ID: ${def}`);
+                data = { id: def, name: 'Unknown Card' };
+            }
+        } else {
+            data = def;
+        }
+
+        return new Card({
+            ...data,
+            id: data.id || `card_${index}`,
+            name: data.name || 'Unknown',
+            color: data.color ?? null
+        });
+    });
 }
 
 // Shuffle a deck (Fisher-Yates)

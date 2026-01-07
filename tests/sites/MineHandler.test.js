@@ -58,6 +58,8 @@ describe('MineHandler', () => {
             const site = { conquered: true };
             const options = handler.getOptions(site, { q: 0, r: 0 });
 
+            // In new system, crystals cost 1 movement
+            // If movementPoints < 1, enabled should be false
             expect(options[0].enabled).toBe(false);
         });
 

@@ -107,6 +107,9 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
 
             // Mock hexgrid behavior for revealed hex
             game.hexGrid.getHex = () => ({ revealed: true, terrain: 'plains' });
+            if (!game.hexGrid.pixelToAxial) {
+                game.hexGrid.pixelToAxial = () => ({ q: 0, r: 0 });
+            }
 
             game.interactionController.handleCanvasMouseMove(mockEvent);
             // Should not throw
@@ -234,14 +237,14 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             game.inputController.setup();
 
             statsBtn.click();
-            expect(statsModal.style.display).toBe('block');
+            expect(statsModal.classList.contains('active')).toBe(true);
 
             const tabs = statsModal.querySelectorAll('.tab-btn');
             tabs[1].click(); // Switch to sessions
             expect(tabs[1].classList.contains('active')).toBe(true);
 
             closeBtn.click();
-            expect(statsModal.style.display).toBe('none');
+            expect(statsModal.classList.contains('active')).toBe(false);
         });
 
         it('should handle outside clicks to close modals', () => {
@@ -249,7 +252,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
 
             const modal = document.createElement('div');
             modal.id = 'achievements-modal';
-            modal.style.display = 'block';
+            modal.classList.add('active');
             document.body.appendChild(modal);
 
             // Re-run setup to bind window click listener
@@ -259,7 +262,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             const event = { type: 'click', target: modal };
             window.dispatchEvent(event);
 
-            expect(modal.style.display).toBe('none');
+            expect(modal.classList.contains('active')).toBe(false);
         });
 
         it('should cover achievements modal tabs', () => {
@@ -311,7 +314,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             const targetBtn = document.getElementById('achievements-btn');
 
             targetBtn.click();
-            expect(modal.style.display).toBe('block');
+            expect(modal.classList.contains('active')).toBe(true);
 
             const tabs = modal.querySelectorAll('.tab-btn');
             tabs[1].click(); // combat category
@@ -395,6 +398,9 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
                     getInfo: () => 'A deep dungeon'
                 }
             });
+            if (!game.hexGrid.pixelToAxial) {
+                game.hexGrid.pixelToAxial = () => ({ q: 0, r: 0 });
+            }
 
             game.interactionController.handleCanvasMouseMove(mockEvent);
             // Verify tooltip. We'd check UI state if we could access the private tooltip element,
@@ -438,7 +444,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
 
             const modal = document.createElement('div');
             modal.id = 'achievements-modal';
-            modal.style.display = 'block';
+            modal.classList.add('active');
             const closeBtn = document.createElement('button');
             closeBtn.id = 'achievements-close';
             document.body.appendChild(modal);
@@ -464,7 +470,7 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
             // Test Achievements Close
             const targetClose = document.getElementById('achievements-close');
             targetClose.click();
-            expect(modal.style.display).toBe('none');
+            expect(modal.classList.contains('active')).toBe(false);
         });
 
         it('should create sound button if missing', () => {

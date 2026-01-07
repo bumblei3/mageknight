@@ -24,16 +24,8 @@ describe('Hero Skills', () => {
             const mockCanvas = { getContext: () => ({}) };
             const hexGrid = new HexGrid(mockCanvas);
 
-            // Stub getHex to return expensive terrain
-            hexGrid.getHex = () => ({ terrain: 'bogs', revealed: true });
-            // Stub terrainSystem if used, or just rely on default logic?
-            // Existing logic fallback: 2 or 3. 
-            // If I just call getMovementCost(..., hasFlight=true) it should return 1.
-
-            const costNormal = hexGrid.getMovementCost(0, 0, false, false);
-            // Default cost for unknown terrain is 2 (fallback in line 229)
-            // Wait, 'bogs' isn't in default list. 'mountains' is 5.
-            hexGrid.getHex = () => ({ terrain: 'mountains', revealed: true });
+            // Stub logic.getHex to return expensive terrain (logic layer is used by getMovementCost)
+            hexGrid.logic.getHex = () => ({ terrain: 'mountains', revealed: true });
 
             const mountainCost = hexGrid.getMovementCost(0, 0, false, false);
             expect(mountainCost).toBe(5);

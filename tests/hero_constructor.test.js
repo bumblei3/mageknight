@@ -82,7 +82,7 @@ describe('Hero Constructor Compatibility', () => {
             const config = HeroManager.getHero('goldyx');
             const hero = new Hero(config);
             // Goldyx has more attack cards
-            const attackCards = hero.deck.filter(c => c.basicEffect?.attack);
+            const attackCards = hero.deck.filter(c => c.basicEffect?.type === 'attack');
             expect(attackCards.length).toBeGreaterThan(0);
         });
 
@@ -90,7 +90,7 @@ describe('Hero Constructor Compatibility', () => {
             const config = HeroManager.getHero('norowas');
             const hero = new Hero(config);
             // Norowas has more influence cards
-            const influenceCards = hero.deck.filter(c => c.basicEffect?.influence);
+            const influenceCards = hero.deck.filter(c => c.basicEffect?.type === 'influence');
             expect(influenceCards.length).toBeGreaterThan(0);
         });
 
@@ -98,7 +98,7 @@ describe('Hero Constructor Compatibility', () => {
             const config = HeroManager.getHero('tovak');
             const hero = new Hero(config);
             // Tovak has more block cards
-            const blockCards = hero.deck.filter(c => c.basicEffect?.block);
+            const blockCards = hero.deck.filter(c => c.basicEffect?.type === 'block');
             expect(blockCards.length).toBeGreaterThan(0);
         });
     });

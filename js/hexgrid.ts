@@ -23,9 +23,25 @@ export class HexGrid {
         this.logic.setTerrainSystem(terrainSystem);
     }
 
+    get hexSize() { return this.logic.hexSize; }
+
     // Proxy methods to Logic
     axialToPixelOffset(q: number, r: number) { return this.logic.axialToPixelOffset(q, r); }
     pixelOffsetToAxial(x: number, y: number) { return this.logic.pixelOffsetToAxial(x, y); }
+
+    // pixelToAxial uses renderer if available (center-relative), otherwise fallback
+    pixelToAxial(x: number, y: number) {
+        if (this.renderer) {
+            return this.renderer.pixelToAxial(x, y);
+        }
+        // Fallback: assume canvas center is hex (0,0)
+        const centerX = this.canvas?.width ? this.canvas.width / 2 : 400;
+        const centerY = this.canvas?.height ? this.canvas.height / 2 : 300;
+        return this.logic.pixelOffsetToAxial(x - centerX, y - centerY);
+    }
+
+    roundAxial(q: number, r: number) { return this.logic.roundAxial(q, r); }
+
     // Note: Renderer uses center-relative pixel coords, logic uses offset.
     // We expose renderer's helper if available for world coords?
     axialToPixel(q: number, r: number) {

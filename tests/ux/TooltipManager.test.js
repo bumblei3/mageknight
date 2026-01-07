@@ -21,6 +21,8 @@ describe('TooltipManager', () => {
         document.body.innerHTML = '';
         tooltipManager = new TooltipManager();
         vi.useFakeTimers();
+        // Mock requestAnimationFrame to integrate with fake timers
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => setTimeout(cb, 0));
     });
 
     afterEach(() => {
@@ -115,8 +117,8 @@ describe('TooltipManager', () => {
             expect(tooltip.innerHTML).toContain('Test Content');
             expect(tooltip.style.display).toBe('block');
 
-            // Fast forward for fade in
-            vi.advanceTimersByTime(10);
+            // Fast forward for fade in (flushes nested requestAnimationFrame mocks)
+            vi.runAllTimers();
             expect(tooltip.style.opacity).toBe('1');
         });
 

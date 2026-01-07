@@ -382,7 +382,7 @@ describe('StatsRenderer', () => {
             statsRenderer.updateHeroStats(hero);
             const img = mockElements.heroAvatar.querySelector('img');
             expect(img).not.toBeNull();
-            expect(img.src).toContain('assets/heroes/goldyx_portrait.webp');
+            expect(img.src).toContain('assets/heroes/goldyx_portrait_thumb.webp');
             expect(img.alt).toBe('Goldyx');
         });
     });

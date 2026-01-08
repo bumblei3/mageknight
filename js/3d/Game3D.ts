@@ -17,6 +17,13 @@ export class Game3D {
     private animationId: number | null = null;
 
     private hexMeshes: Map<string, THREE.Mesh> = new Map();
+    private clock: THREE.Clock = new THREE.Clock();
+    private waterMaterials: THREE.ShaderMaterial[] = [];
+
+    // Hero Animation
+    private heroMesh: THREE.Group | null = null;
+    private heroTargetPosition: THREE.Vector3 | null = null;
+    private heroAnimating: boolean = false;
 
     // Interaction
     private raycaster: THREE.Raycaster;
@@ -54,6 +61,7 @@ export class Game3D {
         this.renderer.setSize(width, height);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
         this.container.appendChild(this.renderer.domElement);
 
         // Interaction Listeners
@@ -83,9 +91,7 @@ export class Game3D {
         // 8. Event Listeners
         const onHeroMove = (data: any) => {
             if (this.enabled) {
-                // Wait for move animation to potentially finish or just render immediately
-                this.renderMap();
-                this.centerCameraOnHero();
+                this.animateHeroToPosition(data.to);
             }
         };
 
@@ -148,9 +154,12 @@ export class Game3D {
             const { q, r } = userData;
             console.log(`3D Click on Hex: q=${q}, r=${r}`);
 
-            // Delegate to InteractionController
+            // Delegate to existing game methods
             if (this.game.interactionController) {
-                this.game.interactionController.handleHexClick(q, r);
+                this.game.interactionController.selectHex(q, r);
+            }
+            if (this.game.movementMode) {
+                this.game.moveHero(q, r);
             }
         }
     }
@@ -262,16 +271,10 @@ export class Game3D {
             geometry = new THREE.SphereGeometry(baseSize, 8, 8, 0, Math.PI * 2, 0, Math.PI / 2);
             yOffset = 0;
         } else if (hex.terrain === 'water') {
-            // Flat and slightly lower
+            // Animated Water using ShaderMaterial
             geometry = new THREE.CylinderGeometry(baseSize, baseSize, 0.1, 6);
             yOffset = -0.05;
-            material = new THREE.MeshStandardMaterial({
-                color: color,
-                roughness: 0.1,
-                metalness: 0.8,
-                transparent: true,
-                opacity: 0.8
-            });
+            material = this.createWaterMaterial();
         } else {
             // Standard flat hex
             geometry = new THREE.CylinderGeometry(baseSize, baseSize, 0.2, 6);
@@ -293,7 +296,227 @@ export class Game3D {
             this.addTreesToGroup(group, baseSize, scale);
         }
 
+        // Add Site Mesh if present
+        if (hex.site) {
+            this.addSiteMesh(group, hex.site, baseSize, scale);
+        }
+
         return group;
+    }
+
+    createWaterMaterial(): THREE.ShaderMaterial {
+        const waterMat = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uColor: { value: new THREE.Color(0x3498db) }
+            },
+            vertexShader: `
+                uniform float uTime;
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    vec3 pos = position;
+                    pos.y += sin(pos.x * 10.0 + uTime * 2.0) * 0.02;
+                    pos.y += cos(pos.z * 10.0 + uTime * 1.5) * 0.02;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 uColor;
+                varying vec2 vUv;
+                void main() {
+                    float alpha = 0.7 + sin(vUv.x * 20.0) * 0.1;
+                    gl_FragColor = vec4(uColor, alpha);
+                }
+            `,
+            transparent: true
+        });
+        this.waterMaterials.push(waterMat);
+        return waterMat;
+    }
+
+    addSiteMesh(group: THREE.Group, site: any, baseSize: number, scale: number): void {
+        const siteType = site.type || site.getName?.().toLowerCase() || 'unknown';
+        const s = scale * 20; // Normalized scale
+
+        let siteMesh: THREE.Group | THREE.Mesh;
+
+        switch (siteType) {
+            case 'village':
+            case 'dorf':
+                siteMesh = this.createVillageMesh(s);
+                break;
+            case 'monastery':
+            case 'kloster':
+                siteMesh = this.createMonasteryMesh(s);
+                break;
+            case 'magetower':
+            case 'magierturm':
+                siteMesh = this.createMageTowerMesh(s);
+                break;
+            case 'keep':
+            case 'festung':
+                siteMesh = this.createKeepMesh(s);
+                break;
+            case 'mine':
+                siteMesh = this.createMineMesh(s);
+                break;
+            case 'portal':
+                siteMesh = this.createPortalMesh(s);
+                break;
+            default:
+                // Generic marker
+                const markerGeo = new THREE.BoxGeometry(0.2 * s, 0.5 * s, 0.2 * s);
+                const markerMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                siteMesh = new THREE.Mesh(markerGeo, markerMat);
+                siteMesh.position.y = 0.25 * s;
+        }
+
+        group.add(siteMesh);
+    }
+
+    createVillageMesh(s: number): THREE.Group {
+        const village = new THREE.Group();
+        const hutMat = new THREE.MeshStandardMaterial({ color: 0xd2b48c }); // Tan
+        const roofMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 }); // Brown
+
+        for (let i = 0; i < 3; i++) {
+            const angle = (i / 3) * Math.PI * 2;
+            const x = Math.cos(angle) * 0.2 * s;
+            const z = Math.sin(angle) * 0.2 * s;
+
+            const hut = new THREE.Mesh(new THREE.BoxGeometry(0.15 * s, 0.15 * s, 0.15 * s), hutMat);
+            hut.position.set(x, 0.075 * s, z);
+            hut.castShadow = true;
+
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(0.12 * s, 0.1 * s, 4), roofMat);
+            roof.position.set(x, 0.2 * s, z);
+            roof.castShadow = true;
+
+            village.add(hut);
+            village.add(roof);
+        }
+        return village;
+    }
+
+    createMonasteryMesh(s: number): THREE.Group {
+        const monastery = new THREE.Group();
+        const stoneMat = new THREE.MeshStandardMaterial({ color: 0xe8e8e8 });
+
+        // Main building
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.3 * s, 0.25 * s, 0.2 * s), stoneMat);
+        body.position.y = 0.125 * s;
+        body.castShadow = true;
+        monastery.add(body);
+
+        // Spire
+        const spire = new THREE.Mesh(new THREE.ConeGeometry(0.08 * s, 0.4 * s, 8), stoneMat);
+        spire.position.y = 0.45 * s;
+        spire.castShadow = true;
+        monastery.add(spire);
+
+        return monastery;
+    }
+
+    createMageTowerMesh(s: number): THREE.Group {
+        const tower = new THREE.Group();
+        const towerMat = new THREE.MeshStandardMaterial({ color: 0x4a0080, emissive: 0x1a0030 }); // Purple with glow
+
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.1 * s, 0.15 * s, 0.5 * s, 8), towerMat);
+        body.position.y = 0.25 * s;
+        body.castShadow = true;
+        tower.add(body);
+
+        const top = new THREE.Mesh(new THREE.SphereGeometry(0.08 * s, 16, 16), new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00aaaa }));
+        top.position.y = 0.55 * s;
+        tower.add(top);
+
+        return tower;
+    }
+
+    createKeepMesh(s: number): THREE.Group {
+        const keep = new THREE.Group();
+        const stoneMat = new THREE.MeshStandardMaterial({ color: 0x696969 });
+
+        // Main structure
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.35 * s, 0.3 * s, 0.35 * s), stoneMat);
+        body.position.y = 0.15 * s;
+        body.castShadow = true;
+        keep.add(body);
+
+        // Corner towers
+        const towerGeo = new THREE.CylinderGeometry(0.06 * s, 0.06 * s, 0.4 * s, 8);
+        const corners = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+        corners.forEach(([dx, dz]) => {
+            const t = new THREE.Mesh(towerGeo, stoneMat);
+            t.position.set(dx * 0.15 * s, 0.2 * s, dz * 0.15 * s);
+            t.castShadow = true;
+            keep.add(t);
+        });
+
+        return keep;
+    }
+
+    createMineMesh(s: number): THREE.Group {
+        const mine = new THREE.Group();
+        const woodMat = new THREE.MeshStandardMaterial({ color: 0x5d4037 });
+        const darkMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
+
+        // Entrance
+        const entrance = new THREE.Mesh(new THREE.BoxGeometry(0.2 * s, 0.15 * s, 0.1 * s), darkMat);
+        entrance.position.set(0, 0.075 * s, 0);
+        mine.add(entrance);
+
+        // Support beams
+        const beamGeo = new THREE.CylinderGeometry(0.02 * s, 0.02 * s, 0.25 * s, 4);
+        const beam1 = new THREE.Mesh(beamGeo, woodMat);
+        beam1.position.set(-0.1 * s, 0.125 * s, 0.05 * s);
+        beam1.castShadow = true;
+        mine.add(beam1);
+
+        const beam2 = new THREE.Mesh(beamGeo, woodMat);
+        beam2.position.set(0.1 * s, 0.125 * s, 0.05 * s);
+        beam2.castShadow = true;
+        mine.add(beam2);
+
+        return mine;
+    }
+
+    createPortalMesh(s: number): THREE.Group {
+        const portal = new THREE.Group();
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+        const glowMat = new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x00ff88, emissiveIntensity: 2 });
+
+        // Arch frame
+        const arch = new THREE.Mesh(new THREE.TorusGeometry(0.2 * s, 0.03 * s, 8, 16, Math.PI), frameMat);
+        arch.rotation.x = Math.PI / 2;
+        arch.position.y = 0.2 * s;
+        arch.castShadow = true;
+        portal.add(arch);
+
+        // Glowing center
+        const glow = new THREE.Mesh(new THREE.CircleGeometry(0.15 * s, 16), glowMat);
+        glow.rotation.x = -Math.PI / 2;
+        glow.position.y = 0.1 * s;
+        portal.add(glow);
+
+        return portal;
+    }
+
+    animateHeroToPosition(to: { q: number, r: number }): void {
+        if (!this.heroMesh || !this.game.hexGrid) {
+            // Fallback: just re-render if hero mesh not available
+            this.renderMap();
+            this.centerCameraOnHero();
+            return;
+        }
+
+        const grid = this.game.hexGrid;
+        const pixel = grid.axialToPixelOffset(to.q, to.r);
+        const scale = 0.02;
+
+        this.heroTargetPosition = new THREE.Vector3(pixel.x * scale, 0, pixel.y * scale);
+        this.heroAnimating = true;
     }
 
     addTreesToGroup(group: THREE.Group, baseSize: number, scale: number): void {
@@ -371,6 +594,7 @@ export class Game3D {
 
         group.position.set(pixel.x * scale, 0, pixel.y * scale);
 
+        this.heroMesh = group;
         this.scene.add(group);
     }
 
@@ -504,6 +728,24 @@ export class Game3D {
         if (!this.enabled) return;
 
         this.animationId = requestAnimationFrame(this.animate.bind(this));
+
+        const delta = this.clock.getDelta();
+        const elapsed = this.clock.getElapsedTime();
+
+        // Update water shader uniforms
+        this.waterMaterials.forEach(mat => {
+            mat.uniforms.uTime.value = elapsed;
+        });
+
+        // Animate hero movement
+        if (this.heroAnimating && this.heroMesh && this.heroTargetPosition) {
+            this.heroMesh.position.lerp(this.heroTargetPosition, 0.1);
+            if (this.heroMesh.position.distanceTo(this.heroTargetPosition) < 0.01) {
+                this.heroMesh.position.copy(this.heroTargetPosition);
+                this.heroAnimating = false;
+                this.centerCameraOnHero();
+            }
+        }
 
         if (this.controls) this.controls.update();
 

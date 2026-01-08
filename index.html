@@ -131,8 +131,16 @@
         }
     </style>
 
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./js/vendor/three.module.js",
+                "three/addons/": "./js/vendor/"
+            }
+        }
+    </script>
     <!-- Import Main Styles (Vite will bundle these) -->
-    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/main.ts"></script>
 
     <noscript>
         <link rel="stylesheet" href="css/reset.css">
@@ -153,14 +161,6 @@
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#a855f7">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "./js/vendor/three.module.js",
-                "three/addons/": "./js/vendor/"
-            }
-        }
-    </script>
 </head>
 
 <body>
@@ -1025,7 +1025,6 @@
         </div>
     </div>
 
-    <script type="module" src="js/main.ts"></script>
 </body>
 
 </html>

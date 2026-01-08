@@ -3,6 +3,27 @@ import { MageKnightGame } from './game';
 import i18n from './i18n/index';
 import { ErrorHandler } from './errorHandler';
 
+/**
+ * Handles dynamic import errors (common after new deployments due to hash mismatch)
+ */
+const handleImportError = (error: any) => {
+    console.error('Dynamic import failed:', error);
+    // If it's a fetch error for a chunk, it might be due to a new deployment
+    if (error.message?.includes('Failed to fetch dynamically imported module') ||
+        error.message?.includes('chunk')) {
+        const lastReload = localStorage.getItem('mk_last_import_reload');
+        const now = Date.now();
+        // Only auto-reload once every 30 seconds to avoid loops
+        if (!lastReload || now - parseInt(lastReload) > 30000) {
+            localStorage.setItem('mk_last_import_reload', now.toString());
+            console.warn('Chunk mismatch detected, reloading page...');
+            window.location.reload();
+            return;
+        }
+    }
+    throw error;
+};
+
 // Import all CSS for Vite bundling
 import '../css/reset.css';
 import '../css/layout.css';
@@ -94,8 +115,8 @@ const startMageKnight = async (): Promise<void> => {
                         toggle3DBtn.classList.add('loading');
 
                         // Dynamic import - only loads Three.js when needed
-                        // @ts-ignore - dynamic import of JS module or TS module
-                        const { Game3D } = await import('./3d/Game3D');
+                        // @ts-ignore
+                        const { Game3D } = await import('./3d/Game3D').catch(handleImportError);
 
                         // Double-check in case another click got through (unlikely with flag but safe)
                         if (!(window as any).game3D) {

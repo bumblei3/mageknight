@@ -14,6 +14,25 @@ import { eventBus } from './eventBus';
 import { GAME_EVENTS } from './constants';
 import ParticleSystem from './particles';
 
+/**
+ * Handles dynamic import errors (common after new deployments due to hash mismatch)
+ */
+const handleImportError = (error: any) => {
+    console.error('Dynamic import failed:', error);
+    if (error.message?.includes('Failed to fetch dynamically imported module') ||
+        error.message?.includes('chunk')) {
+        const lastReload = localStorage.getItem('mk_last_import_reload');
+        const now = Date.now();
+        if (!lastReload || now - parseInt(lastReload) > 30000) {
+            localStorage.setItem('mk_last_import_reload', now.toString());
+            console.warn('Chunk mismatch detected, reloading page...');
+            window.location.reload();
+            return;
+        }
+    }
+    throw error;
+};
+
 export interface UIElements {
     fameValue: HTMLElement | null;
     reputationValue: HTMLElement | null;
@@ -112,7 +131,7 @@ export class UI {
             import('./ui/FloatingTextManager').then(({ FloatingTextManager }) => {
                 this.floatingText = new FloatingTextManager(gameBoard as HTMLElement);
                 this.setupFloatingTextListeners();
-            }).catch(err => console.error('Failed to load FloatingTextManager', err));
+            }).catch(handleImportError);
         }
 
         this.setupEventListeners();
@@ -442,7 +461,7 @@ export class UI {
 
     public async showSettings(): Promise<void> {
         if (!this.settingsModal) {
-            const { SettingsModal } = await import('./ui/SettingsModal');
+            const { SettingsModal } = await import('./ui/SettingsModal').catch(handleImportError) as any;
             this.settingsModal = new SettingsModal(this);
             this.settingsModal.applySettings(this.settingsModal.settings);
         }
@@ -451,7 +470,7 @@ export class UI {
 
     public async showShortcuts(): Promise<void> {
         if (!this.shortcutsModal) {
-            const { ShortcutsModal } = await import('./ui/ShortcutsModal');
+            const { ShortcutsModal } = await import('./ui/ShortcutsModal').catch(handleImportError) as any;
             this.shortcutsModal = new ShortcutsModal(this);
         }
         this.shortcutsModal.show();
@@ -459,7 +478,7 @@ export class UI {
 
     public async showSaveLoad(type: 'save' | 'load'): Promise<string | number | null> {
         if (!this.saveLoadModal) {
-            const { SaveLoadModal } = await import('./ui/SaveLoadModal');
+            const { SaveLoadModal } = await import('./ui/SaveLoadModal').catch(handleImportError) as any;
             this.saveLoadModal = new SaveLoadModal(this);
         }
         return await this.saveLoadModal.show(type);
@@ -467,7 +486,7 @@ export class UI {
 
     public async showScenarioSelection(): Promise<void> {
         if (!this.scenarioSelectionModal) {
-            const { ScenarioSelectionModal } = await import('./ui/ScenarioSelectionModal');
+            const { ScenarioSelectionModal } = await import('./ui/ScenarioSelectionModal').catch(handleImportError) as any;
             this.scenarioSelectionModal = new ScenarioSelectionModal(this);
         }
         this.scenarioSelectionModal.show();
@@ -475,7 +494,7 @@ export class UI {
 
     public async showHeroSelection(scenarioId: string): Promise<void> {
         if (!this.heroSelectionModal) {
-            const { HeroSelectionModal } = await import('./ui/HeroSelectionModal');
+            const { HeroSelectionModal } = await import('./ui/HeroSelectionModal').catch(handleImportError) as any;
             this.heroSelectionModal = new HeroSelectionModal(this);
         }
         this.heroSelectionModal.show(scenarioId);

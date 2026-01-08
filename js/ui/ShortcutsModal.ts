@@ -19,6 +19,11 @@ export class ShortcutsModal {
     }
 
     private createModal(): void {
+        const existingModal = document.getElementById('shortcuts-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
         this.modal = document.createElement('div');
         this.modal.id = 'shortcuts-modal';
         this.modal.className = 'modal';

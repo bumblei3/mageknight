@@ -15,6 +15,12 @@ export class TooltipManager {
     }
 
     private createTooltipElement(): void {
+        // Remove existing tooltip to prevent duplicates
+        const existingTooltip = document.querySelector('.game-tooltip');
+        if (existingTooltip) {
+            existingTooltip.remove();
+        }
+
         // Create tooltip container
         this.tooltip = document.createElement('div');
         this.tooltip.className = 'game-tooltip';

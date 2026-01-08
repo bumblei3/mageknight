@@ -20,6 +20,16 @@ export class DebugManager {
             return;
         }
 
+        // Cleanup existing elements to prevent duplicates
+        const existingPanel = document.getElementById('debug-panel');
+        if (existingPanel) existingPanel.remove();
+
+        const existingToggle = document.querySelector('.debug-toggle');
+        if (existingToggle) existingToggle.remove();
+
+        const existingOverlay = document.getElementById('perf-overlay');
+        if (existingOverlay) existingOverlay.remove();
+
         // Create Panel
         this.panel = document.createElement('div');
         this.panel.id = 'debug-panel';

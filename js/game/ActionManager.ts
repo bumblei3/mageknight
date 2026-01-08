@@ -286,7 +286,7 @@ export class ActionManager {
     explore(): void {
         if (this.game.gameState !== 'playing' || this.game.combat) return;
 
-        const cost = this.game.timeManager.isDay() ? 2 : 3;
+        const cost = 2; // Fixed cost of 2 Regardless of time (Rule alignment)
         if (this.game.hero.movementPoints < cost) {
             this.game.showToast('Nicht genug Bewegungspunkte zum Erkunden!', 'warning');
             return;

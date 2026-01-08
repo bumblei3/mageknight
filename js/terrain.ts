@@ -21,7 +21,7 @@ export class Terrain {
 
         // Flight skill: all terrain costs 2
         if (hero && typeof hero.hasSkill === 'function' && hero.hasSkill('flight')) {
-            cost = Math.min(cost, 2);
+            cost = 2;
         }
 
         // Forward March skill: movement costs -1 (min 1)

@@ -120,12 +120,15 @@ export class HexGridLogic {
     // ========== Pathfinding ==========
 
     getMovementCost(q: number, r: number, isNight: boolean = false, hasFlight: boolean = false): number {
-        if (hasFlight) return 1;
+        if (hasFlight) return 2;
 
         const hex = this.getHex(q, r);
         if (!hex) return 999;
 
         if (this.terrainSystem && hex.terrain) {
+            // City override: Movement cost is always 2 regardless of terrain
+            if (hex.site && hex.site.type === 'city') return 2;
+
             return this.terrainSystem.getMovementCost(hex.terrain, isNight);
         }
 

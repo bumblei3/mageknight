@@ -97,6 +97,13 @@ export class WorldEventManager {
         }
     }
 
+    /**
+     * Returns a random event without terrain specificity.
+     */
+    getRandomEvent(): any {
+        return this.generateEvent('plains');
+    }
+
     // Called by MapManager potentially
     onTileRevealed(q: number, r: number, tileData: any) {
         // Logic for spawning enemies or sites on reveal

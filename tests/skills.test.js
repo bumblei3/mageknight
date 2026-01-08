@@ -19,7 +19,7 @@ describe('Hero Skills', () => {
     });
 
     describe('Flight Skill (HexGrid Interaction)', () => {
-        it('should reduce movement cost to 1 for any terrain', () => {
+        it('should reduce movement cost to 2 for any terrain', () => {
             // Setup minimal HexGrid with terrain system
             const mockCanvas = { getContext: () => ({}) };
             const hexGrid = new HexGrid(mockCanvas);
@@ -31,7 +31,7 @@ describe('Hero Skills', () => {
             expect(mountainCost).toBe(5);
 
             const flightCost = hexGrid.getMovementCost(0, 0, false, true);
-            expect(flightCost).toBe(1);
+            expect(flightCost).toBe(2);
         });
     });
 

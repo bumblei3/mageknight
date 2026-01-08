@@ -475,25 +475,7 @@
     animation-delay: 0.4s;
 }
 
-@keyframes sidebarSlide {
-    from {
-        opacity: 0;
-        transform: translateX(var(--slide-dir, -20px));
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.hud-sidebar.sidebar-left {
-    --slide-dir: -30px;
-}
-
-.hud-sidebar.sidebar-right {
-    --slide-dir: 30px;
-}
+/* Note: sidebarSlide keyframes defined above at line 63 */
 
 .toast {
     background: var(--glass-bg);

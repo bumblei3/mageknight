@@ -3,7 +3,7 @@
  * Cache-first strategy for static assets, network-first for dynamic content
  */
 
-const CACHE_NAME = 'mageknight-v16';
+const CACHE_NAME = 'mageknight-v17';
 const STATIC_ASSETS = [
     './',
     './index.html',
@@ -20,8 +20,8 @@ const STATIC_ASSETS = [
     './styles-events.css',
     './combat-effects.css',
     './time-effects.css',
-    './mobile.css',
-    './js/main.js'
+    './mobile.css'
+    // Note: main.ts is served via Vite, not cached by SW
 ];
 
 // Install event - cache static assets

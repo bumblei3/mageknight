@@ -70,7 +70,7 @@ const startMageKnight = async (): Promise<void> => {
 
                         // Dynamic import - only loads Three.js when needed
                         // @ts-ignore - dynamic import of JS module or TS module
-                        const { Game3D } = await import('./3d/Game3D.js');
+                        const { Game3D } = await import('./3d/Game3D');
                         (window as any).game3D = new Game3D((window as any).game);
                         (window as any).game3D.init('game-container-3d');
 

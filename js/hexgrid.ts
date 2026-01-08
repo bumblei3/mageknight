@@ -48,6 +48,10 @@ export class HexGrid {
         return this.renderer ? this.renderer.axialToPixel(q, r) : this.logic.axialToPixelOffset(q, r); // Fallback to offset if no renderer?
     }
 
+    getScreenPos(q: number, r: number) {
+        return this.axialToPixel(q, r);
+    }
+
     getHexKey(q: number, r: number) { return this.logic.getHexKey(q, r); }
     getNeighbors(q: number, r: number) { return this.logic.getNeighbors(q, r); }
     distance(q1: number, r1: number, q2: number, r2: number) { return this.logic.distance(q1, r1, q2, r2); }
@@ -74,6 +78,10 @@ export class HexGrid {
 
     getState() { return this.logic.getState(); }
     loadState(state: any) { this.logic.loadState(state); }
+
+    exploreAdjacent(pos: HexUtils.HexCoord) {
+        return this.logic.exploreAdjacent(pos);
+    }
 
     selectHex(q: number, r: number) {
         if (this.renderer) this.renderer.selectHex(q, r);

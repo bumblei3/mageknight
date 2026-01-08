@@ -190,6 +190,24 @@ export class HexGridLogic {
         }
     }
 
+    /**
+     * Reveals all EXISTING adjacent hexes that are currently hidden.
+     */
+    exploreAdjacent(pos: HexUtils.HexCoord): HexUtils.HexCoord[] {
+        const neighbors = this.getNeighbors(pos.q, pos.r);
+        const revealed: HexUtils.HexCoord[] = [];
+
+        neighbors.forEach(n => {
+            const hex = this.getHex(n.q, n.r);
+            if (hex && !hex.revealed) {
+                hex.revealed = true;
+                revealed.push({ q: n.q, r: n.r });
+            }
+        });
+
+        return revealed;
+    }
+
     // Helper used by InteractionController 'selectHex' logic maybe? 
     selectHex(q: number, r: number) {
         // Only visual logic usually, handled by Renderer?

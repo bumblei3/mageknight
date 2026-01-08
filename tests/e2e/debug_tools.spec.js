@@ -5,6 +5,7 @@ test.describe('Mage Knight Gameplay', () => {
     test.setTimeout(60000);
 
     test.beforeEach(async ({ page }) => {
+        page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
         const gameFlow = new GameFlow(page);
         await gameFlow.ensureGameStarted();
     });

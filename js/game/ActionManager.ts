@@ -194,7 +194,11 @@ export class ActionManager {
      * Moves the hero to a target hex
      */
     async moveHero(q: number, r: number): Promise<void> {
-        if (!this.game.movementMode || this.game.gameState !== 'playing') return;
+        logger.debug(`moveHero called for ${q},${r} | mode: ${this.game.movementMode}, state: ${this.game.gameState}`);
+        if (!this.game.movementMode || this.game.gameState !== 'playing') {
+            logger.warn(`moveHero ignored: movementMode=${this.game.movementMode}, state=${this.game.gameState}`);
+            return;
+        }
 
         const distance = this.game.hexGrid.distance(
             this.game.hero.position.q,
@@ -203,6 +207,7 @@ export class ActionManager {
         );
 
         if (distance !== 1) {
+            logger.warn(`moveHero failed: distance is ${distance}, not 1`);
             this.game.showToast('Du kannst dich nur auf angrenzende Felder bewegen!', 'warning');
             return;
         }

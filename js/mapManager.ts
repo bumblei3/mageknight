@@ -1,6 +1,7 @@
 import { HexGridLogic } from './hexgrid/HexGridLogic';
 import { Terrain, TerrainType } from './terrain';
 import { TERRAIN_TYPES } from './constants';
+import { logger } from './logger';
 
 export interface MapData {
     hexes: Array<{ q: number; r: number; terrain: TerrainType; site?: any }>;
@@ -130,5 +131,38 @@ export class MapManager {
     canExplore(q: number, r: number): boolean {
         const neighbors = this.hexGrid.getNeighbors(q, r);
         return neighbors.some(n => !this.hexGrid.hasHex(n.q, n.r));
+    }
+
+    /**
+     * Explores adjacent unknown hexes from specified position
+     */
+    explore(q: number, r: number): { success: boolean; event?: any } {
+        logger.debug(`MapManager: Exploring from ${q},${r}`);
+        if (!this.canExplore(q, r)) {
+            logger.warn('MapManager: canExplore returned false');
+            return { success: false };
+        }
+
+        const neighbors = this.hexGrid.getNeighbors(q, r);
+        const unknownNeighbors = neighbors.filter(n => !this.hexGrid.hasHex(n.q, n.r));
+
+        if (unknownNeighbors.length > 0) {
+            // Simplistic exploration: reveal all direct neighbors
+            unknownNeighbors.forEach(n => {
+                this.hexGrid.setHex(n.q, n.r, { terrain: TERRAIN_TYPES.PLAINS });
+                const hex = this.hexGrid.getHex(n.q, n.r);
+                if (hex) hex.revealed = true;
+            });
+
+            // Randomly trigger a world event if possible
+            let event = null;
+            if (this.worldEventManager && Math.random() > 0.7) {
+                event = this.worldEventManager.getRandomEvent();
+            }
+
+            return { success: true, event };
+        }
+
+        return { success: false };
     }
 }

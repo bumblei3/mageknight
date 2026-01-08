@@ -119,7 +119,7 @@ export class UI {
         // Visual effects
         const gameBoard = document.querySelector('#game-board');
         if (gameBoard) {
-            import('./ui/FloatingTextManager.js').then(({ FloatingTextManager }) => {
+            import('./ui/FloatingTextManager').then(({ FloatingTextManager }) => {
                 this.floatingText = new FloatingTextManager(gameBoard as HTMLElement);
                 this.setupFloatingTextListeners();
             }).catch(err => console.error('Failed to load FloatingTextManager', err));
@@ -394,7 +394,7 @@ export class UI {
         this.handRenderer.renderHandCards(hand, onCardClick, onCardRightClick);
     }
 
-    public createCardElement(card: any, index: number): HTMLElement {
+    public createCardElement(card: any, index: number = -1): HTMLElement {
         return this.handRenderer.createCardElement(card, index);
     }
 

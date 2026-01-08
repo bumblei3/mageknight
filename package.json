@@ -1,13 +1,15 @@
 {
     "type": "module",
     "scripts": {
+        "dev": "vite",
         "test": "npx vitest run",
         "test:watch": "npx vitest",
         "test:coverage": "npx vitest run --coverage",
         "test:e2e": "playwright test",
-        "lint": "eslint js/",
-        "lint:fix": "eslint js/ --fix",
-        "build": "node build.js"
+        "lint": "eslint \"js/**/*.{js,ts}\"",
+        "lint:fix": "eslint \"js/**/*.{js,ts}\" --fix",
+        "typecheck": "tsc --noEmit",
+        "build": "vite build"
     },
     "devDependencies": {
         "@playwright/test": "^1.57.0",
@@ -21,12 +23,13 @@
         "jsdom": "^27.4.0",
         "terser": "^5.31.1",
         "typescript": "^5.9.3",
+        "vite": "^7.3.1",
         "vitest": "^4.0.16"
     },
     "c8": {
         "all": true,
         "include": [
-            "js/**/*.js"
+            "js/**/*.{js,ts}"
         ],
         "exclude": [
             "js/three.min.js",

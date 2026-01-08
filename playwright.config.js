@@ -14,7 +14,7 @@ export default defineConfig({
     reporter: 'html',
     use: {
         actionTimeout: 0,
-        baseURL: 'http://localhost:8080',
+        baseURL: 'http://localhost:8081',
         trace: 'on-first-retry',
     },
     projects: [
@@ -24,8 +24,8 @@ export default defineConfig({
         },
     ],
     webServer: {
-        command: 'npx http-server . -p 8080',
-        port: 8080,
+        command: 'npm run dev -- --port 8081',
+        port: 8081,
         reuseExistingServer: !process.env.CI,
         stdout: 'ignore',
         stderr: 'pipe',

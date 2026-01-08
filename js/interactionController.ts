@@ -30,21 +30,28 @@ export class InteractionController {
     }
 
     handleCanvasClick(e: MouseEvent): void {
-        if (!this.cachedRect) this.updateRect();
-        const rect = this.cachedRect || this.game.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const rect = this.game.canvas.getBoundingClientRect();
+
+        // Scale coordinates to internal canvas resolution
+        const scaleX = this.game.canvas.width / rect.width;
+        const scaleY = this.game.canvas.height / rect.height;
+
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         const hex = this.game.hexGrid.pixelToAxial(x, y);
-        if (!hex) return; // Should not happen if pixelToAxial returns value always, but checking safety
+        if (!hex) {
+            logger.warn(`Could not resolve hex at screen: ${x},${y}`);
+            return;
+        }
+
+        logger.debug(`Grid clicked at screen: ${x},${y} -> grid: ${hex.q},${hex.r}`);
 
         // Check if hex exists
         if (!this.game.hexGrid.hasHex(hex.q, hex.r)) {
             logger.verbose(`Click outside grid at ${hex.q},${hex.r}`);
             return;
         }
-
-        logger.debug(`Grid clicked at ${hex.q},${hex.r}`);
 
         // Debug Teleport
         if (this.game.debugTeleport) {
@@ -57,9 +64,10 @@ export class InteractionController {
         }
 
         if (this.game.movementMode) {
-            logger.debug(`Attempting move to ${hex.q},${hex.r}`);
+            logger.info(`Attempting move to ${hex.q},${hex.r}`);
             this.game.moveHero(hex.q, hex.r);
         } else {
+            logger.debug(`Selecting hex ${hex.q},${hex.r} (not in movement mode)`);
             this.selectHex(hex.q, hex.r);
         }
     }
@@ -310,7 +318,9 @@ export class InteractionController {
     }
 
     handleCardRightClick(index: number, card: Card): void {
+        logger.debug(`handleCardRightClick called for index ${index}, card ${card.name}`);
         if (card.isWound() || this.game.combat) {
+            logger.debug(`handleCardRightClick early return: isWound=${card.isWound()}, combat=${!!this.game.combat}`);
             return;
         }
 
@@ -319,7 +329,10 @@ export class InteractionController {
         const cancelBtn = document.getElementById('sideways-cancel');
         const closeBtn = document.getElementById('sideways-close');
 
-        if (!modal || !cancelBtn || !closeBtn) return;
+        if (!modal || !cancelBtn || !closeBtn) {
+            logger.error(`Sideways modal elements missing: modal=${!!modal}, cancelBtn=${!!cancelBtn}, closeBtn=${!!closeBtn}`);
+            return;
+        }
 
         // Populate Preview (Optional visual enhancement)
         const previewContainer = document.getElementById('sideways-card-preview');

@@ -158,6 +158,13 @@ const en = {
         cardPlayed: 'Card played: {card}',
         message: 'Combat against {count} enemies!',
         combatEnded: 'Combat ended',
+        uiActions: {
+            endRanged: 'End Ranged -> Block',
+            endBlock: 'End Block -> Damage',
+            acceptDamage: 'Accept Damage (Rest on Hero)',
+            executeAttack: 'Execute Attack',
+            endCombat: 'End Combat'
+        },
         boss: {
             enraged: '{name} gets angry! Attack increased!',
             summons: '{name} summons {count} {enemy}!',

@@ -158,6 +158,13 @@ const de = {
         cardPlayed: 'Karte gespielt: {card}',
         message: 'Kampf gegen {count} Feinde!',
         combatEnded: 'Kampf beendet',
+        uiActions: {
+            endRanged: 'Fernkampf beenden -> Blocken',
+            endBlock: 'Blocken beenden -> Schaden',
+            acceptDamage: 'Schaden akzeptieren (Rest auf Held)',
+            executeAttack: 'Angriff ausführen',
+            endCombat: 'Kampf beenden'
+        },
         boss: {
             enraged: '{name} wird wütend! Angriff erhöht!',
             summons: '{name} beschwört {count} {enemy}!',

@@ -1,5 +1,6 @@
 import { COMBAT_PHASES, ACTION_TYPES } from '../constants';
 import { UIElements } from '../ui';
+import { t } from '../i18n/index';
 
 export class CombatUIManager {
     private elements: UIElements;
@@ -144,14 +145,15 @@ export class CombatUIManager {
         // Execute Attack Button logic
         const executeAttackBtn = document.getElementById('execute-attack-btn');
         if (executeAttackBtn) {
+            let text = '';
             if (phase === COMBAT_PHASES.RANGED) {
-                executeAttackBtn.textContent = 'Fernkampf beenden -> Blocken';
+                text = t('combat.uiActions.endRanged');
                 executeAttackBtn.style.display = 'block';
             } else if (phase === COMBAT_PHASES.BLOCK) {
-                executeAttackBtn.textContent = 'Blocken beenden -> Schaden';
+                text = t('combat.uiActions.endBlock');
                 executeAttackBtn.style.display = 'block';
             } else if (phase === COMBAT_PHASES.DAMAGE) {
-                executeAttackBtn.textContent = 'Schaden akzeptieren (Rest auf Held)';
+                text = t('combat.uiActions.acceptDamage');
                 executeAttackBtn.style.display = 'block';
                 executeAttackBtn.classList.add('damage-phase-btn'); // Optional styling hook
             } else if (phase === COMBAT_PHASES.ATTACK) {
@@ -160,11 +162,16 @@ export class CombatUIManager {
                 const totalArmor = enemies.reduce((sum: number, e: any) => sum + (e.armor || 0), 0);
                 const canDefeat = attackTotal >= totalArmor && totalArmor > 0;
 
-                executeAttackBtn.textContent = canDefeat ? 'Angriff ausführen' : 'Kampf beenden';
+                text = canDefeat ? t('combat.uiActions.executeAttack') : t('combat.uiActions.endCombat');
                 executeAttackBtn.style.display = 'block';
                 executeAttackBtn.classList.remove('damage-phase-btn');
             } else {
                 executeAttackBtn.style.display = 'none';
+            }
+
+            if (text) {
+                executeAttackBtn.textContent = text;
+                executeAttackBtn.setAttribute('aria-label', text);
             }
         }
     }

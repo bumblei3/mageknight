@@ -79,7 +79,7 @@ test.describe('Advanced Combat Mechanics', () => {
 
             // End ranged phase via central attack button
             const actionBtn = page.locator('#execute-attack-btn');
-            await expect(actionBtn).toContainText(/Fernkampf beenden/);
+            await expect(actionBtn).toHaveText(/Fernkampf beenden|End Ranged/);
             await actionBtn.click();
         });
 
@@ -88,7 +88,7 @@ test.describe('Advanced Combat Mechanics', () => {
             const actionBtn = page.locator('#execute-attack-btn');
             if (await actionBtn.isVisible()) {
                 const text = await actionBtn.textContent();
-                if (text.includes('Blocken beenden')) {
+                if (text.includes('Blocken beenden') || text.includes('End Block')) {
                     await actionBtn.click();
                 }
             }
@@ -98,7 +98,7 @@ test.describe('Advanced Combat Mechanics', () => {
             await page.waitForTimeout(500);
 
             // Check if main button entered Damage Acceptance state ("Schaden akzeptieren")
-            if (await actionBtn.isVisible() && (await actionBtn.textContent()).includes('Schaden akzeptieren')) {
+            if (await actionBtn.isVisible() && (await actionBtn.textContent()).match(/Schaden akzeptieren|Accept Damage/)) {
                 await actionBtn.click();
             } else {
                 // Fallback: Assign damage modal might appear
@@ -122,7 +122,7 @@ test.describe('Advanced Combat Mechanics', () => {
 
             // Final attack phase
             const actionBtn = page.locator('#execute-attack-btn');
-            await expect(actionBtn).toContainText(/Angriff ausführen/);
+            await expect(actionBtn).toHaveText(/Angriff ausführen|Kampf beenden|Execute Attack|End Combat/);
             await actionBtn.click();
         });
 

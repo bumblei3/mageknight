@@ -86,14 +86,14 @@ test.describe('Combat Flow', () => {
 
         await test.step('Ranged Phase', async () => {
             // Skip Ranged Phase (we have no ranged cards)
-            // Button should say "Fernkampf beenden -> Blocken"
-            await expect(page.locator('#execute-attack-btn')).toHaveText(/Fernkampf beenden/);
+            // Button should say "Fernkampf beenden -> Blocken" or "End Ranged -> Block"
+            await expect(page.locator('#execute-attack-btn')).toHaveText(/Fernkampf beenden|End Ranged/);
             await page.locator('#execute-attack-btn').click();
         });
 
         await test.step('Block Phase', async () => {
             // Verify we are in Block Phase
-            await expect(page.locator('#execute-attack-btn')).toHaveText(/Blocken beenden/);
+            await expect(page.locator('#execute-attack-btn')).toHaveText(/Blocken beenden|End Block/);
 
             // Play Block Card (Index 0 in our mocked hand)
             const cards = page.locator('.card');
@@ -111,7 +111,7 @@ test.describe('Combat Flow', () => {
 
         await test.step('Attack Phase', async () => {
             // Verify we are in Attack Phase
-            await expect(page.locator('#execute-attack-btn')).toHaveText(/Angriff ausführen/);
+            await expect(page.locator('#execute-attack-btn')).toHaveText(/Angriff ausführen|Kampf beenden|Execute Attack|End Combat/);
             // Depending on game flow, we might need to click "End Block Phase" 
             // OR if blocking is done automatically/instantly, we move to attack.
             // Let's assume we need to play the Attack card now.

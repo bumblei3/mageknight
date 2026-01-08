@@ -3,6 +3,21 @@ import { MageKnightGame } from './game';
 import i18n from './i18n/index';
 import { ErrorHandler } from './errorHandler';
 
+// Import all CSS for Vite bundling
+import '../css/reset.css';
+import '../css/layout.css';
+import '../css/hud.css';
+import '../css/cards.css';
+import '../css/modals.css';
+import '../css/tooltips.css';
+import '../css/loading.css';
+import '../css/tutorial.css';
+import '../css/effects.css';
+import '../css/mobile.css';
+import '../css/icons.css';
+import '../css/floating-text.css';
+import '../css/rewards.css';
+
 // Expose i18n globally for easy access
 (window as any).i18n = i18n;
 

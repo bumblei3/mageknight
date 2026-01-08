@@ -17,24 +17,7 @@
     <link rel="preload" as="style"
         href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap">
 
-
-    <!-- Fonts (Async to prevent blocking) -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
-        media="print" onload="this.media='all'">
-
-    <script>
-        // Global error catcher for Lighthouse "errors-in-console"
-        window.onerror = function (msg, url, line, col, error) {
-            console.warn('Caught global error for lhci audit:', { msg, url, line, col });
-            return false;
-        };
-        window.onunhandledrejection = function (event) {
-            console.warn('Caught unhandled promise rejection:', event.reason);
-        };
-    </script>
-
-    <!-- Critical CSS Inlined -->
+    <!-- Critical CSS Inlined (Optimization for CLS) -->
     <style>
         :root {
             --font-display: 'Cinzel', serif;
@@ -54,53 +37,10 @@
             --backdrop-blur: blur(16px) saturate(180%);
         }
 
-        /* Critical layout to prevent CLS */
         *,
         *::before,
         *::after {
             box-sizing: border-box;
-        }
-
-        .game-container {
-            position: fixed;
-            inset: 0;
-            display: grid;
-            grid-template-rows: 1fr;
-            background: #050510;
-        }
-
-        .canvas-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-        }
-
-        #game-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .hud-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 10;
-            pointer-events: none;
-            display: grid;
-            grid-template-rows: 64px 1fr auto;
-        }
-
-        .hud-layer>* {
-            pointer-events: auto;
-        }
-
-        .bottom-dock {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 280px;
-            z-index: 100;
         }
 
         body {
@@ -111,33 +51,35 @@
             overflow: hidden;
         }
 
-        .loading-screen {
+        .game-container {
             position: fixed;
             inset: 0;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            transition: opacity 0.6s ease;
+            display: grid;
+            grid-template-rows: 1fr;
+            background: #050510;
         }
 
-        .loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
+        .hud-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
             pointer-events: none;
+            display: grid;
+            grid-template-rows: 64px 1fr 320px;
+            grid-template-columns: 350px 1fr 400px;
         }
 
-        .loading-logo {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: 3rem;
-            font-weight: 700;
-            color: #fbbf24;
-            margin-bottom: 2rem;
-            height: 4.5rem;
-            /* Explicit height to prevent shift */
-            line-height: normal;
+        .bottom-dock {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 320px;
+            display: flex;
+            align-items: flex-end;
+            z-index: 100;
+            pointer-events: none;
+            contain: strict;
         }
 
         .loading-spinner-container {
@@ -189,35 +131,24 @@
         }
     </style>
 
-    <!-- Defer ALL external CSS to eliminate render-blocking -->
-    <link rel="stylesheet" href="css/reset.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/hud.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/cards.css" media="print" onload="this.media='all'">
-
-    <!-- Defer truly non-critical CSS -->
-    <link rel="preload" href="css/modals.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/tutorial.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/effects.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/floating-text.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/tooltips.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/rewards.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/mobile.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Import Main Styles (Vite will bundle these) -->
+    <script type="module" src="./js/main.js"></script>
 
     <noscript>
         <link rel="stylesheet" href="css/reset.css">
         <link rel="stylesheet" href="css/layout.css">
         <link rel="stylesheet" href="css/hud.css">
         <link rel="stylesheet" href="css/cards.css">
+        <link rel="stylesheet" href="css/loading.css">
+        <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/modals.css">
+        <link rel="stylesheet" href="css/tooltips.css">
         <link rel="stylesheet" href="css/tutorial.css">
         <link rel="stylesheet" href="css/effects.css">
+        <link rel="stylesheet" href="css/mobile.css">
         <link rel="stylesheet" href="css/icons.css">
         <link rel="stylesheet" href="css/floating-text.css">
-        <link rel="stylesheet" href="css/tooltips.css">
         <link rel="stylesheet" href="css/rewards.css">
-        <link rel="stylesheet" href="css/loading.css">
     </noscript>
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#a855f7">
@@ -392,7 +323,7 @@
                 <div class="panel hero-panel collapsed-check">
                     <div class="panel-header">
                         <h2 data-i18n="ui.labels.hero">Held</h2>
-                        <button class="panel-toggle">_</button>
+                        <button class="panel-toggle" aria-label="Info-Panel umschalten">_</button>
                     </div>
                     <div class="hero-info">
                         <div class="hero-avatar" id="hero-avatar"></div>
@@ -476,7 +407,8 @@
                     <h2 data-i18n="ui.phases.combat">Kampf</h2>
                     <div class="combat-info" id="combat-info"></div>
                     <div class="combat-units" id="combat-units"></div>
-                    <button class="btn btn-primary" id="execute-attack-btn" style="display: none;">⚔️
+                    <button class="btn btn-primary" id="execute-attack-btn" style="display: none;"
+                        aria-label="Angriff ausführen">⚔️
                         Angriff</button>
                 </div>
 
@@ -876,19 +808,19 @@
             <div id="sideways-card-preview" class="sideways-card-preview"></div>
 
             <div class="sideways-options">
-                <button class="sideways-btn movement" data-type="movement">
+                <button class="sideways-btn movement" data-type="movement" aria-label="Als +1 Bewegung spielen">
                     <span class="btn-icon">👣</span>
                     <span class="btn-label">+1 Bewegung</span>
                 </button>
-                <button class="sideways-btn attack" data-type="attack">
+                <button class="sideways-btn attack" data-type="attack" aria-label="Als +1 Angriff spielen">
                     <span class="btn-icon">⚔️</span>
                     <span class="btn-label">+1 Angriff</span>
                 </button>
-                <button class="sideways-btn block" data-type="block">
+                <button class="sideways-btn block" data-type="block" aria-label="Als +1 Block spielen">
                     <span class="btn-icon">🛡️</span>
                     <span class="btn-label">+1 Block</span>
                 </button>
-                <button class="sideways-btn influence" data-type="influence">
+                <button class="sideways-btn influence" data-type="influence" aria-label="Als +1 Einfluss spielen">
                     <span class="btn-icon">💬</span>
                     <span class="btn-label">+1 Einfluss</span>
                 </button>
@@ -1054,7 +986,7 @@
 
                 <div class="settings-tab-content" id="settings-audio">
                     <div class="setting-item">
-                        <label>Sound Effekte</label>
+                        <label for="setting-sound-enabled">Sound Effekte</label>
                         <label class="switch">
                             <input type="checkbox" id="setting-sound-enabled" checked
                                 aria-label="Sound Effekte aktivieren">
@@ -1078,7 +1010,7 @@
                         </select>
                     </div>
                     <div class="setting-item">
-                        <label>Tooltips anzeigen</label>
+                        <label for="setting-tooltips-enabled">Tooltips anzeigen</label>
                         <label class="switch">
                             <input type="checkbox" id="setting-tooltips-enabled" checked aria-label="Tooltips anzeigen">
                             <span class="slider round"></span>

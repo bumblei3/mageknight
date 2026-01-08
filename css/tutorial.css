@@ -101,19 +101,27 @@
 
 .tutorial-navigation {
     display: flex;
-    gap: var(--spacing-md, 1rem);
+    gap: var(--spacing-lg, 1.5rem);
+    /* Increased gap for better spacing */
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .tutorial-navigation .btn {
     width: auto;
-    min-width: 120px;
-    padding: 0.75rem 1.5rem;
+    min-width: 140px;
+    /* Increased */
+    min-height: 56px;
+    /* Increased to be safe */
+    padding: 0.75rem 1.75rem;
     border-radius: var(--radius-md, 8px);
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    /* Better centering */
+    align-items: center;
+    justify-content: center;
 }
 
 .tutorial-navigation .btn-primary {

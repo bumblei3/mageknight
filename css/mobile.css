@@ -119,6 +119,35 @@
         transform: translateX(0);
     }
 
+    #shortcuts-bar {
+        position: fixed;
+        top: 70px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+        min-width: 40px;
+        /* Reserve space */
+        background: transparent;
+        /* Clear background for the shortcuts bar */
+    }
+
+    .shortcut-item {
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid var(--color-accent-gold);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        overflow: hidden;
+        /* Avoid content bleeding */
+    }
+
     /* Center Game Board */
     #game-board-wrapper {
         grid-column: 1;

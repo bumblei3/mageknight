@@ -5,14 +5,18 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { TooltipManager } from '../../js/ui/TooltipManager.js';
 
 // Mock translation function
-vi.mock('../../js/i18n/index.js', () => ({
-    t: vi.fn((key) => {
+vi.mock('../../js/i18n/index.js', () => {
+    const t = vi.fn((key) => {
         if (key === 'enemies.abilities.descriptions.swift') return 'Swift: Requires double block.';
         if (key === 'cards.basicEffect') return 'Basic Effect';
         if (key === 'cards.actions.movement') return 'Movement';
         return key;
-    })
-}));
+    });
+    return {
+        default: { t },
+        t
+    };
+});
 
 describe('TooltipManager', () => {
     let tooltipManager;

@@ -64,12 +64,12 @@ export class StatsRenderer {
      * @param {any} hero - Hero object or mock
      */
     public updateHeroStats(hero: any): void {
-        const stats = hero.getStats();
-        if (this.elements.heroName) this.elements.heroName.textContent = stats.name;
+        const stats = hero.getStats() || {};
+        if (this.elements.heroName) this.elements.heroName.textContent = stats.name || '';
 
         // Render Portrait
         if (this.elements.heroAvatar && hero.portrait) {
-            let img = this.elements.heroAvatar.querySelector('img');
+            let img = this.elements.heroAvatar.querySelector('img') as HTMLImageElement;
             if (!img) {
                 img = document.createElement('img');
                 img.className = 'hero-avatar-img';
@@ -87,9 +87,10 @@ export class StatsRenderer {
         // Animate numeric values (with null checks)
         if (this.elements.heroArmor) {
             const currentArmor = parseInt(this.elements.heroArmor.textContent || '0') || 0;
-            if (currentArmor !== stats.armor) {
-                animateCounter(this.elements.heroArmor, currentArmor, stats.armor, 500, animator);
-                const diff = stats.armor - currentArmor;
+            const targetArmor = (stats.armor !== undefined) ? stats.armor : currentArmor;
+            if (currentArmor !== targetArmor) {
+                animateCounter(this.elements.heroArmor, currentArmor, targetArmor, 500, animator);
+                const diff = targetArmor - currentArmor;
                 if (diff !== 0) {
                     this.showFloatingText(this.elements.heroArmor as HTMLElement, `${diff > 0 ? '+' : ''}${diff} 🛡️`, diff > 0 ? 'var(--color-mana-green)' : 'var(--color-mana-red)');
                 }
@@ -98,9 +99,10 @@ export class StatsRenderer {
 
         if (this.elements.heroHandLimit) {
             const currentHand = parseInt(this.elements.heroHandLimit.textContent || '0') || 0;
-            if (currentHand !== stats.handLimit) {
-                this.elements.heroHandLimit.textContent = stats.handLimit.toString();
-                const diff = stats.handLimit - currentHand;
+            const targetHand = (stats.handLimit !== undefined) ? stats.handLimit : currentHand;
+            if (currentHand !== targetHand) {
+                this.elements.heroHandLimit.textContent = targetHand.toString();
+                const diff = targetHand - currentHand;
                 if (diff !== 0) {
                     this.showFloatingText(this.elements.heroHandLimit as HTMLElement, `${diff > 0 ? '+' : ''}${diff} 🎴`, 'var(--color-mana-blue)');
                 }
@@ -109,9 +111,10 @@ export class StatsRenderer {
 
         if (this.elements.heroWounds) {
             const currentWounds = parseInt(this.elements.heroWounds.textContent || '0') || 0;
-            if (currentWounds !== stats.wounds) {
-                this.elements.heroWounds.textContent = stats.wounds.toString();
-                const diff = stats.wounds - currentWounds;
+            const targetWounds = (stats.wounds !== undefined) ? stats.wounds : currentWounds;
+            if (currentWounds !== targetWounds) {
+                this.elements.heroWounds.textContent = targetWounds.toString();
+                const diff = targetWounds - currentWounds;
                 if (diff > 0) {
                     this.showFloatingText(this.elements.heroWounds as HTMLElement, `+${diff} 💔`, 'var(--color-mana-red)');
                 }
@@ -120,9 +123,10 @@ export class StatsRenderer {
 
         if (this.elements.fameValue) {
             const currentFame = parseInt(this.elements.fameValue.textContent || '0') || 0;
-            if (currentFame !== stats.fame) {
-                animateCounter(this.elements.fameValue, currentFame, stats.fame, 1000, animator);
-                const diff = stats.fame - currentFame;
+            const targetFame = (stats.fame !== undefined) ? stats.fame : currentFame;
+            if (currentFame !== targetFame) {
+                animateCounter(this.elements.fameValue, currentFame, targetFame, 1000, animator);
+                const diff = targetFame - currentFame;
                 if (diff > 0) {
                     this.showFloatingText(this.elements.fameValue as HTMLElement, `+${diff} ⭐`, 'var(--color-accent-gold)');
                 }
@@ -131,9 +135,10 @@ export class StatsRenderer {
 
         if (this.elements.reputationValue) {
             const currentRep = parseInt(this.elements.reputationValue.textContent || '0') || 0;
-            if (currentRep !== stats.reputation) {
-                animateCounter(this.elements.reputationValue, currentRep, stats.reputation, 800, animator);
-                const diff = stats.reputation - currentRep;
+            const targetRep = (stats.reputation !== undefined) ? stats.reputation : currentRep;
+            if (currentRep !== targetRep) {
+                animateCounter(this.elements.reputationValue, currentRep, targetRep, 800, animator);
+                const diff = targetRep - currentRep;
                 if (diff !== 0) {
                     this.showFloatingText(this.elements.reputationValue as HTMLElement, `${diff > 0 ? '+' : ''}${diff} 💬`, 'var(--color-text-primary)');
                 }
@@ -142,10 +147,10 @@ export class StatsRenderer {
 
         // Update healing button visibility
         if (this.elements.healBtn) {
-            const hasWounds = stats.wounds > 0;
-            const hasHealing = hero.healingPoints > 0;
+            const hasWounds = (stats.wounds || 0) > 0;
+            const hasHealing = (hero.healingPoints || 0) > 0;
             this.elements.healBtn.style.display = (hasWounds && hasHealing) ? 'block' : 'none';
-            this.elements.healBtn.textContent = `Heilen (${hero.healingPoints})`;
+            this.elements.healBtn.textContent = `Heilen (${hero.healingPoints || 0})`;
 
             // Add click sound if not already added
             if (!(this.elements.healBtn as any)._soundAdded) {
@@ -164,7 +169,8 @@ export class StatsRenderer {
      * @param {number} points - Movement points
      */
     public updateMovementPoints(points: number): void {
-        if (this.elements.movementPoints) this.elements.movementPoints.textContent = points.toString();
+        const val = (points !== undefined && points !== null) ? points : 0;
+        if (this.elements.movementPoints) this.elements.movementPoints.textContent = val.toString();
     }
 
     /**

@@ -137,14 +137,10 @@ export class DebugManager {
         if (this.game.ui) this.game.ui.renderUnits(this.game.hero.units);
     }
 
-    private log(msg: string) {
-        console.log(msg);
-        const container = document.getElementById('debug-log-container');
-        if (container) {
-            const entry = document.createElement('div');
-            entry.textContent = msg;
-            container.appendChild(entry);
-            container.scrollTop = container.scrollHeight;
+    private log(msg: string, level: string = 'info') {
+        console.log(`[DEBUG] ${msg}`);
+        if (this.game && typeof this.game.addLog === 'function') {
+            this.game.addLog(msg, level);
         }
     }
 
@@ -204,7 +200,7 @@ export class DebugManager {
         if (card) {
             this.log(`Debug: Drew ${card.name}`);
         } else {
-            this.log('Debug: Deck empty');
+            this.log('Debug: Deck empty', 'warning');
         }
         if (this.game.ui) this.game.ui.renderHandCards(this.game.hero.hand, () => { });
     }

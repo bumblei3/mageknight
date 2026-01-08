@@ -32,7 +32,7 @@ describe('Debug Manager Coverage Boost', () => {
             enemies: [],
             addLog: createSpy(),
             updateStats: createSpy(),
-            renderHand: createSpy(),
+            renderHandCards: createSpy(),
             render: createSpy(),
             debugTeleport: false
         };

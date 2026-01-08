@@ -4,6 +4,7 @@
  */
 import { HexGridLogic, HexData } from './HexGridLogic';
 import { SITE_INFO } from '../sites';
+import { TERRAIN_VISUALS, TERRAIN_TYPES } from '../constants';
 
 interface HexDrawOptions {
     fillColor?: string;
@@ -347,6 +348,8 @@ export class HexGridRenderer {
             case 'mountains': this.drawMountainTexture(pos); break;
             case 'desert': this.drawDesertTexture(pos); break;
             case 'plains': this.drawPlainsTexture(pos); break;
+            case 'hills': this.drawHillsTexture(pos); break;
+            case 'wasteland': this.drawWastelandTexture(pos); break;
         }
         this.ctx.restore();
     }
@@ -428,18 +431,51 @@ export class HexGridRenderer {
         this.ctx.globalAlpha = 1.0;
     }
 
+    drawHillsTexture(pos: { x: number; y: number }) {
+        const seed = pos.x * 13 + pos.y * 7;
+        this.ctx.globalAlpha = 0.2;
+        this.ctx.fillStyle = '#78350f';
+        for (let i = 0; i < 4; i++) {
+            const offsetX = (((seed + i * 19) % 60) - 30) * 0.6;
+            const offsetY = (((seed + i * 11) % 40) - 20) * 0.5;
+            this.ctx.beginPath();
+            this.ctx.arc(pos.x + offsetX, pos.y + offsetY, 6 + (i % 3), 0, Math.PI, true);
+            this.ctx.fill();
+        }
+        this.ctx.globalAlpha = 1.0;
+    }
+
+    drawWastelandTexture(pos: { x: number; y: number }) {
+        const seed = pos.x * 9 + pos.y * 14;
+        this.ctx.globalAlpha = 0.15;
+        this.ctx.strokeStyle = '#4b5563';
+        if (typeof this.ctx.setLineDash === 'function') {
+            this.ctx.setLineDash([2, 2]);
+        }
+        for (let i = 0; i < 6; i++) {
+            const x1 = pos.x + (((seed + i * 23) % 80) - 40) * 0.5;
+            const y1 = pos.y + (((seed + i * 17) % 80) - 40) * 0.5;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x1 + 10, y1 + 10);
+            this.ctx.stroke();
+        }
+        if (typeof this.ctx.setLineDash === 'function') {
+            this.ctx.setLineDash([]);
+        }
+        this.ctx.globalAlpha = 1.0;
+    }
+
     // ========== Color Helpers ==========
 
     getTerrainColor(terrain?: string) {
         if (!terrain) return '#1a1a2e';
-        const colors: any = { plains: '#4ade80', forest: '#22c55e', hills: '#a16207', mountains: '#78716c', desert: '#fbbf24', wasteland: '#6b7280', water: '#3b82f6' };
-        return colors[terrain] || '#1a1a2e';
+        return TERRAIN_VISUALS[terrain as keyof typeof TERRAIN_VISUALS]?.color || '#1a1a2e';
     }
 
     getTerrainIcon(terrain?: string) {
         if (!terrain) return '';
-        const icons: any = { plains: '🌾', forest: '🌲', hills: '⛰️', mountains: '🏔️', desert: '🏜️', wasteland: '☠️', water: '💧' };
-        return icons[terrain] || '';
+        return TERRAIN_VISUALS[terrain as keyof typeof TERRAIN_VISUALS]?.icon || '';
     }
 
     applyLighting(color: string, lightLevel: number) {

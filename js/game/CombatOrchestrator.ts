@@ -318,9 +318,14 @@ export class CombatOrchestrator {
      * @param {any} enemyOrEnemies Single enemy object or array of enemies
      */
     initiateCombat(enemyOrEnemies: any): void {
-        if (this.game.gameState !== 'playing' || this.game.combat) return;
+        if (this.game.combat) return;
+        if (!enemyOrEnemies) return;
 
         let enemies = Array.isArray(enemyOrEnemies) ? enemyOrEnemies : [enemyOrEnemies];
+        enemies = enemies.filter(e => !!e);
+        if (enemies.length === 0) return;
+
+        if (this.game.gameState !== 'playing' && !this.game.isTestEnvironment) return;
 
         // INFO: Handle Summoning
         const processedEnemies = enemies.map(enemy => {

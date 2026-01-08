@@ -243,8 +243,9 @@ export class TooltipManager {
         let top = rect.top - tooltipRect.height - 10;
 
         // Prevent overflow on right
-        if (left + tooltipRect.width > window.innerWidth - 20) {
-            left = window.innerWidth - tooltipRect.width - 20;
+        const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 800;
+        if (left + tooltipRect.width > windowWidth - 20) {
+            left = windowWidth - tooltipRect.width - 20;
         }
 
         // Prevent overflow on left

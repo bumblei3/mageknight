@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MageKnightGame } from '../../js/game.js';
 import { setupGlobalMocks } from '../test-mocks.js';
 import { animator } from '../../js/animator.js';
+import Enemy from '../../js/enemy.js';
 
 describe('Coverage Boost v5 - Deep Integration & Animator', () => {
     let game;
@@ -66,6 +67,10 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
         });
 
         it('should execute ranged attack from game controller', () => {
+            if (game.enemies.length === 0) {
+                const testEnemy = new Enemy({ name: 'Mock Orc', armor: 2, attack: 2, id: 'test_orc' });
+                game.enemies.push(testEnemy);
+            }
             const enemy = game.enemies[0];
             game.initiateCombat(enemy);
 

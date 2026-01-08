@@ -12,7 +12,7 @@ describe('DebugManager', () => {
         // Mock Game and its dependencies
         mockUI = {
             addLog: createSpy('addLog'),
-            renderHand: () => { }
+            renderHandCards: createSpy('renderHandCards')
         };
 
         mockHero = {

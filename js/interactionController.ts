@@ -53,6 +53,9 @@ export class InteractionController {
             return;
         }
 
+        // Always show selection feedback
+        this.selectHex(hex.q, hex.r);
+
         // Debug Teleport
         if (this.game.debugTeleport) {
             this.game.hero.position = { q: hex.q, r: hex.r };
@@ -66,9 +69,6 @@ export class InteractionController {
         if (this.game.movementMode) {
             logger.info(`Attempting move to ${hex.q},${hex.r}`);
             this.game.moveHero(hex.q, hex.r);
-        } else {
-            logger.debug(`Selecting hex ${hex.q},${hex.r} (not in movement mode)`);
-            this.selectHex(hex.q, hex.r);
         }
     }
 
@@ -77,8 +77,13 @@ export class InteractionController {
 
         if (!this.cachedRect) this.updateRect();
         const rect = this.cachedRect || this.game.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+
+        // Scale coordinates to internal canvas resolution (CRITICAL FIX)
+        const scaleX = this.game.canvas.width / rect.width;
+        const scaleY = this.game.canvas.height / rect.height;
+
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         const axial = this.game.hexGrid?.pixelToAxial(x, y);
         if (!axial) {
@@ -97,9 +102,10 @@ export class InteractionController {
                 e.position.r === axial.r
             );
 
+            // Calculate screen position for tooltip (Map back from internal to screen pixels)
             const hexCenter = this.game.hexGrid.axialToPixel(axial.q, axial.r);
-            const screenX = rect.left + hexCenter.x;
-            const screenY = rect.top + hexCenter.y;
+            const screenX = rect.left + (hexCenter.x / scaleX);
+            const screenY = rect.top + (hexCenter.y / scaleY);
 
             const fakeElement = {
                 getBoundingClientRect: () => ({
@@ -142,8 +148,6 @@ export class InteractionController {
                 axial.q, axial.r
             );
 
-            // In Mage Knight, movement is only predicted for ADJACENT steps or
-            // the current step. Let's show cost for the hex under cursor.
             if (distance === 1) {
                 const isNight = this.game.timeManager.isNight();
                 const cost = this.game.hexGrid.getMovementCost(axial.q, axial.r, isNight, this.game.hero.hasSkill('flight'));
@@ -152,7 +156,6 @@ export class InteractionController {
                     previewValueEl.textContent = cost.toString();
                     previewEl.style.display = 'flex';
 
-                    // Add warning color if not enough points
                     if (this.game.hero.movementPoints < cost) {
                         previewValueEl.style.color = '#ef4444';
                     } else {

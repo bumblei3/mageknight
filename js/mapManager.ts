@@ -24,9 +24,19 @@ export class MapManager {
         for (let i = 0; i < 10; i++) {
             const tile = new Array(7).fill(TERRAIN_TYPES.PLAINS);
             // Vary terrains slightly
-            if (i % 2 === 0) tile[1] = TERRAIN_TYPES.FOREST;
+            tile[1] = TERRAIN_TYPES.FOREST;
+            tile[2] = TERRAIN_TYPES.HILLS;
             this.tilesDeck.push(tile);
         }
+    }
+
+    private getRandomTerrain(): TerrainType {
+        const rand = Math.random();
+        if (rand < 0.4) return TERRAIN_TYPES.PLAINS;
+        if (rand < 0.6) return TERRAIN_TYPES.FOREST;
+        if (rand < 0.8) return TERRAIN_TYPES.HILLS;
+        if (rand < 0.9) return TERRAIN_TYPES.MOUNTAINS;
+        return TERRAIN_TYPES.WASTELAND;
     }
 
     private worldEventManager: any;
@@ -38,10 +48,12 @@ export class MapManager {
     /**
      * Initializes the map with a predefined scenario layout or empty
      */
-    createStartingMap(scenarioData: MapData | null = null): void {
+    createStartingMap(scenarioData: any | null = null): void {
         console.log('Initializing Map...');
 
-        if (scenarioData && scenarioData.hexes) {
+        if (scenarioData && scenarioData.mapConfig && scenarioData.mapConfig.startTile) {
+            this.createMapFromStartTile(scenarioData.mapConfig.startTile);
+        } else if (scenarioData && scenarioData.hexes) {
             this.loadMapFromData(scenarioData);
         } else {
             this.generateDefaultMap();
@@ -51,6 +63,17 @@ export class MapManager {
         this.revealStartingArea();
     }
 
+    private createMapFromStartTile(startTile: TerrainType[]): void {
+        // center is [0], neighbors are [1-6]
+        this.hexGrid.setHex(0, 0, { terrain: startTile[0] || TERRAIN_TYPES.PLAINS });
+
+        const neighbors = this.hexGrid.getNeighbors(0, 0);
+        neighbors.forEach((n: any, i: number) => {
+            const terrain = startTile[i + 1] || TERRAIN_TYPES.PLAINS;
+            this.hexGrid.setHex(n.q, n.r, { terrain });
+        });
+    }
+
     /**
      * Generates a default starter map (wedge shape)
      */
@@ -58,16 +81,10 @@ export class MapManager {
         // Center - Portal
         this.hexGrid.setHex(0, 0, { terrain: TERRAIN_TYPES.PLAINS });
 
-        // Immediate surroundings (Radius 1) - Safe terrain
+        // Immediate surroundings (Radius 1)
         const radius1 = this.hexGrid.getRing(0, 0, 1);
         radius1.forEach(hex => {
-            // Mix of plains, forests, and hills
-            const rand = Math.random();
-            let terrain: any = TERRAIN_TYPES.PLAINS;
-            if (rand > 0.6) terrain = TERRAIN_TYPES.FOREST;
-            else if (rand > 0.8) terrain = TERRAIN_TYPES.HILLS;
-
-            this.hexGrid.setHex(hex.q, hex.r, { terrain });
+            this.hexGrid.setHex(hex.q, hex.r, { terrain: this.getRandomTerrain() });
         });
 
         // Radius 2-3 - Exploration zone
@@ -149,7 +166,7 @@ export class MapManager {
         if (unknownNeighbors.length > 0) {
             // Simplistic exploration: reveal all direct neighbors
             unknownNeighbors.forEach(n => {
-                this.hexGrid.setHex(n.q, n.r, { terrain: TERRAIN_TYPES.PLAINS });
+                this.hexGrid.setHex(n.q, n.r, { terrain: this.getRandomTerrain() });
                 const hex = this.hexGrid.getHex(n.q, n.r);
                 if (hex) hex.revealed = true;
             });

@@ -7,7 +7,7 @@ export default defineConfig({
         globals: true, // This allows using describe, it, expect without imports (optional, but convenient)
         setupFiles: ['./tests/setup.js'],
         include: ['tests/**/*.{test,spec}.{js,ts}'],
-        exclude: ['node_modules', 'dist'],
+        exclude: ['node_modules', 'dist', 'tests/e2e/**/*'],
         coverage: {
             provider: 'v8',
             include: ['js/**/*.{js,ts}'],

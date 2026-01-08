@@ -37,15 +37,42 @@ export class Card {
     manaCost: number;
     description: string;
 
-    constructor(data: CardData) {
+    constructor(data: CardData & { advancedEffect?: CardEffect }) {
         this.id = data.id;
         this.name = data.name;
         this.type = data.type || CARD_TYPES.ACTION;
         this.color = data.color;
-        this.basicEffect = data.basicEffect || {};
-        this.strongEffect = data.strongEffect || {};
+
+        // Normalize basic effect
+        this.basicEffect = this.normalizeEffect(data.basicEffect || {});
+
+        // Handle both strongEffect and advancedEffect naming
+        const strongSource = data.strongEffect || data.advancedEffect || {};
+        this.strongEffect = this.normalizeEffect(strongSource);
+
         this.manaCost = data.manaCost || 0;
         this.description = data.description || '';
+    }
+
+    private normalizeEffect(effect: CardEffect): CardEffect {
+        if (!effect) return {};
+
+        const normalized = { ...effect };
+
+        // Map common type-based effects to direct property effects used by Hero/UI
+        if (effect.type === 'move' && effect.value !== undefined) {
+            normalized.movement = effect.value;
+        } else if (effect.type === 'attack' && effect.value !== undefined) {
+            normalized.attack = effect.value;
+        } else if (effect.type === 'block' && effect.value !== undefined) {
+            normalized.block = effect.value;
+        } else if (effect.type === 'influence' && effect.value !== undefined) {
+            normalized.influence = effect.value;
+        } else if (effect.type === 'heal' && effect.value !== undefined) {
+            normalized.healing = effect.value;
+        }
+
+        return normalized;
     }
 
     getEffect(useStrong = false): CardEffect {

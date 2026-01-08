@@ -54,8 +54,8 @@ export class ParticleEngine {
         // Default values
         particle.x = x;
         particle.y = y;
-        particle.vx = options.vx ?? ((Math.random() - 0.5) * (options['speed'] || 2)); // 'speed' might be passed in options but not in interface?
-        particle.vy = options.vy ?? ((Math.random() - 0.5) * (options['speed'] || 2));
+        particle.vx = options.vx ?? ((Math.random() - 0.5) * ((options as any)['speed'] || 2)); // 'speed' might be passed in options but not in interface?
+        particle.vy = options.vy ?? ((Math.random() - 0.5) * ((options as any)['speed'] || 2));
         particle.life = options.life ?? 1.0;
         particle.decay = options.decay ?? 0.02;
         particle.color = options.color ?? '#ffffff';

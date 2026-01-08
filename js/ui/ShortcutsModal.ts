@@ -106,7 +106,7 @@ export class ShortcutsModal {
                 <span class="shortcut-key" data-action="${action}">${binding.key === ' ' ? 'Space' : binding.key}</span>
             `;
 
-            row.querySelector('.shortcut-key')?.addEventListener('click', (e: MouseEvent) =>
+            row.querySelector('.shortcut-key')?.addEventListener('click', (e: Event) =>
                 this.startListening(action, e.target as HTMLElement)
             );
 

@@ -16,7 +16,7 @@ export class PerformanceMonitor {
     private rafId: number | null;
     private memoryInterval: number | NodeJS.Timeout | null;
     private isRunning: boolean;
-    private updateRectBound: () => void;
+
 
     constructor() {
         this.fps = 0;

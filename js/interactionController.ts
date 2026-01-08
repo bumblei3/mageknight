@@ -282,7 +282,8 @@ export class InteractionController {
         // Populate Content
         basicDesc.textContent = this.game.ui.formatEffect(card.basicEffect);
         strongDesc.textContent = this.game.ui.formatEffect(card.strongEffect);
-        strongCost.textContent = `-1 ${card.color.charAt(0).toUpperCase() + card.color.slice(1)} Mana`;
+        const color = card.color || 'white';
+        strongCost.textContent = `-1 ${color.charAt(0).toUpperCase() + color.slice(1)} Mana`;
 
         // Check affordability again just for UI state
         const canAfford = this.game.hero.canAffordMana(card, isNight);

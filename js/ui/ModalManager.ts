@@ -254,6 +254,6 @@ export class ModalManager {
             });
         }
 
-        el.eventModal.classList.add('active');
+        el.eventModal!.classList.add('active');
     }
 }

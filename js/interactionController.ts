@@ -194,7 +194,8 @@ export class InteractionController {
     }
 
     handleCardClick(index: number, card: Card): void {
-        if (card.isWound()) {
+        const isWound = typeof card.isWound === 'function' ? card.isWound() : !!(card as any).isWound;
+        if (isWound) {
             this.game.sound.error();
             this.game.addLog('Verletzungen können nicht gespielt werden.', 'warning');
             return;

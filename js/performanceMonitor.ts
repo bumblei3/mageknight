@@ -2,9 +2,22 @@
  * Performance Monitor for Mage Knight
  * Tracks FPS, memory usage, and render times
  */
-import { logger } from './logger.js';
+import { logger } from './logger';
 
 export class PerformanceMonitor {
+    private fps: number;
+    private frameCount: number;
+    private lastFpsUpdate: number;
+    private frameTimes: number[];
+    private maxFrameTimes: number;
+    private memoryUsage: number;
+    private showOverlay: boolean;
+    private overlay: HTMLDivElement | null;
+    private rafId: number | null;
+    private memoryInterval: number | NodeJS.Timeout | null;
+    private isRunning: boolean;
+    private updateRectBound: () => void;
+
     constructor() {
         this.fps = 0;
         this.frameCount = 0;
@@ -15,39 +28,44 @@ export class PerformanceMonitor {
         this.memoryUsage = 0;
         this.showOverlay = false;
         this.overlay = null;
+        this.rafId = null;
+        this.memoryInterval = null;
+        this.isRunning = false;
 
         this.startMonitoring();
     }
 
-    startMonitoring() {
+    startMonitoring(): void {
+        // @ts-ignore - Check for test environment
         if (typeof globalThis !== 'undefined' && globalThis.isTestEnvironment) return;
 
         // FPS counter loop
+        this.isRunning = true;
         this.measureFrame();
 
         // Memory sampling (every 2 seconds)
-        if (performance.memory) {
+        const perf = performance as any;
+        if (perf.memory) {
             this.memoryInterval = setInterval(() => {
-                this.memoryUsage = Math.round(performance.memory.usedJSHeapSize / 1048576);
+                this.memoryUsage = Math.round(perf.memory.usedJSHeapSize / 1048576);
             }, 2000);
         }
 
         logger.info('📊 Performance monitor initialized');
     }
 
-    stopMonitoring() {
+    stopMonitoring(): void {
         this.isRunning = false;
         if (this.rafId) {
             cancelAnimationFrame(this.rafId);
         }
         if (this.memoryInterval) {
-            clearInterval(this.memoryInterval);
+            clearInterval(this.memoryInterval as number);
         }
     }
 
-    measureFrame() {
-        if (this.isRunning === false) return;
-        this.isRunning = true;
+    measureFrame(): void {
+        if (!this.isRunning) return;
 
         const now = performance.now();
         this.frameCount++;
@@ -66,27 +84,27 @@ export class PerformanceMonitor {
         this.rafId = requestAnimationFrame(() => this.measureFrame());
     }
 
-    recordFrameTime(duration) {
+    recordFrameTime(duration: number): void {
         this.frameTimes.push(duration);
         if (this.frameTimes.length > this.maxFrameTimes) {
             this.frameTimes.shift();
         }
     }
 
-    getAverageFrameTime() {
+    getAverageFrameTime(): number {
         if (this.frameTimes.length === 0) return 0;
         return this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
     }
 
-    getFPS() {
+    getFPS(): number {
         return this.fps;
     }
 
-    getMemoryUsage() {
+    getMemoryUsage(): number {
         return this.memoryUsage;
     }
 
-    toggleOverlay() {
+    toggleOverlay(): void {
         this.showOverlay = !this.showOverlay;
 
         if (this.showOverlay) {
@@ -97,7 +115,7 @@ export class PerformanceMonitor {
         }
     }
 
-    createOverlay() {
+    createOverlay(): void {
         if (this.overlay) return;
 
         this.overlay = document.createElement('div');
@@ -119,7 +137,7 @@ export class PerformanceMonitor {
         this.updateOverlay();
     }
 
-    updateOverlay() {
+    updateOverlay(): void {
         if (!this.overlay) return;
 
         const fpsColor = this.fps >= 55 ? '#0f0' : this.fps >= 30 ? '#ff0' : '#f00';
@@ -136,7 +154,7 @@ export class PerformanceMonitor {
         this.overlay.innerHTML = html;
     }
 
-    getStats() {
+    getStats(): { fps: number; averageFrameTime: number; memoryUsage: number } {
         return {
             fps: this.fps,
             averageFrameTime: this.getAverageFrameTime(),

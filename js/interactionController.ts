@@ -208,7 +208,7 @@ export class InteractionController {
 
         // If card has strong effect AND player can afford it, SHOW MODAL
         if (hasStrongEffect && canAffordStrong) {
-            this.showCardPlayModal(index, card, isNight);
+            this.showCardPlayModal(index, card);
             return;
         }
 
@@ -266,8 +266,10 @@ export class InteractionController {
         }
     }
 
-    showCardPlayModal(index: number, card: Card, isNight: boolean): void {
+    showCardPlayModal(index: number, card: Card): void {
+        const isNight = this.game.timeManager.isNight();
         const modal = document.getElementById('card-play-modal');
+        if (!modal) return;
         const basicBtn = document.getElementById('play-basic-btn');
         const strongBtn = document.getElementById('play-strong-btn') as HTMLButtonElement | null;
         const basicDesc = document.getElementById('basic-effect-desc');

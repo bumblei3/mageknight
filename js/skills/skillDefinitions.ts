@@ -1,10 +1,24 @@
-
 /**
  * Hero Skill Definitions
  * Defines available skills for each hero class.
  */
 
-export const HERO_SKILLS = {
+export interface Skill {
+    id: string;
+    name: string;
+    type: 'active' | 'passive';
+    description: string;
+    icon: string;
+    cooldown?: 'round';
+}
+
+export interface HeroSkills {
+    [key: string]: {
+        common: Skill[];
+    };
+}
+
+export const HERO_SKILLS: HeroSkills = {
     // Draconum (Goldyx) - Magic, Flight, Elements
     goldyx: {
         common: [
@@ -79,12 +93,12 @@ export const HERO_SKILLS = {
 
 /**
  * Get random skills for a hero class, excluding already owned ones.
- * @param {string} heroId - The hero ID (e.g., 'goldyx')
- * @param {Set<string>} ownedSkillIds - Set of skill IDs the hero already has
- * @param {number} count - Number of skills to return
- * @returns {Array} Array of skill objects
  */
-export function getRandomSkills(heroId, ownedSkillIds, count = 2) {
+export function getRandomSkills(
+    heroId: string,
+    ownedSkillIds: Set<string>,
+    count: number = 2
+): Skill[] {
     const classSkills = HERO_SKILLS[heroId]?.common || [];
     const available = classSkills.filter(s => !ownedSkillIds.has(s.id));
 

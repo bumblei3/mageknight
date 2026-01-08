@@ -253,6 +253,12 @@ export class Hero {
     }
 
     drawCard(): Card | null {
+        // If deck is empty, shuffle discard pile back into deck
+        if (this.deck.length === 0 && this.discard.length > 0) {
+            this.deck = shuffleDeck([...this.discard]);
+            this.discard = [];
+        }
+
         if (this.deck.length > 0) {
             const card = this.deck.pop()!;
             this.hand.push(card);

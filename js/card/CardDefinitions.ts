@@ -111,6 +111,66 @@ export const CARD_DEFINITIONS: Record<string, any> = {
         advancedEffect: { type: 'enhance_next', value: 5 },
         image: 'concentrate.png'
     },
+    'inf_2': {
+        id: 'inf_2',
+        name: 'Noble Manners',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.WHITE,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 2 },
+        advancedEffect: { type: 'influence', value: 4 },
+        image: 'noble_manners.png'
+    },
+    'unit_1': {
+        id: 'unit_1',
+        name: 'Call to Arms',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.WHITE,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 2 },
+        advancedEffect: { type: 'influence', value: 5, unitRecruitment: true },
+        image: 'call_to_arms.png'
+    },
+    'atk_cha': {
+        id: 'atk_cha',
+        name: 'Savage Bite',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.RED,
+        cost: 0,
+        basicEffect: { type: 'attack', value: 2 },
+        advancedEffect: { type: 'attack', value: 5 },
+        image: 'savage_bite.png'
+    },
+    'chaos_1': {
+        id: 'chaos_1',
+        name: 'Burning Shield',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.RED,
+        cost: 0,
+        basicEffect: { type: 'block', value: 2 },
+        advancedEffect: { type: 'block', value: 4, fireAttack: 2 },
+        image: 'burning_shield.png'
+    },
+    'blk_tac': {
+        id: 'blk_tac',
+        name: 'Agility',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.BLUE,
+        cost: 0,
+        basicEffect: { type: 'block', value: 2 },
+        advancedEffect: { type: 'block', value: 3, type2: 'move', value2: 2 },
+        image: 'agility.png'
+    },
+    'tac_1': {
+        id: 'tac_1',
+        name: 'Cold Toughness',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.BLUE,
+        cost: 0,
+        basicEffect: { type: 'block', value: 2 },
+        advancedEffect: { type: 'block', value: 5, iceBlock: true },
+        image: 'cold_toughness.png'
+    },
     'wound': {
         id: 'wound',
         name: 'Wound',

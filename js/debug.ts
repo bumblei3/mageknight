@@ -139,6 +139,23 @@ export class DebugManager {
 
     private log(msg: string, level: string = 'info') {
         console.log(`[DEBUG] ${msg}`);
+
+        // Update Debug UI Log
+        const logContainer = document.getElementById('debug-log-container');
+        if (logContainer) {
+            const entry = document.createElement('div');
+            entry.style.color = level === 'error' ? '#ff4d4d' : level === 'warning' ? '#ffcc00' : '#fff';
+            entry.style.marginBottom = '2px';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+
+            // Limit entries
+            while (logContainer.childElementCount > 20) {
+                logContainer.removeChild(logContainer.firstChild!);
+            }
+        }
+
         if (this.game && typeof this.game.addLog === 'function') {
             this.game.addLog(msg, level);
         }

@@ -110,6 +110,12 @@ export class UnitRenderer {
                 unitCard.style.boxShadow = 'none';
             });
 
+            // Attach tooltip
+            if (this.ui.tooltipManager) {
+                const tooltipHTML = this.ui.tooltipManager.createUnitTooltipHTML(unit);
+                this.ui.tooltipManager.attachToElement(unitCard, tooltipHTML);
+            }
+
             grid.appendChild(unitCard);
         });
 

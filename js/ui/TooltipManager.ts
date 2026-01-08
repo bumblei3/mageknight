@@ -391,6 +391,39 @@ export class TooltipManager {
     }
 
     /**
+     * Create HTML for unit tooltip
+     * @param {any} unit - Unit object
+     * @returns {string} HTML string
+     */
+    public createUnitTooltipHTML(unit: any): string {
+        const unitName = typeof unit.getName === 'function' ? unit.getName() : (unit.name || 'Unit');
+        const unitLevel = unit.level || 1;
+        const abilities = typeof unit.getAbilities === 'function' ? unit.getAbilities() : [];
+        const abilityText = (abilities as any[]).map(a => `<div class="tooltip-ability">✨ ${a.text || a}</div>`).join('');
+
+        return `
+            <div class="tooltip-unit">
+                <div class="tooltip-header">
+                    <span class="tooltip-name">${unitName}</span>
+                    <span class="tooltip-level">Level ${unitLevel}</span>
+                </div>
+                <div class="tooltip-divider"></div>
+                <div class="tooltip-stats">
+                    <div class="tooltip-stat-row">
+                        <span>🛡️ ${t('ui.labels.armor')}:</span>
+                        <span class="value">${unit.armor || 0}</span>
+                    </div>
+                </div>
+                ${abilityText ? `
+                <div class="tooltip-section">
+                    <strong>${t('ui.labels.skills')}:</strong>
+                    <div style="margin-top: 0.25rem;">${abilityText}</div>
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    /**
      * Get color icon for card type
      */
     public getColorIcon(color: string): string {

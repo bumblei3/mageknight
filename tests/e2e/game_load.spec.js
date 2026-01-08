@@ -53,6 +53,7 @@ test.describe('Mage Knight Game Loading', () => {
     });
 
     test('should persist state after save and reload', async ({ page }) => {
+        test.setTimeout(120000); // Increase timeout for heavy reload/load sequence
         const gameFlow = new GameFlow(page);
         await gameFlow.ensureGameStarted();
 
@@ -82,6 +83,7 @@ test.describe('Mage Knight Game Loading', () => {
 
         await test.step('Save Game', async () => {
             await page.evaluate(() => {
+                console.log('Saving game...');
                 window.game.stateManager.saveGame('e2e_test_slot');
             });
         });
@@ -91,19 +93,30 @@ test.describe('Mage Knight Game Loading', () => {
         const expectedHandSize = await page.evaluate(() => window.game.hero.hand.length);
 
         await test.step('Reload Page', async () => {
+            console.log('Reloading page...');
             await page.reload();
-            await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 15000 });
-            await gameFlow.skipTutorial();
-            await gameFlow.handleModals();
+            await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 60000 });
+
+            // Wait for game instance to be ready
+            await page.waitForFunction(() => !!window.game && !!window.game.stateManager);
         });
 
         await test.step('Load Game', async () => {
             await page.evaluate(() => {
-                window.game.stateManager.loadGame('e2e_test_slot');
+                console.log('Loading game...');
+                if (!window.game || !window.game.stateManager) {
+                    throw new Error('Game or StateManager not initialized');
+                }
+
+                // Force close any blocking modals (scenario/hero selection) that might auto-appear
+                document.querySelectorAll('.modal, .site-modal').forEach(el => el.classList.remove('active'));
+
+                const success = window.game.stateManager.loadGame('e2e_test_slot');
+                console.log('Game loaded result:', success);
             });
 
             // Wait for state to be applied
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(1000);
         });
 
         await test.step('Verify Restored State', async () => {

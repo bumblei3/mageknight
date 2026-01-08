@@ -9,12 +9,11 @@ export class GameFlow {
     }
 
     async loadGame() {
-        await this.page.goto('/');
-        // Disable tutorial for all E2E tests to prevent UI blocking
-        await this.page.evaluate(() => {
+        // Disable tutorial via InitScript to avoid reload
+        await this.page.addInitScript(() => {
             localStorage.setItem('mageKnightTutorialCompleted', 'true');
         });
-        await this.page.reload(); // Reload to apply localStorage if needed, or just let it be
+        await this.page.goto('/');
         await expect(this.page.locator('#loading-screen')).toBeHidden({ timeout: 15000 });
     }
 
@@ -37,24 +36,26 @@ export class GameFlow {
         // Scenario Selection
         const scenarioModal = this.page.locator('#scenario-selection-modal');
         try {
-            // Short timeout because it usually appears quickly or not at all
-            if (await scenarioModal.isVisible({ timeout: 3000 })) {
-                console.log('GameFlow: Selecting scenario...');
-                await this.page.locator('.scenario-card').first().click();
-                await expect(scenarioModal).toBeHidden();
-            }
-        } catch (e) { }
+            // Wait up to 5s for the modal to appear
+            await scenarioModal.waitFor({ state: 'visible', timeout: 5000 });
+            console.log('GameFlow: Selecting scenario...');
+            await this.page.locator('.scenario-card').first().click();
+            await scenarioModal.waitFor({ state: 'hidden', timeout: 5000 });
+        } catch (e) {
+            console.log('GameFlow: Scenario modal not found or already closed.');
+        }
 
         // Hero Selection
         const heroModal = this.page.locator('#hero-selection-modal');
         try {
-            if (await heroModal.isVisible({ timeout: 3000 })) {
-                console.log('GameFlow: Selecting hero...');
-                // Click the "Wählen" button on first hero card
-                await this.page.locator('#hero-selection-modal button:has-text("Wählen")').first().click();
-                await expect(heroModal).toBeHidden({ timeout: 10000 });
-            }
-        } catch (e) { }
+            await heroModal.waitFor({ state: 'visible', timeout: 5000 });
+            console.log('GameFlow: Selecting hero...');
+            // Click the "Wählen" button on first hero card
+            await this.page.locator('#hero-selection-modal button:has-text("Wählen")').first().click();
+            await heroModal.waitFor({ state: 'hidden', timeout: 10000 });
+        } catch (e) {
+            console.log('GameFlow: Hero modal not found or already closed.');
+        }
     }
 
     /**
@@ -65,15 +66,19 @@ export class GameFlow {
         await this.skipTutorial();
         await this.handleModals();
 
-        // Wait a bit for game reset after hero selection
-        await this.page.waitForTimeout(1000);
+        // Wait for game to be initialized and scenario/hero to be set
+        await this.page.waitForFunction(() => {
+            return window.game &&
+                window.game.gameState === 'playing' &&
+                window.game.hero !== null;
+        }, { timeout: 20000 });
 
-        // Skip tutorial again if it reappears after new game
-        await this.skipTutorial();
-
-        // Final verification that we are in-game
+        // Final verification that we are in-game and UI is ready
         const canvas = this.page.locator('canvas#game-board');
         await expect(canvas).toBeVisible({ timeout: 15000 });
+
+        // Ensure UI elements like hand or mana are clickable
+        await this.page.locator('#hand-cards').waitFor({ state: 'visible', timeout: 10000 });
     }
 
     /**

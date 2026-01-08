@@ -63,7 +63,7 @@ export class CombatOrchestrator {
             } else if (result.card.type === 'spell' || result.effect.ranged) {
                 this.combatRangedTotal += (result.effect.attack || 0);
             }
-        } else if (phase === COMBAT_PHASES.ATTACK && result.effect.attack) {
+        } else if ((phase === COMBAT_PHASES.ATTACK || phase === COMBAT_PHASES.DAMAGE) && result.effect.attack) {
             this.combatAttackTotal += result.effect.attack;
         }
 

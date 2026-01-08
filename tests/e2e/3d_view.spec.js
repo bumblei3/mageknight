@@ -28,25 +28,64 @@ test.describe('3D View Functionality', () => {
         });
 
         await test.step('Verify 3D Toggle Attempted', async () => {
-            // In headless CI, 3D rendering may fail silently even when WebGL is "available"
-            // Just verify the toggle was clicked and no crash occurred
-            // The button should still be interactive after the toggle attempt
-            await expect(toggleBtn).toBeVisible();
+            // Basic visibility check
+            await expect(container3D).toBeVisible();
 
-            // Check if 3D actually activated (may or may not work in CI)
-            const is3DVisible = await container3D.isVisible();
-            if (is3DVisible) {
-                console.log('3D mode activated successfully');
-                // In environments without GPU, the 2D canvas might stay visible
-                // so we only expect it to be hidden if the 3D overlay is actually shown
-                const is3DOverlayVisible = await page.locator('#game-3d-overlay').isVisible();
-                if (is3DOverlayVisible) {
-                    await expect(canvas2D).toBeHidden();
-                }
-            } else {
-                console.log('3D mode did not activate - likely CI GPU limitations');
-                // This is acceptable in CI - just pass the test
-            }
+            // INTERNAL INSPECTION: Check Three.js Scene State
+            await page.waitForFunction(() => window.game3D && window.game3D.scene && window.game3D.scene.children.length > 5);
+
+            const sceneInfo = await page.evaluate(() => {
+                const g3d = window.game3D;
+                if (!g3d || !g3d.scene) return null;
+
+                return {
+                    childrenCount: g3d.scene.children.length,
+                    hexCount: g3d.hexMeshes.size,
+                    hasHero: !!g3d.scene.getObjectByName('hero-token'),
+                    hasVolkare: !!g3d.scene.getObjectByName('volkare-token'),
+                    backgroundHex: g3d.scene.background ? g3d.scene.background.getHexString() : null
+                };
+            });
+
+            console.log('3D Scene Info:', sceneInfo);
+
+            expect(sceneInfo).not.toBeNull();
+            expect(sceneInfo.hexCount).toBeGreaterThan(0); // Should have hexes
+            expect(sceneInfo.hasHero).toBe(true); // Should have hero token
+            expect(sceneInfo.hasVolkare).toBe(true, 'Volkare token should be present');
+
+            // Initial state is DAY (Sky Blue)
+            expect(sceneInfo.backgroundHex).toBe('87ceeb');
+        });
+
+        await test.step('Verify Day/Night Lighting', async () => {
+            // Trigger Night
+            await page.evaluate(() => {
+                window.game.timeManager.toggleTime(); // Force time toggle
+            });
+
+            // Wait for lighting update
+            await page.waitForTimeout(500);
+
+            const nightInfo = await page.evaluate(() => {
+                return window.game3D.scene.background.getHexString();
+            });
+
+            console.log('Night Background:', nightInfo);
+            // Night color is 0x050510 -> '050510'
+            expect(nightInfo).toBe('050510');
+        });
+
+        await test.step('Verify 3D Interaction Setup', async () => {
+            // Check if raycaster is initialized
+            const isInitialized = await page.evaluate(() => {
+                const game3D = window.game3D;
+                return !!game3D.raycaster && !!game3D.mouse;
+            });
+            expect(isInitialized).toBe(true);
+
+            // Trigger a click and safe check (doesn't crash)
+            await page.mouse.click(400, 300); // Center screen
         });
     });
 });

@@ -19,14 +19,7 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "baseUrl": ".",
-        "paths": {
-            "three": [
-                "./js/vendor/three.module.js"
-            ],
-            "three/addons/*": [
-                "./js/vendor/*"
-            ]
-        },
+        "paths": {},
         "typeRoots": [
             "./types",
             "./node_modules/@types"

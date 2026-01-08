@@ -10,6 +10,7 @@ import Terrain from './terrain';
 import TutorialManager from './tutorialManager';
 import { TimeManager } from './timeManager';
 import { MapManager } from './mapManager';
+import { VolkareController } from './game/VolkareController';
 import { WorldEventManager } from './worldEvents';
 import ParticleSystem from './particles';
 import { WeatherSystem } from './particles/WeatherSystem';
@@ -96,6 +97,7 @@ export class MageKnightGame {
     public stateManager: GameStateManager;
     public combatOrchestrator: CombatOrchestrator;
     public heroController: HeroController;
+    public volkare: VolkareController; // Boss
 
     // State
     public movementMode: boolean;
@@ -187,6 +189,7 @@ export class MageKnightGame {
         this.stateManager = new GameStateManager(this);
         this.combatOrchestrator = new CombatOrchestrator(this);
         this.heroController = new HeroController(this);
+        this.volkare = new VolkareController(this);
 
         // State
         this.movementMode = false;
@@ -316,6 +319,14 @@ export class MageKnightGame {
         }
 
         this.phaseManager.setupTimeListener();
+
+        // Volkare Logic
+        eventBus.on(GAME_EVENTS.TIME_CHANGED, () => {
+            if (this.volkare && this.volkare.isActive) {
+                this.volkare.move();
+            }
+        });
+
         this.setupVisualEffectsListeners();
         this.inputController.setup();
 
@@ -360,6 +371,7 @@ export class MageKnightGame {
         this.abortController.abort();
         if (this.ui) this.ui.destroy();
         if (this.touchController) this.touchController.destroy();
+        if (this.interactionController) this.interactionController.destroy();
         if (this.debug && this.debug.destroy) this.debug.destroy();
     }
 
@@ -426,6 +438,15 @@ export class MageKnightGame {
 
         // Create enemies
         this.createEnemies();
+
+        // Spawn Volkare (Demo Scenario)
+        // Hardcoded positions: Start far away, Target is Hero's start (Portal?)
+        // Assuming map has some size.
+        if (this.volkare) {
+            const startPos = { q: -3, r: 0 }; // Arbitrary start
+            const targetPos = { q: 2, r: 0 }; // Hero/Portal area
+            this.volkare.spawn(startPos, targetPos);
+        }
 
         // Initial render
         this.render();

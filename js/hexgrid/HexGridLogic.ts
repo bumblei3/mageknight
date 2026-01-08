@@ -178,6 +178,99 @@ export class HexGridLogic {
         return reachable;
     }
 
+    findPath(start: HexUtils.HexCoord, end: HexUtils.HexCoord, isFlight: boolean = false): HexUtils.HexCoord[] {
+        const startKey = this.getHexKey(start.q, start.r);
+        const endKey = this.getHexKey(end.q, end.r);
+
+        if (startKey === endKey) return [];
+
+        const openSet = new Set<string>();
+        openSet.add(startKey);
+
+        const cameFrom = new Map<string, HexUtils.HexCoord>();
+
+        const gScore = new Map<string, number>();
+        gScore.set(startKey, 0);
+
+        const fScore = new Map<string, number>();
+        fScore.set(startKey, this.distance(start.q, start.r, end.q, end.r));
+
+        const openQueue = [{ key: startKey, f: fScore.get(startKey)! }];
+
+        while (openQueue.length > 0) {
+            // Sort by lowest fScore (simple priority queue)
+            openQueue.sort((a, b) => a.f - b.f);
+            const currentItem = openQueue.shift()!;
+            const currentKey = currentItem.key;
+
+            // Reconstruct coord from key since we stored keys
+            // This is a bit inefficient, better to store objects or parsing
+            // But Map keys are strings. 
+            // Optim: Store nodes in openQueue
+            // Let's parse key: "q,r"
+            const [cq, cr] = currentKey.split(',').map(Number);
+
+            if (currentKey === endKey) {
+                return this.reconstructPath(cameFrom, currentKey);
+            }
+
+            openSet.delete(currentKey);
+
+            for (const neighbor of this.getNeighbors(cq, cr)) {
+                if (!this.hasHex(neighbor.q, neighbor.r)) continue;
+
+                const neighborKey = this.getHexKey(neighbor.q, neighbor.r);
+                const cost = this.getMovementCost(neighbor.q, neighbor.r, false, isFlight);
+
+                // If it's effectively infinite (water without flight), skip unless it's the target?
+                // Actually Volkare might fly or have special rules. 
+                // For now, respect terrain cost. Water = 999.
+                if (cost >= 900) continue;
+
+                const tentativeG = gScore.get(currentKey)! + cost;
+
+                if (tentativeG < (gScore.get(neighborKey) ?? Infinity)) {
+                    cameFrom.set(neighborKey, { q: cq, r: cr });
+                    gScore.set(neighborKey, tentativeG);
+                    const f = tentativeG + this.distance(neighbor.q, neighbor.r, end.q, end.r);
+                    fScore.set(neighborKey, f);
+
+                    if (!openSet.has(neighborKey)) {
+                        openSet.add(neighborKey);
+                        openQueue.push({ key: neighborKey, f });
+                    }
+                }
+            }
+        }
+
+        return []; // No path found
+    }
+
+    private reconstructPath(cameFrom: Map<string, HexUtils.HexCoord>, currentKey: string): HexUtils.HexCoord[] {
+        const totalPath: HexUtils.HexCoord[] = [];
+        // Parse current
+        let [q, r] = currentKey.split(',').map(Number);
+        totalPath.push({ q, r });
+
+        while (cameFrom.has(currentKey)) {
+            const prev = cameFrom.get(currentKey)!;
+            currentKey = this.getHexKey(prev.q, prev.r);
+            if (cameFrom.has(currentKey)) { // Don't push start node? Or yes?
+                // Actually standard is start -> ... -> end. 
+                // reconstruct walks backwards end -> start
+                totalPath.push(prev);
+            }
+        }
+
+        // Return start -> end (reverse the backward walk)
+        // But excluding start usually acts better for "next steps"
+        // Let's return full path including target, excluding start?
+        // Method name: findPath. Usually returns list of steps.
+        // Current: end, pre-end, ..., start
+        // Reverse it
+        return totalPath.reverse();
+    }
+
     // ========== State Persistence ==========
 
     getState(): any {

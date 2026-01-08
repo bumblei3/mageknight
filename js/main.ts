@@ -53,12 +53,12 @@ const hideLoadingScreen = (): void => {
  * Uses a global guard and state check to ensure only one instance runs.
  */
 const startMageKnight = async (): Promise<void> => {
-    // Global singleton guard
-    if ((window as any).game) {
-        console.warn('Mage Knight already initialized. Skipping.');
-        hideLoadingScreen();
+    // Global singleton guard (synchronous check)
+    if ((window as any).game || (window as any).mk_initializing) {
+        console.warn('Mage Knight already initialized or initializing. Skipping.');
         return;
     }
+    (window as any).mk_initializing = true;
 
     console.log('Starting Mage Knight...');
 
@@ -71,48 +71,57 @@ const startMageKnight = async (): Promise<void> => {
 
         const game = new MageKnightGame();
         (window as any).game = game;
+        delete (window as any).mk_initializing;
 
         // 3D View - Lazy loaded on first toggle
         const toggle3DBtn = document.getElementById('toggle-3d-btn') as HTMLButtonElement | null;
+        let is3DLoading = false;
 
         if (toggle3DBtn) {
             toggle3DBtn.addEventListener('click', async () => {
+                console.log('Toggle 3D: Clicked');
+                if (is3DLoading) {
+                    console.log('Toggle 3D: Loading in progress, ignoring click');
+                    return;
+                }
+
                 try {
                     // Lazy load 3D module on first click
                     if (!(window as any).game3D) {
+                        is3DLoading = true;
                         toggle3DBtn.disabled = true;
                         toggle3DBtn.style.opacity = '0.5';
+                        toggle3DBtn.classList.add('loading');
 
                         // Dynamic import - only loads Three.js when needed
                         // @ts-ignore - dynamic import of JS module or TS module
                         const { Game3D } = await import('./3d/Game3D');
-                        (window as any).game3D = new Game3D((window as any).game);
-                        (window as any).game3D.init('game-container-3d');
 
-                        // Hook into updateStats to refresh 3D view
-                        const originalUpdateStats = (window as any).game.updateStats.bind((window as any).game);
-                        (window as any).game.updateStats = () => {
-                            originalUpdateStats();
-                            if ((window as any).game3D && (window as any).game3D.enabled) {
-                                (window as any).game3D.update();
-                            }
-                        };
+                        // Double-check in case another click got through (unlikely with flag but safe)
+                        if (!(window as any).game3D) {
+                            (window as any).game3D = new Game3D((window as any).game);
+                            (window as any).game3D.init('game-container-3d');
+                        }
 
                         toggle3DBtn.disabled = false;
                         toggle3DBtn.style.opacity = '';
+                        toggle3DBtn.classList.remove('loading');
+                        is3DLoading = false;
                     }
 
+                    console.log('Toggling 3D view...');
                     const isEnabled = (window as any).game3D.toggle();
+                    console.log('3D Enabled state:', isEnabled);
                     toggle3DBtn.classList.toggle('active', isEnabled);
                     if (isEnabled) {
-                        toggle3DBtn.style.backgroundColor = 'var(--primary-color)';
-                    } else {
-                        toggle3DBtn.style.backgroundColor = '';
+                        // active style handled by class
                     }
                 } catch (e) {
                     console.warn('3D initialization failed:', e);
                     toggle3DBtn.disabled = false;
                     toggle3DBtn.style.opacity = '';
+                    toggle3DBtn.classList.remove('loading');
+                    is3DLoading = false;
                 }
             });
         }

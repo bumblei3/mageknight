@@ -714,6 +714,12 @@ export class Hero {
     }
 
     canAffordMana(card: Card, isNight = false): boolean {
+        // If checking for Strong effect (implied 1 mana cost of card color)
+        if (card.color && (card.type === 'action' || card.type === 'spell')) {
+            return this.hasMana(card.color as ManaColor, isNight);
+        }
+
+        // Legacy/Generic check
         if (!card.manaCost || card.manaCost === 0) return true;
         return this.hasMana(card.color as ManaColor, isNight);
     }

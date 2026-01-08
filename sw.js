@@ -91,6 +91,9 @@ async function staleWhileRevalidate(request) {
             cache.put(request, networkResponse.clone());
         }
         return networkResponse;
+    }).catch((error) => {
+        console.warn('[SW] StaleWhileRevalidate fetch failed:', error);
+        return cachedResponse; // Fallback to cache if network fails
     });
 
     return cachedResponse || networkFetch;

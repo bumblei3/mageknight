@@ -37,6 +37,7 @@ describe('InteractionController Coverage', () => {
                 <button id="play-basic-btn"></button>
                 <button id="play-strong-btn"></button>
                 <button id="card-play-close"></button>
+                <div id="card-play-preview"></div>
             </div>
             <div id="sideways-modal" style="display: none;" class="modal">
                  <button id="sideways-close">&times;</button>
@@ -58,6 +59,7 @@ describe('InteractionController Coverage', () => {
     });
 
     afterEach(() => {
+        if (controller && controller.destroy) controller.destroy();
         if (game && game.destroy) game.destroy();
         if (store) store.clearListeners();
         vi.clearAllMocks();
@@ -75,6 +77,7 @@ describe('InteractionController Coverage', () => {
         };
         game.hero.hand = [card];
         game.hero.manaInventory = { red: 1 }; // Can afford
+        game.hero.tempMana = ['red']; // Can afford
 
         controller.handleCardClick(0, card);
 
@@ -93,7 +96,7 @@ describe('InteractionController Coverage', () => {
             strongEffect: { attack: 5 }
         };
         game.hero.hand = [card];
-        game.hero.manaInventory = { red: 1 };
+        game.hero.tempMana = ['red'];
 
         controller.handleCardClick(0, card);
 
@@ -119,7 +122,7 @@ describe('InteractionController Coverage', () => {
             strongEffect: { attack: 5 }
         };
         game.hero.hand = [card];
-        game.hero.manaInventory = { red: 1 };
+        game.hero.tempMana = ['red'];
 
         controller.handleCardClick(0, card);
 
@@ -145,7 +148,7 @@ describe('InteractionController Coverage', () => {
             strongEffect: { attack: 5 }
         };
         game.hero.hand = [card];
-        game.hero.manaInventory = { red: 1 };
+        game.hero.tempMana = ['red'];
 
         controller.handleCardClick(0, card);
         const modal = document.getElementById('card-play-modal');
@@ -183,7 +186,7 @@ describe('InteractionController Coverage', () => {
             strongEffect: { attack: 5 }
         };
         game.hero.hand = [card];
-        game.hero.manaInventory = { red: 1 };
+        game.hero.tempMana = ['red'];
 
         let playInCombatCalled = false;
         game.combatOrchestrator.playCardInCombat = (idx, c, strong) => { if (strong) playInCombatCalled = true; };
@@ -225,13 +228,16 @@ describe('InteractionController Coverage', () => {
             strongEffect: { attack: 5 }
         };
         game.hero.hand = [card];
-        game.hero.manaInventory = { red: 1 };
+        game.hero.tempMana = ['red'];
 
         controller.handleCardClick(0, card);
         const modal = document.getElementById('card-play-modal');
+        expect(modal.style.display).toBe('flex'); // Modal should be open
 
-        // Mock event targeting the modal itself
-        modal.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        // Directly invoke onclick with a mock event to avoid JSDOM parallel execution issues
+        if (modal.onclick) {
+            modal.onclick({ target: { id: 'card-play-modal' } });
+        }
         expect(modal.style.display).toBe('none');
     });
 

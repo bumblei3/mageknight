@@ -8,10 +8,12 @@ export class InteractionController {
     private game: MageKnightGame;
     private cachedRect: DOMRect | null;
     private updateRectBound: () => void;
+    private initTimeout: any;
 
     constructor(game: MageKnightGame) {
         this.game = game;
         this.cachedRect = null;
+        this.initTimeout = null;
 
         // Cache rect on resize/scroll to avoid layout thrashing on every frame
         this.updateRectBound = this.updateRect.bind(this);
@@ -19,7 +21,15 @@ export class InteractionController {
             window.addEventListener('resize', this.updateRectBound);
             window.addEventListener('scroll', this.updateRectBound);
             // Initial cache
-            setTimeout(this.updateRectBound, 100);
+            this.initTimeout = setTimeout(this.updateRectBound, 100);
+        }
+    }
+
+    destroy(): void {
+        if (this.initTimeout) clearTimeout(this.initTimeout);
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('resize', this.updateRectBound);
+            window.removeEventListener('scroll', this.updateRectBound);
         }
     }
 
@@ -194,6 +204,7 @@ export class InteractionController {
     }
 
     handleCardClick(index: number, card: Card): void {
+        logger.debug(`handleCardClick called for ${card.name} (index: ${index})`);
         const isWound = typeof card.isWound === 'function' ? card.isWound() : !!(card as any).isWound;
         if (isWound) {
             this.game.sound.error();
@@ -267,17 +278,27 @@ export class InteractionController {
     }
 
     showCardPlayModal(index: number, card: Card): void {
+        logger.debug(`showCardPlayModal called for ${card.name}`);
         const isNight = this.game.timeManager.isNight();
         const modal = document.getElementById('card-play-modal');
-        if (!modal) return;
+        if (!modal) {
+            logger.error('Card Play Modal not found in DOM');
+            return;
+        }
         const basicBtn = document.getElementById('play-basic-btn');
         const strongBtn = document.getElementById('play-strong-btn') as HTMLButtonElement | null;
         const basicDesc = document.getElementById('basic-effect-desc');
         const strongDesc = document.getElementById('strong-effect-desc');
         const strongCost = document.getElementById('strong-cost-desc');
         const closeBtn = document.getElementById('card-play-close');
+        const preview = document.getElementById('card-play-preview');
 
-        if (!modal || !basicBtn || !strongBtn || !basicDesc || !strongDesc || !strongCost || !closeBtn) return;
+        if (!basicBtn || !strongBtn || !basicDesc || !strongDesc || !strongCost || !closeBtn || !preview) {
+            logger.error(`Missing modal elements: basicBtn=${!!basicBtn}, strongBtn=${!!strongBtn}, basicDesc=${!!basicDesc}, strongDesc=${!!strongDesc}, strongCost=${!!strongCost}, closeBtn=${!!closeBtn}, preview=${!!preview}`);
+            return;
+        }
+
+        logger.debug('Card Play Modal elements found, populating content...');
 
         // Populate Content
         basicDesc.textContent = this.game.ui.formatEffect(card.basicEffect);
@@ -318,7 +339,7 @@ export class InteractionController {
         closeBtn.addEventListener('click', close);
 
         modal.onclick = (e) => {
-            if (e.target === modal) close();
+            if ((e.target as HTMLElement).id === 'card-play-modal') close();
         };
 
         modal.style.display = 'flex';

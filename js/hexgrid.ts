@@ -76,6 +76,10 @@ export class HexGrid {
         return this.logic.getReachableHexes(startPos, movementPoints, isDay, hasFlight);
     }
 
+    findPath(start: HexUtils.HexCoord, end: HexUtils.HexCoord, isFlight: boolean = false) {
+        return this.logic.findPath(start, end, isFlight);
+    }
+
     getState() { return this.logic.getState(); }
     loadState(state: any) { this.logic.loadState(state); }
 

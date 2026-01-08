@@ -31,15 +31,16 @@ export class TimeManager {
     public endRound(): { round: number, timeOfDay: TimeOfDay } {
         this.round++;
         this.toggleTime();
-        this.notifyListeners();
+        // notifyListeners is called by toggleTime
         return {
             round: this.round,
             timeOfDay: this.timeOfDay
         };
     }
 
-    private toggleTime(): void {
+    public toggleTime(): void {
         this.timeOfDay = this.timeOfDay === TIME_OF_DAY.DAY ? TIME_OF_DAY.NIGHT : TIME_OF_DAY.DAY;
+        this.notifyListeners();
     }
 
     public addListener(callback: (state: { round: number, timeOfDay: TimeOfDay }) => void): void {

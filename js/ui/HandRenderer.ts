@@ -58,12 +58,35 @@ export class HandRenderer {
                 this.animatedCards.set(card, true);
             }
 
-            cardEl.addEventListener('click', () => {
-                if (this.ui && this.ui.game && this.ui.game.sound) {
-                    this.ui.game.sound.cardPlay();
-                }
-                onCardClick(index, card);
+            // Custom click handling to co-exist with Drag & Drop
+            const CLICK_THRESHOLD = 5;
+            let startX = 0;
+            let startY = 0;
+            let isClick = true;
+
+            cardEl.addEventListener('pointerdown', (e) => {
+                startX = e.clientX;
+                startY = e.clientY;
+                isClick = true;
             });
+
+            cardEl.addEventListener('pointermove', (e) => {
+                if (!isClick) return;
+                const dist = Math.sqrt(Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2));
+                if (dist > CLICK_THRESHOLD) {
+                    isClick = false;
+                }
+            });
+
+            cardEl.addEventListener('pointerup', (e) => {
+                if (isClick && e.button === 0) { // Left click only
+                    if (this.ui && this.ui.game && this.ui.game.sound) {
+                        this.ui.game.sound.cardPlay();
+                    }
+                    onCardClick(index, card);
+                }
+            });
+
             cardEl.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 if (this.ui && this.ui.game && this.ui.game.sound) {

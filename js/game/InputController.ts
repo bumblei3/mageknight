@@ -67,8 +67,8 @@ export class InputController {
             if (this.isUIBlocked()) return;
             // NOTE: InteractionController handles both mouse and touch via separate listeners if needed,
             // but for simple clicks it's here.
-            if (this.game.interactionController && typeof this.game.interactionController.handleClick === 'function') {
-                this.game.interactionController.handleClick(e);
+            if (this.game.interactionController && typeof this.game.interactionController.handleCanvasClick === 'function') {
+                this.game.interactionController.handleCanvasClick(e);
             }
         }, { signal });
 

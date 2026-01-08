@@ -17,6 +17,11 @@ export class TurnManager {
      * Ends the current turn and prepares for the next.
      */
     async endTurn(): Promise<void> {
+        if (this.game.gameState === 'combat') {
+            this.game.addLog(t('game.endTurnCombatBlocked'), 'warning');
+            this.game.showToast(t('game.endTurnCombatBlocked'), 'warning');
+            return;
+        }
         if (this.game.gameState !== 'playing') return;
 
         // 1. Reset Move Points

@@ -13,7 +13,8 @@ const en = {
         night: 'Night',
         victory: 'Victory!',
         defeat: 'Defeat!',
-        gameOver: 'Game Over'
+        gameOver: 'Game Over',
+        endTurnCombatBlocked: 'Finish the combat first before ending your turn!'
     },
 
     // UI Elements

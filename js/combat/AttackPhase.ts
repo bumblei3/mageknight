@@ -63,26 +63,45 @@ export class AttackPhase {
     }
 
     private _handleRegularEnemies(regularEnemies: any[], totalAttack: number, attackElement: string, result: any): void {
-        const totalArmor = regularEnemies.reduce((sum, enemy) => {
+        let remainingAttack = totalAttack;
+        const defeated: any[] = [];
+
+        // Sort enemies by armor (optional, but let's try to kill weakest first automatically or just iterate)
+        // For now, iterate and kill as many as we can
+        for (const enemy of regularEnemies) {
             const multiplier = enemy.getResistanceMultiplier(attackElement);
-            // Use getCurrentArmor logic (Elusive checks blocked status + attack phase)
             const isBlocked = this.combat.blockedEnemies.has(enemy.id);
             const currentArmor = typeof enemy.getCurrentArmor === 'function' ? enemy.getCurrentArmor(isBlocked, true) : enemy.armor;
-            return sum + (currentArmor / multiplier);
-        }, 0);
+            const neededForThis = currentArmor / multiplier;
 
-        if (totalAttack >= totalArmor) {
-            regularEnemies.forEach(enemy => {
+            if (remainingAttack >= neededForThis) {
+                remainingAttack -= neededForThis;
+                defeated.push(enemy);
+            }
+        }
+
+        if (defeated.length > 0) {
+            defeated.forEach(enemy => {
                 this.combat.defeatedEnemies.push(enemy);
                 this.combat.hero.gainFame(enemy.fame);
                 result.defeated.push(enemy);
                 result.fameGained += enemy.fame;
+                this.combat.enemies = this.combat.enemies.filter((e: any) => e.id !== enemy.id);
             });
-            this.combat.enemies = this.combat.enemies.filter((e: any) => !regularEnemies.includes(e));
-            result.messages.push(t('combat.enemiesDefeated', { count: regularEnemies.length }));
+            result.messages.push(t('combat.enemiesDefeated', { count: defeated.length }));
             result.success = true;
-        } else {
-            result.messages.push(t('combat.attackWeak', { attack: totalAttack, armor: totalArmor }));
+        }
+
+        if (defeated.length < regularEnemies.length) {
+            const totalRemainingArmor = regularEnemies
+                .filter(e => !defeated.includes(e))
+                .reduce((sum, e) => {
+                    const mult = e.getResistanceMultiplier(attackElement);
+                    const isB = this.combat.blockedEnemies.has(e.id);
+                    const armor = typeof e.getCurrentArmor === 'function' ? e.getCurrentArmor(isB, true) : e.armor;
+                    return sum + (armor / mult);
+                }, 0);
+            result.messages.push(t('combat.attackWeak', { attack: Math.floor(remainingAttack), armor: Math.floor(totalRemainingArmor) }));
         }
     }
 

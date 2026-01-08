@@ -155,7 +155,12 @@ export class CombatUIManager {
                 executeAttackBtn.style.display = 'block';
                 executeAttackBtn.classList.add('damage-phase-btn'); // Optional styling hook
             } else if (phase === COMBAT_PHASES.ATTACK) {
-                executeAttackBtn.textContent = 'Angriff ausführen';
+                // Check if attack is sufficient to defeat at least one enemy (simplified check for UI)
+                const enemies = this.ui?.game?.combat?.enemies || [];
+                const totalArmor = enemies.reduce((sum: number, e: any) => sum + (e.armor || 0), 0);
+                const canDefeat = attackTotal >= totalArmor && totalArmor > 0;
+
+                executeAttackBtn.textContent = canDefeat ? 'Angriff ausführen' : 'Kampf beenden';
                 executeAttackBtn.style.display = 'block';
                 executeAttackBtn.classList.remove('damage-phase-btn');
             } else {

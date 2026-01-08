@@ -288,11 +288,8 @@ export class CombatOrchestrator {
 
         this.game.addLog(attackResult.message, attackResult.success ? 'success' : 'warning');
 
-        if (attackResult.success) {
-            this.onCombatEnd({ victory: true, enemy: this.game.combat.enemy });
-        } else {
-            this.updateCombatInfo();
-        }
+        // ALWAYS end combat when this button is pressed in the Attack phase
+        this.onCombatEnd({ victory: attackResult.success, enemy: this.game.combat.enemy });
     }
 
     /**

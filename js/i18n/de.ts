@@ -13,7 +13,8 @@ const de = {
         night: 'Nacht',
         victory: 'Sieg!',
         defeat: 'Niederlage!',
-        gameOver: 'Spiel beendet'
+        gameOver: 'Spiel beendet',
+        endTurnCombatBlocked: 'Beende erst den Kampf, bevor du den Zug beenden kannst!'
     },
 
     // UI Elements

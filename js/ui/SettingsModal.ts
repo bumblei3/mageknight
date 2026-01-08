@@ -43,10 +43,8 @@ export class SettingsModal {
         // Shortcuts button
         const shortcutsBtn = document.getElementById('settings-shortcuts-btn');
         if (shortcutsBtn) {
-            shortcutsBtn.addEventListener('click', () => {
-                if (this.ui.shortcutsModal) {
-                    this.ui.shortcutsModal.show();
-                }
+            shortcutsBtn.addEventListener('click', async () => {
+                await this.ui.showShortcuts();
             });
         }
 

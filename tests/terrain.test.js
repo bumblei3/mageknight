@@ -11,7 +11,7 @@ describe('Terrain', () => {
         expect(terrain.getMovementCost(TERRAIN_TYPES.HILLS, false)).toBe(3);
         expect(terrain.getMovementCost(TERRAIN_TYPES.MOUNTAINS, false)).toBe(5);
         expect(terrain.getMovementCost(TERRAIN_TYPES.DESERT, false)).toBe(5);
-        expect(terrain.getMovementCost(TERRAIN_TYPES.WASTELAND, false)).toBe(3);
+        expect(terrain.getMovementCost(TERRAIN_TYPES.WASTELAND, false)).toBe(4);
     });
 
     it('should return correct night movement costs', () => {

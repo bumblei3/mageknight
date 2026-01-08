@@ -127,7 +127,8 @@
     background: hsla(0, 0%, 100%, 0.05);
     border: 1px solid var(--glass-border);
     color: var(--color-text-secondary);
-    padding: 0.6rem 1.2rem;
+    padding: 0.8rem 1.4rem;
+    min-height: 44px;
     border-radius: var(--radius-xl);
     cursor: pointer;
     transition: var(--transition-normal);
@@ -392,6 +393,8 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-md);
     padding: 1.5rem;
+    min-height: 100px;
+    min-width: 140px;
     color: var(--color-text-primary);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -599,6 +602,7 @@
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-md);
     padding: 1rem;
+    min-height: 70px;
     gap: 1.5rem;
     transition: all 0.2s;
     cursor: pointer;
@@ -1059,6 +1063,7 @@ input:checked+.slider:before {
 .hero-card:hover .select-hero-btn {
     filter: brightness(1.2);
 }
+
 /* --- Sideways Play Modal --- */
 .sideways-content {
     max-width: 500px;
@@ -1111,10 +1116,21 @@ input:checked+.slider:before {
 }
 
 /* Specific colors for types */
-.sideways-btn.movement:hover { border-color: #10b981; }
-.sideways-btn.attack:hover { border-color: #ef4444; }
-.sideways-btn.block:hover { border-color: #3b82f6; }
-.sideways-btn.influence:hover { border-color: #f3f4f6; }
+.sideways-btn.movement:hover {
+    border-color: #10b981;
+}
+
+.sideways-btn.attack:hover {
+    border-color: #ef4444;
+}
+
+.sideways-btn.block:hover {
+    border-color: #3b82f6;
+}
+
+.sideways-btn.influence:hover {
+    border-color: #f3f4f6;
+}
 
 .sideways-cancel {
     width: 100%;
@@ -1122,7 +1138,8 @@ input:checked+.slider:before {
 
 .sideways-card-preview {
     margin-bottom: 2rem;
-    pointer-events: none; /* Just visual */
+    pointer-events: none;
+    /* Just visual */
     display: flex;
     justify-content: center;
 }

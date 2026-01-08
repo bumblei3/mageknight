@@ -2,9 +2,19 @@
 export const SKILL_TYPES = {
     PASSIVE: 'passive',
     ACTIVE: 'active'
-};
+} as const;
 
-export const SKILLS = {
+export type SkillType = typeof SKILL_TYPES[keyof typeof SKILL_TYPES];
+
+export interface Skill {
+    id: string;
+    name: string;
+    type: SkillType;
+    icon: string;
+    description: string;
+}
+
+export const SKILLS: Record<string, Skill[]> = {
     GOLDYX: [
         { id: 'flight', name: 'Flug', type: SKILL_TYPES.ACTIVE, icon: '🦅', description: 'Bewege dich 2 Felder weit und ignoriere Geländekosten.' },
         { id: 'motivation', name: 'Motivation', type: SKILL_TYPES.ACTIVE, icon: '🚩', description: '+2 Karten, +1 Weißes Mana' },
@@ -25,17 +35,18 @@ export const SKILLS = {
 
 /**
  * Get random skills for a hero class.
- * Backward compatible signature.
  */
-export function getRandomSkills(heroId, count = 2) {
+export function getRandomSkills(heroId: string, countOrExcludeSet: number | Set<string> = 2, countIfSet: number = 2): Skill[] {
     const list = SKILLS[heroId.toUpperCase()] || [];
-    // If 2nd arg is a Set (new API), handle it
-    let finalCount = count;
-    let excludeSet = new Set();
 
-    if (arguments.length >= 2 && arguments[1] instanceof Set) {
-        excludeSet = arguments[1];
-        finalCount = arguments[2] || 2;
+    let excludeSet = new Set<string>();
+    let finalCount = 2;
+
+    if (typeof countOrExcludeSet === 'number') {
+        finalCount = countOrExcludeSet;
+    } else if (countOrExcludeSet instanceof Set) {
+        excludeSet = countOrExcludeSet;
+        finalCount = countIfSet;
     }
 
     const available = list.filter(s => !excludeSet.has(s.id));

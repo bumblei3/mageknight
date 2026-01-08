@@ -58,7 +58,7 @@ export const TERRAIN_COSTS: Record<TerrainType, TerrainCost> = {
     [TERRAIN_TYPES.HILLS]: { day: 3, night: 3 },
     [TERRAIN_TYPES.MOUNTAINS]: { day: 5, night: 5 },
     [TERRAIN_TYPES.DESERT]: { day: 5, night: 3 },
-    [TERRAIN_TYPES.WASTELAND]: { day: 3, night: 3 },
+    [TERRAIN_TYPES.WASTELAND]: { day: 4, night: 4 },
     [TERRAIN_TYPES.WATER]: { day: 999, night: 999 }
 };
 

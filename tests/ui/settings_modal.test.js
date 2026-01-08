@@ -32,6 +32,7 @@ describe('SettingsModal', () => {
             tooltipManager: { enabled: true },
             showToast: vi.fn(),
             refreshTranslations: vi.fn(),
+            showShortcuts: vi.fn(() => Promise.resolve()),
             shortcutsModal: { show: vi.fn() }
         };
 
@@ -133,7 +134,7 @@ describe('SettingsModal', () => {
 
     test('should show shortcuts modal when button is clicked', () => {
         document.getElementById('settings-shortcuts-btn').click();
-        expect(ui.shortcutsModal.show).toHaveBeenCalled();
+        expect(ui.showShortcuts).toHaveBeenCalled();
     });
 
     test('should handle missing game instance in applySettings', () => {

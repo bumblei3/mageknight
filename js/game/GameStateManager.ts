@@ -108,9 +108,9 @@ export class GameStateManager {
      * Opens the save file dialog (Slot-based)
      */
     async openSaveDialog(): Promise<void> {
-        if (!this.game.ui || !this.game.ui.saveLoadModal) return;
+        if (!this.game.ui || typeof this.game.ui.showSaveLoad !== 'function') return;
 
-        const slot = await this.game.ui.saveLoadModal.show('save');
+        const slot = await this.game.ui.showSaveLoad('save');
         if (slot !== null) {
             this.saveGame(slot);
         }
@@ -120,9 +120,9 @@ export class GameStateManager {
      * Opens the load file dialog (Slot-based)
      */
     async openLoadDialog(): Promise<void> {
-        if (!this.game.ui || !this.game.ui.saveLoadModal) return;
+        if (!this.game.ui || typeof this.game.ui.showSaveLoad !== 'function') return;
 
-        const slot = await this.game.ui.saveLoadModal.show('load');
+        const slot = await this.game.ui.showSaveLoad('load');
         if (slot !== null) {
             const state = SaveManager.loadGame(`slot_${slot}`);
             if (state) {
@@ -138,9 +138,9 @@ export class GameStateManager {
     /**
      * Opens the scenario selection dialog
      */
-    openScenarioSelection(): void {
-        if (this.game.ui && this.game.ui.scenarioSelectionModal) {
-            this.game.ui.scenarioSelectionModal.show();
+    async openScenarioSelection(): Promise<void> {
+        if (this.game.ui && typeof this.game.ui.showScenarioSelection === 'function') {
+            await this.game.ui.showScenarioSelection();
         }
     }
 
@@ -148,9 +148,9 @@ export class GameStateManager {
      * Opens the hero selection dialog
      * @param {string} scenarioId - The scenario chosen in the previous step
      */
-    openHeroSelection(scenarioId: string): void {
-        if (this.game.ui && this.game.ui.heroSelectionModal) {
-            this.game.ui.heroSelectionModal.show(scenarioId);
+    async openHeroSelection(scenarioId: string): Promise<void> {
+        if (this.game.ui && typeof this.game.ui.showHeroSelection === 'function') {
+            await this.game.ui.showHeroSelection(scenarioId);
         }
     }
 }

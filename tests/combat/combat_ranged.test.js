@@ -61,6 +61,11 @@ describe('Combat Ranged Phase Integration', () => {
             updateMovementPoints: createSpy(),
             renderUnits: createSpy(),
             setButtonEnabled: createSpy(),
+            showScenarioSelection: createSpy(() => Promise.resolve()),
+            showHeroSelection: createSpy(() => Promise.resolve()),
+            showSaveLoad: createSpy(() => Promise.resolve(null)),
+            showSettings: createSpy(() => Promise.resolve()),
+            showShortcuts: createSpy(() => Promise.resolve()),
             elements: {
                 playedCards: { getBoundingClientRect: () => ({ top: 0, right: 0 }) },
                 exploreBtn: { style: {} },

@@ -128,7 +128,7 @@ export class InteractionController {
                 const content = this.game.ui.tooltipManager.createSiteTooltipHTML(hex.site);
                 this.game.ui.tooltipManager.showTooltip(fakeElement, content);
             } else if (hex.terrain) {
-                const content = this.game.ui.tooltipManager.createTerrainTooltipHTML(hex.terrain);
+                const content = this.game.ui.tooltipManager.createTerrainTooltipHTML(hex.terrain, this.game);
                 this.game.ui.tooltipManager.showTooltip(fakeElement, content);
             } else {
                 this.game.ui.tooltipManager.hideTooltip();

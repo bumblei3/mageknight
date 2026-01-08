@@ -36,10 +36,10 @@ export class TooltipManager {
      * Show tooltip for terrain
      * @param {HTMLElement} element - Element to attach tooltip to
      * @param {string} terrainType - Terrain type
-     * @param {any} terrainData - Terrain data
+     * @param {any} game - Game instance for context
      */
-    public showTerrainTooltip(element: HTMLElement, terrainType: string, terrainData?: any): void {
-        const content = this.createTerrainTooltipHTML(terrainType, terrainData);
+    public showTerrainTooltip(element: HTMLElement, terrainType: string, game?: any): void {
+        const content = this.createTerrainTooltipHTML(terrainType, game);
         this.showTooltip(element, content);
     }
 
@@ -322,22 +322,47 @@ export class TooltipManager {
     /**
      * Create HTML for terrain tooltip
      * @param {string} terrainType - Terrain type
-     * @param {any} _terrainData - Terrain data object with cost info
+     * @param {any} game - Game instance for context
      * @returns {string} HTML string
      */
-    public createTerrainTooltipHTML(terrainType: string, _terrainData?: any): string {
+    public createTerrainTooltipHTML(terrainType: string, game?: any): string {
         // Icons mapping
         const icons: Record<string, string> = { 'plains': '🌾', 'forest': '🌲', 'hills': '⛰️', 'mountains': '🏔️', 'desert': '🏜️', 'wasteland': '☠️', 'water': '💧' };
 
         // Fetch data from i18n
         const nameKey = `terrain.${terrainType}.name`;
         const descKey = `terrain.${terrainType}.desc`;
-        const costKey = `terrain.${terrainType}.cost`;
 
         const name = t(nameKey);
         const desc = t(descKey);
-        const cost = t(costKey) || '?';
         const icon = icons[terrainType] || '❓';
+
+        // Dynamic cost calculation
+        let costDisplay = '?';
+        if (game && game.timeManager) {
+            const isNight = game.timeManager.isNight();
+            // Get base cost from constants or terrain system if available
+            // For now, let's use a simpler way if hexGrid.getMovementCost is too complex for here
+            // or just pull from constants via a helper
+            const terrainCosts = (game.constructor as any).TERRAIN_COSTS || {};
+            const costs = terrainCosts[terrainType];
+            if (costs) {
+                const dayCost = costs.day;
+                const nightCost = costs.night;
+
+                if (dayCost === nightCost) {
+                    costDisplay = `${dayCost}`;
+                } else {
+                    // Show current cost with indicator
+                    const currentCost = isNight ? nightCost : dayCost;
+                    const timeIcon = isNight ? '🌙' : '☀️';
+                    costDisplay = `<span class="current-cost">${currentCost}</span> <small>(${timeIcon})</small>`;
+                }
+            }
+        } else {
+            // Fallback to static i18n cost if game context missing
+            costDisplay = t(`terrain.${terrainType}.cost`) || '?';
+        }
 
         // Check if translations were found, otherwise fallback nicely
         const displayName = (name !== nameKey) ? name : (terrainType.charAt(0).toUpperCase() + terrainType.slice(1));
@@ -352,7 +377,7 @@ export class TooltipManager {
                 <div class="tooltip-divider"></div>
                 <div class="tooltip-stat-row">
                     <span>👣 ${t('ui.labels.movement')}:</span>
-                    <span class="value">${cost}</span>
+                    <span class="value">${costDisplay}</span>
                 </div>
                 <div class="tooltip-description">${displayDesc}</div>
             </div>

@@ -2,34 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { setLanguage } from '../js/i18n/index.js';
 import { TooltipManager } from '../js/ui/TooltipManager.js';
 
-// Mock DOM
-const mockDocument = {
-    createElement: (tag) => ({
-        className: '',
-        style: {},
-        classList: {
-            add: () => { },
-            remove: () => { },
-            contains: () => false
-        },
-        innerHTML: '',
-        getBoundingClientRect: () => ({ width: 200, height: 100 })
-    }),
-    body: {
-        appendChild: () => { }
-    }
-};
-
-const mockWindow = {
-    innerWidth: 1024,
-    innerHeight: 768
-};
-
-// Apply mocks if not in browser
-if (typeof document === 'undefined') {
-    global.document = mockDocument;
-    global.window = mockWindow;
-}
+// Mocks handled by setup.js and vitest-jsdom environment
 
 describe('TooltipManager', () => {
     let tooltipManager;

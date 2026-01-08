@@ -176,6 +176,11 @@ export function createMockUI() {
         renderHandCards: createSpy(),
         renderManaSource: createSpy(),
         setButtonEnabled: createSpy(),
+        showScenarioSelection: createSpy(() => Promise.resolve()),
+        showHeroSelection: createSpy(() => Promise.resolve()),
+        showSaveLoad: createSpy(() => Promise.resolve(null)),
+        showSettings: createSpy(() => Promise.resolve()),
+        showShortcuts: createSpy(() => Promise.resolve()),
         elements: {
             endTurnBtn: { addEventListener: createSpy() },
             restBtn: { addEventListener: createSpy() },

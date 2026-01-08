@@ -117,7 +117,10 @@ export class MageKnightGame {
         this.abortController = new AbortController();
         this.activeTimeouts = new Set();
         this.gameState = 'playing';
-        this.isTestEnvironment = !!(typeof window !== 'undefined' && ((window as any).isTest || (window as any).__playwright__ || navigator.webdriver));
+        this.isTestEnvironment = !!(
+            (typeof window !== 'undefined' && ((window as any).isTest || (window as any).__playwright__ || navigator.webdriver)) ||
+            (globalThis as any).isTestEnvironment
+        );
 
         // Managers
         this.ui = new UI();
@@ -203,12 +206,12 @@ export class MageKnightGame {
         this.startNewGame(null, 'goldyx');
 
         // Show scenario selection modal after a brief delay
-        this.setGameTimeout(() => {
+        this.setGameTimeout(async () => {
             if (this.stateManager &&
-                this.ui?.scenarioSelectionModal?.modal &&
+                this.ui &&
                 this.scenarioManager &&
                 !this.isTestEnvironment) {
-                this.stateManager.openScenarioSelection();
+                await this.stateManager.openScenarioSelection();
             }
         }, 500);
     }

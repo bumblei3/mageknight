@@ -13,11 +13,6 @@ import { store, ACTIONS } from './game/Store';
 import { eventBus } from './eventBus';
 import { GAME_EVENTS } from './constants';
 import ParticleSystem from './particles';
-import { SaveLoadModal } from './ui/SaveLoadModal';
-import { ScenarioSelectionModal } from './ui/ScenarioSelectionModal';
-import { HeroSelectionModal } from './ui/HeroSelectionModal';
-import { SettingsModal } from './ui/SettingsModal';
-import { ShortcutsModal } from './ui/ShortcutsModal';
 
 export interface UIElements {
     fameValue: HTMLElement | null;
@@ -81,11 +76,11 @@ export class UI {
     public unitRenderer: any;
     public handRenderer: any;
     public skillRenderer: any;
-    public saveLoadModal: any;
-    public scenarioSelectionModal: any;
-    public heroSelectionModal: any;
-    public settingsModal: any;
-    public shortcutsModal: any;
+    public saveLoadModal: any = null;
+    public scenarioSelectionModal: any = null;
+    public heroSelectionModal: any = null;
+    public settingsModal: any = null;
+    public shortcutsModal: any = null;
     public floatingText: any;
     public particleCanvas: HTMLCanvasElement | null = null;
     public particleSystem: any;
@@ -110,11 +105,6 @@ export class UI {
         this.unitRenderer = new UnitRenderer(this.elements, this);
         this.handRenderer = new HandRenderer(this.elements, this.tooltipManager, this);
         this.skillRenderer = new SkillRenderer(this);
-        this.saveLoadModal = new SaveLoadModal(this);
-        this.scenarioSelectionModal = new ScenarioSelectionModal(this);
-        this.heroSelectionModal = new HeroSelectionModal(this);
-        this.settingsModal = new SettingsModal(this);
-        this.shortcutsModal = new ShortcutsModal(this);
 
         // Visual effects
         const gameBoard = document.querySelector('#game-board');
@@ -202,7 +192,7 @@ export class UI {
             this.skillRenderer.setContainer(this.elements.skillList);
         }
 
-        if (this.settingsModal) {
+        if (this.settingsModal && typeof this.settingsModal.applySettings === 'function') {
             this.settingsModal.applySettings(this.settingsModal.settings);
         }
 
@@ -355,8 +345,8 @@ export class UI {
             });
         }
         if (this.elements.settingsBtn) {
-            this.elements.settingsBtn.addEventListener('click', () => {
-                this.settingsModal.show();
+            this.elements.settingsBtn.addEventListener('click', async () => {
+                await this.showSettings();
                 if (this.game && this.game.sound) this.game.sound.click();
             });
         }
@@ -448,6 +438,47 @@ export class UI {
 
     public renderUnits(units: any[]): void {
         this.unitRenderer.renderUnits(units);
+    }
+
+    public async showSettings(): Promise<void> {
+        if (!this.settingsModal) {
+            const { SettingsModal } = await import('./ui/SettingsModal');
+            this.settingsModal = new SettingsModal(this);
+            this.settingsModal.applySettings(this.settingsModal.settings);
+        }
+        this.settingsModal.show();
+    }
+
+    public async showShortcuts(): Promise<void> {
+        if (!this.shortcutsModal) {
+            const { ShortcutsModal } = await import('./ui/ShortcutsModal');
+            this.shortcutsModal = new ShortcutsModal(this);
+        }
+        this.shortcutsModal.show();
+    }
+
+    public async showSaveLoad(type: 'save' | 'load'): Promise<string | number | null> {
+        if (!this.saveLoadModal) {
+            const { SaveLoadModal } = await import('./ui/SaveLoadModal');
+            this.saveLoadModal = new SaveLoadModal(this);
+        }
+        return await this.saveLoadModal.show(type);
+    }
+
+    public async showScenarioSelection(): Promise<void> {
+        if (!this.scenarioSelectionModal) {
+            const { ScenarioSelectionModal } = await import('./ui/ScenarioSelectionModal');
+            this.scenarioSelectionModal = new ScenarioSelectionModal(this);
+        }
+        this.scenarioSelectionModal.show();
+    }
+
+    public async showHeroSelection(scenarioId: string): Promise<void> {
+        if (!this.heroSelectionModal) {
+            const { HeroSelectionModal } = await import('./ui/HeroSelectionModal');
+            this.heroSelectionModal = new HeroSelectionModal(this);
+        }
+        this.heroSelectionModal.show(scenarioId);
     }
 
     public showPlayArea(): void {

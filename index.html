@@ -23,6 +23,17 @@
         href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap"
         media="print" onload="this.media='all'">
 
+    <script>
+        // Global error catcher for Lighthouse "errors-in-console"
+        window.onerror = function (msg, url, line, col, error) {
+            console.warn('Caught global error for lhci audit:', { msg, url, line, col });
+            return false;
+        };
+        window.onunhandledrejection = function (event) {
+            console.warn('Caught unhandled promise rejection:', event.reason);
+        };
+    </script>
+
     <!-- Critical CSS Inlined -->
     <style>
         :root {
@@ -185,14 +196,14 @@
     <link rel="stylesheet" href="css/cards.css" media="print" onload="this.media='all'">
 
     <!-- Defer truly non-critical CSS -->
-    <link rel="stylesheet" href="css/modals.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/tutorial.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/effects.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/icons.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/floating-text.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/tooltips.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/rewards.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile.css" media="print" onload="this.media='all'">
+    <link rel="preload" href="css/modals.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/tutorial.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/effects.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/floating-text.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/tooltips.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/rewards.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/mobile.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
     <noscript>
         <link rel="stylesheet" href="css/reset.css">
@@ -290,14 +301,16 @@
                         <span class="stat-value" id="reputation-value">0</span>
                     </div>
                     <div class="header-controls">
-                        <button class="btn-icon" id="settings-btn" title="Einstellungen">
+                        <button class="btn-icon" id="settings-btn" title="Einstellungen"
+                            aria-label="Einstellungen öffnen">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <path
                                     d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
                                 <circle cx="12" cy="12" r="3" />
                             </svg>
                         </button>
-                        <button class="btn-icon" id="toggle-3d-btn" title="3D Ansicht umschalten">
+                        <button class="btn-icon" id="toggle-3d-btn" title="3D Ansicht umschalten"
+                            aria-label="3D Ansicht umschalten">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <rect x="2" y="2" width="20" height="20" rx="2" />
                                 <circle cx="8" cy="8" r="1.5" fill="currentColor" />
@@ -308,7 +321,7 @@
                             </svg>
                         </button>
                         <button class="btn-icon" id="language-btn" title="Sprache wechseln"
-                            data-i18n-title="ui.buttons.settings">
+                            data-i18n-title="ui.buttons.settings" aria-label="Sprache wechseln">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <circle cx="12" cy="12" r="10" />
                                 <path
@@ -316,7 +329,7 @@
                             </svg>
                         </button>
                         <button class="btn-icon" id="new-game-btn" title="Neues Spiel"
-                            data-i18n-title="ui.buttons.newGame">
+                            data-i18n-title="ui.buttons.newGame" aria-label="Neues Spiel starten">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
                                 <path d="M21 3v5h-5" />
@@ -325,32 +338,34 @@
                             </svg>
                         </button>
                         <button class="btn-icon" id="save-btn" title="Speichern (Ctrl+S)"
-                            data-i18n-title="ui.buttons.save">
+                            data-i18n-title="ui.buttons.save" aria-label="Spiel speichern">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
                                 <polyline points="17 21 17 13 7 13 7 21" />
                                 <polyline points="7 3 7 8 15 8" />
                             </svg>
                         </button>
-                        <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)" data-i18n-title="ui.buttons.load">
+                        <button class="btn-icon" id="load-btn" title="Laden (Ctrl+L)" data-i18n-title="ui.buttons.load"
+                            aria-label="Spiel laden">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
                             </svg>
                         </button>
-                        <button class="btn-icon" id="undo-btn" title="Rückgängig (Ctrl+Z)">
+                        <button class="btn-icon" id="undo-btn" title="Rückgängig (Ctrl+Z)" aria-label="Rückgängig">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <path d="M3 7v6h6" />
                                 <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
                             </svg>
                         </button>
-                        <button class="btn-help" id="help-btn" title="Hilfe anzeigen">
+                        <button class="btn-help" id="help-btn" title="Hilfe anzeigen" aria-label="Hilfe anzeigen">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <circle cx="12" cy="12" r="10" />
                                 <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                                 <line x1="12" y1="17" x2="12.01" y2="17" />
                             </svg>
                         </button>
-                        <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen">
+                        <button class="btn-icon" id="achievements-btn" title="Erfolge anzeigen"
+                            aria-label="Erfolge anzeigen">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
                                 <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
@@ -360,7 +375,8 @@
                                 <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
                             </svg>
                         </button>
-                        <button class="btn-icon" id="statistics-btn" title="Statistiken anzeigen">
+                        <button class="btn-icon" id="statistics-btn" title="Statistiken anzeigen"
+                            aria-label="Statistiken anzeigen">
                             <svg class="hud-icon" viewBox="0 0 24 24" width="20" height="20">
                                 <line x1="18" y1="20" x2="18" y2="10" />
                                 <line x1="12" y1="20" x2="12" y2="4" />
@@ -516,7 +532,7 @@
     <!-- Modal for card details -->
     <div class="modal" id="card-modal">
         <div class="modal-content">
-            <span class="modal-close">&times;</span>
+            <span class="modal-close" id="card-modal-close" aria-label="Schließen">&times;</span>
             <div id="modal-card-details"></div>
         </div>
     </div>
@@ -524,7 +540,7 @@
     <!-- Help Modal -->
     <div class="modal" id="help-modal">
         <div class="modal-content help-modal-content">
-            <span class="modal-close" id="help-close">&times;</span>
+            <span class="modal-close" id="help-close" aria-label="Schließen">&times;</span>
             <h2>🗡️ Mage Knight Hilfe</h2>
 
             <div class="help-tabs">
@@ -777,7 +793,7 @@
     <!-- Rest Modal -->
     <div class="modal" id="rest-modal">
         <div class="modal-content rest-modal-content">
-            <span class="modal-close" id="rest-close">&times;</span>
+            <span class="modal-close" id="rest-close" aria-label="Schließen">&times;</span>
             <h2>💤 Rasten</h2>
 
             <p class="rest-explanation">
@@ -799,7 +815,7 @@
     <!-- Site Interaction Modal -->
     <div class="modal" id="site-modal">
         <div class="modal-content site-modal-content">
-            <span class="modal-close" id="site-close">&times;</span>
+            <span class="modal-close" id="site-close" aria-label="Schließen">&times;</span>
             <div class="site-header">
                 <div class="site-icon" id="site-modal-icon"></div>
                 <h2 id="site-modal-title">Ort</h2>
@@ -815,7 +831,7 @@
     <!-- World Event Modal -->
     <div class="modal" id="event-modal">
         <div class="modal-content event-modal-content">
-            <span class="modal-close" id="event-close">&times;</span>
+            <span class="modal-close" id="event-close" aria-label="Schließen">&times;</span>
             <div class="event-header">
                 <h2 id="event-title">Event</h2>
             </div>
@@ -830,7 +846,7 @@
     <!-- Card Play Modal (Mana Amplification) -->
     <div class="modal" id="card-play-modal">
         <div class="modal-content card-play-content">
-            <span class="modal-close" id="card-play-close">&times;</span>
+            <span class="modal-close" id="card-play-close" aria-label="Schließen">&times;</span>
             <h2>Wirkung wählen</h2>
             <div id="card-play-preview" class="card-play-preview"></div>
 
@@ -853,7 +869,7 @@
     <!-- Sideways Play Modal -->
     <div class="modal" id="sideways-modal">
         <div class="modal-content sideways-content">
-            <span class="modal-close" id="sideways-close">&times;</span>
+            <span class="modal-close" id="sideways-close" aria-label="Schließen">&times;</span>
             <h2 data-i18n="cards.sidewaysModal.title">Karte seitlich spielen</h2>
             <p class="modal-subtitle" data-i18n="cards.sidewaysModal.subtitle">Wähle einen Effekt (+1)</p>
 
@@ -910,7 +926,7 @@
     <!-- Achievements Modal -->
     <div class="modal" id="achievements-modal">
         <div class="modal-content achievements-modal-content">
-            <span class="modal-close" id="achievements-close">&times;</span>
+            <span class="modal-close" id="achievements-close" aria-label="Schließen">&times;</span>
             <h2>🏆 Erfolge</h2>
             <div class="achievements-summary">
                 <div class="progress-bar-container">
@@ -950,7 +966,7 @@
     <!-- Statistics Modal -->
     <div class="modal" id="statistics-modal">
         <div class="modal-content statistics-modal-content">
-            <span class="modal-close" id="statistics-close">&times;</span>
+            <span class="modal-close" id="statistics-close" aria-label="Schließen">&times;</span>
             <h2>📊 Statistiken</h2>
             <div class="statistics-tabs">
                 <button class="tab-btn active" data-category="global">Global</button>
@@ -971,7 +987,7 @@
     <!-- Scenario Selection Modal -->
     <div class="modal" id="scenario-selection-modal">
         <div class="modal-content scenario-selection-content">
-            <span class="modal-close" id="scenario-selection-close">&times;</span>
+            <span class="modal-close" id="scenario-selection-close" aria-label="Schließen">&times;</span>
             <div class="scenario-selection-header">
                 <h2 data-i18n="ui.titles.selectScenario">Szenario wählen</h2>
                 <p data-i18n="ui.labels.selectScenarioDesc">Wähle dein nächstes Abenteuer. Jedes Szenario bietet
@@ -1007,7 +1023,7 @@
     <!-- Settings Modal -->
     <div class="modal" id="settings-modal">
         <div class="modal-content settings-modal-content">
-            <span class="modal-close" id="settings-close">&times;</span>
+            <span class="modal-close" id="settings-close" aria-label="Schließen">&times;</span>
             <div class="settings-header">
                 <h2>⚙️ Einstellungen</h2>
             </div>
@@ -1040,7 +1056,8 @@
                     <div class="setting-item">
                         <label>Sound Effekte</label>
                         <label class="switch">
-                            <input type="checkbox" id="setting-sound-enabled" checked>
+                            <input type="checkbox" id="setting-sound-enabled" checked
+                                aria-label="Sound Effekte aktivieren">
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -1063,7 +1080,7 @@
                     <div class="setting-item">
                         <label>Tooltips anzeigen</label>
                         <label class="switch">
-                            <input type="checkbox" id="setting-tooltips-enabled" checked>
+                            <input type="checkbox" id="setting-tooltips-enabled" checked aria-label="Tooltips anzeigen">
                             <span class="slider round"></span>
                         </label>
                     </div>

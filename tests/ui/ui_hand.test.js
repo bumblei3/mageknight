@@ -65,4 +65,20 @@ describe('UI Hand Rendering', () => {
         expect(clickSpy.calls[0][0]).toBe(0); // Index
         expect(clickSpy.calls[0][1]).toBe(mockHand[0]); // Card
     });
+
+    it('should NOT trigger callback if dragged (moved too much)', () => {
+        const mockHand = [new Card({ id: 1, name: 'Test', type: 'action', color: 'red' })];
+        const clickSpy = createSpy();
+
+        ui.renderHandCards(mockHand, clickSpy, () => { });
+
+        const cardEl = ui.elements.handCards.children[0];
+
+        // Simulate move beyond threshold (5px)
+        cardEl.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 10, clientY: 10 }));
+        cardEl.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: 20, clientY: 20 })); // 14px distance
+        cardEl.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 20, clientY: 20, button: 0 }));
+
+        expect(clickSpy.callCount).toBe(0);
+    });
 });

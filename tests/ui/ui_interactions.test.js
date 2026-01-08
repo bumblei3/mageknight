@@ -263,4 +263,25 @@ describe('Advanced UI Interaction Coverage', () => {
             expect(modal.classList.contains('active')).toBe(true);
         });
     });
+    describe('Canvas Click Logic', () => {
+        it('should trigger moveHero when in movementMode', () => {
+            game.movementMode = true;
+            game.hexGrid.pixelToAxial = () => ({ q: 1, r: 0 });
+            game.hexGrid.hasHex = () => true;
+            game.hexGrid.axialToPixel = () => ({ x: 100, y: 100 });
+
+            const moveSpy = vi.fn();
+            game.moveHero = moveSpy;
+
+            // Mock canvas rect for coordinates
+            game.canvas.getBoundingClientRect = () => ({ left: 0, top: 0, width: 800, height: 600 });
+            game.canvas.width = 800;
+            game.canvas.height = 600;
+
+            const event = new MouseEvent('click', { clientX: 100, clientY: 100 });
+            game.interactionController.handleCanvasClick(event);
+
+            expect(moveSpy).toHaveBeenCalledWith(1, 0);
+        });
+    });
 });

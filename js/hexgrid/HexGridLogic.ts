@@ -255,11 +255,7 @@ export class HexGridLogic {
         while (cameFrom.has(currentKey)) {
             const prev = cameFrom.get(currentKey)!;
             currentKey = this.getHexKey(prev.q, prev.r);
-            if (cameFrom.has(currentKey)) { // Don't push start node? Or yes?
-                // Actually standard is start -> ... -> end. 
-                // reconstruct walks backwards end -> start
-                totalPath.push(prev);
-            }
+            totalPath.push(prev);
         }
 
         // Return start -> end (reverse the backward walk)

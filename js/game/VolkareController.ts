@@ -76,7 +76,16 @@ export class VolkareController {
         }
 
         // Check if Hero is on same hex -> Combat
-        // This logic might be better in Hero movement or Interaction Controller
+        if (this.game.hero && this.game.hero.position) {
+            if (this.position.q === this.game.hero.position.q && this.position.r === this.game.hero.position.r) {
+                console.log('💀 Volkare has caught the Hero! TO BATTLE!');
+                eventBus.emit(GAME_EVENTS.LOG_ADDED, {
+                    message: "Volkare has intercepted the Hero! Prepare for combat.",
+                    type: 'bad'
+                });
+                eventBus.emit('HERO_VOLKARE_COMBAT', { volkare: this });
+            }
+        }
     }
 
     notifyUpdate() {

@@ -42,22 +42,18 @@ test.describe('Card Interaction Flow', () => {
         });
     });
 
-    test('should play basic card effect by clicking', async ({ page }) => {
+    test('should play basic card effect by clicking (auto-play without mana)', async ({ page }) => {
         // Initial state
         const initialPoints = await page.evaluate(() => window.game.hero.movementPoints);
         expect(initialPoints).toBe(0);
 
-        // Click Stamina card (Green)
+        // Click Stamina card (Green) - use pointer events to match HandRenderer
+        // Since no mana is available, the basic effect should auto-play without modal
         const card = page.locator('.card', { hasText: 'Stamina' });
-        await card.click();
+        await card.dispatchEvent('pointerdown', { button: 0, clientX: 0, clientY: 0 });
+        await card.dispatchEvent('pointerup', { button: 0, clientX: 0, clientY: 0 });
 
-        // Modal should appear
-        const modal = page.locator('#card-play-modal');
-        await expect(modal).toBeVisible();
-
-        // Click Basic
-        await page.locator('#play-basic-btn').click();
-
+        // No modal should appear (auto-play basic effect)
         // Verify movement points increased (Stamina gives 2)
         await expect(async () => {
             const points = await page.evaluate(() => window.game.hero.movementPoints);
@@ -73,8 +69,9 @@ test.describe('Card Interaction Flow', () => {
         const woundCard = page.locator('.card.wound-card');
         await expect(woundCard).toBeVisible();
 
-        // Click it
-        await woundCard.click();
+        // Click it using pointer events
+        await woundCard.dispatchEvent('pointerdown', { button: 0, clientX: 0, clientY: 0 });
+        await woundCard.dispatchEvent('pointerup', { button: 0, clientX: 0, clientY: 0 });
 
         // Hand size should NOT change (3 cards)
         const handSize = await page.locator('#hand-cards .card').count();
@@ -87,9 +84,10 @@ test.describe('Card Interaction Flow', () => {
             window.game.hero.tempMana = ['green'];
         });
 
-        // Click Stamina card (Green)
+        // Click Stamina card (Green) using pointer events
         const card = page.locator('.card', { hasText: 'Stamina' });
-        await card.click();
+        await card.dispatchEvent('pointerdown', { button: 0, clientX: 0, clientY: 0 });
+        await card.dispatchEvent('pointerup', { button: 0, clientX: 0, clientY: 0 });
 
         // Modal should appear
         const modal = page.locator('#card-play-modal');

@@ -32,7 +32,7 @@ export class EnemyAI {
         this.pendingResolve = null;
 
         try {
-            this.worker = new Worker('./js/workers/aiWorker.js', { type: 'module' });
+            this.worker = new Worker(new URL('./workers/aiWorker.js', import.meta.url), { type: 'module' });
             this.worker.onmessage = this.handleWorkerMessage.bind(this);
             console.log('AI Worker initialized');
         } catch (e) {

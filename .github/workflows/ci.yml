@@ -202,7 +202,7 @@ jobs:
         with:
           path: dist/
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   # --- Optional: Security Audit ---
   security:

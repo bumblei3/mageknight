@@ -106,6 +106,50 @@ export class WorldEventManager {
 
     // Called by MapManager potentially
     onTileRevealed(q: number, r: number, tileData: any) {
-        // Logic for spawning enemies or sites on reveal
+        if (tileData.site && tileData.site.type === 'spawning_grounds' && !tileData.site.conquered) {
+            // Spawning Grounds auto-spawn enemies when revealed
+            const enemies: any[] = [];
+
+            // 1-2 enemies spawn automatically
+            const spawnCount = Math.random() > 0.5 ? 2 : 1;
+
+            for (let i = 0; i < spawnCount; i++) {
+                const enemyType = Math.random() > 0.5 ? 'orc' : 'rat';
+                const isElite = Math.random() > 0.7;
+
+                if (enemyType === 'orc') {
+                    enemies.push({
+                        id: `spawn_orc_${Date.now()}_${i}`,
+                        name: isElite ? 'Ork-Elite' : 'Ork',
+                        armor: isElite ? 4 : 3,
+                        attack: isElite ? 5 : 3,
+                        fame: isElite ? 5 : 2,
+                        icon: '👹',
+                        type: isElite ? 'orc_elite' : 'orc',
+                        color: '#16a34a',
+                        brutal: isElite
+                    });
+                } else {
+                    enemies.push({
+                        id: `spawn_rat_${Date.now()}_${i}`,
+                        name: isElite ? 'Riesige Ratte' : 'Sumpf-Ratte',
+                        armor: isElite ? 4 : 3,
+                        attack: isElite ? 4 : 3,
+                        fame: isElite ? 3 : 2,
+                        icon: '🐀',
+                        type: isElite ? 'giant_rat' : 'rat',
+                        color: '#a16207',
+                        swift: isElite
+                    });
+                }
+            }
+
+            this.game.addLog(`Die Brutstätte erwacht! ${enemies.length} Monster greifen an!`, 'warning');
+            
+            // Start combat immediately
+            if (enemies.length > 0 && this.game.combatOrchestrator) {
+                this.game.combatOrchestrator.initiateCombat(enemies);
+            }
+        }
     }
 }

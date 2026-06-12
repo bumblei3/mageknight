@@ -82,6 +82,10 @@ export class InteractionController {
         }
     }
 
+    handleMouseMove(e: MouseEvent): void {
+        this.handleCanvasMouseMove(e);
+    }
+
     handleCanvasMouseMove(e: MouseEvent): void {
         if (!this.game.hexGrid || !this.game.ui.tooltipManager) return;
 

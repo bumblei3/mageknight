@@ -169,7 +169,8 @@ const de = {
             enraged: '{name} wird wütend! Angriff erhöht!',
             summons: '{name} beschwört {count} {enemy}!',
             heals: '{name} heilt sich um {amount}!',
-            doubleAttack: '{name} greift nun doppelt an!'
+            doubleAttack: '{name} greift nun doppelt an!',
+            manaburn: '{name} verbrennt {amount} Mana des Helden!'
         },
         fightAgainst: 'Kampf gegen {enemy}!',
         victoryOver: 'Sieg über {enemy}!',
@@ -358,6 +359,7 @@ const de = {
         dragon_lord: 'Drachen-König',
         lich_king: 'Lich-König',
         dragonlord: 'Drachen-König', // Handle case differences
+        volkare: 'Volkare',
         abilities: {
             descriptions: {
                 fortified: 'Befestigt: Immun gegen Fernkampf (außer Belagerung).',
@@ -376,6 +378,7 @@ const de = {
                 elusive: 'Ausweichend: Höhere Rüstung gegen Fernkampf.',
                 arcane_immune: 'Arkane Immunität: Immun gegen Nicht-Angriffs- und Nicht-Blockwirkungen (Gift, Brennen, Frost, Schwächung, Schild, Wut). Direkte Angriffe und Betäubung wirken normal.',
                 defensive: 'Verteidigend: Feinde mit dieser Fähigkeit unterstützen sich gegenseitig. Wenn du einen verteidigenden Feind an einer Stadt oder Burg angriffst, schließen sich benachbarte verteidigende Feinde an Stadt- und Burgstandorten dem Kampf an.',
+                manaburn: 'Manabrand: Verbrennt Mana des Helden (2-4 Kristalle).',
                 boss: 'Boss: Ein mächtiger Gegner mit mehreren Phasen und einzigartigen Mechaniken.'
             }
         }
@@ -395,6 +398,7 @@ const de = {
         elusive: { name: 'Ausweichend', desc: 'Hat höhere Rüstung gegen Fernkampf-Angriffe.' },
         arcane_immune: { name: 'Arkane Immunität', desc: 'Immun gegen Nicht-Angriffs- und Nicht-Blockwirkungen wie Gift, Brennen, Frost, Schwächung, Schild, Wut. Direkte Angriffe und Betäubung wirken normal.' },
         defensive: { name: 'Verteidigend', desc: 'Feinde mit dieser Fähigkeit unterstützen sich gegenseitig. Wenn du einen verteidigenden Feind an einer Stadt oder Burg angriffst, schließen sich benachbarte verteidigende Feinde an Stadt- und Burgstandorten dem Kampf an.' },
+        manaburn: { name: 'Manabrand', desc: 'Verbrennt 2-4 Mana-Kristalle des Helden.' },
         resistance: { name: 'Resistenz', desc: 'Halbiert Schaden/Block von nicht-passenden Elementen (z.B. Feuer gegen Feuer).' },
         block: { name: 'Block', desc: 'Verhindert den Angriff des Feindes. Muss gleich oder höher als der Angriffswert sein.' },
         wound: { name: 'Wunde', desc: 'Negative Karte, die die Hand verstopft. Kann nicht gespielt werden (außer zum Rasten).' },

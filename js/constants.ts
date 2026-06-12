@@ -239,6 +239,20 @@ export const BOSS_DEFINITIONS: Record<string, BossDefinition> = {
         icon: '💀', color: '#7c3aed',
         summonType: 'phantom', summonCount: 3,
         phaseAbilities: { 1: 'summon', 2: 'heal', 3: 'summon', enraged: 'double_attack' }
+    },
+    volkare: {
+        name: 'Volkare', armor: 10, attack: 7, fame: 70, maxHealth: 50,
+        fortified: true, brutal: true, fireResist: true, iceResist: true, physicalResist: true,
+        attackType: 'cold_fire',
+        icon: '👑', color: '#4b0082',
+        summonType: 'orc_elite', summonCount: 3,
+        phaseAbilities: { 
+            1: 'summon', 
+            2: 'summon', 
+            3: 'heal', 
+            4: 'manaburn', 
+            enraged: 'double_attack' 
+        }
     }
 };
 

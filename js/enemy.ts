@@ -292,11 +292,17 @@ export class BossEnemy extends Enemy {
         this.isBoss = true;
         this.maxHealth = data.maxHealth || 30;
         this.currentHealth = data.currentHealth || this.maxHealth;
-        this.phases = data.phases || [
+        this.phases = data.phases || (data.type === 'volkare' ? [
+            { threshold: 0.75, name: t('ui.phases.phase1') || 'Phase 1', triggered: false },
+            { threshold: 0.5, name: t('ui.phases.phase2') || 'Phase 2', triggered: false },
+            { threshold: 0.25, name: t('ui.phases.phase3') || 'Phase 3', triggered: false },
+            { threshold: 0.1, name: t('ui.phases.phase4') || 'Phase 4', triggered: false },
+            { threshold: 0, name: t('ui.phases.enraged') || 'Enraged', triggered: false }
+        ] : [
             { threshold: 0.66, name: t('ui.phases.phase1') || 'Phase 1', triggered: false },
             { threshold: 0.33, name: t('ui.phases.phase2') || 'Phase 2', triggered: false },
             { threshold: 0, name: t('ui.phases.enraged') || 'Enraged', triggered: false }
-        ];
+        ]);
         this.currentPhase = BOSS_PHASES.PHASE_1;
         this.enraged = false;
         this.enrageThreshold = data.enrageThreshold || 0.25;
@@ -400,6 +406,14 @@ export class BossEnemy extends Enemy {
     getPhaseName(): string {
         if (this.enraged) return t('ui.phases.enraged') || 'Wütend';
         const healthPercent = this.getHealthPercent();
+        // Volkare has 4 phases before enraged
+        if (this.type === 'volkare') {
+            if (healthPercent > 0.75) return t('ui.phases.phase1') || 'Phase 1';
+            if (healthPercent > 0.5) return t('ui.phases.phase2') || 'Phase 2';
+            if (healthPercent > 0.25) return t('ui.phases.phase3') || 'Phase 3';
+            if (healthPercent > 0.1) return t('ui.phases.phase4') || 'Phase 4';
+            return t('ui.phases.enraged') || 'Enraged';
+        }
         if (healthPercent > 0.66) return t('ui.phases.phase1') || 'Phase 1';
         if (healthPercent > 0.33) return t('ui.phases.phase2') || 'Phase 2';
         return t('ui.phases.phase3') || 'Phase 3';
@@ -421,6 +435,14 @@ export class BossEnemy extends Enemy {
                     type: 'heal',
                     amount: healAmount,
                     message: t('combat.boss.heals', { name: this.name, amount: healAmount })
+                };
+            }
+            case 'manaburn': {
+                const burnAmount = Math.floor(Math.random() * 3) + 2; // 2-4 mana
+                return {
+                    type: 'manaburn',
+                    amount: burnAmount,
+                    message: t('combat.boss.manaburn', { name: this.name, amount: burnAmount })
                 };
             }
             case 'enrage':

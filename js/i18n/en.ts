@@ -169,7 +169,8 @@ const en = {
             enraged: '{name} gets angry! Attack increased!',
             summons: '{name} summons {count} {enemy}!',
             heals: '{name} heals for {amount}!',
-            doubleAttack: '{name} now attacks twice!'
+            doubleAttack: '{name} now attacks twice!',
+            manaburn: '{name} burns {amount} mana from Hero!'
         },
         fightAgainst: 'Fight against {enemy}!',
         victoryOver: 'Victory over {enemy}!',
@@ -349,6 +350,7 @@ const en = {
         dragon_lord: 'Dragon King',
         lich_king: 'Lich King',
         dragonlord: 'Dragon King',
+        volkare: 'Volkare',
         abilities: {
             descriptions: {
                 fortified: 'Fortified: Immune to Ranged Attacks (unless Siege).',
@@ -366,6 +368,7 @@ const en = {
                 summoner: 'Summoner: Summons a brown enemy token before blocking phase.',
                 elusive: 'Elusive: Higher armor against Ranged attacks.',
                 defensive: 'Defensive: Enemies with this ability support each other. When you attack a defensive enemy at a city or keep, adjacent defensive enemies at city and keep locations join the fight.',
+                manaburn: 'Mana Burn: Burns 2-4 mana crystals from Hero.',
                 boss: 'Boss: A powerful enemy with multiple phases and unique mechanics.'
             }
         }

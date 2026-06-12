@@ -90,6 +90,26 @@ export class StatusEffectManager {
     }
 
     applyToEnemy(enemy: any, effectType: string, source: any = null): any {
+        // Arcane Immunity: Immune to non-attack/non-block effects
+        if (enemy.arcaneImmune) {
+            // Define which effects are attack/block related (allowed)
+            const allowedEffects = ['stun']; // Stun can be considered attack-related
+            // Actually, let's be more precise - only effects that directly modify attack/block
+            
+            // Arcane Immunity blocks: poison, burn, freeze, weaken, shield, enrage
+            // But allows: direct damage, stun (combat effect)
+            const blockedEffects = ['poison', 'burn', 'freeze', 'weaken', 'shield', 'enrage'];
+            
+            if (blockedEffects.includes(effectType)) {
+                return { 
+                    success: false, 
+                    blocked: true, 
+                    reason: 'arcane_immune',
+                    message: `${enemy.name} ist immun gegen ${effectType} (Arkane Immunität)!`
+                };
+            }
+        }
+
         if (!this.enemyEffects.has(enemy.id)) {
             this.enemyEffects.set(enemy.id, []);
         }

@@ -24,6 +24,7 @@ export interface EnemyData {
     poison?: boolean;
     petrify?: boolean;
     elusive?: boolean;
+    defensive?: boolean;
     vampiric?: boolean;
     assassin?: boolean;
     cumbersome?: boolean;
@@ -104,6 +105,7 @@ export class Enemy {
         this.poison = data.poison || false;
         this.petrify = data.petrify || false;
         this.elusive = data.elusive || false;
+        this.defensive = data.defensive || false;
         this.vampiric = data.vampiric || false;
         this.assassin = data.assassin || false;
         this.cumbersome = data.cumbersome || false;
@@ -117,6 +119,9 @@ export class Enemy {
         this.fireResist = data.fireResist || false;
         this.iceResist = data.iceResist || false;
         this.physicalResist = data.physicalResist || false;
+
+        // Arcane Immunity
+        this.arcaneImmune = data.arcaneImmune || false;
 
         // Visual
         this.icon = data.icon || '👹';
@@ -198,9 +203,17 @@ export class Enemy {
             brutal: this.brutal,
             poison: this.poison,
             petrify: this.petrify,
+            elusive: this.elusive,
+            defensive: this.defensive,
+            vampiric: this.vampiric,
+            assassin: this.assassin,
+            cumbersome: this.cumbersome,
+            summoner: this.summoner,
+            summoned: this.summoned,
             fireResist: this.fireResist,
             iceResist: this.iceResist,
             physicalResist: this.physicalResist,
+            arcaneImmune: this.arcaneImmune,
             icon: this.icon,
             color: this.color
         });

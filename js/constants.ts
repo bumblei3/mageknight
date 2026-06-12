@@ -188,16 +188,18 @@ export interface EnemyDefinition {
     summonType?: string;
     attackType?: string;
     maxHealth?: number;
+    arcaneImmune?: boolean;
+    defensive?: boolean;
 }
 
 export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     [ENEMY_TYPES.ORC]: { name: 'Ork', armor: 3, attack: 2, fame: 2, icon: '👹', color: '#16a34a' },
     [ENEMY_TYPES.GOBLIN]: { name: 'Goblin', armor: 2, attack: 2, fame: 1, swift: true, icon: '👺', color: '#15803d' },
     weakling: { name: 'Schwächling', armor: 2, attack: 1, fame: 1, icon: '🗡️', color: '#a3a3a3' },
-    guard: { name: 'Wächter', armor: 4, attack: 3, fame: 3, fortified: true, icon: '🛡️', color: '#dc2626' },
+    guard: { name: 'Wächter', armor: 4, attack: 3, fame: 3, fortified: true, defensive: true, icon: '🛡️', color: '#dc2626' },
     [ENEMY_TYPES.DRACONUM]: { name: 'Drakonium', armor: 5, attack: 4, fame: 4, swift: true, fireResist: true, attackType: 'fire', icon: '🐲', color: '#dc2626' },
     [ENEMY_TYPES.ROBBER]: { name: 'Räuber', armor: 3, attack: 2, fame: 2, swift: true, icon: '🏹', color: '#78716c' },
-    mage: { name: 'Magier', armor: 3, attack: 4, fame: 4, swift: true, physicalResist: true, petrify: true, attackType: 'ice', icon: '🧙', color: '#8b5cf6' },
+    mage: { name: 'Magier', armor: 3, attack: 4, fame: 4, swift: true, physicalResist: true, petrify: true, attackType: 'ice', icon: '🧙', color: '#8b5cf6', arcaneImmune: true },
     dragon: { name: 'Drache', armor: 6, attack: 5, fame: 6, brutal: true, fireResist: true, attackType: 'fire', icon: '🐉', color: '#dc2626' },
     phantom: { name: 'Phantom', armor: 2, attack: 3, fame: 4, swift: true, physicalResist: true, assassin: true, attackType: 'physical', icon: '👻', color: '#a78bfa' },
     golem: { name: 'Golem', armor: 8, attack: 2, fame: 5, fortified: true, iceResist: true, physicalResist: true, attackType: 'physical', icon: '🗿', color: '#78716c' },
@@ -206,7 +208,7 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     summoner_orc: { attack: 4, armor: 4, fame: 4, summoner: true, summonType: 'orc', icon: '🧙‍♂️', color: '#16a34a' },
     deep_orc: { name: 'Deep Orc', attack: 4, armor: 4, fame: 4, fortified: true, icon: '👺', color: '#115e59' },
     crystal_golem: { name: 'Crystal Golem', attack: 6, armor: 6, fame: 6, physicalResist: true, icon: '💎', color: '#22d3ee' },
-    [ENEMY_TYPES.ELEMENTAL]: { name: 'Feuer-Elementar', armor: 6, attack: 5, fame: 6, fireResist: true, attackType: 'fire', icon: '🔥', color: '#f97316' },
+    [ENEMY_TYPES.ELEMENTAL]: { name: 'Feuer-Elementar', armor: 6, attack: 5, fame: 6, fireResist: true, attackType: 'fire', icon: '🔥', color: '#f97316', arcaneImmune: true },
     [ENEMY_TYPES.BOSS]: { name: 'Dunkler Lord', armor: 10, attack: 8, fame: 20, fortified: true, brutal: true, fireResist: true, iceResist: true, physicalResist: true, icon: '👿', color: '#000000' }
 };
 

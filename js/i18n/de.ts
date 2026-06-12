@@ -181,6 +181,7 @@ const de = {
         spawningCleared: 'Brutstätte vernichtet! Die Gegend ist wieder sicher.',
         rewardClaimed: '{card} beansprucht!',
         siteConquered: '{site} erobert!',
+        defensiveJoin: '{count} verteidigende Feinde schließen sich dem Kampf an!',
         defeatAgainst: 'Niederlage gegen {enemy}.',
         retreatFrom: 'Rückzug aus dem Kampf gegen {enemy}.',
         efficiency: {
@@ -373,6 +374,8 @@ const de = {
                 physical: 'Physischer Angriff: Ein Standardangriff ohne besondere elementare Eigenschaften.',
                 summoner: 'Beschwörer: Ruft vor der Blockphase einen Gegner herbei.',
                 elusive: 'Ausweichend: Höhere Rüstung gegen Fernkampf.',
+                arcane_immune: 'Arkane Immunität: Immun gegen Nicht-Angriffs- und Nicht-Blockwirkungen (Gift, Brennen, Frost, Schwächung, Schild, Wut). Direkte Angriffe und Betäubung wirken normal.',
+                defensive: 'Verteidigend: Feinde mit dieser Fähigkeit unterstützen sich gegenseitig. Wenn du einen verteidigenden Feind an einer Stadt oder Burg angriffst, schließen sich benachbarte verteidigende Feinde an Stadt- und Burgstandorten dem Kampf an.',
                 boss: 'Boss: Ein mächtiger Gegner mit mehreren Phasen und einzigartigen Mechaniken.'
             }
         }
@@ -390,6 +393,8 @@ const de = {
         assassin: { name: 'Attentäter', desc: 'Schaden von diesem Feind kann nicht Einheiten zugewiesen werden. Muss vom Helden genommen werden.' },
         summoner: { name: 'Beschwörer', desc: 'Beschwört vor der Block-Phase einen zusätzlichen Gegner.' },
         elusive: { name: 'Ausweichend', desc: 'Hat höhere Rüstung gegen Fernkampf-Angriffe.' },
+        arcane_immune: { name: 'Arkane Immunität', desc: 'Immun gegen Nicht-Angriffs- und Nicht-Blockwirkungen wie Gift, Brennen, Frost, Schwächung, Schild, Wut. Direkte Angriffe und Betäubung wirken normal.' },
+        defensive: { name: 'Verteidigend', desc: 'Feinde mit dieser Fähigkeit unterstützen sich gegenseitig. Wenn du einen verteidigenden Feind an einer Stadt oder Burg angriffst, schließen sich benachbarte verteidigende Feinde an Stadt- und Burgstandorten dem Kampf an.' },
         resistance: { name: 'Resistenz', desc: 'Halbiert Schaden/Block von nicht-passenden Elementen (z.B. Feuer gegen Feuer).' },
         block: { name: 'Block', desc: 'Verhindert den Angriff des Feindes. Muss gleich oder höher als der Angriffswert sein.' },
         wound: { name: 'Wunde', desc: 'Negative Karte, die die Hand verstopft. Kann nicht gespielt werden (außer zum Rasten).' },

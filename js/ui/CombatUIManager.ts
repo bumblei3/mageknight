@@ -427,6 +427,18 @@ export class CombatUIManager {
             grid.appendChild(unitCard);
         });
 
+        // Attach tooltips to unit cards
+        if (this.ui && this.ui.tooltipManager) {
+            const unitCards = container.querySelectorAll('.unit-combat-card');
+            unitCards.forEach((card, index) => {
+                const unit = units[index];
+                if (unit && typeof unit.getAbilities === 'function') {
+                    const tooltipHTML = this.ui.tooltipManager.createUnitTooltipHTML(unit);
+                    this.ui.tooltipManager.attachToElement(card as HTMLElement, tooltipHTML);
+                }
+            });
+        }
+
         container.appendChild(grid);
     }
 }

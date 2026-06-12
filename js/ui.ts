@@ -286,6 +286,15 @@ export class UI {
             this.tooltipManager.attachToElement(phaseEl,
                 this.tooltipManager.createStatTooltipHTML(t('ui.tooltips.phase.title'), t('ui.tooltips.phase.desc')));
         }
+
+        // Movement points tooltip
+        if (this.elements.movementPoints) {
+            this.tooltipManager.attachToElement(this.elements.movementPoints,
+                this.tooltipManager.createStatTooltipHTML(
+                    'Bewegungspunkte',
+                    'Verfügbare Bewegungspunkte für diesen Zug. Verschiedene Gelände kosten unterschiedlich viel.'
+                ));
+        }
     }
 
     private getElements(): UIElements {

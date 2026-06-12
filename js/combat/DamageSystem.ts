@@ -29,6 +29,7 @@ export class DamageSystem {
 
     /**
      * Calculates wounds received from unblocked enemies and applies effects.
+     * Poison: All wounds go to Discard pile (not Hand). Double wounds to Units.
      */
     public calculateDamage(hero: any, unblockedEnemies: any[]): DamageResult {
         let totalDamage = 0;
@@ -38,24 +39,29 @@ export class DamageSystem {
         });
 
         const effectiveArmor = Math.max(1, hero.armor || 1);
-        let woundsReceived = Math.ceil(totalDamage / effectiveArmor);
-        if (isNaN(woundsReceived)) woundsReceived = 0;
+        let baseWounds = Math.ceil(totalDamage / effectiveArmor);
+        if (isNaN(baseWounds)) baseWounds = 0;
 
-        logger.info(`Damage phase: Total damage ${totalDamage} vs Armor ${effectiveArmor} = ${woundsReceived} wounds`);
+        logger.info(`Damage phase: Total damage ${totalDamage} vs Armor ${effectiveArmor} = ${baseWounds} wounds`);
 
-        for (let i = 0; i < woundsReceived; i++) {
-            hero.takeWound();
-        }
-
+        // Check for poison enemies
         const isPoison = unblockedEnemies.some(e => e.poison || (e.abilities && e.abilities.includes('poison')));
         const isPetrify = unblockedEnemies.some(e => e.petrify || (e.abilities && e.abilities.includes('petrify')));
 
+        let woundsReceived = baseWounds;
+
         if (isPoison) {
-            const poisonWounds = woundsReceived;
-            for (let i = 0; i < poisonWounds; i++) {
+            // Poison: All wounds go to Discard pile (not Hand)
+            for (let i = 0; i < baseWounds; i++) {
                 hero.takeWoundToDiscard();
             }
-            woundsReceived += poisonWounds;
+            // Double the wound count for tracking/stats
+            woundsReceived = baseWounds * 2;
+        } else {
+            // Normal: wounds go to Hand
+            for (let i = 0; i < baseWounds; i++) {
+                hero.takeWound();
+            }
         }
 
         if (isPetrify && woundsReceived > 0) {
@@ -105,6 +111,7 @@ export class DamageSystem {
 
     /**
      * Assigns damage to a unit from an enemy.
+     * Poison: Double wounds (2 per damage point) which destroys units.
      * Resistance reduces the effective damage before wound assignment.
      */
     public assignDamageToUnit(unit: any, enemy: any): UnitDamageResult {
@@ -124,18 +131,22 @@ export class DamageSystem {
             unit.destroyed = true;
             logger.info(`${unit.getName()} wurde durch Versteinerung zerstört!`);
         } else {
+            // Normal: 1 wound per damage point
             unit.takeWound();
             logger.info(`${unit.getName()} wurde verwundet.`);
         }
 
+        // Poison: Double wounds (2 per damage point) - destroys units
         if (enemy.poison) {
+            // Second wound for poison (first was applied above)
             unit.takeWound();
-            logger.info(`${unit.getName()} erlitt zusätzlich Gift-Schaden.`);
+            logger.info(`${unit.getName()} erlitt zusätzlich Gift-Schaden (doppelte Wunde).`);
         }
 
         const isVampiric = enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'));
         if (isVampiric) {
-            const woundsDealt = unit.destroyed ? 2 : 1;
+            // Count wounds dealt: destroyed = 2, wounded = 1
+            const woundsDealt = unit.destroyed ? 2 : (enemy.poison ? 2 : 1);
             enemy.armorBonus = (enemy.armorBonus || 0) + woundsDealt;
             logger.info(`${enemy.name} erhält +${woundsDealt} Rüstung durch Vampirismus!`);
         }

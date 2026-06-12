@@ -21,18 +21,14 @@ export class CombatOrchestrator {
         this.game = game;
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
-        this.activeBlocks = []; // Track individual block sources for elemental logic
+        this.activeBlocks = [];
         this.combatRangedTotal = 0;
         this.combatSiegeTotal = 0;
     }
 
-    /**
-     * Handles playing a card during combat
-     */
     playCardInCombat(index: number, card: any, useStrong: boolean = false): void {
         if (!this.game.combat || card.isWound()) return;
 
-        // SAVE STATE before playing card in combat
         if (this.game.actionManager) {
             this.game.actionManager.saveCheckpoint();
         }
@@ -40,7 +36,6 @@ export class CombatOrchestrator {
         const result = this.game.hero.playCard(index, useStrong, this.game.timeManager.isNight());
         if (!result) return;
 
-        // Particle Effect
         if (this.game.ui && this.game.ui.elements && this.game.ui.elements.playedCards) {
             const rect = this.game.ui.elements.playedCards.getBoundingClientRect();
             if (this.game.particleSystem) {
@@ -48,11 +43,9 @@ export class CombatOrchestrator {
             }
         }
 
-        // Accumulate values based on phase
         const phase = this.game.combat.phase;
         if (phase === COMBAT_PHASES.BLOCK && result.effect.block) {
             this.combatBlockTotal += result.effect.block;
-            // Store block source
             this.activeBlocks.push({
                 value: result.effect.block,
                 element: result.effect.element || 'physical'
@@ -83,18 +76,12 @@ export class CombatOrchestrator {
         this.updateCombatTotals();
     }
 
-    /**
-     * Renders units available for combat
-     */
     renderUnitsInCombat(): void {
         if (!this.game.combat || !this.game.ui) return;
         const units = this.game.hero.units;
-        this.game.ui.renderUnitsInCombat(units, this.game.combat.phase, (u: any) => this.activateUnitInCombat(u));
+        this.game.ui.renderUnitsInCombat(units, this.game.combat.phase, (u) => this.activateUnitInCombat(u));
     }
 
-    /**
-     * Activates a unit in combat
-     */
     activateUnitInCombat(unit: any): void {
         if (!this.game.combat) return;
         const result = this.game.combat.activateUnit(unit);
@@ -111,36 +98,26 @@ export class CombatOrchestrator {
         }
     }
 
-    /**
-     * Ends the block phase and processes damage
-     */
     endBlockPhase(): void {
         if (!this.game.combat) return;
 
-        // Apply block points
         this.game.combat.blockEnemy(this.game.combat.enemy, this.combatBlockTotal);
 
-        // End Block Phase is irreversible (reveals damage/wounds)
         if (this.game.actionManager) this.game.actionManager.clearHistory();
 
         const result = this.game.combat.endBlockPhase();
 
-        // INTERACTIVE DAMAGE PHASE:
-        // If we are waiting for assignment, just update UI and waiting state
         if (result.waitingForAssignment) {
             this.game.addLog(result.message, 'info');
             this.combatBlockTotal = 0;
             this.activeBlocks = [];
 
-            // Show new phase UI
             this.game.updatePhaseIndicator();
             this.updateCombatInfo();
-            // Force render units to make them potentially clickable (handled by UI logic)
             this.renderUnitsInCombat();
             return;
         }
 
-        // If not waiting (skipped or auto-resolved?), handle immediate results
         this.handleDamageResults(result);
 
         this.combatBlockTotal = 0;
@@ -151,9 +128,6 @@ export class CombatOrchestrator {
         this.updateCombatTotals();
     }
 
-    /**
-     * Assigns damage to a unit interactively
-     */
     assignDamageToUnit(unit: any): void {
         if (!this.game.combat) return;
 
@@ -163,21 +137,18 @@ export class CombatOrchestrator {
             this.game.addLog(result.message, 'warning');
 
             if (result.unitDestroyed && this.game.particleSystem) {
-                this.game.particleSystem.triggerShake(8, 0.4); // Big shake for death
-                this.game.particleSystem.freeze(0.1); // Impact freeze
+                this.game.particleSystem.triggerShake(8, 0.4);
+                this.game.particleSystem.freeze(0.1);
             }
 
             this.updateCombatInfo();
-            this.renderUnitsInCombat(); // Update unit status (wounded/destroyed)
+            this.renderUnitsInCombat();
             this.game.updateStats();
         } else {
             this.game.addLog(result.message, 'error');
         }
     }
 
-    /**
-     * Resolves the damage phase (Player confirms "Take remaining damage on Hero")
-     */
     resolveDamagePhase(): void {
         if (!this.game.combat) return;
 
@@ -191,18 +162,14 @@ export class CombatOrchestrator {
         }
     }
 
-    /**
-     * Helper to process damage results (visuals, logs)
-     */
     handleDamageResults(result: any): void {
         if (this.game.hexGrid && this.game.particleSystem) {
             const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
             this.game.particleSystem.damageSplatter(heroPixel.x, heroPixel.y, result.woundsReceived);
 
-            // Visual Polish: Screen Shake based on severity
             const shakeIntensty = Math.min(15, result.woundsReceived * 3);
             this.game.particleSystem.triggerShake(shakeIntensty, 0.4);
-            this.game.particleSystem.freeze(0.05); // Subtle hit-stop
+            this.game.particleSystem.freeze(0.05);
 
             this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y - 20, result.woundsReceived, result.woundsReceived > 1);
         }
@@ -213,7 +180,6 @@ export class CombatOrchestrator {
             targetType: 'hero'
         });
 
-        // Handle Paralyze discard effect
         if (result.paralyzeTriggered) {
             const discarded = this.game.combat.handleParalyzeEffect();
             if (discarded > 0) {
@@ -233,9 +199,6 @@ export class CombatOrchestrator {
         this.game.addLog(result.message, 'combat');
     }
 
-    /**
-     * Executes attack action
-     */
     executeAttackAction(): void {
         if (!this.game.combat) return;
 
@@ -256,21 +219,18 @@ export class CombatOrchestrator {
 
         if (this.game.combat.phase !== COMBAT_PHASES.ATTACK) return;
 
-        // Execute Attack is irreversible (reveals info, deals damage)
         if (this.game.actionManager) this.game.actionManager.clearHistory();
 
-        // Visual Impact
         if (this.game.hexGrid && this.game.particleSystem) {
             const pixelPos = this.game.hexGrid.axialToPixel(this.game.combat.enemy.position.q, this.game.combat.enemy.position.r);
             this.game.particleSystem.combatClashEffect(pixelPos.x, pixelPos.y, 'physical');
 
-            // Visual Polish: Enemy taking damage
             if (this.combatAttackTotal > 0) {
                 this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal, this.combatAttackTotal >= 5);
 
                 if (this.combatAttackTotal >= 4) {
                     this.game.particleSystem.triggerShake(Math.min(10, this.combatAttackTotal), 0.3);
-                    this.game.particleSystem.freeze(0.05); // Tactical freeze
+                    this.game.particleSystem.freeze(0.05);
                 }
             }
         }
@@ -285,16 +245,11 @@ export class CombatOrchestrator {
             });
         }
 
-
         this.game.addLog(attackResult.message, attackResult.success ? 'success' : 'warning');
 
-        // ALWAYS end combat when this button is pressed in the Attack phase
         this.onCombatEnd({ victory: attackResult.success, enemy: this.game.combat.enemy });
     }
 
-    /**
-     * Ends the ranged phase
-     */
     endRangedPhase(): void {
         if (!this.game.combat) return;
         const result = this.game.combat.endRangedPhase();
@@ -310,11 +265,7 @@ export class CombatOrchestrator {
         }
     }
 
-    /**
-     * Starts combat with an enemy or group of enemies
-     * @param {any} enemyOrEnemies Single enemy object or array of enemies
-     */
-    initiateCombat(enemyOrEnemies: any): void {
+    initiateCombat(enemyOrEnemies) {
         if (this.game.combat) return;
         if (!enemyOrEnemies) return;
 
@@ -324,7 +275,6 @@ export class CombatOrchestrator {
 
         if (this.game.gameState !== 'playing' && !this.game.isTestEnvironment) return;
 
-        // INFO: Handle Summoning
         const processedEnemies = enemies.map(enemy => {
             if (enemy.summoner) {
                 let summonKey = 'orc';
@@ -340,7 +290,7 @@ export class CombatOrchestrator {
                 const summonDef = ENEMY_DEFINITIONS[summonKey] || ENEMY_DEFINITIONS['orc'];
                 const summonedEnemy = new (Enemy as any)({
                     ...summonDef,
-                    id: `summoned_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                    id: 'summoned_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
                 });
 
                 this.game.addLog(t('combat.summoning', { summoner: enemy.name, summoned: summonedEnemy.name }), 'warning');
@@ -351,49 +301,54 @@ export class CombatOrchestrator {
 
         enemies = processedEnemies;
 
-        const names = enemies.map(e => e.name).join(' & ');
+        // Defensive trait: If any enemy is defensive and at a city/keep site, 
+        // nearby defensive enemies join the fight
+        var defensiveEnemies = enemies.filter(function(e) { return e.defensive; });
+        if (defensiveEnemies.length > 0 && this.game.hexGrid) {
+            var additionalEnemies = this.findDefensiveAllies(defensiveEnemies);
+            if (additionalEnemies.length > 0) {
+                enemies.push.apply(enemies, additionalEnemies);
+                this.game.addLog(t('combat.defensiveJoin', { count: additionalEnemies.length }), 'warning');
+            }
+        }
+
+        var names = enemies.map(function(e) { return e.name; }).join(' & ');
 
         this.game.addLog(t('combat.fightAgainst', { enemy: names }), 'combat');
 
-        // Create combat instance
-        this.game.combat = new Combat(this.game.hero, enemies, (result: any) => this.onCombatEnd(result));
+        this.game.combat = new Combat(this.game.hero, enemies, function(result) { return this.onCombatEnd(result); }.bind(this));
         this.game.combat.start();
         this.game.gameState = 'combat';
 
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
 
-        // UI Updates
         if (this.game.ui) {
-            this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e: any) => this.handleEnemyClick(e));
+            this.game.ui.showCombatPanel(enemies, this.game.combat.phase, function(e) { return this.handleEnemyClick(e); }.bind(this));
         }
-        this.updateCombatTotals(); // Ensure button visibility
+        this.updateCombatTotals();
         this.game.updatePhaseIndicator();
 
-        // Emit event for other systems
-        eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemies });
+        eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemies: enemies });
     }
 
-    /**
-     * Handles clicking an enemy in the combat panel
-     */
-    handleEnemyClick(enemy: any): void {
+    handleEnemyClick(enemy) {
         if (!this.game.combat) return;
 
         if (this.game.combat.phase === COMBAT_PHASES.RANGED) {
             this.executeRangedAttack(enemy);
         } else if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
-            const movementPoints = this.game.hero.movementPoints;
-            let movementToSpend = movementPoints;
+            var movementPoints = this.game.hero.movementPoints;
+            var movementToSpend = movementPoints;
 
-            const result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementToSpend);
+            var result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementToSpend);
 
             if (result.success && result.blocked) {
                 if (enemy.cumbersome && movementPoints > 0) {
-                    const rawReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
-                    const effectiveFromCardsAndUnits = result.totalBlock;
-                    const neededMove = Math.max(0, rawReq - effectiveFromCardsAndUnits);
-                    const actualSpent = Math.min(movementPoints, neededMove);
+                    var rawReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
+                    var effectiveFromCardsAndUnits = result.totalBlock;
+                    var neededMove = Math.max(0, rawReq - effectiveFromCardsAndUnits);
+                    var actualSpent = Math.min(movementPoints, neededMove);
 
                     if (actualSpent > 0) {
                         this.game.hero.movementPoints = Math.max(0, this.game.hero.movementPoints - actualSpent);
@@ -408,7 +363,6 @@ export class CombatOrchestrator {
 
             }
 
-            // Reset for next block attempt
             this.activeBlocks = [];
             this.combatBlockTotal = 0;
 
@@ -417,32 +371,22 @@ export class CombatOrchestrator {
         }
     }
 
-    /**
-     * Updates combat info in UI
-     */
-    updateCombatInfo(): void {
+    updateCombatInfo() {
         if (!this.game.combat || !this.game.ui) return;
-        this.game.ui.updateCombatInfo(this.game.combat.enemies, this.game.combat.phase, (e: any) => this.handleEnemyClick(e));
+        this.game.ui.updateCombatInfo(this.game.combat.enemies, this.game.combat.phase, function(e) { return this.handleEnemyClick(e); }.bind(this));
         this.updateCombatTotals();
     }
 
-    /**
-     * Updates combat totals in UI
-     */
-    updateCombatTotals(): void {
+    updateCombatTotals() {
         if (!this.game.combat || !this.game.ui) return;
         this.game.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.game.combat.phase);
     }
 
-    /**
-     * Called when combat instance finishes
-     */
-    onCombatEnd(result: any): void {
+    onCombatEnd(result) {
         this.game.gameState = 'playing';
-        const enemy = result.enemy || (this.game.combat ? this.game.combat.enemies[0] : null);
+        var enemy = result.enemy || (this.game.combat ? this.game.combat.enemies[0] : null);
         this.game.combat = null;
 
-        // Reset totals
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
         this.activeBlocks = [];
@@ -453,9 +397,8 @@ export class CombatOrchestrator {
             this.game.addLog(t('combat.victoryOver', { enemy: enemy.name }), 'success');
             this.game.entityManager.removeEnemy(enemy);
 
-            // Gain fame
-            const fameGained = enemy.fame || 0;
-            const levelResult = this.game.hero.gainFame(fameGained);
+            var fameGained = enemy.fame || 0;
+            var levelResult = this.game.hero.gainFame(fameGained);
             if (this.game.statisticsManager) {
                 this.game.statisticsManager.increment('enemiesDefeated');
             }
@@ -466,12 +409,11 @@ export class CombatOrchestrator {
                 this.game.levelUpManager.handleLevelUp(levelResult);
             }
 
-            // --- SITE REWARDS ---
-            const currentSite = this.game.siteManager ? this.game.siteManager.currentSite : null;
+            var currentSite = this.game.siteManager ? this.game.siteManager.currentSite : null;
             if (currentSite && !currentSite.conquered) {
                 if (currentSite.type === 'dungeon' || currentSite.type === 'ruin') {
                     currentSite.conquered = true;
-                    const logKey = currentSite.type === 'dungeon' ? 'combat.dungeonCleared' : 'combat.ruinCleared';
+                    var logKey = currentSite.type === 'dungeon' ? 'combat.dungeonCleared' : 'combat.ruinCleared';
                     this.game.addLog(t(logKey), 'success');
 
                     if (this.game.rewardManager) {
@@ -493,11 +435,10 @@ export class CombatOrchestrator {
                     currentSite.conquered = true;
                     this.game.addLog(t('combat.spawningCleared'), 'success');
 
-                    // Reward: Small Heal
-                    const healed = this.game.hero.healWound(false);
+                    var healed = this.game.hero.healWound(false);
                     if (healed && this.game.hexGrid && this.game.particleSystem) {
                         this.game.addLog('Die reinigende Energie heilt eine Wunde!', 'success');
-                        const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+                        var heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
                         this.game.particleSystem.buffEffect(heroPixel.x, heroPixel.y, 'green');
                     }
                 } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower' || currentSite.type === 'mine') {
@@ -507,14 +448,13 @@ export class CombatOrchestrator {
                         this.game.statisticsManager.increment('sitesConquered');
                     }
 
-                    // Check Victory Condition after every conquest
                     if (this.game.scenarioManager) {
-                        const win = this.game.scenarioManager.checkVictory();
+                        var win = this.game.scenarioManager.checkVictory();
                         if (win && win.victory) {
-                            setTimeout(() => {
+                            setTimeout(function() {
                                 this.game.showNotification('🎉 ' + win.message, 'success');
                                 this.game.addLog(win.message, 'success');
-                            }, 1000);
+                            }.bind(this), 1000);
                         }
                     }
                 }
@@ -535,33 +475,28 @@ export class CombatOrchestrator {
             this.game.checkAndShowAchievements();
         }
 
-        // Emit event for other systems
-        eventBus.emit(GAME_EVENTS.COMBAT_ENDED, { victory: result.victory, enemy });
+        eventBus.emit(GAME_EVENTS.COMBAT_ENDED, { victory: result.victory, enemy: enemy });
     }
 
-    /**
-     * Executes ranged attack
-     */
-    executeRangedAttack(enemy: any): void {
+    executeRangedAttack(enemy) {
         if (!this.game.combat) return;
 
-        const attackResult = this.game.combat.rangedAttackEnemy(
+        var attackResult = this.game.combat.rangedAttackEnemy(
             enemy,
             this.combatRangedTotal || 0,
             (this.combatSiegeTotal || 0) + (this.game.hero.hasSkill('siege_mastery') ? 2 : 0)
         );
 
-        // Visual Polish: Ranged Impact
-        const damageDealt = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);
+        var damageDealt = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);
         if (this.game.hexGrid && this.game.particleSystem) {
             if (enemy.position) {
-                const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+                var pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
                 this.game.particleSystem.impactEffect(pixelPos.x, pixelPos.y, 'blue');
                 if (damageDealt > 0) {
                     this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, damageDealt);
                 }
             } else if (this.game.hero.position) {
-                const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+                var heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
                 this.game.particleSystem.impactEffect(heroPixel.x, heroPixel.y - 50, 'blue');
                 if (damageDealt > 0) {
                     this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y - 50, damageDealt);
@@ -572,7 +507,6 @@ export class CombatOrchestrator {
         this.game.addLog(attackResult.message, 'combat');
 
         if (attackResult.success) {
-            // Update totals based on consumption
             this.combatRangedTotal = Math.max(0, this.combatRangedTotal - (attackResult.consumedRanged || 0));
             this.combatSiegeTotal = Math.max(0, this.combatSiegeTotal - (attackResult.consumedSiege || 0));
 
@@ -584,5 +518,52 @@ export class CombatOrchestrator {
         } else {
             this.updateCombatInfo();
         }
+    }
+
+    findDefensiveAllies(defensiveEnemies) {
+        var allies = [];
+        var processedPositions = {};
+
+        for (var i = 0; i < defensiveEnemies.length; i++) {
+            var enemy = defensiveEnemies[i];
+            if (!enemy.position) continue;
+
+            var siteHex = this.game.hexGrid.getHex(enemy.position.q, enemy.position.r);
+            if (!siteHex || !siteHex.site) continue;
+            
+            var siteType = siteHex.site.type;
+            if (siteType !== 'city' && siteType !== 'keep') continue;
+
+            var neighbors = this.game.hexGrid.getNeighbors(enemy.position.q, enemy.position.r);
+            
+            for (var j = 0; j < neighbors.length; j++) {
+                var neighbor = neighbors[j];
+                var key = neighbor.q + ',' + neighbor.r;
+                if (processedPositions[key]) continue;
+
+                var neighborHex = this.game.hexGrid.getHex(neighbor.q, neighbor.r);
+                if (!neighborHex || !neighborHex.site) continue;
+                
+                var neighborSiteType = neighborHex.site.type;
+                if (neighborSiteType !== 'city' && neighborSiteType !== 'keep') continue;
+
+                var allyEnemy = this.game.entityManager.getEnemyAt(neighbor.q, neighbor.r);
+                if (allyEnemy && allyEnemy.defensive) {
+                    var alreadyInCombat = false;
+                    for (var k = 0; k < enemies.length; k++) {
+                        if (enemies[k].id === allyEnemy.id) {
+                            alreadyInCombat = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyInCombat) {
+                        allies.push(allyEnemy);
+                        processedPositions[key] = true;
+                    }
+                }
+            }
+        }
+
+        return allies;
     }
 }

@@ -178,6 +178,7 @@ const en = {
         ruinCleared: 'Ruin cleared! You found a treasure.',
         rewardClaimed: '{card} claimed!',
         siteConquered: '{site} conquered!',
+        defensiveJoin: '{count} defensive enemies join the fight!',
         defeatAgainst: 'Defeat against {enemy}.',
         retreatFrom: 'Retreat from combat against {enemy}.',
         efficiency: {
@@ -352,7 +353,7 @@ const en = {
             descriptions: {
                 fortified: 'Fortified: Immune to Ranged Attacks (unless Siege).',
                 vampiric: 'Vampiric: Gains Armor equal to wounds dealt to Hero.',
-                poison: 'Poison: Wounds caused go to Discard pile. Double wounds to Units.',
+                poison: 'Poison: Wounds go to Discard pile. Double wounds to Units.',
                 swift: 'Swift: Requires double Block to block efficiently.',
                 brutal: 'Brutal: Deals double damage if not blocked.',
                 paralyze: 'Paralyze: If wounded, Hero must discard non-wound cards. Destroys Units.',
@@ -364,6 +365,7 @@ const en = {
                 physical: 'Physical Attack: A standard attack with no special elemental properties.',
                 summoner: 'Summoner: Summons a brown enemy token before blocking phase.',
                 elusive: 'Elusive: Higher armor against Ranged attacks.',
+                defensive: 'Defensive: Enemies with this ability support each other. When you attack a defensive enemy at a city or keep, adjacent defensive enemies at city and keep locations join the fight.',
                 boss: 'Boss: A powerful enemy with multiple phases and unique mechanics.'
             }
         }

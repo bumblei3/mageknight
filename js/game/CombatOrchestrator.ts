@@ -9,6 +9,23 @@ export interface BlockSource {
     element: string;
 }
 
+interface CombatResult {
+    victory: boolean;
+    enemy?: Enemy;
+    defeat?: boolean;
+}
+
+export interface EnemyData {
+    id: string;
+    name: string;
+    defensive?: boolean;
+    position?: { q: number; r: number };
+    attack?: number;
+    getBlockRequirement?: () => number;
+    cumbersome?: boolean;
+    [key: string]: any;
+}
+
 export class CombatOrchestrator {
     private game: any;
     public combatAttackTotal: number;
@@ -79,7 +96,7 @@ export class CombatOrchestrator {
     renderUnitsInCombat(): void {
         if (!this.game.combat || !this.game.ui) return;
         const units = this.game.hero.units;
-        this.game.ui.renderUnitsInCombat(units, this.game.combat.phase, (u) => this.activateUnitInCombat(u));
+        this.game.ui.renderUnitsInCombat(units, this.game.combat.phase, (u: any) => this.activateUnitInCombat(u));
     }
 
     activateUnitInCombat(unit: any): void {
@@ -265,20 +282,20 @@ export class CombatOrchestrator {
         }
     }
 
-    initiateCombat(enemyOrEnemies) {
+    initiateCombat(enemyOrEnemies: any): void {
         if (this.game.combat) return;
         if (!enemyOrEnemies) return;
 
-        let enemies = Array.isArray(enemyOrEnemies) ? enemyOrEnemies : [enemyOrEnemies];
-        enemies = enemies.filter(e => !!e);
+        let enemies: any[] = Array.isArray(enemyOrEnemies) ? enemyOrEnemies : [enemyOrEnemies];
+        enemies = enemies.filter((e: any) => !!e);
         if (enemies.length === 0) return;
 
         if (this.game.gameState !== 'playing' && !this.game.isTestEnvironment) return;
 
-        const processedEnemies = enemies.map(enemy => {
+        const processedEnemies = enemies.map((enemy: any) => {
             if (enemy.summoner) {
                 let summonKey = 'orc';
-                const candidates = Object.keys(ENEMY_DEFINITIONS).filter(k => {
+                const candidates = Object.keys(ENEMY_DEFINITIONS).filter((k: string) => {
                     const def = ENEMY_DEFINITIONS[k];
                     return !def.summoner && !def.fortified && k !== 'weakling';
                 });
@@ -303,20 +320,20 @@ export class CombatOrchestrator {
 
         // Defensive trait: If any enemy is defensive and at a city/keep site, 
         // nearby defensive enemies join the fight
-        var defensiveEnemies = enemies.filter(function(e) { return e.defensive; });
+        const defensiveEnemies = enemies.filter((e: any) => e.defensive);
         if (defensiveEnemies.length > 0 && this.game.hexGrid) {
-            var additionalEnemies = this.findDefensiveAllies(defensiveEnemies);
+            const additionalEnemies = this.findDefensiveAllies(defensiveEnemies, enemies);
             if (additionalEnemies.length > 0) {
-                enemies.push.apply(enemies, additionalEnemies);
+                enemies.push(...additionalEnemies);
                 this.game.addLog(t('combat.defensiveJoin', { count: additionalEnemies.length }), 'warning');
             }
         }
 
-        var names = enemies.map(function(e) { return e.name; }).join(' & ');
+        const names = enemies.map((e: any) => e.name).join(' & ');
 
         this.game.addLog(t('combat.fightAgainst', { enemy: names }), 'combat');
 
-        this.game.combat = new Combat(this.game.hero, enemies, function(result) { return this.onCombatEnd(result); }.bind(this));
+        this.game.combat = new Combat(this.game.hero, enemies, (result: any) => this.onCombatEnd(result));
         this.game.combat.start();
         this.game.gameState = 'combat';
 
@@ -324,7 +341,7 @@ export class CombatOrchestrator {
         this.combatBlockTotal = 0;
 
         if (this.game.ui) {
-            this.game.ui.showCombatPanel(enemies, this.game.combat.phase, function(e) { return this.handleEnemyClick(e); }.bind(this));
+            this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e: any) => this.handleEnemyClick(e));
         }
         this.updateCombatTotals();
         this.game.updatePhaseIndicator();
@@ -332,23 +349,23 @@ export class CombatOrchestrator {
         eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemies: enemies });
     }
 
-    handleEnemyClick(enemy) {
+    handleEnemyClick(enemy: any): void {
         if (!this.game.combat) return;
 
         if (this.game.combat.phase === COMBAT_PHASES.RANGED) {
             this.executeRangedAttack(enemy);
         } else if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
-            var movementPoints = this.game.hero.movementPoints;
-            var movementToSpend = movementPoints;
+            const movementPoints = this.game.hero.movementPoints;
+            let movementToSpend = movementPoints;
 
-            var result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementToSpend);
+            const result = this.game.combat.blockEnemy(enemy, this.activeBlocks, movementToSpend);
 
             if (result.success && result.blocked) {
                 if (enemy.cumbersome && movementPoints > 0) {
-                    var rawReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
-                    var effectiveFromCardsAndUnits = result.totalBlock;
-                    var neededMove = Math.max(0, rawReq - effectiveFromCardsAndUnits);
-                    var actualSpent = Math.min(movementPoints, neededMove);
+                    const rawReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : enemy.attack;
+                    const effectiveFromCardsAndUnits = result.totalBlock;
+                    const neededMove = Math.max(0, rawReq - effectiveFromCardsAndUnits);
+                    const actualSpent = Math.min(movementPoints, neededMove);
 
                     if (actualSpent > 0) {
                         this.game.hero.movementPoints = Math.max(0, this.game.hero.movementPoints - actualSpent);
@@ -371,20 +388,20 @@ export class CombatOrchestrator {
         }
     }
 
-    updateCombatInfo() {
+    updateCombatInfo(): void {
         if (!this.game.combat || !this.game.ui) return;
-        this.game.ui.updateCombatInfo(this.game.combat.enemies, this.game.combat.phase, function(e) { return this.handleEnemyClick(e); }.bind(this));
+        this.game.ui.updateCombatInfo(this.game.combat.enemies, this.game.combat.phase, (e: any) => this.handleEnemyClick(e));
         this.updateCombatTotals();
     }
 
-    updateCombatTotals() {
+    updateCombatTotals(): void {
         if (!this.game.combat || !this.game.ui) return;
         this.game.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.game.combat.phase);
     }
 
-    onCombatEnd(result) {
+    onCombatEnd(result: any): void {
         this.game.gameState = 'playing';
-        var enemy = result.enemy || (this.game.combat ? this.game.combat.enemies[0] : null);
+        const enemy = result.enemy || (this.game.combat ? this.game.combat.enemies[0] : null);
         this.game.combat = null;
 
         this.combatAttackTotal = 0;
@@ -397,8 +414,8 @@ export class CombatOrchestrator {
             this.game.addLog(t('combat.victoryOver', { enemy: enemy.name }), 'success');
             this.game.entityManager.removeEnemy(enemy);
 
-            var fameGained = enemy.fame || 0;
-            var levelResult = this.game.hero.gainFame(fameGained);
+            const fameGained = enemy.fame || 0;
+            const levelResult = this.game.hero.gainFame(fameGained);
             if (this.game.statisticsManager) {
                 this.game.statisticsManager.increment('enemiesDefeated');
             }
@@ -409,11 +426,11 @@ export class CombatOrchestrator {
                 this.game.levelUpManager.handleLevelUp(levelResult);
             }
 
-            var currentSite = this.game.siteManager ? this.game.siteManager.currentSite : null;
+            const currentSite = this.game.siteManager ? this.game.siteManager.currentSite : null;
             if (currentSite && !currentSite.conquered) {
                 if (currentSite.type === 'dungeon' || currentSite.type === 'ruin') {
                     currentSite.conquered = true;
-                    var logKey = currentSite.type === 'dungeon' ? 'combat.dungeonCleared' : 'combat.ruinCleared';
+                    const logKey = currentSite.type === 'dungeon' ? 'combat.dungeonCleared' : 'combat.ruinCleared';
                     this.game.addLog(t(logKey), 'success');
 
                     if (this.game.rewardManager) {
@@ -435,10 +452,10 @@ export class CombatOrchestrator {
                     currentSite.conquered = true;
                     this.game.addLog(t('combat.spawningCleared'), 'success');
 
-                    var healed = this.game.hero.healWound(false);
+                    const healed = this.game.hero.healWound(false);
                     if (healed && this.game.hexGrid && this.game.particleSystem) {
                         this.game.addLog('Die reinigende Energie heilt eine Wunde!', 'success');
-                        var heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+                        const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
                         this.game.particleSystem.buffEffect(heroPixel.x, heroPixel.y, 'green');
                     }
                 } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower' || currentSite.type === 'mine') {
@@ -449,12 +466,12 @@ export class CombatOrchestrator {
                     }
 
                     if (this.game.scenarioManager) {
-                        var win = this.game.scenarioManager.checkVictory();
+                        const win = this.game.scenarioManager.checkVictory();
                         if (win && win.victory) {
-                            setTimeout(function() {
+                            setTimeout(() => {
                                 this.game.showNotification('🎉 ' + win.message, 'success');
                                 this.game.addLog(win.message, 'success');
-                            }.bind(this), 1000);
+                            }, 1000);
                         }
                     }
                 }
@@ -478,25 +495,25 @@ export class CombatOrchestrator {
         eventBus.emit(GAME_EVENTS.COMBAT_ENDED, { victory: result.victory, enemy: enemy });
     }
 
-    executeRangedAttack(enemy) {
+    executeRangedAttack(enemy: any): void {
         if (!this.game.combat) return;
 
-        var attackResult = this.game.combat.rangedAttackEnemy(
+        const attackResult = this.game.combat.rangedAttackEnemy(
             enemy,
             this.combatRangedTotal || 0,
             (this.combatSiegeTotal || 0) + (this.game.hero.hasSkill('siege_mastery') ? 2 : 0)
         );
 
-        var damageDealt = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);
+        const damageDealt = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);
         if (this.game.hexGrid && this.game.particleSystem) {
             if (enemy.position) {
-                var pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
+                const pixelPos = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
                 this.game.particleSystem.impactEffect(pixelPos.x, pixelPos.y, 'blue');
                 if (damageDealt > 0) {
                     this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, damageDealt);
                 }
             } else if (this.game.hero.position) {
-                var heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
+                const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
                 this.game.particleSystem.impactEffect(heroPixel.x, heroPixel.y - 50, 'blue');
                 if (damageDealt > 0) {
                     this.game.particleSystem.createDamageNumber(heroPixel.x, heroPixel.y - 50, damageDealt);
@@ -520,38 +537,38 @@ export class CombatOrchestrator {
         }
     }
 
-    findDefensiveAllies(defensiveEnemies) {
-        var allies = [];
-        var processedPositions = {};
+    findDefensiveAllies(defensiveEnemies: EnemyData[], allEnemies: EnemyData[]): EnemyData[] {
+        const allies: EnemyData[] = [];
+        const processedPositions: Record<string, boolean> = {};
 
-        for (var i = 0; i < defensiveEnemies.length; i++) {
-            var enemy = defensiveEnemies[i];
+        for (let i = 0; i < defensiveEnemies.length; i++) {
+            const enemy = defensiveEnemies[i];
             if (!enemy.position) continue;
 
-            var siteHex = this.game.hexGrid.getHex(enemy.position.q, enemy.position.r);
+            const siteHex = this.game.hexGrid.getHex(enemy.position.q, enemy.position.r);
             if (!siteHex || !siteHex.site) continue;
             
-            var siteType = siteHex.site.type;
+            const siteType = siteHex.site.type;
             if (siteType !== 'city' && siteType !== 'keep') continue;
 
-            var neighbors = this.game.hexGrid.getNeighbors(enemy.position.q, enemy.position.r);
+            const neighbors = this.game.hexGrid.getNeighbors(enemy.position.q, enemy.position.r);
             
-            for (var j = 0; j < neighbors.length; j++) {
-                var neighbor = neighbors[j];
-                var key = neighbor.q + ',' + neighbor.r;
+            for (let j = 0; j < neighbors.length; j++) {
+                const neighbor = neighbors[j];
+                const key = neighbor.q + ',' + neighbor.r;
                 if (processedPositions[key]) continue;
 
-                var neighborHex = this.game.hexGrid.getHex(neighbor.q, neighbor.r);
+                const neighborHex = this.game.hexGrid.getHex(neighbor.q, neighbor.r);
                 if (!neighborHex || !neighborHex.site) continue;
                 
-                var neighborSiteType = neighborHex.site.type;
+                const neighborSiteType = neighborHex.site.type;
                 if (neighborSiteType !== 'city' && neighborSiteType !== 'keep') continue;
 
-                var allyEnemy = this.game.entityManager.getEnemyAt(neighbor.q, neighbor.r);
+                const allyEnemy = this.game.entityManager.getEnemyAt(neighbor.q, neighbor.r);
                 if (allyEnemy && allyEnemy.defensive) {
-                    var alreadyInCombat = false;
-                    for (var k = 0; k < enemies.length; k++) {
-                        if (enemies[k].id === allyEnemy.id) {
+                    let alreadyInCombat = false;
+                    for (let k = 0; k < allEnemies.length; k++) {
+                        if (allEnemies[k].id === allyEnemy.id) {
                             alreadyInCombat = true;
                             break;
                         }

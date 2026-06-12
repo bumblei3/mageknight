@@ -183,11 +183,13 @@ export class MapManager {
             unknownNeighbors.forEach(n => {
                 this.hexGrid.setHex(n.q, n.r, { terrain: this.getRandomTerrain() });
                 const hex = this.hexGrid.getHex(n.q, n.r);
-                if (hex) hex.revealed = true;
-                
-                // Check for Spawning Grounds auto-spawn on reveal
-                if (this.worldEventManager && hex.site && hex.site.type === SITE_TYPES.SPAWNING_GROUNDS) {
-                    this.worldEventManager.onTileRevealed(n.q, n.r, hex);
+                if (hex) {
+                    hex.revealed = true;
+
+                    // Check for Spawning Grounds auto-spawn on reveal
+                    if (this.worldEventManager && hex.site && hex.site.type === SITE_TYPES.SPAWNING_GROUNDS) {
+                        this.worldEventManager.onTileRevealed(n.q, n.r, hex);
+                    }
                 }
             });
 

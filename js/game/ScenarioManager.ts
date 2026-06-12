@@ -101,11 +101,12 @@ export class ScenarioManager {
             'dungeon_lords': {
                 id: 'dungeon_lords',
                 name: 'Dungeon Lords',
-                description: 'Mächtige Dungeon-Lords haben sich in den Tiefen verschanzt. Erobere 2 Dungeons, 1 Gruft und 1 Ruine, um ihre Herrschaft zu brechen.',
+                description: 'Mächtige Dungeon-Lords haben sich in den Tiefen verschanzt. Erobere 2 Dungeons, 1 Gruft, 1 Ruine und 1 Labyrinth, um ihre Herrschaft zu brechen.',
                 victoryConditions: {
                     dungeon: 2,
                     tomb: 1,
-                    ruins: 1
+                    ruins: 1,
+                    labyrinth: 1
                 },
                 mapConfig: {
                     startTile: [
@@ -121,7 +122,32 @@ export class ScenarioManager {
                     sitePlacements: [
                         { type: SITE_TYPES.DUNGEON, q: 2, r: -2, count: 2, radius: 3 },
                         { type: SITE_TYPES.TOMB, q: -2, r: 2, count: 1, radius: 2 },
-                        { type: SITE_TYPES.RUINS, q: 0, r: 3, count: 1, radius: 2 }
+                        { type: SITE_TYPES.RUINS, q: 0, r: 3, count: 1, radius: 2 },
+                        { type: SITE_TYPES.LABYRINTH, q: -2, r: -2, count: 1, radius: 2 }
+                    ]
+                }
+            },
+            'labyrinth_rising': {
+                id: 'labyrinth_rising',
+                name: 'Labyrinth Rising',
+                description: 'Ein uraltes Labyrinth ist erwacht und speit Monster aus. Durchquere 3 Labyrinthe, bevor die Zeit abläuft.',
+                victoryConditions: {
+                    labyrinth: 3,
+                    rounds: 8
+                },
+                mapConfig: {
+                    startTile: [
+                        TERRAIN_TYPES.HILLS,
+                        TERRAIN_TYPES.MOUNTAINS,
+                        TERRAIN_TYPES.WASTELAND,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.HILLS,
+                        TERRAIN_TYPES.MOUNTAINS,
+                        TERRAIN_TYPES.WASTELAND
+                    ],
+                    deckDistribution: 'dungeon_focused',
+                    sitePlacements: [
+                        { type: SITE_TYPES.LABYRINTH, q: 2, r: -1, count: 3, radius: 4 }
                     ]
                 }
             }
@@ -161,6 +187,7 @@ export class ScenarioManager {
         let conqueredDungeons = 0;
         let conqueredTombs = 0;
         let conqueredRuins = 0;
+        let conqueredLabyrinths = 0;
 
         // Iterate all hexes
         if (this.game.hexGrid && this.game.hexGrid.hexes) {
@@ -172,6 +199,7 @@ export class ScenarioManager {
                     if (hex.site.type === SITE_TYPES.DUNGEON) conqueredDungeons++;
                     if (hex.site.type === SITE_TYPES.TOMB) conqueredTombs++;
                     if (hex.site.type === 'ruins' || hex.site.type === SITE_TYPES.RUINS) conqueredRuins++;
+                    if (hex.site.type === SITE_TYPES.LABYRINTH) conqueredLabyrinths++;
                 }
             }
         }
@@ -206,11 +234,30 @@ export class ScenarioManager {
             const dungeonsNeeded = scenario.victoryConditions.dungeon || 0;
             const tombsNeeded = scenario.victoryConditions.tomb || 0;
             const ruinsNeeded = scenario.victoryConditions.ruins || 0;
+            const labyrinthsNeeded = scenario.victoryConditions.labyrinth || 0;
 
-            if (conqueredDungeons >= dungeonsNeeded && conqueredTombs >= tombsNeeded && conqueredRuins >= ruinsNeeded) {
+            if (conqueredDungeons >= dungeonsNeeded && conqueredTombs >= tombsNeeded && conqueredRuins >= ruinsNeeded && conqueredLabyrinths >= labyrinthsNeeded) {
                 return {
                     victory: true,
                     message: `${scenario.name} erfolgreich abgeschlossen! Die Dungeon-Lords sind besiegt.`
+                };
+            }
+        } else if (scenario.id === 'labyrinth_rising') {
+            const labyrinthsNeeded = scenario.victoryConditions.labyrinth || 0;
+            const roundsNeeded = scenario.victoryConditions.rounds || 0;
+            const currentRound = this.game.round || 0;
+            
+            if (conqueredLabyrinths >= labyrinthsNeeded) {
+                return {
+                    victory: true,
+                    message: `${scenario.name} erfolgreich abgeschlossen! Die Labyrinthe sind durchquert.`
+                };
+            }
+            
+            if (currentRound > roundsNeeded) {
+                return {
+                    victory: false,
+                    message: `Zeit abgelaufen! Die Labyrinthe haben dich überwältigt.`
                 };
             }
         }
@@ -237,7 +284,9 @@ export class ScenarioManager {
         } else if (scenario.id === 'mining_expedition') {
             return 'Ziele: Befreie 3 Kristallminen.';
         } else if (scenario.id === 'dungeon_lords') {
-            return 'Ziele: 2 Dungeons, 1 Gruft und 1 Ruine erobern.';
+            return 'Ziele: 2 Dungeons, 1 Gruft, 1 Ruine und 1 Labyrinth erobern.';
+        } else if (scenario.id === 'labyrinth_rising') {
+            return 'Ziele: 3 Labyrinthe durchqueren in 8 Runden.';
         }
         return scenario.description;
     }

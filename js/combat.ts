@@ -13,7 +13,6 @@ import { Hero } from './hero';
 import { Enemy } from './enemy';
 import { Card } from './card';
 
-// For backward compatibility
 export const COMBAT_PHASE = COMBAT_PHASES;
 
 export interface CombatState {
@@ -98,14 +97,11 @@ export class Combat {
         this.totalDamage = 0;
         this.woundsReceived = 0;
 
-        // Status Effects
         this.statusEffects = new StatusEffectManager();
 
-        // Sub-Systems
         this.blockingEngine = new BlockingEngine();
         this.damageSystem = new DamageSystem();
 
-        // New Managers
         this.unitManager = new CombatUnitManager();
         this.rangedPhaseController = new RangedPhase(this);
         this.attackPhaseController = new AttackPhase(this);
@@ -113,23 +109,34 @@ export class Combat {
         this.summonedEnemies = new Map();
     }
 
-    // Proxy properties
-    get unitAttackPoints(): number { return this.unitManager.unitAttackPoints; }
-    set unitAttackPoints(v: number) { this.unitManager.unitAttackPoints = v; }
+    // Backward compatible getters/setters
+    get unitAttackPoints(): number { return this.unitManager.totalAttackPoints; }
+    set unitAttackPoints(v: number) { 
+        // For backward compat: add to physical attack points
+        this.unitManager.unitAttackPoints.physical = v; 
+    }
 
-    get unitBlockPoints(): number { return this.unitManager.unitBlockPoints; }
-    set unitBlockPoints(v: number) { this.unitManager.unitBlockPoints = v; }
+    get unitBlockPoints(): number { return this.unitManager.totalBlockPoints; }
+    set unitBlockPoints(v: number) { 
+        // For backward compat: add to physical block points
+        this.unitManager.unitBlockPoints.physical = v; 
+    }
 
-    get unitRangedPoints(): number { return this.unitManager.unitRangedPoints; }
-    set unitRangedPoints(v: number) { this.unitManager.unitRangedPoints = v; }
+    get unitRangedPoints(): number { return this.unitManager.totalRangedPoints; }
+    set unitRangedPoints(v: number) { 
+        // For backward compat: add to physical ranged points
+        this.unitManager.unitRangedPoints.physical = v; 
+    }
 
-    get unitSiegePoints(): number { return this.unitManager.unitSiegePoints; }
-    set unitSiegePoints(v: number) { this.unitManager.unitSiegePoints = v; }
+    get unitSiegePoints(): number { return this.unitManager.totalSiegePoints; }
+    set unitSiegePoints(v: number) { 
+        // For backward compat
+        this.unitManager.unitSiegePoints = v; 
+    }
 
     get activatedUnits(): any[] { return this.unitManager.activatedUnits; }
     set activatedUnits(v: any[]) { this.unitManager.activatedUnits = v; }
 
-    // Start combat
     start(): CombatStartResult {
         logger.info(`Combat started against ${this.enemies.length} enemies`);
         this.damageSystem.reset();
@@ -142,17 +149,14 @@ export class Combat {
         };
     }
 
-    // Ranged phase
     rangedPhase(): any {
         return this.rangedPhaseController.update(this.enemies);
     }
 
-    // Attempt to defeat enemies with Ranged/Siege Attack
     rangedAttackEnemy(enemy: Enemy, rangedValue: number, siegeValue: number, element = 'physical'): any {
         return this.rangedPhaseController.executeAttack(enemy, rangedValue, siegeValue, element);
     }
 
-    // End ranged phase
     endRangedPhase(): PhaseResult {
         if (this.phase !== COMBAT_PHASES.RANGED) {
             return { error: t('ui.phases.ranged') };
@@ -171,12 +175,10 @@ export class Combat {
         };
     }
 
-    // Handle enemies with summoner ability
     handleSummoning(): void {
         this.rangedPhaseController.handleSummoning(this.enemies, this.defeatedEnemies);
     }
 
-    // Block phase
     blockPhase(): PhaseResult {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
             return { error: t('ui.phases.block') };
@@ -196,7 +198,6 @@ export class Combat {
         };
     }
 
-    // Attempt to block an enemy
     blockEnemy(enemy: Enemy, blockInput: any, movementPoints = 0): BlockResult {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
             return { success: false, error: t('ui.phases.block') };
@@ -206,19 +207,20 @@ export class Combat {
             return { success: false, message: t('combat.alreadyBlocked') };
         }
 
-        const result = this.blockingEngine.calculateBlock(enemy, blockInput, this.unitBlockPoints, movementPoints);
+        const unitBlockSources = this.unitManager.getBlockSources ? this.unitManager.getBlockSources() : [];
+
+        const result = this.blockingEngine.calculateBlock(enemy, blockInput, unitBlockSources, movementPoints);
 
         if (result.success && result.blocked) {
             this.blockedEnemies.add(enemy.id);
             if (result.unitPointsConsumed > 0) {
-                this.unitBlockPoints = 0;
+                this.unitManager.unitBlockPoints = { physical: 0, fire: 0, ice: 0, cold_fire: 0 };
             }
         }
 
         return result;
     }
 
-    // End block phase
     endBlockPhase(): PhaseResult {
         if (this.phase !== COMBAT_PHASES.BLOCK) {
             return { error: t('ui.phases.block') };
@@ -228,7 +230,6 @@ export class Combat {
         return this.damagePhase();
     }
 
-    // Damage phase
     damagePhase(): PhaseResult {
         if (this.phase !== COMBAT_PHASES.DAMAGE) {
             return { error: t('ui.phases.combat') };
@@ -251,14 +252,13 @@ export class Combat {
 
         return {
             totalDamage: this.totalDamage,
-            unblockedEnemies: this.unblockedEnemies as any, // Cast to any to avoid property issues in UI
+            unblockedEnemies: this.unblockedEnemies as any,
             message: t('combat.assignDamage'),
             nextPhase: COMBAT_PHASES.DAMAGE,
             waitingForAssignment: true
         };
     }
 
-    // Resolves the Damage Phase
     resolveDamagePhase(): PhaseResult | undefined {
         if (this.phase !== COMBAT_PHASES.DAMAGE) return;
 
@@ -281,7 +281,6 @@ export class Combat {
         };
     }
 
-    // Assign damage to a unit from an enemy
     assignDamageToUnit(unit: any, enemyId: string | null = null): DamageAssignmentResult {
         if (this.phase !== COMBAT_PHASES.DAMAGE) {
             return { success: false, message: t('combat.phaseDamageOnly') };
@@ -324,22 +323,18 @@ export class Combat {
         return discarded;
     }
 
-    // Attack phase
     attackPhase(): any {
         return this.attackPhaseController.update(this.enemies);
     }
 
-    // Activate a unit
     activateUnit(unit: any): any {
         return this.unitManager.activateUnit(unit, this.phase);
     }
 
-    // Attempt to defeat enemies with attack
     attackEnemies(attackValue: number, attackElement = 'physical', targetEnemies: Enemy[] | null = null): any {
         return this.attackPhaseController.executeAttack(attackValue, attackElement, targetEnemies);
     }
 
-    // Combo System
     detectCombo(playedCards: Card[]): any {
         return (CombatCombos as any).detectCombo(playedCards);
     }
@@ -351,8 +346,6 @@ export class Combat {
     applyComboBonus(baseValue: number, combo: any): number {
         return (CombatCombos as any).applyComboBonus(baseValue, combo);
     }
-
-    // ============ STATUS EFFECTS ============
 
     applyEffectToHero(effectType: string, source: any = null): any {
         return this.statusEffects.applyToHero(this.hero, effectType, source);
@@ -394,7 +387,6 @@ export class Combat {
         return results;
     }
 
-    // End combat
     endCombat(): PhaseResult {
         const endResult = this.statusEffects.processCombatEnd(this.hero);
         if (endResult.wounds > 0) {

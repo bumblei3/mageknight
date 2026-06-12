@@ -24,7 +24,6 @@ export class RangedPhase {
             return { success: false, error: t('combat.phaseRanged') };
         }
 
-        // Check immunities
         if (enemy.fortified && siegeValue === 0) {
             return {
                 success: false,
@@ -35,20 +34,17 @@ export class RangedPhase {
         const multiplier = enemy.getResistanceMultiplier(element);
         const unitManager = this.combat.unitManager;
 
-        // Fortified Rule: If fortified, only Siege contributes. If not, both do.
         let combinedAttack = 0;
         if (enemy.fortified) {
-            combinedAttack = siegeValue + unitManager.unitSiegePoints;
+            combinedAttack = siegeValue + unitManager.totalSiegePoints;
         } else {
-            combinedAttack = rangedValue + siegeValue + unitManager.unitRangedPoints + unitManager.unitSiegePoints;
+            combinedAttack = rangedValue + siegeValue + unitManager.totalRangedPoints + unitManager.totalSiegePoints;
         }
 
-        // Handle boss enemies (health-based damage)
         if (enemy.isBoss) {
             return this._handleBossAttack(enemy, rangedValue, siegeValue, combinedAttack, multiplier);
         }
 
-        // Handle regular enemies (armor-based defeat)
         return this._handleRegularEnemyAttack(enemy, rangedValue, siegeValue, combinedAttack, multiplier);
     }
 
@@ -57,7 +53,6 @@ export class RangedPhase {
         const damageResult = enemy.takeDamage(effectiveDamage);
         const unitManager = this.combat.unitManager;
 
-        // Consume points (Bosses take all available relevant damage)
         let consumedRanged = 0;
         let consumedSiege = 0;
 
@@ -67,7 +62,7 @@ export class RangedPhase {
         } else {
             consumedRanged = rangedValue;
             consumedSiege = siegeValue;
-            unitManager.unitRangedPoints = 0;
+            unitManager.unitRangedPoints = { physical: 0, fire: 0, ice: 0, cold_fire: 0 };
             unitManager.unitSiegePoints = 0;
         }
 
@@ -82,7 +77,6 @@ export class RangedPhase {
             message: t('combat.rangedAttack', { enemy: enemy.name, amount: effectiveDamage, current: enemy.currentHealth, max: enemy.maxHealth })
         };
 
-        // Handle phase transitions
         if (damageResult.transitions && damageResult.transitions.length > 0) {
             damageResult.transitions.forEach((transition: any) => {
                 result.bossTransitions.push({
@@ -94,7 +88,6 @@ export class RangedPhase {
             });
         }
 
-        // Check if boss is defeated
         if (damageResult.defeated) {
             this._handleEnemyDefeated(enemy);
             result.defeated = [enemy];
@@ -115,21 +108,18 @@ export class RangedPhase {
         if (combinedAttack >= effectiveArmor) {
             this._handleEnemyDefeated(enemy);
 
-            // Consume points used
             let consumedRanged = 0;
             let consumedSiege = 0;
 
             if (enemy.fortified) {
-                consumedSiege = Math.max(0, effectiveArmor - unitManager.unitSiegePoints);
+                consumedSiege = Math.max(0, effectiveArmor - unitManager.totalSiegePoints);
                 unitManager.unitSiegePoints = 0;
             } else {
-                // Greedy consumption: use units first, then siege, then ranged
                 let remaining = effectiveArmor;
 
-                // Units first
-                const unitTotal = unitManager.unitRangedPoints + unitManager.unitSiegePoints;
+                const unitTotal = unitManager.totalRangedPoints + unitManager.totalSiegePoints;
                 remaining = Math.max(0, remaining - unitTotal);
-                unitManager.unitRangedPoints = 0;
+                unitManager.unitRangedPoints = { physical: 0, fire: 0, ice: 0, cold_fire: 0 };
                 unitManager.unitSiegePoints = 0;
 
                 if (remaining > 0) {
@@ -177,7 +167,6 @@ export class RangedPhase {
         if (summoners.length === 0) return;
 
         summoners.forEach(summoner => {
-            // Draw a random brown token (Orcs/Goblins/etc)
             const brownTokens = Object.keys(ENEMY_DEFINITIONS).filter(key =>
                 key === 'orc' || key === 'weakling' || key === 'robber'
             );
@@ -212,7 +201,6 @@ export class RangedPhase {
                 this.combat.summonedEnemies.set(summoned.id, summoner);
             }
 
-            // Replace summoner with summoned in the active enemies list within combat context
             if (this.combat.enemies) {
                 this.combat.enemies = this.combat.enemies.map((e: any) => e.id === summoner.id ? summoned : e);
             }

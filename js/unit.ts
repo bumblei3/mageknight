@@ -30,6 +30,7 @@ export interface UnitInfo {
     icon: string;
     abilities: UnitAbility[];
     location: string[];
+    resistances?: string[]; // Physical, Fire, Ice, Cold Fire
 }
 
 export const UNIT_INFO: Record<string, UnitInfo> = {
@@ -91,7 +92,8 @@ export const UNIT_INFO: Record<string, UnitInfo> = {
             { type: ACTION_TYPES.BLOCK, value: 4, text: '4 Block' },
             { type: ACTION_TYPES.ATTACK, value: 1, text: '1 Angriff' }
         ],
-        location: ['keep', 'city']
+        location: ['keep', 'city'],
+        resistances: ['physical']
     },
     [UNIT_TYPES.CROSSBOWMEN]: {
         name: 'Armbrustschützen',
@@ -103,7 +105,8 @@ export const UNIT_INFO: Record<string, UnitInfo> = {
             { type: ACTION_TYPES.RANGED, value: 3, text: '3 Fernkampf' },
             { type: ACTION_TYPES.ATTACK, value: 2, text: '2 Angriff' }
         ],
-        location: ['keep', 'city']
+        location: ['keep', 'city'],
+        resistances: ['physical']
     },
     [UNIT_TYPES.CATAPULT]: {
         name: 'Katapult',
@@ -127,7 +130,8 @@ export const UNIT_INFO: Record<string, UnitInfo> = {
             { type: ACTION_TYPES.ATTACK, value: 4, text: '4 Angriff' },
             { type: ACTION_TYPES.BLOCK, value: 4, text: '4 Block' }
         ],
-        location: ['mage_tower']
+        location: ['mage_tower'],
+        resistances: ['physical', 'fire', 'ice']
     },
     [UNIT_TYPES.MAGES]: {
         name: 'Magier',
@@ -139,7 +143,8 @@ export const UNIT_INFO: Record<string, UnitInfo> = {
             { type: ACTION_TYPES.ATTACK, value: 4, element: 'fire', text: '4 Feuer-Angriff' },
             { type: ACTION_TYPES.BLOCK, value: 4, element: 'ice', text: '4 Eis-Block' }
         ],
-        location: ['mage_tower']
+        location: ['mage_tower'],
+        resistances: ['fire', 'ice']
     }
 };
 
@@ -195,6 +200,14 @@ export class Unit {
 
     public getAbilities(): UnitAbility[] {
         return this.info.abilities;
+    }
+
+    public getResistances(): string[] {
+        return this.info.resistances || [];
+    }
+
+    public hasResistance(resistance: string): boolean {
+        return this.getResistances().includes(resistance);
     }
 
     public isReady(): boolean {

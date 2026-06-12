@@ -20,11 +20,44 @@ export default defineConfig({
             output: {
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
+                        // Three.js - large, loaded lazily for 3D view
+                        if (id.includes('three')) {
+                            return 'vendor-three';
+                        }
+                        // Game3D - only used when 3D view is toggled
+                        if (id.includes('Game3D') || id.includes('OrbitControls')) {
+                            return 'vendor-3d';
+                        }
+                        // Remaining vendor
                         return 'vendor';
+                    }
+                    // App code - put shared/core modules in main to avoid circular
+                    if (id.includes('/constants') || id.includes('/utils/') || id.includes('/i18n/') || id.includes('/logger') || id.includes('/eventBus') || id.includes('/errorHandler') || id.includes('/performanceMonitor') || id.includes('/animator') || id.includes('/particles/') || id.includes('/soundManager') || id.includes('/statistics') || id.includes('/achievements') || id.includes('/tutorialManager') || id.includes('/touchController') || id.includes('/timeManager') || id.includes('/debug')) {
+                        return 'main';
+                    }
+                    // Feature-based chunks
+                    if (id.includes('/game/')) {
+                        return 'game-core';
+                    }
+                    if (id.includes('/combat/')) {
+                        return 'combat';
+                    }
+                    if (id.includes('/sites/')) {
+                        return 'sites';
+                    }
+                    if (id.includes('/3d/')) {
+                        return 'game-3d';
+                    }
+                    if (id.includes('/ui/')) {
+                        return 'ui';
+                    }
+                    if (id.includes('/hero/') || id.includes('/card/') || id.includes('/enemy/') || id.includes('/unit/') || id.includes('/hexgrid/') || id.includes('/terrain') || id.includes('/mana') || id.includes('/skills')) {
+                        return 'game-core';
                     }
                 }
             }
-        }
+        },
+        chunkSizeWarningLimit: 800 // KB, warn at 800KB instead of 500KB
     },
     plugins: [
         VitePWA({

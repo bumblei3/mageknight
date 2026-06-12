@@ -2,9 +2,19 @@ import { HexGridLogic } from './hexgrid/HexGridLogic';
 import { Terrain, TerrainType } from './terrain';
 import { TERRAIN_TYPES } from './constants';
 import { logger } from './logger';
+import { SITE_TYPES } from './sites';
+import { Site } from './sites';
 
 export interface MapData {
     hexes: Array<{ q: number; r: number; terrain: TerrainType; site?: any }>;
+}
+
+export interface SitePlacement {
+    type: string;
+    q: number;
+    r: number;
+    count?: number;
+    radius?: number;
 }
 
 export class MapManager {
@@ -57,6 +67,11 @@ export class MapManager {
             this.loadMapFromData(scenarioData);
         } else {
             this.generateDefaultMap();
+        }
+
+        // Place scenario-specific sites
+        if (scenarioData && scenarioData.mapConfig && scenarioData.mapConfig.sitePlacements) {
+            this.placeScenarioSites(scenarioData.mapConfig.sitePlacements);
         }
 
         // Reveal starting area
@@ -181,5 +196,74 @@ export class MapManager {
         }
 
         return { success: false };
+    }
+
+    /**
+     * Places scenario-specific sites on the map
+     */
+    placeScenarioSites(placements: SitePlacement[]): void {
+        placements.forEach(placement => {
+            const count = placement.count || 1;
+            const radius = placement.radius || 2;
+
+            for (let i = 0; i < count; i++) {
+                // Try primary position first
+                let q = placement.q;
+                let r = placement.r;
+                let attempts = 0;
+
+                // If count > 1, distribute around the center within radius
+                if (count > 1) {
+                    const ring = this.hexGrid.getRing(placement.q, placement.r, radius);
+                    const validPositions = ring.filter(pos =>
+                        this.hexGrid.hasHex(pos.q, pos.r) &&
+                        !this.hexGrid.getHex(pos.q, pos.r)?.site
+                    );
+
+                    if (validPositions.length > 0) {
+                        const pos = validPositions[i % validPositions.length];
+                        q = pos.q;
+                        r = pos.r;
+                    } else {
+                        // Fallback: find any empty hex within radius
+                        const inRange = this.hexGrid.getHexesInRange(placement.q, placement.r, radius);
+                        const emptyHexes = inRange.filter(pos =>
+                            this.hexGrid.hasHex(pos.q, pos.r) &&
+                            !this.hexGrid.getHex(pos.q, pos.r)?.site
+                        );
+                        if (emptyHexes.length > 0) {
+                            const pos = emptyHexes[i % emptyHexes.length];
+                            q = pos.q;
+                            r = pos.r;
+                        }
+                    }
+                }
+
+                // Final check: ensure the hex exists and has no site
+                while (attempts < 10) {
+                    if (this.hexGrid.hasHex(q, r)) {
+                        const hex = this.hexGrid.getHex(q, r);
+                        if (hex && !hex.site) {
+                            hex.site = new Site(placement.type);
+                            logger.info(`Placed ${placement.type} at (${q}, ${r})`);
+                            break;
+                        }
+                    }
+                    // Try adjacent
+                    const neighbors = this.hexGrid.getNeighbors(q, r);
+                    const emptyNeighbor = neighbors.find(n =>
+                        this.hexGrid.hasHex(n.q, n.r) &&
+                        !this.hexGrid.getHex(n.q, n.r)?.site
+                    );
+                    if (emptyNeighbor) {
+                        q = emptyNeighbor.q;
+                        r = emptyNeighbor.r;
+                    } else {
+                        break;
+                    }
+                    attempts++;
+                }
+            }
+        });
     }
 }

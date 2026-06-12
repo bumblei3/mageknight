@@ -1,46 +1,46 @@
 import { SITE_TYPES } from './sites';
+import { MineHandler } from './sites/MineHandler';
+import { KeepHandler } from './sites/KeepHandler';
+import { MageTowerHandler } from './sites/MageTowerHandler';
+import { MonasteryHandler } from './sites/MonasteryHandler';
+import { VillageHandler } from './sites/VillageHandler';
+import { ExplorationHandler } from './sites/ExplorationHandler';
+import { SpawningGroundsHandler } from './sites/SpawningGroundsHandler';
+import { LabyrinthHandler } from './sites/LabyrinthHandler';
+import { BaseSiteHandler, SiteOption } from './sites/BaseSiteHandler';
 
 export class SiteInteractionManager {
     private game: any;
-    private currentSiteHandler: any;
+    private currentSiteHandler: BaseSiteHandler | null = null;
+    private handlers: Map<string, BaseSiteHandler>;
 
     constructor(game: any) {
         this.game = game;
-        this.currentSiteHandler = null;
+        this.handlers = new Map();
+        this.initializeHandlers();
+    }
+
+    private initializeHandlers(): void {
+        this.handlers.set(SITE_TYPES.MINE, new MineHandler(this.game));
+        this.handlers.set(SITE_TYPES.KEEP, new KeepHandler(this.game));
+        this.handlers.set(SITE_TYPES.MAGE_TOWER, new MageTowerHandler(this.game));
+        this.handlers.set(SITE_TYPES.MONASTERY, new MonasteryHandler(this.game));
+        this.handlers.set(SITE_TYPES.VILLAGE, new VillageHandler(this.game));
+        this.handlers.set(SITE_TYPES.DUNGEON, new ExplorationHandler(this.game));
+        this.handlers.set(SITE_TYPES.RUINS, new ExplorationHandler(this.game));
+        this.handlers.set(SITE_TYPES.TOMB, new ExplorationHandler(this.game));
+        this.handlers.set(SITE_TYPES.LABYRINTH, new LabyrinthHandler(this.game));
+        this.handlers.set(SITE_TYPES.SPAWNING_GROUNDS, new SpawningGroundsHandler(this.game));
+    }
+
+    private getHandler(siteType: string): BaseSiteHandler | null {
+        // Fallback to ExplorationHandler for unhandled types
+        return this.handlers.get(siteType) || this.handlers.get(SITE_TYPES.DUNGEON) || null;
     }
 
     visitSite(hex: any, site: any): any {
-        const options: any[] = [];
-
-        switch (site.type) {
-            case SITE_TYPES.VILLAGE:
-                options.push({
-                    id: 'heal',
-                    label: 'Heilen',
-                    cost: 3,
-                    enabled: this.game.hero.influencePoints >= 3 && this.game.hero.wounds.length > 0
-                });
-                options.push({
-                    id: 'recruit',
-                    label: 'Rekrutieren',
-                    cost: 3,
-                    enabled: this.game.hero.influencePoints >= 3
-                });
-                break;
-            case SITE_TYPES.MONASTERY:
-                options.push({ id: 'learn_spell', label: 'Zauber lernen', cost: 2 });
-                break;
-            case SITE_TYPES.MAGE_TOWER:
-                options.push({ id: 'buy_spell', label: 'Zauber kaufen', cost: 5 });
-                break;
-            case SITE_TYPES.KEEP:
-            case SITE_TYPES.DUNGEON:
-            case SITE_TYPES.CITY:
-                options.push({ id: 'attack', label: 'Angreifen', cost: 0 });
-                break;
-            default:
-                options.push({ id: 'explore', label: 'Erkunden', cost: 0 });
-        }
+        const handler = this.getHandler(site.type);
+        const options = handler ? handler.getOptions(site, hex) : [];
 
         return {
             type: site.type,

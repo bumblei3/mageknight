@@ -55,7 +55,7 @@ export class CombatPredictor {
 
         // 2. ATTACK PHASE PREDICTION
         if (combat.phase === COMBAT_PHASES.ATTACK || combat.phase === COMBAT_PHASES.BLOCK || combat.phase === COMBAT_PHASES.RANGED) {
-            const combinedAttack = currentAttack + (combat.unitManager?.unitAttackPoints || 0);
+            const combinedAttack = currentAttack + (combat.unitManager?.totalAttackPoints || 0);
 
             // For now, only predict against the first enemy (main target) or all if simple
             // In MK, you can distribute attack.

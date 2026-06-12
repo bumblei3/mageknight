@@ -3,10 +3,8 @@ import { logger } from '../logger';
 import { t } from '../i18n/index';
 
 export interface BlockSource {
-    value?: number;
-    element?: string;
-    movementPoints?: number;
-    blocks?: BlockSource[];
+    value: number;
+    element: string;
 }
 
 export interface BlockResult {
@@ -23,57 +21,44 @@ export class BlockingEngine {
     constructor() {
     }
 
-    /**
-     * Attempts to block an enemy attack.
-     * @param {any} enemy The enemy being blocked.
-     * @param {BlockSource | BlockSource[] | any} blockInput The block input provided by the player.
-     * @param {number} unitBlockPoints Generic block points from units.
-     * @param {number} movementSpent Movement points spent for Cumbersome reduction.
-     * @returns {BlockResult} Result object containing success, totalBlock, etc.
-     */
-    public calculateBlock(enemy: any, blockInput: BlockSource | BlockSource[] | any, unitBlockPoints: number = 0, movementSpent: number = 0): BlockResult {
-        // Normalize input to array
-        let blocks: BlockSource[] = [];
+    public calculateBlock(enemy: any, blockInput: BlockSource | BlockSource[] | any, unitBlockSources: BlockSource[] = [], movementSpent: number = 0): BlockResult {
+        let cardBlocks: BlockSource[] = [];
         let internalMovementSpent = movementSpent;
 
         if (Array.isArray(blockInput)) {
-            blocks = blockInput;
+            cardBlocks = blockInput;
         } else if (typeof blockInput === 'object' && blockInput !== null) {
             if (blockInput.blocks) {
-                blocks = blockInput.blocks;
+                cardBlocks = blockInput.blocks;
                 if (blockInput.movementPoints && !movementSpent) {
                     internalMovementSpent = blockInput.movementPoints;
                 }
             } else if (blockInput.value !== undefined) {
-                blocks = [blockInput];
+                cardBlocks = [blockInput];
                 if (blockInput.movementPoints && !movementSpent) {
                     internalMovementSpent = blockInput.movementPoints;
                 }
             } else {
-                // Fallback for objects that might just be a block source
-                blocks = [blockInput];
+                cardBlocks = [blockInput];
             }
         } else {
-            blocks = [{ value: Number(blockInput) || 0, element: ATTACK_ELEMENTS.PHYSICAL }];
+            cardBlocks = [{ value: Number(blockInput) || 0, element: ATTACK_ELEMENTS.PHYSICAL }];
         }
 
-        // Calculate Required Block Power
         let blockRequired = enemy.getBlockRequirement();
 
-        // Cumbersome (Schwerfällig): Reduce attack by spending movement
         if (enemy.cumbersome && internalMovementSpent > 0) {
             blockRequired = Math.max(0, blockRequired - internalMovementSpent);
             logger.debug(`Cumbersome: Reduced block requirement by ${internalMovementSpent} to ${blockRequired}`);
         }
         const enemyElement = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
 
-        // Calculate block from cards
         let totalEffectiveBlock = 0;
         let totalInputBlock = 0;
         let isInefficient = false;
         const inefficiencyReasons = new Set<string>();
 
-        blocks.forEach(block => {
+        cardBlocks.forEach(block => {
             const val = block.value || 0;
             const el = block.element || ATTACK_ELEMENTS.PHYSICAL;
             totalInputBlock += val;
@@ -106,21 +91,42 @@ export class BlockingEngine {
             totalEffectiveBlock += Math.floor(val * efficiency);
         });
 
-        // Add Unit Block (assume inefficient against elemental for now)
-        let unitEfficiency = 1.0;
-        if (enemyElement !== ATTACK_ELEMENTS.PHYSICAL && unitBlockPoints > 0) {
-            unitEfficiency = 0.5;
-            inefficiencyReasons.add('unit_vs_elemental');
-        }
+        let unitContribution = 0;
+        unitBlockSources.forEach(block => {
+            const val = block.value || 0;
+            const el = block.element || ATTACK_ELEMENTS.PHYSICAL;
+            let efficiency = 1.0;
 
-        // Calculate unit contribution
-        const unitContribution = Math.floor(unitBlockPoints * unitEfficiency);
+            if (enemyElement === ATTACK_ELEMENTS.FIRE) {
+                if (el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                    efficiency = 0.5;
+                    isInefficient = true;
+                    if (el === ATTACK_ELEMENTS.FIRE) inefficiencyReasons.add('unit_fire_vs_fire');
+                    else inefficiencyReasons.add('unit_vs_elemental');
+                }
+            } else if (enemyElement === ATTACK_ELEMENTS.ICE) {
+                if (el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                    efficiency = 0.5;
+                    isInefficient = true;
+                    if (el === ATTACK_ELEMENTS.ICE) inefficiencyReasons.add('unit_ice_vs_ice');
+                    else inefficiencyReasons.add('unit_vs_elemental');
+                }
+            } else if (enemyElement === ATTACK_ELEMENTS.COLD_FIRE) {
+                if (el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                    efficiency = 0.5;
+                    isInefficient = true;
+                    inefficiencyReasons.add('unit_vs_cold_fire');
+                }
+            }
+
+            const effectiveVal = Math.floor(val * efficiency);
+            unitContribution += effectiveVal;
+        });
+
         totalEffectiveBlock += unitContribution;
 
-        // Debug log
-        logger.debug(`Block vs ${enemy.name} (${enemyElement}): Input total ${totalInputBlock} -> Effective total ${totalEffectiveBlock}. Required: ${blockRequired}`);
+        logger.debug(`Block vs ${enemy.name} (${enemyElement}): Card input ${totalInputBlock} + Unit input ${unitBlockSources.reduce((s, b) => s + b.value, 0)} -> Effective total ${totalEffectiveBlock}. Required: ${blockRequired}`);
 
-        // Format inefficiency reasons
         let limitNote = '';
         if (inefficiencyReasons.size > 0) {
             const reasons = Array.from(inefficiencyReasons).map(r => t(`combat.efficiency.${r}`));
@@ -128,13 +134,20 @@ export class BlockingEngine {
         }
 
         if (totalEffectiveBlock >= blockRequired) {
-            // Determine if unit points were needed
             let unitPointsUsed = 0;
-            if (unitBlockPoints > 0) {
-                const blockWithoutUnits = totalEffectiveBlock - unitContribution;
-                if (blockWithoutUnits < blockRequired) {
-                    // Units were needed
-                    unitPointsUsed = unitBlockPoints; // Consume all provided unit points for simplicity
+            if (unitBlockSources.length > 0) {
+                const cardOnlyBlock = cardBlocks.reduce((sum, b) => {
+                    const el = b.element || ATTACK_ELEMENTS.PHYSICAL;
+                    let eff = 1.0;
+                    const enemyEl = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
+                    if (enemyEl === ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) eff = 0.5;
+                    else if (enemyEl === ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) eff = 0.5;
+                    else if (enemyEl === ATTACK_ELEMENTS.COLD_FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) eff = 0.5;
+                    return sum + Math.floor(b.value * eff);
+                }, 0);
+
+                if (cardOnlyBlock < blockRequired) {
+                    unitPointsUsed = unitBlockSources.reduce((s, b) => s + b.value, 0);
                 }
             }
 

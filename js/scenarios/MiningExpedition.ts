@@ -1,5 +1,6 @@
 import { Scenario } from '../game/ScenarioManager';
 import { TERRAIN_TYPES } from '../constants';
+import { SITE_TYPES } from '../sites';
 
 export const MINING_EXPEDITION: Scenario = {
     id: 'mining_expedition',
@@ -19,6 +20,9 @@ export const MINING_EXPEDITION: Scenario = {
             TERRAIN_TYPES.HILLS,
             TERRAIN_TYPES.WASTELAND
         ],
-        deckDistribution: 'mines_focused'
+        deckDistribution: 'mines_focused',
+        sitePlacements: [
+            { type: SITE_TYPES.MINE, q: 2, r: -2, count: 3, radius: 3 }
+        ]
     }
 };

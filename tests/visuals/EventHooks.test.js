@@ -56,7 +56,7 @@ describe('Visual Event Hooks', () => {
 
     it('should emit COMBAT_BLOCK when blocking', () => {
         // Mock combat
-        game.initiateCombat({ name: 'Orc', armor: 3, attack: 4, position: { q: 2, r: 2 } });
+        game.initiateCombat({ name: 'Orc', armor: 3, attack: 4, position: { q: 2, r: 2 }, getBlockRequirement: () => 4 });
         game.combat.phase = 'block';
 
         // Mock block function

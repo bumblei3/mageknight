@@ -25,9 +25,8 @@ export class AttackPhase {
         }
 
         const targets = targetEnemies || this.combat.enemies;
-        const totalAttack = attackValue + this.combat.unitManager.unitAttackPoints;
+        const totalAttack = attackValue + this.combat.unitManager.totalAttackPoints;
 
-        // Split targets into bosses and regular enemies
         const bosses = targets.filter((e: any) => e.isBoss);
         const regularEnemies = targets.filter((e: any) => !e.isBoss);
 
@@ -38,24 +37,20 @@ export class AttackPhase {
             bossTransitions: [],
             fameGained: 0,
             totalAttack: totalAttack,
-            unitContribution: this.combat.unitManager.unitAttackPoints,
+            unitContribution: this.combat.unitManager.totalAttackPoints,
             messages: []
         };
 
-        // Handle regular enemies (armor-based defeat)
         if (regularEnemies.length > 0) {
             this._handleRegularEnemies(regularEnemies, totalAttack, attackElement, result);
         }
 
-        // Handle bosses (health-based damage)
         if (bosses.length > 0) {
             this._handleBosses(bosses, totalAttack, attackElement, result);
         }
 
-        // Create combined message
         result.message = result.messages.join(' ');
         if (result.success && !result.message) {
-            // Fallback if success but no message generated
             result.message = t('combat.attackSuccess');
         }
 
@@ -66,8 +61,6 @@ export class AttackPhase {
         let remainingAttack = totalAttack;
         const defeated: any[] = [];
 
-        // Sort enemies by armor (optional, but let's try to kill weakest first automatically or just iterate)
-        // For now, iterate and kill as many as we can
         for (const enemy of regularEnemies) {
             const multiplier = enemy.getResistanceMultiplier(attackElement);
             const isBlocked = this.combat.blockedEnemies.has(enemy.id);
@@ -117,7 +110,6 @@ export class AttackPhase {
                 healthPercent: damageResult.healthPercent
             });
 
-            // Handle phase transitions
             if (damageResult.transitions && damageResult.transitions.length > 0) {
                 damageResult.transitions.forEach((transition: any) => {
                     result.bossTransitions.push({
@@ -127,7 +119,6 @@ export class AttackPhase {
                         message: transition.message || `${boss.name} erreicht ${transition.phase}!`
                     });
 
-                    // Execute phase ability if exists
                     if (transition.ability && transition.ability !== 'enrage' && typeof boss.executePhaseAbility === 'function') {
                         const abilityResult = boss.executePhaseAbility(transition.ability);
                         if (abilityResult) {
@@ -142,7 +133,6 @@ export class AttackPhase {
 
             result.messages.push(t('combat.bossDamaged', { enemy: boss.name, amount: effectiveDamage, current: boss.currentHealth, max: boss.maxHealth }));
 
-            // Check if boss is defeated
             if (damageResult.defeated) {
                 this.combat.defeatedEnemies.push(boss);
                 this.combat.hero.gainFame(boss.fame);

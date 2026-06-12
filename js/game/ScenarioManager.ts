@@ -2,6 +2,7 @@ import { SITE_TYPES } from '../sites';
 import { TERRAIN_TYPES, TerrainType } from '../constants';
 import { logger } from '../logger';
 import { MINING_EXPEDITION } from '../scenarios/MiningExpedition';
+import { SitePlacement } from '../mapManager';
 
 /**
  * Interface for scenario victory conditions.
@@ -26,6 +27,7 @@ export interface Scenario {
         startTile: TerrainType[];
         deckDistribution?: string;
         deck?: TerrainType[][];
+        sitePlacements?: SitePlacement[];
     };
 }
 
@@ -60,7 +62,11 @@ export class ScenarioManager {
                         TERRAIN_TYPES.HILLS,
                         TERRAIN_TYPES.WASTELAND
                     ],
-                    deckDistribution: 'mines_focused'
+                    deckDistribution: 'mines_focused',
+                    sitePlacements: [
+                        { type: SITE_TYPES.MINE, q: 2, r: -2, count: 2, radius: 3 },
+                        { type: SITE_TYPES.KEEP, q: -2, r: 2, count: 1, radius: 2 }
+                    ]
                 }
             },
             'mining_expedition': MINING_EXPEDITION as unknown as Scenario,
@@ -86,6 +92,9 @@ export class ScenarioManager {
                         [TERRAIN_TYPES.FOREST, TERRAIN_TYPES.WASTELAND, TERRAIN_TYPES.WASTELAND, TERRAIN_TYPES.FOREST, TERRAIN_TYPES.HILLS, TERRAIN_TYPES.WATER, TERRAIN_TYPES.FOREST],
                         [TERRAIN_TYPES.WASTELAND, TERRAIN_TYPES.FOREST, TERRAIN_TYPES.HILLS, TERRAIN_TYPES.WASTELAND, TERRAIN_TYPES.FOREST, TERRAIN_TYPES.PLAINS, TERRAIN_TYPES.WATER],
                         [TERRAIN_TYPES.HILLS, TERRAIN_TYPES.FOREST, TERRAIN_TYPES.DESERT, TERRAIN_TYPES.WASTELAND, TERRAIN_TYPES.FOREST, TERRAIN_TYPES.HILLS, TERRAIN_TYPES.MOUNTAINS]
+                    ],
+                    sitePlacements: [
+                        { type: SITE_TYPES.SPAWNING_GROUNDS, q: 3, r: -1, count: 2, radius: 3 }
                     ]
                 }
             }

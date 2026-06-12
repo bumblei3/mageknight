@@ -1,5 +1,6 @@
 import { logger } from '../logger';
 import { t } from '../i18n/index';
+import { ATTACK_ELEMENTS } from '../constants';
 
 export interface DamageResult {
     totalDamage: number;
@@ -28,9 +29,6 @@ export class DamageSystem {
 
     /**
      * Calculates wounds received from unblocked enemies and applies effects.
-     * @param {any} hero The hero taking damage.
-     * @param {any[]} unblockedEnemies List of enemies that were not blocked.
-     * @returns {DamageResult} Result object.
      */
     public calculateDamage(hero: any, unblockedEnemies: any[]): DamageResult {
         let totalDamage = 0;
@@ -39,40 +37,33 @@ export class DamageSystem {
             totalDamage += enemy.getEffectiveAttack();
         });
 
-        // Calculate wounds (damage / hero armor, rounded up)
         const effectiveArmor = Math.max(1, hero.armor || 1);
         let woundsReceived = Math.ceil(totalDamage / effectiveArmor);
         if (isNaN(woundsReceived)) woundsReceived = 0;
 
         logger.info(`Damage phase: Total damage ${totalDamage} vs Armor ${effectiveArmor} = ${woundsReceived} wounds`);
 
-        // Apply wounds to hero
         for (let i = 0; i < woundsReceived; i++) {
             hero.takeWound();
         }
-
-        // --- Apply Special Abilities ---
 
         const isPoison = unblockedEnemies.some(e => e.poison || (e.abilities && e.abilities.includes('poison')));
         const isPetrify = unblockedEnemies.some(e => e.petrify || (e.abilities && e.abilities.includes('petrify')));
 
         if (isPoison) {
-            // Poison deals equal amount of wounds to Discard
             const poisonWounds = woundsReceived;
             for (let i = 0; i < poisonWounds; i++) {
                 hero.takeWoundToDiscard();
             }
-            woundsReceived += poisonWounds; // Track total wounds received
+            woundsReceived += poisonWounds;
         }
 
         if (isPetrify && woundsReceived > 0) {
-            // Paralyze: Hero must discard all non-wound cards
             logger.info(t('combat.paralyzeEffect'));
             this.paralyzeTriggered = true;
         }
 
         unblockedEnemies.forEach(enemy => {
-            // Vampiric: Increases Armor if they deal damage (wound hero)
             const isVampiric = enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'));
             if (isVampiric && woundsReceived > 0) {
                 enemy.armorBonus = (enemy.armorBonus || 0) + woundsReceived;
@@ -89,19 +80,47 @@ export class DamageSystem {
     }
 
     /**
+     * Checks if damage of a specific element is reduced by unit resistances.
+     * Returns the effective damage after resistance reduction.
+     */
+    private applyUnitResistance(unit: any, damage: number, element: string): number {
+        const resistances = unit.getResistances ? unit.getResistances() : [];
+
+        if (element === ATTACK_ELEMENTS.PHYSICAL && resistances.includes('physical')) {
+            return Math.floor(damage / 2);
+        }
+        if (element === ATTACK_ELEMENTS.FIRE && resistances.includes('fire')) {
+            return Math.floor(damage / 2);
+        }
+        if (element === ATTACK_ELEMENTS.ICE && resistances.includes('ice')) {
+            return Math.floor(damage / 2);
+        }
+        if (element === ATTACK_ELEMENTS.COLD_FIRE && (resistances.includes('fire') || resistances.includes('ice'))) {
+            // Cold Fire is resisted by Fire OR Ice resistance (whichever is present)
+            // If both, still only halve once
+            return Math.floor(damage / 2);
+        }
+        return damage;
+    }
+
+    /**
      * Assigns damage to a unit from an enemy.
-     * @param {any} unit The target unit.
-     * @param {any} enemy The attacking enemy.
-     * @returns {UnitDamageResult} Result of assignment.
+     * Resistance reduces the effective damage before wound assignment.
      */
     public assignDamageToUnit(unit: any, enemy: any): UnitDamageResult {
-        // Assassinate Rule: Cannot assign damage to units
         if (enemy.assassin) {
             return { success: false, message: t('combat.assassinateRestriction', { enemy: enemy.name }) };
         }
 
+        const enemyElement = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
+        const enemyAttack = enemy.getEffectiveAttack();
+
+        // Apply resistance (with fallback for mock/test units)
+        const effectiveDamage = unit.getResistances ? this.applyUnitResistance(unit, enemyAttack, enemyElement) : enemyAttack;
+
+        logger.info(`${unit.getName()} takes ${effectiveDamage} damage (${enemyAttack} ${enemyElement} vs resistances: ${unit.getResistances ? unit.getResistances().join(', ') : 'N/A'})`);
+
         if (enemy.petrify) {
-            // Paralyze: Unit is destroyed instantly if wounded
             unit.destroyed = true;
             logger.info(`${unit.getName()} wurde durch Versteinerung zerstört!`);
         } else {
@@ -110,16 +129,12 @@ export class DamageSystem {
         }
 
         if (enemy.poison) {
-            // Poison: Unit takes 2 Wounds (instantly wounded again)
             unit.takeWound();
             logger.info(`${unit.getName()} erlitt zusätzlich Gift-Schaden.`);
         }
 
-        // Vampiric: Increases Armor for each wound dealt
         const isVampiric = enemy.vampiric || (enemy.abilities && enemy.abilities.includes('vampiric'));
         if (isVampiric) {
-            // A unit destroyed by Petrify counts as wound(s)?
-            // Simplified: if unit wounded or destroyed, increment armorBonus.
             const woundsDealt = unit.destroyed ? 2 : 1;
             enemy.armorBonus = (enemy.armorBonus || 0) + woundsDealt;
             logger.info(`${enemy.name} erhält +${woundsDealt} Rüstung durch Vampirismus!`);

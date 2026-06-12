@@ -34,6 +34,7 @@ export interface EnemyData {
     fireResist?: boolean;
     iceResist?: boolean;
     physicalResist?: boolean;
+    arcaneImmune?: boolean;
     icon?: string;
     color?: string;
     attackType?: string;
@@ -68,6 +69,7 @@ export class Enemy {
     poison: boolean;
     petrify: boolean;
     elusive: boolean;
+    defensive: boolean = false;
     vampiric: boolean;
     assassin: boolean;
     cumbersome: boolean;
@@ -78,6 +80,7 @@ export class Enemy {
     fireResist: boolean;
     iceResist: boolean;
     physicalResist: boolean;
+    arcaneImmune: boolean = false;
     icon: string;
     color: string;
     attackType: string;

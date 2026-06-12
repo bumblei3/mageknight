@@ -97,6 +97,33 @@ export class ScenarioManager {
                         { type: SITE_TYPES.SPAWNING_GROUNDS, q: 3, r: -1, count: 2, radius: 3 }
                     ]
                 }
+            },
+            'dungeon_lords': {
+                id: 'dungeon_lords',
+                name: 'Dungeon Lords',
+                description: 'Mächtige Dungeon-Lords haben sich in den Tiefen verschanzt. Erobere 2 Dungeons, 1 Gruft und 1 Ruine, um ihre Herrschaft zu brechen.',
+                victoryConditions: {
+                    dungeon: 2,
+                    tomb: 1,
+                    ruins: 1
+                },
+                mapConfig: {
+                    startTile: [
+                        TERRAIN_TYPES.PLAINS,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.HILLS,
+                        TERRAIN_TYPES.MOUNTAINS,
+                        TERRAIN_TYPES.WASTELAND,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.HILLS
+                    ],
+                    deckDistribution: 'dungeon_focused',
+                    sitePlacements: [
+                        { type: SITE_TYPES.DUNGEON, q: 2, r: -2, count: 2, radius: 3 },
+                        { type: SITE_TYPES.TOMB, q: -2, r: 2, count: 1, radius: 2 },
+                        { type: SITE_TYPES.RUINS, q: 0, r: 3, count: 1, radius: 2 }
+                    ]
+                }
             }
         };
     }
@@ -131,6 +158,9 @@ export class ScenarioManager {
         let conqueredMines = 0;
         let conqueredKeeps = 0;
         let conqueredSpawns = 0;
+        let conqueredDungeons = 0;
+        let conqueredTombs = 0;
+        let conqueredRuins = 0;
 
         // Iterate all hexes
         if (this.game.hexGrid && this.game.hexGrid.hexes) {
@@ -139,6 +169,9 @@ export class ScenarioManager {
                     if (hex.site.type === SITE_TYPES.MINE) conqueredMines++;
                     if (hex.site.type === SITE_TYPES.KEEP) conqueredKeeps++;
                     if (hex.site.type === SITE_TYPES.SPAWNING_GROUNDS) conqueredSpawns++;
+                    if (hex.site.type === SITE_TYPES.DUNGEON) conqueredDungeons++;
+                    if (hex.site.type === SITE_TYPES.TOMB) conqueredTombs++;
+                    if (hex.site.type === 'ruins' || hex.site.type === SITE_TYPES.RUINS) conqueredRuins++;
                 }
             }
         }
@@ -169,6 +202,17 @@ export class ScenarioManager {
                     message: 'Mission erfüllt! Die Minen sind gesichert.'
                 };
             }
+        } else if (scenario.id === 'dungeon_lords') {
+            const dungeonsNeeded = scenario.victoryConditions.dungeon || 0;
+            const tombsNeeded = scenario.victoryConditions.tomb || 0;
+            const ruinsNeeded = scenario.victoryConditions.ruins || 0;
+
+            if (conqueredDungeons >= dungeonsNeeded && conqueredTombs >= tombsNeeded && conqueredRuins >= ruinsNeeded) {
+                return {
+                    victory: true,
+                    message: `${scenario.name} erfolgreich abgeschlossen! Die Dungeon-Lords sind besiegt.`
+                };
+            }
         }
 
         return false;
@@ -192,6 +236,8 @@ export class ScenarioManager {
             return 'Ziele: Zerstöre 2 Brutstätten bevor die Zeit abläuft.';
         } else if (scenario.id === 'mining_expedition') {
             return 'Ziele: Befreie 3 Kristallminen.';
+        } else if (scenario.id === 'dungeon_lords') {
+            return 'Ziele: 2 Dungeons, 1 Gruft und 1 Ruine erobern.';
         }
         return scenario.description;
     }

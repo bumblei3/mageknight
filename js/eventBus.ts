@@ -1,7 +1,9 @@
 /**
  * Lightweight Global Event Bus for Mage Knight
  */
-export type EventCallback = (data?: any) => void;
+import { EventCallback, EventData, ToastData, NotificationData, HeroMoveStepData, CombatBlockData, CombatDamageData, CombatStartedData, CombatEndedData, CardPlayedData, HeroStatsUpdatedData, ManaSourceUpdatedData, TurnEndedData, HeroMovedData, AchievementUnlockedData, NotificationShowData, TimeChangedData, CardPlayedDetailData, TurnStartedData, VisualEffectData, ParticleEventData } from './event-bus-types';
+
+export type { EventCallback, EventData, ToastData, NotificationData, HeroMoveStepData, CombatBlockData, CombatDamageData, CombatStartedData, CombatEndedData, CardPlayedData, HeroStatsUpdatedData, ManaSourceUpdatedData, TurnEndedData, HeroMovedData, AchievementUnlockedData, NotificationShowData, TimeChangedData, CardPlayedDetailData, TurnStartedData, VisualEffectData, ParticleEventData };
 
 class EventBus {
     private listeners: Map<string, EventCallback[]>;
@@ -41,7 +43,7 @@ class EventBus {
      * @param {string} event - Event name
      * @param {any} data - Data to pass to callbacks
      */
-    emit(event: string, data?: any): void {
+    emit(event: string, data?: unknown): void {
         if (!this.listeners.has(event)) return;
         this.listeners.get(event)!.forEach(callback => {
             try {
@@ -62,4 +64,4 @@ class EventBus {
 
 // Global instance
 export const eventBus = new EventBus();
-export default eventBus;
+export default EventBus;

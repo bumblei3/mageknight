@@ -312,6 +312,81 @@ describe('Site Handlers - Coverage Boost', () => {
             const options = handler.getOptions(site);
             expect(options.length).toBeGreaterThan(0);
         });
+
+        it('should return heal option with correct properties', () => {
+            const site = { conquered: false, getName: () => 'Village' };
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            expect(heal).toBeDefined();
+            expect(heal.id).toBe('heal');
+            expect(heal.label).toBe('Heilen (3 Einfluss / Wunde)');
+            expect(typeof heal.action).toBe('function');
+        });
+
+        it('should enable heal when hero has wounds', () => {
+            const site = { conquered: false, getName: () => 'Village' };
+            game.hero.wounds = [{ id: 'w1' }];
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            expect(heal.enabled).toBe(true);
+        });
+
+        it('should disable heal when hero has no wounds', () => {
+            const site = { conquered: false, getName: () => 'Village' };
+            game.hero.wounds = [];
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            expect(heal.enabled).toBe(false);
+        });
+
+        it('should return recruit option with subItems', () => {
+            const site = { conquered: false, getName: () => 'Village' };
+            const options = handler.getOptions(site);
+            const recruit = options.find(o => o.id === 'recruit');
+            expect(recruit).toBeDefined();
+            expect(recruit.id).toBe('recruit');
+            expect(recruit.label).toBe('Einheiten rekrutieren');
+            expect(recruit.subItems).toBeDefined();
+            expect(Array.isArray(recruit.subItems)).toBe(true);
+            expect(recruit.subItems.length).toBeGreaterThan(0);
+        });
+
+        it('should have recruit subItems with correct structure', () => {
+            const site = { conquered: false, getName: () => 'Village' };
+            const options = handler.getOptions(site);
+            const recruit = options.find(o => o.id === 'recruit');
+            const firstUnit = recruit.subItems[0];
+            expect(firstUnit.id).toMatch(/^recruit_/);
+            expect(firstUnit.label).toBeDefined();
+            expect(firstUnit.type).toBe('unit');
+            expect(firstUnit.data).toBeDefined();
+            expect(firstUnit.cost).toBeDefined();
+            expect(typeof firstUnit.action).toBe('function');
+        });
+
+        it('should allow executing heal action', () => {
+            const site = { conquered: false, getName: () => 'Village' };
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            game.hero.wounds = [{ id: 'w1' }];
+            game.hero.influencePoints = 10;
+            game.hero.healWound = vi.fn().mockReturnValue(true);
+            const result = heal.action();
+            expect(result.success).toBe(true);
+            expect(game.hero.healWound).toHaveBeenCalledWith(false);
+        });
+
+        it('should allow executing recruit action for first unit', () => {
+            const site = { conquered: false, getName: () => 'Village' };
+            const options = handler.getOptions(site);
+            const recruit = options.find(o => o.id === 'recruit');
+            const firstUnit = recruit.subItems[0];
+            game.hero.influencePoints = 10;
+            game.hero.addUnit = vi.fn().mockReturnValue(true);
+            const result = firstUnit.action();
+            expect(result.success).toBe(true);
+            expect(game.hero.addUnit).toHaveBeenCalled();
+        });
     });
 
     describe('MonasteryHandler', () => {

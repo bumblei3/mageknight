@@ -35,6 +35,7 @@ export interface EnemyData {
     iceResist?: boolean;
     physicalResist?: boolean;
     arcaneImmune?: boolean;
+    paralyze?: boolean;
     icon?: string;
     color?: string;
     attackType?: string;
@@ -81,6 +82,7 @@ export class Enemy {
     iceResist: boolean;
     physicalResist: boolean;
     arcaneImmune: boolean = false;
+    paralyze: boolean;
     icon: string;
     color: string;
     attackType: string;
@@ -125,6 +127,7 @@ export class Enemy {
 
         // Arcane Immunity
         this.arcaneImmune = data.arcaneImmune || false;
+        this.paralyze = data.paralyze || false;
 
         // Visual
         this.icon = data.icon || '👹';

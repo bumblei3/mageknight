@@ -426,6 +426,16 @@ export class TooltipManager {
                         <span class="value">${enemy.fame}</span>
                     </div>
                     ${enemy.fortified ? `<div class="tooltip-ability">🏰 ${t('mana.fortified')}</div>` : ''}
+                    ${enemy.swift ? `<div class="tooltip-ability">💨 ${t('mana.swift')}</div>` : ''}
+                    ${enemy.poison ? `<div class="tooltip-ability">🤢 ${t('mana.poison')}</div>` : ''}
+                    ${enemy.vampiric ? `<div class="tooltip-ability">🧛 ${t('mana.vampiric')}</div>` : ''}
+                    ${enemy.brutal ? `<div class="tooltip-ability">👹 ${t('mana.brutal')}</div>` : ''}
+                    ${enemy.paralyze ? `<div class="tooltip-ability">⚡ ${t('mana.paralyze')}</div>` : ''}
+                    ${enemy.cumbersome ? `<div class="tooltip-ability">🏋️ ${t('mana.cumbersome')}</div>` : ''}
+                    ${enemy.assassin ? `<div class="tooltip-ability">🗡️ ${t('mana.assassin')}</div>` : ''}
+                    ${enemy.summoner ? `<div class="tooltip-ability">🦇 ${t('mana.summoner')}</div>` : ''}
+                    ${enemy.elusive ? `<div class="tooltip-ability">👤 ${t('mana.elusive')}</div>` : ''}
+                    ${enemy.isBoss ? `<div class="tooltip-ability">👑 ${t('mana.boss')}</div>` : ''}
                 </div>
             </div>
         `;

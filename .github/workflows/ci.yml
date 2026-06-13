@@ -21,12 +21,10 @@ jobs:
   setup:
     name: Setup & Cache
     runs-on: ubuntu-latest
-    outputs:
-      cache-key: ${{ steps.cache.outputs.cache-primary-key }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # für commit-lint/history
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,24 +33,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      - name: Get npm cache dir
-        id: npm-cache
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: cache
-        with:
-          path: |
-            ${{ steps.npm-cache.outputs.dir }}
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Install Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci --prefer-offline --no-audit
+
+  # Cache key for node_modules (used by all jobs)
+  # Key includes OS + hash of package-lock.json for automatic invalidation
+  _cache-key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
   # --- Lint & TypeCheck (fast, parallel) ---
   lint-typecheck:
@@ -69,7 +55,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ needs.setup.outputs.cache-key }}
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Lint
@@ -92,7 +78,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ needs.setup.outputs.cache-key }}
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - name: Run Tests
         run: npm run test:coverage
       - name: Upload Coverage
@@ -126,7 +112,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ needs.setup.outputs.cache-key }}
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run E2E Tests
@@ -155,7 +141,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ needs.setup.outputs.cache-key }}
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - name: Build
         run: npm run build
       - name: Upload Build Artifact
@@ -207,10 +193,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ needs.setup.outputs.cache-key }}
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
       - name: npm audit
         run: npm audit --audit-level=high
-        continue-on-error: true  # blockiert nicht, warnt nur
+        continue-on-error: true
 
   # --- Dependency Review ---
   deps:

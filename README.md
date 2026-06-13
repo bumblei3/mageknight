@@ -89,7 +89,10 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 - 🗡️ **Schwächling**: Rüstung 2, Angriff 1
 - 👹 **Ork**: Rüstung 3, Angriff 2
 - 🛡️ **Wächter**: Rüstung 4, Angriff 3 (befestigt)
- 
+- 👻 **Phantom**: Rüstung 2, Angriff 3, **Attentäter** (Schaden muss vom Helden genommen werden)
+- 🦇 **Vampir**: Rüstung 4, Angriff 4, **Attentäter**, Vampirismus, Giftig
+- 🐲 **Drache**: Rüstung 6, Angriff 5, Brutal, Feuer-Resistenz
+
 *(Siehe [rules.md](rules.md) für Details zu Feindfähigkeiten wie Vampirismus, Flink, etc.)*
 
 ### Mana-System
@@ -114,20 +117,23 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 
 Das Spiel ist modular aufgebaut:
 
-- `js/game.js` - Haupt-Spiellogik und Controller
-- `js/hexgrid.js` - Hex-Grid-System mit axialen Koordinaten
-- `js/hero.js` - Helden-Klasse mit Stats und Deck-Management
-- `js/card.js` - Kartensystem und Karten-Definitionen
-- `js/enemy.js` - Feind-System
-- `js/combat.js` - Kampf-Mechanik
-- `js/mana.js` - Mana-Quelle und Kristall-Verwaltung
+- `js/game.ts` - Haupt-Spiellogik und Controller
+- `js/hexgrid.ts` - Hex-Grid-System mit axialen Koordinaten
+- `js/hero.ts` - Helden-Klasse mit Stats und Deck-Management
+- `js/card.ts` - Kartensystem und Karten-Definitionen
+- `js/enemy.ts` - Feind-System
+- `js/combat.ts` - Kampf-Mechanik
+- `js/mana.ts` - Mana-Quelle und Kristall-Verwaltung
 - `js/saveManager.js` - Robustes Speichersystem
 - `js/statistics.js` - Performance- und Spielstatistiken
-- `js/terrain.js` - Terrain-Definitionen
-- `js/ui.js` - UI-Rendering und Interaktion
+- `js/terrain.ts` - Terrain-Definitionen
+- `js/ui.ts` - UI-Rendering und Interaktion
 - `js/particles.js` - Leistungsstarkes Partikelsystem
 - `js/skills.js` - Fähigkeiten-System
 - `js/tutorialManager.js` - Erweitertes Tutorial-System
+- `js/combat/CombatPredictor.ts` - **NEU**: Kampf-Vorhersage-System
+- `js/combat/CombatUnitManager.ts` - **NEU**: Elementare Unit-Angriffe/Blöcke
+- `js/game/CombatOrchestrator.ts` - **NEU**: Combat UI Orchestrierung
 
 ### Technologie-Stack
 
@@ -135,10 +141,15 @@ Das Spiel ist modular aufgebaut:
 - **Vanilla CSS** - Styling mit CSS-Variablen
 - **JavaScript ES6+** - Spiellogik mit Modulen
 - **Canvas API** - Hex-Grid-Rendering
+- **Three.js** - 3D-Ansicht (lazy-loaded, ~514KB)
+- **TypeScript** - Typsichere Entwicklung
+- **Vite** - Build-Tool mit Chunk-Splitting
+- **Vitest** - Unit/Integration Tests
+- **Playwright** - E2E Tests
 
 ## 🧪 Testing
 
-Das Projekt verfügt über eine hochmoderne Test-Suite mit **944 Tests** und **94.67% Global Statement Coverage**.
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **1227 Tests**.
 
 ```bash
 # Alle Tests ausführen
@@ -146,11 +157,23 @@ npm test
 
 # Tests mit Coverage
 npm run test:coverage
+
+# E2E Tests
+npm run test:e2e
+
+# Linting
+npm run lint
+
+# Typecheck
+npm run typecheck
+
+# Production Build
+npm run build
 ```
 
 ## 📜 Lizenz
 
-Dieses ist ein Fan-Projekt basierend auf dem Mage Knight Brettspiel von WizKids.
+Dies ist ein Fan-Projekt basierend auf dem Mage Knight Brettspiel von WizKids.
 Nur für Lern- und Demonstrationszwecke.
 
 ## 🙏 Credits

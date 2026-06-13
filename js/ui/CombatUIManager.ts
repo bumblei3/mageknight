@@ -350,11 +350,12 @@ export class CombatUIManager {
         title.textContent = '🎖️ Deine Einheiten';
         container.appendChild(title);
 
+        // Check for Assassin restriction (used in hint + unit cards)
+        const combat = this.ui?.game?.combat;
+        const hasAssassinRestriction = phase === COMBAT_PHASES.DAMAGE && combat && combat.unblockedEnemies && combat.unblockedEnemies.some((e: any) => e.assassin && !e.damageAssigned);
+
         // Add Context Hint for Damage Phase
         if (phase === COMBAT_PHASES.DAMAGE) {
-            const combat = this.ui?.game?.combat;
-            const hasAssassinRestriction = combat && combat.unblockedEnemies && combat.unblockedEnemies.some((e: any) => e.assassin && !e.damageAssigned);
-            
             const hint = document.createElement('div');
             hint.className = 'damage-assignment-hint';
             if (hasAssassinRestriction) {
@@ -400,10 +401,6 @@ export class CombatUIManager {
                     return `${elementIcon} ${a.text}`;
                 }).join(', ');
             } else if (phase === COMBAT_PHASES.DAMAGE) {
-                // Check for Assassin restriction - if any unblocked enemy has assassin and damage not assigned
-                const combat = this.ui?.game?.combat;
-                const hasAssassinRestriction = combat && combat.unblockedEnemies && combat.unblockedEnemies.some((e: any) => e.assassin && !e.damageAssigned);
-                
                 if (hasAssassinRestriction) {
                     canAct = false;
                     actionText = '🗡️ Attentäter! Schaden muss vom Helden genommen werden';
@@ -442,6 +439,19 @@ export class CombatUIManager {
                 unitCard.style.borderColor = '#ef4444';
                 const strongEl = unitCard.querySelector('strong');
                 if (strongEl) strongEl.style.color = '#ef4444';
+            } else if (phase === COMBAT_PHASES.DAMAGE && hasAssassinRestriction) {
+                // Attach tooltip explaining Assassin restriction for disabled units
+                if (this.ui && this.ui.tooltipManager) {
+                    const tooltipHTML = `
+                        <div style="min-width: 220px;">
+                            <div style="font-weight: bold; color: #ef4444; margin-bottom: 0.5rem;">🗡️ Attentäter-Effekt</div>
+                            <div>Dieser Feind hat die Eigenschaft <strong>Attentäter</strong>.</div>
+                            <div style="margin-top: 0.25rem;">Schaden <strong>kann nicht</strong> auf Einheiten zugewiesen werden.</div>
+                            <div style="margin-top: 0.25rem; font-size: 0.85rem; color: #9ca3af;">Alle Wunden müssen vom Helden genommen werden.</div>
+                        </div>
+                    `;
+                    this.ui.tooltipManager.attachToElement(unitCard as HTMLElement, tooltipHTML);
+                }
             }
 
             if (canAct && onUnitActivate) {

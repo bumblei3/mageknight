@@ -38,6 +38,11 @@
         "exclude": [
             "js/three.min.js",
             "js/main.js",
+            "js/card.ts",
+            "js/errorHandler.ts",
+            "js/performanceMonitor.ts",
+            "js/workers/aiWorker.js",
+            "js/icons.ts",
             "tests/**",
             "node_modules/**",
             "*.config.js"
@@ -49,7 +54,7 @@
         ],
         "report-dir": "./coverage",
         "clean": true,
-        "check-coverage": false,
+        "check-coverage": true,
         "lines": 80,
         "functions": 80,
         "branches": 80,

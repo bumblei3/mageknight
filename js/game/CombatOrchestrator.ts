@@ -3,6 +3,8 @@ import { eventBus } from '../eventBus';
 import { GAME_EVENTS, COMBAT_PHASES } from '../constants';
 import { t } from '../i18n/index';
 import Enemy, { ENEMY_DEFINITIONS } from '../enemy';
+import { Card } from '../card';
+import { Unit } from '../unit';
 
 export interface BlockSource {
     value: number;
@@ -23,11 +25,11 @@ export interface EnemyData {
     attack?: number;
     getBlockRequirement?: () => number;
     cumbersome?: boolean;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export class CombatOrchestrator {
-    private game: any;
+    private game: any; // TODO: Replace with proper Game interface
     public combatAttackTotal: number;
     public combatBlockTotal: number;
     public activeBlocks: BlockSource[];
@@ -43,7 +45,7 @@ export class CombatOrchestrator {
         this.combatSiegeTotal = 0;
     }
 
-    playCardInCombat(index: number, card: any, useStrong: boolean = false): void {
+    playCardInCombat(index: number, card: Card, useStrong: boolean = false): void {
         if (!this.game.combat || card.isWound()) return;
 
         if (this.game.actionManager) {
@@ -99,7 +101,7 @@ export class CombatOrchestrator {
         this.game.ui.renderUnitsInCombat(units, this.game.combat.phase, (u: any) => this.activateUnitInCombat(u));
     }
 
-    activateUnitInCombat(unit: any): void {
+    activateUnitInCombat(unit: Unit): void {
         if (!this.game.combat) return;
         const result = this.game.combat.activateUnit(unit);
         if (result.success) {
@@ -341,7 +343,7 @@ export class CombatOrchestrator {
         this.combatBlockTotal = 0;
 
         if (this.game.ui) {
-            this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e: any) => this.handleEnemyClick(e));
+            this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e: Enemy) => this.handleEnemyClick(e));
         }
         this.updateCombatTotals();
         this.game.updatePhaseIndicator();
@@ -349,7 +351,7 @@ export class CombatOrchestrator {
         eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemies: enemies });
     }
 
-    handleEnemyClick(enemy: any): void {
+    handleEnemyClick(enemy: Enemy): void {
         if (!this.game.combat) return;
 
         if (this.game.combat.phase === COMBAT_PHASES.RANGED) {
@@ -495,7 +497,7 @@ export class CombatOrchestrator {
         eventBus.emit(GAME_EVENTS.COMBAT_ENDED, { victory: result.victory, enemy: enemy });
     }
 
-    executeRangedAttack(enemy: any): void {
+    executeRangedAttack(enemy: Enemy): void {
         if (!this.game.combat) return;
 
         const attackResult = this.game.combat.rangedAttackEnemy(

@@ -91,7 +91,7 @@ jobs:
         if: always()
         run: |
           echo "Checking coverage thresholds from coverage report..."
-          node -e "
+          node << 'EOF'
             const fs = require('fs');
             const path = require('path');
             const coverageDir = path.join(process.cwd(), 'coverage');
@@ -117,7 +117,7 @@ jobs:
             if (failed) {
               process.exit(1);
             }
-          "
+          EOF
       - name: Upload Coverage
         uses: actions/upload-artifact@v7
         if: always()

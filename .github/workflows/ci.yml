@@ -122,9 +122,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps firefox
+        run: npx playwright install --with-deps chromium
       - name: Run E2E Tests
-        run: npx playwright test --project=firefox
+        run: npx playwright test --project=chromium
       - name: Upload Playwright Report
         if: always()
         uses: actions/upload-artifact@v7

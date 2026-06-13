@@ -199,8 +199,8 @@ export class InteractionController {
         }
 
         const hexData = this.game.hexGrid.getHex(q, r);
-        if (hexData) {
-            const terrainName = this.game.terrain.getName(hexData.terrain);
+        if (hexData && hexData.terrain) {
+            const terrainName = this.game.terrain.getName(hexData.terrain as string);
             this.game.addLog(`Hex ausgewählt: ${q},${r} - ${terrainName}`, 'info');
         }
 
@@ -265,7 +265,7 @@ export class InteractionController {
             this.game.ui.addPlayedCard(result.card, result.effect);
             this.game.ui.showPlayArea();
 
-            if (this.game.particleSystem) {
+            if (this.game.particleSystem && this.game.ui.elements.playedCards) {
                 const rect = this.game.ui.elements.playedCards.getBoundingClientRect();
                 const x = rect.right - 50;
                 const y = rect.top + 75;
@@ -396,7 +396,7 @@ export class InteractionController {
             if (result) {
                 this.game.sound.cardPlaySideways();
 
-                if (this.game.particleSystem) {
+                if (this.game.particleSystem && this.game.ui.elements.handCards) {
                     const rect = this.game.ui.elements.handCards.getBoundingClientRect();
                     const x = rect.left + (rect.width / 2);
                     const y = rect.top + 50;
@@ -449,7 +449,6 @@ export class InteractionController {
 
             // Update UI
             this.game.renderMana();
-            if (this.game.ui.updateHeroMana) this.game.ui.updateHeroMana(this.game.hero);
         }
     }
 }

@@ -173,12 +173,20 @@ export class AchievementManager {
     private unlockedAchievements: Set<string> = new Set();
     private notifications: any[] = [];
     public achievements = ACHIEVEMENTS;
+    private gameRef: any = null;
 
     constructor() {
         this.unlockedAchievements = new Set();
         this.notifications = [];
         this.achievements = ACHIEVEMENTS;
         this.load();
+    }
+
+    /**
+     * Set game reference for callbacks
+     */
+    public setGame(game: any): void {
+        this.gameRef = game;
     }
 
     /**

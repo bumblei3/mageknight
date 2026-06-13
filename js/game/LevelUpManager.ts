@@ -21,7 +21,8 @@ export class LevelUpManager {
     /**
      * Entry point for handling a level-up event.
      */
-    async handleLevelUp(newLevelData: { newLevel: number }): Promise<void> {
+    async handleLevelUp(newLevelData: { leveledUp: boolean; newLevel?: number; reward?: string }): Promise<void> {
+        if (!newLevelData.leveledUp || newLevelData.newLevel === undefined) return;
         this.currentLevel = newLevelData.newLevel;
 
         this.game.addLog(`⭐ Level ${this.currentLevel} erreicht!`, 'success');

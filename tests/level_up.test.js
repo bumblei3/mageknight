@@ -85,14 +85,14 @@ describe('Level Up System', () => {
         levelUpManager.renderSkills = (skills) => { skillsRendered = skills.length; };
         levelUpManager.renderCards = (cards) => { cardsRendered = cards.length; };
 
-        levelUpManager.handleLevelUp({ newLevel: 2 });
+        levelUpManager.handleLevelUp({ leveledUp: true, newLevel: 2 });
 
         expect(skillsRendered).toBe(2);
         expect(cardsRendered).toBe(3);
     });
 
     it('Should disable confirm button until both choices are made', () => {
-        levelUpManager.handleLevelUp({ newLevel: 2 });
+        levelUpManager.handleLevelUp({ leveledUp: true, newLevel: 2 });
 
         expect(levelUpManager.confirmBtn.disabled).toBe(true);
 

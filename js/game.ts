@@ -170,7 +170,7 @@ export class MageKnightGame {
         this.manaSource = new ManaSource();
         this.enemyAI = new EnemyAI(this);
         this.particleSystem = new ParticleSystem(this.canvas);
-        this.weatherSystem = new WeatherSystem(this.particleSystem, this.canvas);
+        this.weatherSystem = new WeatherSystem(this.particleSystem.engine, this.canvas);
         this.particleSystem.registerSystem(this.weatherSystem);
 
         this.mapManager = new MapManager(this);

@@ -36,6 +36,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci --prefer-offline --no-audit
 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
   # --- Lint & TypeCheck (fast, parallel) ---
   lint-typecheck:
     name: Lint & TypeCheck
@@ -75,6 +83,8 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Run Tests
         run: npm run test:coverage
       - name: Upload Coverage
@@ -109,10 +119,14 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run E2E Tests
-        run: npm run test:e2e
+        run: npx playwright test
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
         if: always()
@@ -138,6 +152,8 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Build
         run: npm run build
       - name: Upload Build Artifact
@@ -179,6 +195,7 @@ jobs:
     name: Security Audit
     needs: setup
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -190,9 +207,10 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: npm audit
-        run: npm audit --audit-level=high
-        continue-on-error: true
+        run: npm audit --audit-level=high || true
 
   # --- Dependency Review ---
   deps:

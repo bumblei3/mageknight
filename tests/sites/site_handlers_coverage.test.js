@@ -165,6 +165,63 @@ describe('Site Handlers - Coverage Boost', () => {
             const options = handler.getOptions(site);
             expect(options.length).toBeGreaterThan(0);
         });
+
+        it('should return explore option for unconquered labyrinth', () => {
+            const site = { conquered: false, getName: () => 'Labyrinth' };
+            const options = handler.getOptions(site);
+            expect(options.length).toBe(1);
+            expect(options[0].id).toBe('explore_labyrinth');
+            expect(options[0].label).toBe('Labyrinth betreten (Mehrere Kämpfe)');
+            expect(options[0].enabled).toBe(true);
+        });
+
+        it('should return disabled option for conquered labyrinth', () => {
+            const site = { conquered: true, getName: () => 'Labyrinth' };
+            const options = handler.getOptions(site);
+            expect(options.length).toBe(1);
+            expect(options[0].id).toBe('cleared');
+            expect(options[0].label).toBe('Labyrinth bereits durchquert');
+            expect(options[0].enabled).toBe(false);
+        });
+
+        it('should explore labyrinth and start combat with mage theme enemy', () => {
+            game.addLog = vi.fn();
+            game.combatOrchestrator.initiateCombat = vi.fn();
+            
+            // Mock Math.random to return specific enemy types
+            const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.6); // > 0.5 = mage
+            
+            const result = handler.exploreLabyrinth();
+            
+            expect(result.success).toBe(true);
+            expect(result.message).toBe('Labyrinth betreten!');
+            expect(game.addLog).toHaveBeenCalled();
+            expect(game.combatOrchestrator.initiateCombat).toHaveBeenCalled();
+            
+            const enemies = game.combatOrchestrator.initiateCombat.mock.calls[0][0];
+            expect(enemies.length).toBe(2);
+            expect(enemies[0].type).toBe('mage'); // or 'golem' depending on random
+            expect(enemies[1].type).toMatch(/draconum|orc_khan/);
+            
+            randomSpy.mockRestore();
+        });
+
+        it('should explore labyrinth and start combat with golem theme enemy', () => {
+            game.addLog = vi.fn();
+            game.combatOrchestrator.initiateCombat = vi.fn();
+            
+            const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.4); // < 0.5 = golem
+            
+            const result = handler.exploreLabyrinth();
+            
+            expect(result.success).toBe(true);
+            expect(game.combatOrchestrator.initiateCombat).toHaveBeenCalled();
+            
+            const enemies = game.combatOrchestrator.initiateCombat.mock.calls[0][0];
+            expect(enemies[0].type).toBe('golem');
+            
+            randomSpy.mockRestore();
+        });
     });
 
     describe('CityHandler', () => {

@@ -340,10 +340,19 @@ export class CombatUIManager {
 
         // Add Context Hint for Damage Phase
         if (phase === COMBAT_PHASES.DAMAGE) {
+            const combat = this.ui?.game?.combat;
+            const hasAssassinRestriction = combat && combat.unblockedEnemies && combat.unblockedEnemies.some((e: any) => e.assassin && !e.damageAssigned);
+            
             const hint = document.createElement('div');
             hint.className = 'damage-assignment-hint';
-            hint.innerHTML = '<small>Klicke auf eine Einheit, um Schaden zuzuweisen (Schützt den Helden).</small>';
-            hint.style.color = '#ef4444';
+            if (hasAssassinRestriction) {
+                hint.innerHTML = '<small>🗡️ <strong>Attentäter im Kampf!</strong> Schaden kann NICHT auf Einheiten zugewiesen werden. Der Held muss den Schaden nehmen.</small>';
+                hint.style.color = '#ef4444';
+                hint.style.fontWeight = 'bold';
+            } else {
+                hint.innerHTML = '<small>Klicke auf eine Einheit, um Schaden zuzuweisen (Schützt den Helden).</small>';
+                hint.style.color = '#ef4444';
+            }
             hint.style.marginBottom = '10px';
             container.appendChild(hint);
         }
@@ -379,8 +388,17 @@ export class CombatUIManager {
                     return `${elementIcon} ${a.text}`;
                 }).join(', ');
             } else if (phase === COMBAT_PHASES.DAMAGE) {
-                canAct = isReady;
-                actionText = 'Schaden nehmen (-1 Wunde)';
+                // Check for Assassin restriction - if any unblocked enemy has assassin and damage not assigned
+                const combat = this.ui?.game?.combat;
+                const hasAssassinRestriction = combat && combat.unblockedEnemies && combat.unblockedEnemies.some((e: any) => e.assassin && !e.damageAssigned);
+                
+                if (hasAssassinRestriction) {
+                    canAct = false;
+                    actionText = '🗡️ Attentäter! Schaden muss vom Helden genommen werden';
+                } else {
+                    canAct = isReady;
+                    actionText = 'Schaden nehmen (-1 Wunde)';
+                }
             }
 
             const unitCard = document.createElement('div');

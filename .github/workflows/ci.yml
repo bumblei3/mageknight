@@ -95,13 +95,47 @@ jobs:
             const fs = require('fs');
             const path = require('path');
             const coverageDir = path.join(process.cwd(), 'coverage');
-            const files = fs.readdirSync(coverageDir);
-            const jsonFile = files.find(f => f.endsWith('.json'));
-            if (!jsonFile) {
-              console.error('No coverage JSON found');
+            
+            // Debug: list all files in coverage directory
+            console.log('Coverage directory:', coverageDir);
+            if (!fs.existsSync(coverageDir)) {
+              console.error('Coverage directory does not exist!');
               process.exit(1);
             }
-            const coverage = JSON.parse(fs.readFileSync(path.join(coverageDir, jsonFile), 'utf8'));
+            
+            const files = fs.readdirSync(coverageDir);
+            console.log('Files in coverage dir:', files);
+            
+            // Look for any JSON file (could be coverage-final.json, coverage.json, etc.)
+            const jsonFiles = files.filter(f => f.endsWith('.json'));
+            console.log('JSON files found:', jsonFiles);
+            
+            if (jsonFiles.length === 0) {
+              console.error('No coverage JSON files found!');
+              process.exit(1);
+            }
+            
+            // Try each JSON file until we find one with coverage data
+            let coverage = null;
+            for (const jsonFile of jsonFiles) {
+              try {
+                const content = fs.readFileSync(path.join(coverageDir, jsonFile), 'utf8');
+                const data = JSON.parse(content);
+                if (data && (data.total || data.files)) {
+                  coverage = data;
+                  console.log('Using coverage file:', jsonFile);
+                  break;
+                }
+              } catch (e) {
+                console.log('Failed to parse:', jsonFile, e.message);
+              }
+            }
+            
+            if (!coverage) {
+              console.error('No valid coverage data found in any JSON file!');
+              process.exit(1);
+            }
+            
             const totals = coverage.total || {};
             const thresholds = { statements: 80, branches: 80, functions: 80, lines: 80 };
             let failed = false;

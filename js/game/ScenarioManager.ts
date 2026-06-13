@@ -12,7 +12,8 @@ export interface VictoryConditions {
     keeps?: number;
     spawning_grounds?: number;
     rounds?: number;
-    [key: string]: number | undefined;
+    boss?: string;
+    [key: string]: number | string | undefined;
 }
 
 /**
@@ -150,6 +151,84 @@ export class ScenarioManager {
                         { type: SITE_TYPES.LABYRINTH, q: 2, r: -1, count: 3, radius: 4 }
                     ]
                 }
+            },
+            'volkare_quest': {
+                id: 'volkare_quest',
+                name: "Volkare's Quest",
+                description: "Volkare zieht mit seiner Armee auf die Stadt zu. Besiege Volkare, bevor er das Portal erreicht, oder erobere 2 Festungen, um seine Versorgungslinien zu kappen.",
+                victoryConditions: {
+                    boss: 'volkare',
+                    keeps: 2
+                },
+                mapConfig: {
+                    startTile: [
+                        TERRAIN_TYPES.PLAINS,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.HILLS,
+                        TERRAIN_TYPES.MOUNTAINS,
+                        TERRAIN_TYPES.PLAINS,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.HILLS
+                    ],
+                    deckDistribution: 'dungeon_focused',
+                    sitePlacements: [
+                        { type: SITE_TYPES.KEEP, q: 2, r: -2, count: 2, radius: 3 },
+                        { type: SITE_TYPES.CITY, q: -2, r: 2, count: 1, radius: 2 },
+                        { type: SITE_TYPES.MAGE_TOWER, q: 0, r: -3, count: 1, radius: 2 }
+                    ]
+                }
+            },
+            'volkare_return': {
+                id: 'volkare_return',
+                name: "Volkare's Return",
+                description: "Volkare ist zurückgekehrt, mächtiger als je zuvor. Besiege ihn in seinem Lager, während du seine Generäle ausschaltest.",
+                victoryConditions: {
+                    boss: 'volkare',
+                    spawning_grounds: 2
+                },
+                mapConfig: {
+                    startTile: [
+                        TERRAIN_TYPES.WASTELAND,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.HILLS,
+                        TERRAIN_TYPES.MOUNTAINS,
+                        TERRAIN_TYPES.WASTELAND,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.PLAINS
+                    ],
+                    deckDistribution: 'dungeon_focused',
+                    sitePlacements: [
+                        { type: SITE_TYPES.SPAWNING_GROUNDS, q: 3, r: -1, count: 2, radius: 3 },
+                        { type: SITE_TYPES.DUNGEON, q: -2, r: 2, count: 1, radius: 2 },
+                        { type: SITE_TYPES.KEEP, q: 2, r: 2, count: 1, radius: 2 }
+                    ]
+                }
+            },
+            'volkare_legacy': {
+                id: 'volkare_legacy',
+                name: "Volkare's Legacy",
+                description: "Volkares dunkles Vermächtnis lastet auf dem Land. Reinige 3 Brutstätten und besiege seinen Avatar im finalen Kampf.",
+                victoryConditions: {
+                    spawning_grounds: 3,
+                    boss: 'volkare'
+                },
+                mapConfig: {
+                    startTile: [
+                        TERRAIN_TYPES.WASTELAND,
+                        TERRAIN_TYPES.WASTELAND,
+                        TERRAIN_TYPES.FOREST,
+                        TERRAIN_TYPES.MOUNTAINS,
+                        TERRAIN_TYPES.HILLS,
+                        TERRAIN_TYPES.WASTELAND,
+                        TERRAIN_TYPES.PLAINS
+                    ],
+                    deckDistribution: 'dungeon_focused',
+                    sitePlacements: [
+                        { type: SITE_TYPES.SPAWNING_GROUNDS, q: 2, r: -2, count: 3, radius: 4 },
+                        { type: SITE_TYPES.TOMB, q: -2, r: 2, count: 1, radius: 2 },
+                        { type: SITE_TYPES.CITY, q: 0, r: 3, count: 1, radius: 2 }
+                    ]
+                }
             }
         };
     }
@@ -223,7 +302,7 @@ export class ScenarioManager {
                 };
             }
         } else if (scenario.id === 'mining_expedition') {
-            const minesNeeded = scenario.victoryConditions.mines || 0;
+            const minesNeeded = (scenario.victoryConditions.mines as number) || 0;
             if (conqueredMines >= minesNeeded) {
                 return {
                     victory: true,
@@ -231,10 +310,10 @@ export class ScenarioManager {
                 };
             }
         } else if (scenario.id === 'dungeon_lords') {
-            const dungeonsNeeded = scenario.victoryConditions.dungeon || 0;
-            const tombsNeeded = scenario.victoryConditions.tomb || 0;
-            const ruinsNeeded = scenario.victoryConditions.ruins || 0;
-            const labyrinthsNeeded = scenario.victoryConditions.labyrinth || 0;
+            const dungeonsNeeded = (scenario.victoryConditions.dungeon as number) || 0;
+            const tombsNeeded = (scenario.victoryConditions.tomb as number) || 0;
+            const ruinsNeeded = (scenario.victoryConditions.ruins as number) || 0;
+            const labyrinthsNeeded = (scenario.victoryConditions.labyrinth as number) || 0;
 
             if (conqueredDungeons >= dungeonsNeeded && conqueredTombs >= tombsNeeded && conqueredRuins >= ruinsNeeded && conqueredLabyrinths >= labyrinthsNeeded) {
                 return {
@@ -243,8 +322,8 @@ export class ScenarioManager {
                 };
             }
         } else if (scenario.id === 'labyrinth_rising') {
-            const labyrinthsNeeded = scenario.victoryConditions.labyrinth || 0;
-            const roundsNeeded = scenario.victoryConditions.rounds || 0;
+            const labyrinthsNeeded = (scenario.victoryConditions.labyrinth as number) || 0;
+            const roundsNeeded = (scenario.victoryConditions.rounds as number) || 0;
             const currentRound = this.game.round || 0;
             
             if (conqueredLabyrinths >= labyrinthsNeeded) {
@@ -260,9 +339,61 @@ export class ScenarioManager {
                     message: `Zeit abgelaufen! Die Labyrinthe haben dich überwältigt.`
                 };
             }
+        } else if (scenario.id === 'volkare_quest') {
+            const keepsNeeded = (scenario.victoryConditions.keeps as number) || 0;
+            const bossDefeated = this.checkBossDefeated('volkare');
+            
+            if (bossDefeated || conqueredKeeps >= keepsNeeded) {
+                return {
+                    victory: true,
+                    message: `${scenario.name} erfolgreich abgeschlossen! Volkares Vormarsch wurde gestoppt.`
+                };
+            }
+        } else if (scenario.id === 'volkare_return') {
+            const spawnsNeeded = (scenario.victoryConditions.spawning_grounds as number) || 0;
+            const bossDefeated = this.checkBossDefeated('volkare');
+            
+            if (bossDefeated || conqueredSpawns >= spawnsNeeded) {
+                return {
+                    victory: true,
+                    message: `${scenario.name} erfolgreich abgeschlossen! Volkares Rückkehr wurde abgewehrt.`
+                };
+            }
+        } else if (scenario.id === 'volkare_legacy') {
+            const spawnsNeeded = (scenario.victoryConditions.spawning_grounds as number) || 0;
+            const bossDefeated = this.checkBossDefeated('volkare');
+            
+            if (bossDefeated || conqueredSpawns >= spawnsNeeded) {
+                return {
+                    victory: true,
+                    message: `${scenario.name} erfolgreich abgeschlossen! Volkares Vermächtnis ist gebrochen.`
+                };
+            }
         }
 
         return false;
+    }
+
+    /**
+     * Checks if a boss enemy has been defeated.
+     */
+    private checkBossDefeated(bossType: string): boolean {
+        if (this.game.hexGrid && this.game.hexGrid.hexes) {
+            for (const hex of this.game.hexGrid.hexes.values()) {
+                if (hex.enemy && hex.enemy.type === bossType && hex.enemy.isBoss) {
+                    return false; // Boss still alive
+                }
+            }
+        }
+        // Also check game's enemy list
+        if (this.game.enemies) {
+            for (const enemy of this.game.enemies) {
+                if (enemy.type === bossType && enemy.isBoss) {
+                    return false; // Boss still alive
+                }
+            }
+        }
+        return true; // No boss found = defeated
     }
 
     /**
@@ -287,6 +418,12 @@ export class ScenarioManager {
             return 'Ziele: 2 Dungeons, 1 Gruft, 1 Ruine und 1 Labyrinth erobern.';
         } else if (scenario.id === 'labyrinth_rising') {
             return 'Ziele: 3 Labyrinthe durchqueren in 8 Runden.';
+        } else if (scenario.id === 'volkare_quest') {
+            return 'Ziele: Besiege Volkare ODER erobere 2 Festungen.';
+        } else if (scenario.id === 'volkare_return') {
+            return 'Ziele: Besiege Volkare ODER zerstöre 2 Brutstätten.';
+        } else if (scenario.id === 'volkare_legacy') {
+            return 'Ziele: Zerstöre 3 Brutstätten UND besiege Volkare.';
         }
         return scenario.description;
     }

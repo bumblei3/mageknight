@@ -135,6 +135,18 @@ export class CombatUIManager {
                                 ⚔️ <strong>Besiegbar:</strong> ${prediction.enemiesDefeated.join(', ')}
                              </div>` : ''
                 }
+                        ${prediction.assassinRestriction ?
+                    `<div class="prediction-warning">
+                                🗡️ <strong>Attentäter!</strong> Schaden muss vom Helden genommen werden.
+                             </div>` : ''
+                }
+                        ${(prediction.elementalEfficiencyWarnings?.length > 0 || prediction.blockEfficiencyWarnings?.length > 0) ?
+                    (() => {
+                        const elemWarn = (prediction.elementalEfficiencyWarnings || []).map((w: string) => `<span class="efficiency-warning">⚡ ${w}</span>`).join('');
+                        const blockWarn = (prediction.blockEfficiencyWarnings || []).map((w: string) => `<span class="efficiency-warning">🛡️ ${w}</span>`).join('');
+                        return `<div class="prediction-efficiency">${elemWarn}${blockWarn}</div>`;
+                    })() : ''
+                }
                     </div>
                 </div>
             `;

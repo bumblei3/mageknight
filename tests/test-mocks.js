@@ -896,6 +896,8 @@ export function setupGlobalMocks() {
     global.CustomEvent = MockCustomEvent;
     global.MouseEvent = MockMouseEvent;
     global.KeyboardEvent = MockKeyboardEvent;
+    global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
+    global.cancelAnimationFrame = (id) => clearTimeout(id);
 
     if (typeof prompt === 'undefined' || (global.prompt && global.prompt.toString().includes('native'))) {
         global.prompt = () => '1';

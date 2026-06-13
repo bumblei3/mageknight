@@ -42,6 +42,13 @@ import { ShortcutManager } from './game/ShortcutManager';
 import { HeroManager } from './game/HeroManager';
 import { store } from './game/Store';
 
+import Enemy from './enemy';
+import { Combat } from './combat';
+import { SaveManagerAPI, GameAPIExtended, SaveManagerAPI as SaveManagerAPIType } from './game/game-types';
+import { SoundManager as SoundManagerType } from './soundManager';
+import { AchievementManager as AchievementManagerType } from './achievements';
+import { StatisticsManager as StatisticsManagerType } from './statistics';
+
 /**
  * Main Game Controller Class
  * Orchestrates the game loop, state management, and interaction between subsystems.
@@ -54,15 +61,15 @@ export class MageKnightGame {
     public isTestEnvironment: boolean;
 
     // Subsystems & Managers
-    public ui: any; // To be converted to UI
-    public terrain: any;
-    public saveManager: any;
-    public timeManager: any;
-    private _sound: any | null = null;
-    private _achievementManager: any | null = null;
-    private _statisticsManager: any | null = null;
-    private _tutorial: any | null = null;
-    public animator: any;
+    public ui: UI;
+    public terrain: Terrain;
+    public saveManager: SaveManagerAPIType;
+    public timeManager: TimeManager;
+    private _sound: SoundManagerType | null = null;
+    private _achievementManager: AchievementManagerType | null = null;
+    private _statisticsManager: StatisticsManagerType | null = null;
+    private _tutorial: TutorialManager | null = null;
+    public animator: typeof animator;
     public levelUpManager: LevelUpManager;
     public rewardManager: RewardManager;
     public scenarioManager: ScenarioManager;
@@ -70,17 +77,17 @@ export class MageKnightGame {
     // Core Components
     public canvas: HTMLCanvasElement;
     public ctx: CanvasRenderingContext2D | null;
-    public hexGrid: any;
-    public hero: any;
-    public enemies: any[];
-    public manaSource: any;
-    public enemyAI: any;
-    public particleSystem: any;
-    public weatherSystem: any;
-    public mapManager: any;
-    public worldEventManager: any;
-    public siteManager: any;
-    public debug: any;
+    public hexGrid: HexGrid;
+    public hero: Hero;
+    public enemies: Enemy[];
+    public manaSource: ManaSource;
+    public enemyAI: EnemyAI;
+    public particleSystem: ParticleSystem;
+    public weatherSystem: WeatherSystem;
+    public mapManager: MapManager;
+    public worldEventManager: WorldEventManager;
+    public siteManager: SiteInteractionManager;
+    public debug: DebugManager;
 
     // Refactored Controllers
     public turnManager: TurnManager;
@@ -88,7 +95,7 @@ export class MageKnightGame {
     public shortcutManager: ShortcutManager;
     public inputController: InputController;
     public renderController: RenderController;
-    public touchController: any;
+    public touchController: TouchController;
 
     // Core Game Managers
     public phaseManager: PhaseManager;
@@ -101,8 +108,8 @@ export class MageKnightGame {
 
     // State
     public movementMode: boolean;
-    public combat: any | null;
-    public reachableHexes: any[] = [];
+    public combat: Combat | null;
+    public reachableHexes: { q: number; r: number }[] = [];
     public selectedCard: any | null = null;
 
     /**

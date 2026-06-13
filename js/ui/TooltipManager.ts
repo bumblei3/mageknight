@@ -430,7 +430,10 @@ export class TooltipManager {
         const unitName = typeof unit.getName === 'function' ? unit.getName() : (unit.name || 'Unit');
         const unitLevel = unit.level || 1;
         const abilities = typeof unit.getAbilities === 'function' ? unit.getAbilities() : [];
-        const abilityText = (abilities as any[]).map(a => `<div class="tooltip-ability">✨ ${a.text || a}</div>`).join('');
+        const abilityText = (abilities as any[]).map(a => {
+            const elementIcon = this.getElementIcon(a.element);
+            return `<div class="tooltip-ability">${elementIcon} ${a.text || a}</div>`;
+        }).join('');
 
         return `
             <div class="tooltip-unit">
@@ -452,6 +455,23 @@ export class TooltipManager {
                 </div>` : ''}
             </div>
         `;
+    }
+
+    // Helper method to get element icon
+    private getElementIcon(element?: string): string {
+        const icons: Record<string, string> = {
+            'fire': '🔥',
+            'ice': '❄️',
+            'cold_fire': '🔥❄️',
+            'physical': '⚔️',
+            'holy': '✨',
+            'healing': '❤️',
+            'influence': '💬',
+            'movement': '🌿',
+            'ranged': '🏹',
+            'siege': '🎯'
+        };
+        return icons[element || 'physical'] || '⚔️';
     }
 
     /**

@@ -360,15 +360,24 @@ export class CombatUIManager {
             if (phase === COMBAT_PHASES.BLOCK) {
                 const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter((a: any) => a.type === ACTION_TYPES.BLOCK);
                 canAct = isReady && abilities.length > 0;
-                actionText = abilities.map((a: any) => a.text).join(', ');
+                actionText = abilities.map((a: any) => {
+                    const elementIcon = this.getElementIcon(a.element);
+                    return `${elementIcon} ${a.text}`;
+                }).join(', ');
             } else if (phase === COMBAT_PHASES.ATTACK) {
                 const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter((a: any) => a.type === ACTION_TYPES.ATTACK);
                 canAct = isReady && abilities.length > 0;
-                actionText = abilities.map((a: any) => a.text).join(', ');
+                actionText = abilities.map((a: any) => {
+                    const elementIcon = this.getElementIcon(a.element);
+                    return `${elementIcon} ${a.text}`;
+                }).join(', ');
             } else if (phase === COMBAT_PHASES.RANGED) {
                 const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter((a: any) => a.type === ACTION_TYPES.RANGED || a.type === ACTION_TYPES.SIEGE);
                 canAct = isReady && abilities.length > 0;
-                actionText = abilities.map((a: any) => a.text).join(', ');
+                actionText = abilities.map((a: any) => {
+                    const elementIcon = this.getElementIcon(a.element);
+                    return `${elementIcon} ${a.text}`;
+                }).join(', ');
             } else if (phase === COMBAT_PHASES.DAMAGE) {
                 canAct = isReady;
                 actionText = 'Schaden nehmen (-1 Wunde)';
@@ -440,5 +449,17 @@ export class CombatUIManager {
         }
 
         container.appendChild(grid);
+    }
+
+    // Helper method to get element icon
+    private getElementIcon(element?: string): string {
+        const icons: Record<string, string> = {
+            'fire': '🔥',
+            'ice': '❄️',
+            'cold_fire': '🔥❄️',
+            'physical': '⚔️',
+            'holy': '✨'
+        };
+        return icons[element || 'physical'] || '⚔️';
     }
 }

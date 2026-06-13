@@ -8,8 +8,10 @@ export const UNIT_TYPES = {
     SWORDSMEN: 'swordsmen',
     GUARDS: 'guards',
     CROSSBOWMEN: 'crossbowmen',
+    ELVEN_RANGERS: 'elven_rangers',
     CATAPULT: 'catapult',
     GOLEMS: 'golems',
+    FIRE_DRAKES: 'fire_drakes',
     MAGES: 'mages'
 } as const;
 
@@ -108,6 +110,19 @@ export const UNIT_INFO: Record<string, UnitInfo> = {
         location: ['keep', 'city'],
         resistances: ['physical']
     },
+    [UNIT_TYPES.ELVEN_RANGERS]: {
+        name: 'Elfen-Waldläufer',
+        level: 2,
+        cost: 7,
+        armor: 3,
+        icon: '🏹',
+        abilities: [
+            { type: ACTION_TYPES.RANGED, value: 4, text: '4 Fernkampf' },
+            { type: ACTION_TYPES.BLOCK, value: 3, element: 'ice', text: '3 Eis-Block' }
+        ],
+        location: ['mage_tower', 'monastery'],
+        resistances: ['ice', 'physical']
+    },
     [UNIT_TYPES.CATAPULT]: {
         name: 'Katapult',
         level: 3,
@@ -132,6 +147,19 @@ export const UNIT_INFO: Record<string, UnitInfo> = {
         ],
         location: ['mage_tower'],
         resistances: ['physical', 'fire', 'ice']
+    },
+    [UNIT_TYPES.FIRE_DRAKES]: {
+        name: 'Feuer-Drachen',
+        level: 3,
+        cost: 9,
+        armor: 4,
+        icon: '🐉',
+        abilities: [
+            { type: ACTION_TYPES.ATTACK, value: 5, element: 'fire', text: '5 Feuer-Angriff' },
+            { type: ACTION_TYPES.BLOCK, value: 3, element: 'fire', text: '3 Feuer-Block' }
+        ],
+        location: ['mage_tower', 'keep'],
+        resistances: ['fire', 'physical']
     },
     [UNIT_TYPES.MAGES]: {
         name: 'Magier',

@@ -222,11 +222,15 @@ export class CombatOrchestrator {
         if (!this.game.combat) return;
 
         if (this.game.combat.phase === COMBAT_PHASES.RANGED) {
+            // Save checkpoint before ending ranged phase
+            if (this.game.actionManager) this.game.actionManager.saveCheckpoint();
             this.endRangedPhase();
             return;
         }
 
         if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
+            // Save checkpoint before ending block phase
+            if (this.game.actionManager) this.game.actionManager.saveCheckpoint();
             this.endBlockPhase();
             return;
         }
@@ -354,9 +358,14 @@ export class CombatOrchestrator {
     handleEnemyClick(enemy: Enemy): void {
         if (!this.game.combat) return;
 
+        // Save checkpoint before enemy interaction
+        if (this.game.actionManager) this.game.actionManager.saveCheckpoint();
+
         if (this.game.combat.phase === COMBAT_PHASES.RANGED) {
             this.executeRangedAttack(enemy);
         } else if (this.game.combat.phase === COMBAT_PHASES.BLOCK) {
+            // Save checkpoint before block assignment
+            if (this.game.actionManager) this.game.actionManager.saveCheckpoint();
             const movementPoints = this.game.hero.movementPoints;
             let movementToSpend = movementPoints;
 
@@ -499,6 +508,9 @@ export class CombatOrchestrator {
 
     executeRangedAttack(enemy: Enemy): void {
         if (!this.game.combat) return;
+
+        // Save checkpoint before ranged attack
+        if (this.game.actionManager) this.game.actionManager.saveCheckpoint();
 
         const attackResult = this.game.combat.rangedAttackEnemy(
             enemy,

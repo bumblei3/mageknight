@@ -71,7 +71,10 @@ describe('Advanced Combat Coverage', () => {
         });
 
         it('should handle executeAttackAction variants', () => {
-            game.combat = { phase: 'ranged' };
+            game.combat = { 
+                phase: 'ranged',
+                getState: () => ({ phase: 'ranged', enemies: [], defeatedEnemies: [], blockedEnemies: [] })
+            };
             let rangedEnded = false;
             game.combatOrchestrator.endRangedPhase = () => { rangedEnded = true; return { message: 'Ended' }; };
             game.combat.endRangedPhase = () => { rangedEnded = true; return { message: 'Ended' }; };

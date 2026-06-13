@@ -58,7 +58,7 @@ export default defineConfig({
                 }
             }
         },
-        chunkSizeWarningLimit: 800 // KB, warn at 800KB instead of 500KB
+        chunkSizeWarningLimit: 800
     },
     plugins: [
         VitePWA({
@@ -88,5 +88,10 @@ export default defineConfig({
     ],
     esbuild: {
         format: 'esm'
-    }
+    },
+    resolve: {
+        alias: {
+            '/@': resolve(__dirname, './js'),
+        },
+    },
 });

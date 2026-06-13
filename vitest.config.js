@@ -1,10 +1,11 @@
 
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
 
 export default defineConfig({
     test: {
         environment: 'jsdom',
-        globals: true, // This allows using describe, it, expect without imports (optional, but convenient)
+        globals: true,
         setupFiles: ['./tests/setup.js'],
         include: ['tests/**/*.{test,spec}.{js,ts}'],
         exclude: ['node_modules', 'dist', 'tests/e2e/**/*'],
@@ -14,6 +15,11 @@ export default defineConfig({
             exclude: ['js/three.min.js', 'js/vendor/**'],
             reporter: ['text', 'json', 'html'],
             reportsDirectory: './coverage',
+        },
+    },
+    resolve: {
+        alias: {
+            '/@': resolve(__dirname, './js'),
         },
     },
 });

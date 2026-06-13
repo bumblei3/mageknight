@@ -45,12 +45,32 @@ export default class TouchController {
             if (this.game.hexGrid.hasHex(hex.q, hex.r)) {
                 const enemy = this.game.enemies?.find((en: any) =>
                     en.position?.q === hex.q && en.position?.r === hex.r);
+                
+                // Create fake element for tooltip positioning
+                const fakeElement = {
+                    getBoundingClientRect: () => ({
+                        left: touch.clientX,
+                        top: touch.clientY,
+                        right: touch.clientX,
+                        bottom: touch.clientY,
+                        width: 0,
+                        height: 0,
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        toJSON: () => { }
+                    } as DOMRect)
+                } as HTMLElement;
+
                 if (enemy && this.game.ui?.tooltipManager?.showEnemyTooltip) {
-                    this.game.ui.tooltipManager.showEnemyTooltip(enemy, touch.clientX, touch.clientY);
-                } else if (this.game.hexGrid.getHex && this.game.ui?.tooltipManager?.showTerrainTooltip) {
+                    this.game.ui.tooltipManager.showEnemyTooltip(fakeElement, enemy);
+                } else {
                     const hexData = this.game.hexGrid.getHex(hex.q, hex.r);
-                    if (hexData?.terrain) {
-                        this.game.ui.tooltipManager.showTerrainTooltip(hexData.terrain, touch.clientX, touch.clientY);
+                    if (hexData?.site && this.game.ui?.tooltipManager?.showSiteTooltip) {
+                        this.game.ui.tooltipManager.showSiteTooltip(fakeElement, hexData.site);
+                    } else if (hexData?.terrain && this.game.ui?.tooltipManager?.showTerrainTooltip) {
+                        this.game.ui.tooltipManager.showTerrainTooltip(fakeElement, hexData.terrain, this.game);
+                    } else {
+                        this.game.ui.tooltipManager?.hideTooltip();
                     }
                 }
             }

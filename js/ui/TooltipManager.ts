@@ -60,6 +60,16 @@ export class TooltipManager {
     }
 
     /**
+     * Show tooltip for site
+     * @param {HTMLElement} element - Element to attach tooltip to
+     * @param {any} site - Site object
+     */
+    public showSiteTooltip(element: HTMLElement, site: any): void {
+        const content = this.createSiteTooltipHTML(site);
+        this.showTooltip(element, content);
+    }
+
+    /**
      * Show tooltip for stat pill
      * @param {HTMLElement} element - Element to attach tooltip to
      * @param {string} statType - Type of stat

@@ -377,10 +377,23 @@ export class MockHTMLElement {
 
     dispatchEvent(event) {
         const type = event.type;
+        const bubbles = event.bubbles === true;
+        
+        // Create a proper event object with currentTarget
+        const eventObj = {
+            ...event,
+            target: event.target || this,
+            currentTarget: this,
+            preventDefault: event.preventDefault || (() => {}),
+            stopPropagation: event.stopPropagation || (() => { event._stopped = true; }),
+            _stopped: false
+        };
+
+        // Fire on current element
         if (this._listeners.has(type)) {
             this._listeners.get(type).forEach(cb => {
                 try {
-                    cb(event);
+                    cb(eventObj);
                 } catch (e) {
                     console.error('Error in mock listener:', e);
                 }
@@ -391,13 +404,36 @@ export class MockHTMLElement {
         const onHandler = this[`on${type}`];
         if (typeof onHandler === 'function') {
             try {
-                onHandler(event);
+                onHandler(eventObj);
             } catch (e) {
                 console.error(`Error in mock on${type} handler:`, e);
             }
         }
 
+        // Bubble up to parent if bubbles is true and not stopped
+        if (bubbles && !eventObj._stopped && this.parentNode) {
+            this.parentNode.dispatchEvent(eventObj);
+        }
+
         return true;
+    }
+
+    /**
+     * Get attribute names - needed for TooltipManager hideTooltip
+     */
+    getAttributeNames() {
+        const attrs = [];
+        // Include data-* attributes
+        for (const key in this.dataset) {
+            attrs.push(`data-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+        }
+        if (this.id) attrs.push('id');
+        if (this._className) attrs.push('class');
+        // style attributes are on the style object
+        for (const key in this.style) {
+            if (this.style[key]) attrs.push(key);
+        }
+        return attrs;
     }
 
     click() {

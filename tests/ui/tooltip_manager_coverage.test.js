@@ -830,7 +830,8 @@ describe('TooltipManager - Coverage Boost', () => {
             expect(tooltipManager.currentTarget).toBe(element);
         });
 
-        it('should hide tooltip immediately', () => {
+        it('should hide tooltip immediately (with 200ms fade delay)', () => {
+            vi.useFakeTimers();
             const element = document.createElement('div');
             element.getBoundingClientRect = () => ({
                 left: 100, top: 100, width: 50, height: 50
@@ -840,6 +841,10 @@ describe('TooltipManager - Coverage Boost', () => {
             tooltipManager.showTooltip(element, 'Test');
             tooltipManager.hideTooltip(0);
             
+            // Even with delay=0, hide() has a 200ms fade timeout before clearing currentTarget
+            expect(tooltipManager.currentTarget).not.toBeNull();
+            
+            vi.advanceTimersByTime(201);
             expect(tooltipManager.currentTarget).toBeNull();
         });
 
@@ -856,7 +861,8 @@ describe('TooltipManager - Coverage Boost', () => {
             
             expect(tooltipManager.currentTarget).not.toBeNull();
             
-            vi.advanceTimersByTime(101);
+            // delay=100 triggers hide after 100ms, then 200ms fade = 301ms total
+            vi.advanceTimersByTime(301);
             expect(tooltipManager.currentTarget).toBeNull();
         });
 

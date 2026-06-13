@@ -36,10 +36,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci --prefer-offline --no-audit
 
-  # Cache key for node_modules (used by all jobs)
-  # Key includes OS + hash of package-lock.json for automatic invalidation
-  _cache-key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-
   # --- Lint & TypeCheck (fast, parallel) ---
   lint-typecheck:
     name: Lint & TypeCheck

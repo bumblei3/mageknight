@@ -44,6 +44,7 @@ import { store } from './game/Store';
 
 import Enemy from './enemy';
 import { Combat } from './combat';
+import { Card } from './card';
 import { SaveManagerAPI, GameAPIExtended, SaveManagerAPI as SaveManagerAPIType } from './game/game-types';
 import { SoundManager as SoundManagerType } from './soundManager';
 import { AchievementManager as AchievementManagerType } from './achievements';
@@ -110,7 +111,7 @@ export class MageKnightGame {
     public movementMode: boolean;
     public combat: Combat | null;
     public reachableHexes: { q: number; r: number }[] = [];
-    public selectedCard: any | null = null;
+    public selectedCard: Card | null = null;
 
     /**
      * Initializes the game engine and subsystems.
@@ -250,7 +251,7 @@ export class MageKnightGame {
     }
 
     // Lazy Getters for heavy systems
-    get sound(): any {
+    get sound(): SoundManagerType {
         if (!this._sound) {
             this._sound = new SoundManager();
             console.log('[Lazy] SoundManager initialized');
@@ -258,11 +259,11 @@ export class MageKnightGame {
         return this._sound;
     }
 
-    set sound(value: any) {
+    set sound(value: SoundManagerType) {
         this._sound = value;
     }
 
-    get achievementManager(): any {
+    get achievementManager(): AchievementManagerType {
         if (!this._achievementManager) {
             this._achievementManager = new AchievementManager();
             if (this._achievementManager && typeof this._achievementManager.setGame === 'function') {
@@ -273,11 +274,11 @@ export class MageKnightGame {
         return this._achievementManager;
     }
 
-    set achievementManager(value: any) {
+    set achievementManager(value: AchievementManagerType) {
         this._achievementManager = value;
     }
 
-    get statisticsManager(): any {
+    get statisticsManager(): StatisticsManagerType {
         if (!this._statisticsManager) {
             this._statisticsManager = new StatisticsManager();
             console.log('[Lazy] StatisticsManager initialized');
@@ -285,11 +286,11 @@ export class MageKnightGame {
         return this._statisticsManager;
     }
 
-    set statisticsManager(value: any) {
+    set statisticsManager(value: StatisticsManagerType) {
         this._statisticsManager = value;
     }
 
-    get tutorial(): any {
+    get tutorial(): TutorialManager {
         if (!this._tutorial) {
             this._tutorial = new TutorialManager(this);
             console.log('[Lazy] TutorialManager initialized');
@@ -297,7 +298,7 @@ export class MageKnightGame {
         return this._tutorial;
     }
 
-    set tutorial(value: any) {
+    set tutorial(value: TutorialManager) {
         this._tutorial = value;
     }
 
@@ -752,7 +753,9 @@ export class MageKnightGame {
         const newAchievements = this.achievementManager.checkAchievements(stats);
 
         newAchievements.forEach((achievement: any) => {
-            if (this.sound.success) this.sound.success();
+            if (this.sound && typeof this.sound.achievement === 'function') {
+                this.sound.achievement();
+            }
             this.showNotification(
                 `🏆 ${achievement.name} freigeschaltet!`,
                 'success'

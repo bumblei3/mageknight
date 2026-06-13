@@ -87,6 +87,37 @@ jobs:
             ${{ runner.os }}-node-
       - name: Run Tests
         run: npm run test:coverage
+      - name: Coverage Gate (80% thresholds)
+        if: always()
+        run: |
+          echo "Checking coverage thresholds from coverage report..."
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const coverageDir = path.join(process.cwd(), 'coverage');
+            const files = fs.readdirSync(coverageDir);
+            const jsonFile = files.find(f => f.endsWith('.json'));
+            if (!jsonFile) {
+              console.error('No coverage JSON found');
+              process.exit(1);
+            }
+            const coverage = JSON.parse(fs.readFileSync(path.join(coverageDir, jsonFile), 'utf8'));
+            const totals = coverage.total || {};
+            const thresholds = { statements: 80, branches: 80, functions: 80, lines: 80 };
+            let failed = false;
+            for (const [key, threshold] of Object.entries(thresholds)) {
+              const pct = Math.round(totals[key]?.pct || 0);
+              if (pct < threshold) {
+                console.error(`FAIL: ${key} ${pct}% < ${threshold}%`);
+                failed = true;
+              } else {
+                console.log(`OK: ${key} ${pct}% >= ${threshold}%`);
+              }
+            }
+            if (failed) {
+              process.exit(1);
+            }
+          "
       - name: Upload Coverage
         uses: actions/upload-artifact@v7
         if: always()

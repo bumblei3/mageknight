@@ -401,6 +401,85 @@ describe('Site Handlers - Coverage Boost', () => {
             const options = handler.getOptions(site);
             expect(options.length).toBeGreaterThan(0);
         });
+
+        it('should return heal option with correct properties', () => {
+            const site = { conquered: false, getName: () => 'Monastery' };
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            expect(heal).toBeDefined();
+            expect(heal.id).toBe('heal');
+            expect(heal.label).toBe('Heilen (2 Einfluss / Wunde)');
+            expect(typeof heal.action).toBe('function');
+        });
+
+        it('should enable heal when hero has wounds', () => {
+            const site = { conquered: false, getName: () => 'Monastery' };
+            game.hero.wounds = [{ id: 'w1' }];
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            expect(heal.enabled).toBe(true);
+        });
+
+        it('should disable heal when hero has no wounds', () => {
+            const site = { conquered: false, getName: () => 'Monastery' };
+            game.hero.wounds = [];
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            expect(heal.enabled).toBe(false);
+        });
+
+        it('should return train option with subItems', () => {
+            const site = { conquered: false, getName: () => 'Monastery' };
+            const options = handler.getOptions(site);
+            const train = options.find(o => o.id === 'train');
+            expect(train).toBeDefined();
+            expect(train.id).toBe('train');
+            expect(train.label).toBe('Training (Karten kaufen)');
+            expect(train.subItems).toBeDefined();
+            expect(Array.isArray(train.subItems)).toBe(true);
+            expect(train.subItems.length).toBeGreaterThan(0);
+        });
+
+        it('should have train subItems with correct structure', () => {
+            const site = { conquered: false, getName: () => 'Monastery' };
+            const options = handler.getOptions(site);
+            const train = options.find(o => o.id === 'train');
+            const firstCard = train.subItems[0];
+            expect(firstCard.id).toMatch(/^train_/);
+            expect(firstCard.label).toBeDefined();
+            expect(firstCard.type).toBe('card');
+            expect(firstCard.data).toBeDefined();
+            expect(firstCard.cost).toBe(6);
+            expect(typeof firstCard.action).toBe('function');
+        });
+
+        it('should allow executing heal action', () => {
+            const site = { conquered: false, getName: () => 'Monastery' };
+            const options = handler.getOptions(site);
+            const heal = options.find(o => o.id === 'heal');
+            game.hero.wounds = [{ id: 'w1' }];
+            game.hero.influencePoints = 10;
+            game.hero.healWound = vi.fn().mockReturnValue(true);
+            const result = heal.action();
+            expect(result.success).toBe(true);
+            expect(game.hero.healWound).toHaveBeenCalledWith(false);
+        });
+
+        it('should allow executing train action for first card', () => {
+            const site = { conquered: false, getName: () => 'Monastery' };
+            const options = handler.getOptions(site);
+            const train = options.find(o => o.id === 'train');
+            const firstCard = train.subItems[0];
+            game.hero.influencePoints = 10;
+            // buyCard checks mana inventory - mock it
+            game.hero.getManaInventory = vi.fn().mockReturnValue(['red']);
+            game.hero.removeMana = vi.fn();
+            game.hero.discard = [];
+            game.hero.discard.push = vi.fn();
+            const result = firstCard.action();
+            expect(result.success).toBe(true);
+            expect(game.hero.discard.push).toHaveBeenCalled();
+        });
     });
 
     describe('BaseSiteHandler shared methods', () => {

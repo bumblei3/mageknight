@@ -76,11 +76,64 @@ describe('Site Handlers - Coverage Boost', () => {
             expect(options.length).toBeGreaterThanOrEqual(1);
         });
 
+        it('should return attack option with correct properties', () => {
+            const site = { conquered: false, getName: () => 'Mage Tower' };
+            const options = handler.getOptions(site);
+            const attack = options.find(o => o.id === 'attack');
+            expect(attack).toBeDefined();
+            expect(attack.label).toBe('Magierturm angreifen (Erobern)');
+            expect(attack.enabled).toBe(true);
+            expect(typeof attack.action).toBe('function');
+        });
+
+        it('should return spells option when conquered', () => {
+            const site = { conquered: true, getName: () => 'Mage Tower' };
+            const options = handler.getOptions(site);
+            const spells = options.find(o => o.id === 'spells');
+            expect(spells).toBeDefined();
+            expect(spells.label).toBe('Zauber lernen (7 Einfluss + Mana)');
+            expect(spells.subItems).toBeDefined();
+            expect(spells.subItems.length).toBeGreaterThan(0);
+        });
+
+        it('should have spell subItems with correct structure', () => {
+            const site = { conquered: true, getName: () => 'Mage Tower' };
+            const options = handler.getOptions(site);
+            const spells = options.find(o => o.id === 'spells');
+            const firstSpell = spells.subItems[0];
+            expect(firstSpell.id).toMatch(/^spell_/);
+            expect(firstSpell.label).toBeDefined();
+            expect(firstSpell.type).toBe('card');
+            expect(firstSpell.data).toBeDefined();
+            expect(firstSpell.cost).toBe(7);
+            expect(typeof firstSpell.action).toBe('function');
+        });
+
         it('should attack for unconquered tower', () => {
             const site = { conquered: false, getName: () => 'Mage Tower' };
             game.combatOrchestrator.initiateCombat = vi.fn();
+            game.addLog = vi.fn();
             const result = handler.attackSite(site);
             expect(result.success).toBe(true);
+            expect(game.addLog).toHaveBeenCalled();
+            expect(game.combatOrchestrator.initiateCombat).toHaveBeenCalled();
+            const enemy = game.combatOrchestrator.initiateCombat.mock.calls[0][0];
+            expect(enemy.name).toBe('Wächter des Turms');
+            expect(enemy.armor).toBe(5);
+            expect(enemy.attack).toBe(5);
+            expect(enemy.fortified).toBe(true);
+            expect(enemy.attackType).toBe('fire');
+        });
+
+        it('should allow executing attack action from options', () => {
+            const site = { conquered: false, getName: () => 'Mage Tower' };
+            const options = handler.getOptions(site);
+            const attack = options.find(o => o.id === 'attack');
+            game.combatOrchestrator.initiateCombat = vi.fn();
+            game.addLog = vi.fn();
+            const result = attack.action();
+            expect(result.success).toBe(true);
+            expect(game.combatOrchestrator.initiateCombat).toHaveBeenCalled();
         });
     });
 

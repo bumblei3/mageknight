@@ -24,7 +24,8 @@ test.describe('3D View Functionality', () => {
         await test.step('Activate 3D Mode', async () => {
             console.log('Clicking 3D Toggle...');
             await toggleBtn.click({ force: true });
-            await page.waitForTimeout(1000);
+            // Wait for 3D container to become visible (lazy-load + init can take time in CI)
+            await expect(container3D).toBeVisible({ timeout: 30000 });
         });
 
         await test.step('Verify 3D Toggle Attempted', async () => {

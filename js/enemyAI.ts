@@ -230,7 +230,11 @@ export class EnemyAI {
             if (!hex || hex.terrain === 'water' || hex.terrain === 'mountains') return false;
 
             // Avoid other enemies
-            const isOccupied = allEnemies.some(e => e !== enemy && !e.isDefeated && e.position && e.position.q === n.q && e.position.r === n.r);
+            const isOccupied = allEnemies.some(e => {
+                if (e === enemy) return false;
+                const isDefeated = typeof e.isDefeated === 'function' ? e.isDefeated() : !!e.isDefeated;
+                return !isDefeated && e.position && e.position.q === n.q && e.position.r === n.r;
+            });
             if (isOccupied) return false;
 
             // Avoid Hero collision

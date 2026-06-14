@@ -121,7 +121,7 @@ export class StatusEffectManager {
         }
         const effect = new StatusEffect(effectType, enemy);
         effects.push(effect);
-        return { success: true, applied: true, effect };
+        return { success: true, applied: true, stacked: false, effect };
     }
 
     heroHasEffect(effectType: string): boolean {
@@ -187,6 +187,6 @@ export class StatusEffectManager {
     }
 
     static hasEffect(unit: any, effect: string): boolean {
-        return unit.statusEffects && unit.statusEffects.includes(effect);
+        return !!(unit.statusEffects && unit.statusEffects.includes(effect));
     }
 }

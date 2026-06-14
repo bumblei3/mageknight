@@ -195,6 +195,7 @@ export interface EnemyDefinition {
 export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     [ENEMY_TYPES.ORC]: { name: 'Ork', armor: 3, attack: 2, fame: 2, icon: '👹', color: '#16a34a' },
     [ENEMY_TYPES.GOBLIN]: { name: 'Goblin', armor: 2, attack: 2, fame: 1, swift: true, icon: '👺', color: '#15803d' },
+    [ENEMY_TYPES.MAGE_TOWER]: { name: 'Magierturm-Wächter', armor: 4, attack: 3, fame: 4, swift: true, physicalResist: true, petrify: true, attackType: 'ice', arcaneImmune: true, icon: '🧙', color: '#8b5cf6' },
     weakling: { name: 'Schwächling', armor: 2, attack: 1, fame: 1, icon: '🗡️', color: '#a3a3a3' },
     guard: { name: 'Wächter', armor: 4, attack: 3, fame: 3, fortified: true, defensive: true, icon: '🛡️', color: '#dc2626' },
     [ENEMY_TYPES.DRACONUM]: { name: 'Drakonium', armor: 5, attack: 4, fame: 4, swift: true, fireResist: true, attackType: 'fire', icon: '🐲', color: '#dc2626' },

@@ -87,7 +87,7 @@ export class CombatLogDetails {
             lines.push(`   ⬇ Schwerfällig: −${breakdown.cumbersomeUsed} Bewegungspunkte`);
         }
 
-        if (breakdown.inefficiencyReasons.length > 0) {
+        if (breakdown.inefficiencyReasons?.length > 0) {
             lines.push(`   ⚠ Ineffizienz: ${breakdown.inefficiencyReasons.join(', ')}`);
         }
 

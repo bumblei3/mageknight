@@ -3,7 +3,7 @@ import { HandRenderer } from '../../js/ui/HandRenderer.js';
 import { ManaRenderer } from '../../js/ui/ManaRenderer.js';
 import { StatsRenderer } from '../../js/ui/StatsRenderer.js';
 import { setLanguage } from '../../js/i18n/index.js';
-import { store } from '../../js/game/Store.js';
+import { store } from '../../js/store.js';
 import { vi, afterEach } from 'vitest';
 
 

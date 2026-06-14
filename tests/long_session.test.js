@@ -3,7 +3,7 @@ import { MageKnightGame } from '../js/game.js';
 import { SKILLS } from '../js/skills.js';
 import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
 import { setLanguage } from '../js/i18n/index.js';
-import { store } from '../js/game/Store.js';
+import { store } from '../js/store.js';
 import { eventBus } from '../js/eventBus.js';
 
 describe('Long Session - Integration', () => {

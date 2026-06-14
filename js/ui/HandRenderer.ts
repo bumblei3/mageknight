@@ -1,4 +1,4 @@
-import { store, ACTIONS } from '../game/Store';
+import { store, ACTIONS } from '../store';
 import { t } from '../i18n/index';
 import * as CardAnimations from '../cardAnimations';
 import { UIElements } from '../ui';

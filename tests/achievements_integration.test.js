@@ -3,7 +3,7 @@ import { ACHIEVEMENTS } from '../js/achievements.js';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { eventBus } from '../js/eventBus.js';
 import { GAME_EVENTS } from '../js/constants.js';
-import { store } from '../js/game/Store.js';
+import { store } from '../js/store.js';
 import { setLanguage } from '../js/i18n/index.js';
 
 describe('Achievements Integration', () => {

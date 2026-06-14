@@ -6,7 +6,7 @@ import { SKILLS } from '../js/skills.js';
 import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
 
 // Mock Store to prevent external dependencies
-vi.mock('../js/game/Store.js', () => ({
+vi.mock('../js/store.js', () => ({
     store: {
         dispatch: () => { },
         subscribe: () => { },

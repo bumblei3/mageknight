@@ -1,7 +1,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { SoundManager } from '../../js/soundManager.js';
-import { store } from '../../js/game/Store.js';
+import { store } from '../../js/store.js';
 
 describe('SoundManager Coverage', () => {
     let soundManager;

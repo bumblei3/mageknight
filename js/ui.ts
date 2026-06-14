@@ -9,7 +9,7 @@ import { ManaRenderer } from './ui/ManaRenderer';
 import { UnitRenderer } from './ui/UnitRenderer';
 import { StatsRenderer } from './ui/StatsRenderer';
 import { SkillRenderer } from './ui/SkillRenderer';
-import { store, ACTIONS } from './game/Store';
+import { store, ACTIONS } from './store';
 import { eventBus } from './eventBus';
 import { GAME_EVENTS } from './constants';
 import ParticleSystem from './particles';

@@ -194,7 +194,18 @@ export function createMockUI() {
             showEnemyTooltip: createSpy(),
             showTerrainTooltip: createSpy(),
             createStatTooltipHTML: createSpy(() => '<div>Tooltip</div>'),
-            register: createSpy()
+            register: createSpy(),
+            attachToElement: createSpy(),
+            createAbilityTooltipHTML: createSpy((key) => `<div>Ability: ${key}</div>`),
+            createUnitTooltipHTML: createSpy(() => '<div>Unit Tooltip</div>'),
+            createEnemyTooltipHTML: createSpy(() => '<div>Enemy Tooltip</div>'),
+            createSiteTooltipHTML: createSpy(() => '<div>Site Tooltip</div>'),
+            createCardTooltipHTML: createSpy(() => '<div>Card Tooltip</div>'),
+            createTerrainTooltipHTML: createSpy(() => '<div>Terrain Tooltip</div>'),
+            showTooltip: createSpy(),
+            showCardTooltip: createSpy(),
+            showSiteTooltip: createSpy(),
+            showStatTooltip: createSpy()
         }
     };
 }

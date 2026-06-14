@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { BossEnemy, BOSS_DEFINITIONS, BOSS_PHASES, createBoss } from '../js/enemy.js';
 import { Combat, COMBAT_PHASE } from '../js/combat.js';
 import { setLanguage } from '../js/i18n/index.js';
-import { store } from '../js/game/Store.js';
+import { store } from '../js/store.js';
 
 describe('Boss Encounters', () => {
     let boss;

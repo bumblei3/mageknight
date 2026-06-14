@@ -1,5 +1,5 @@
 import { animator, animateCounter } from '../animator';
-import { store, ACTIONS } from '../game/Store';
+import { store, ACTIONS } from '../store';
 import { UIElements } from '../ui';
 
 export class StatsRenderer {

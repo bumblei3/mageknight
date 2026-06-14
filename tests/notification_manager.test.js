@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { NotificationManager } from '../js/ui/NotificationManager.js';
 import { NotificationManager } from '../js/ui/NotificationManager.js';
-import { store } from '../js/game/Store.js';
+import { store } from '../js/store.js';
 import { afterEach } from 'vitest';
 
 /**

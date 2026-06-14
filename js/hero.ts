@@ -4,7 +4,7 @@ import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_A
 import { MANA_COLORS, ManaColor } from './constants';
 import { HeroInventory } from './hero/HeroInventory';
 import { HeroSkills } from './hero/HeroSkills';
-import { store, ACTIONS } from './game/Store';
+import { store, ACTIONS } from './store';
 
 // Fame thresholds for levels
 export interface LevelEntry {

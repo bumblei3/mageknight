@@ -61,7 +61,6 @@ class MockEnemy {
 describe('CombatUIManager - Coverage Boost', () => {
     let combatUIManager;
     let mockUI;
-    let tooltipManager;
     let container;
     let totalsDiv;
     let predictionDiv;
@@ -79,10 +78,7 @@ describe('CombatUIManager - Coverage Boost', () => {
             <div id="execute-attack-btn"></div>
         `;
 
-        tooltipManager = new TooltipManager();
-        
         mockUI = createMockUI();
-        mockUI.tooltipManager = tooltipManager;
         mockUI.game = {
             combat: {
                 blockedEnemies: new Set(),
@@ -216,6 +212,28 @@ describe('CombatUIManager - Coverage Boost', () => {
             expect(unitCard.classList.contains('not-ready')).toBe(true);
             expect(unitCard.classList.contains('damage-target')).toBe(false);
             expect(unitCard.innerHTML).toContain('🗡️ Attentäter! Schaden muss vom Helden genommen werden');
+        });
+
+        it('should attach Assassin restriction tooltip to disabled units in DAMAGE phase', () => {
+            mockUI.game.combat.unblockedEnemies = [
+                new MockEnemy({ id: 'e1', name: 'Assassin', assassin: true, damageAssigned: false })
+            ];
+            
+            const unit = new MockUnit({ id: 'unit-1', name: 'Damage Unit', ready: true });
+            combatUIManager.renderUnitsInCombat([unit], COMBAT_PHASES.DAMAGE, () => {});
+
+            const unitCard = container.querySelector('.unit-combat-card');
+            
+            expect(unitCard).toBeTruthy();
+            // Verify tooltipManager.attachToElement was called with the unit card and tooltip content
+            expect(mockUI.tooltipManager.attachToElement.called).toBe(true);
+            const attachCall = mockUI.tooltipManager.attachToElement.calls.find(call => call[0] === unitCard);
+            expect(attachCall).toBeTruthy();
+            // Verify tooltip content contains Assassin explanation
+            const tooltipHTML = attachCall[1];
+            expect(tooltipHTML).toContain('Attentäter-Effekt');
+            expect(tooltipHTML).toContain('kann nicht');
+            expect(tooltipHTML).toContain('Helden genommen werden');
         });
 
         it('should show hint for Damage Phase when Assassin restriction active', () => {

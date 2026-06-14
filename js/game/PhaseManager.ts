@@ -1,6 +1,6 @@
 import { eventBus } from '../eventBus';
 import { GAME_EVENTS } from '../constants';
-import { store, ACTIONS } from './Store';
+import { store, ACTIONS } from '../store';
 
 /**
  * Manages game phases, turns, and the Day/Night cycle.

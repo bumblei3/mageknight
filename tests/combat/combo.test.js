@@ -5,7 +5,7 @@ import { Card, CARD_COLORS, CARD_TYPES } from '../../js/card.js';
 import Hero from '../../js/hero.js';
 import { Enemy } from '../../js/enemy.js';
 import { setLanguage } from '../../js/i18n/index.js';
-import { store } from '../../js/game/Store.js';
+import { store } from '../../js/store.js';
 
 describe('Combo System', () => {
     let hero;

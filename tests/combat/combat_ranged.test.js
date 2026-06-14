@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../../js/game.js';
 import { Combat, COMBAT_PHASE } from '../../js/combat.js';
 import { createSpy } from '../test-mocks.js';
-import { store } from '../../js/game/Store.js';
+import { store } from '../../js/store.js';
 import { setLanguage } from '../../js/i18n/index.js';
 
 describe('Combat Ranged Phase Integration', () => {

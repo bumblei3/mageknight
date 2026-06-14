@@ -2,7 +2,7 @@
  * Internationalization (i18n) System for Mage Knight
  * Provides translation support for multiple languages.
  */
-import { store, ACTIONS } from '../game/Store';
+import { store, ACTIONS } from '../store';
 
 export interface TranslationDictionary {
     [key: string]: any; // Allow nested objects or strings

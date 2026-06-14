@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
-import { store } from '../js/game/Store.js';
+import { store } from '../js/store.js';
 import { setLanguage } from '../js/i18n/index.js';
 
 describe('Visual Rendering Snapshots', () => {

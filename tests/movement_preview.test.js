@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { InteractionController } from '../js/interactionController.js';
 import { TERRAIN_TYPES } from '../js/constants.js';
 import { setLanguage } from '../js/i18n/index.js';
-import { store } from '../js/game/Store.js';
+import { store } from '../js/store.js';
 
 describe('Movement Preview Logic', () => {
     let interactionController;

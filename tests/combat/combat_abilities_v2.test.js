@@ -5,7 +5,7 @@ import { Hero } from '../../js/hero.js';
 import { Enemy } from '../../js/enemy.js';
 import { ATTACK_ELEMENTS } from '../../js/constants.js';
 import { setLanguage } from '../../js/i18n/index.js';
-import { store } from '../../js/game/Store.js';
+import { store } from '../../js/store.js';
 
 describe('Advanced Combat Abilities V2', () => {
     let hero;

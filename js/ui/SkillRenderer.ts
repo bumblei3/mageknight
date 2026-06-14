@@ -1,5 +1,5 @@
 // Skill Renderer
-import { store, ACTIONS } from '../game/Store';
+import { store, ACTIONS } from '../store';
 import i18n from '../i18n/index';
 const { t } = i18n as any;
 

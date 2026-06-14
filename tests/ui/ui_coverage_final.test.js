@@ -3,7 +3,7 @@ import { UI } from '../../js/ui.js';
 import { TooltipManager } from '../../js/ui/TooltipManager.js';
 import { animator } from '../../js/animator.js';
 import { setLanguage } from '../../js/i18n/index.js';
-import { store } from '../../js/game/Store.js';
+import { store } from '../../js/store.js';
 import { createSpy } from '../test-mocks.js';
 
 // Mock animator to be synchronous for tests

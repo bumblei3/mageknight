@@ -40,7 +40,7 @@ import { InputController } from './game/InputController';
 import { RenderController } from './game/RenderController';
 import { ShortcutManager } from './game/ShortcutManager';
 import { HeroManager } from './game/HeroManager';
-import { store } from './game/Store';
+import { store } from './store';
 
 import Enemy from './enemy';
 import { Combat } from './combat';

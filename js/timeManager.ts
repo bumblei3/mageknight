@@ -1,6 +1,6 @@
 import { TIME_OF_DAY, GAME_EVENTS, TimeOfDay } from './constants';
 import { eventBus } from './eventBus';
-import { store, ACTIONS } from './game/Store';
+import { store, ACTIONS } from './store';
 
 export { TIME_OF_DAY };
 

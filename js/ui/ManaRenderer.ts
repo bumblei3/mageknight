@@ -1,5 +1,5 @@
 import { t } from '../i18n/index';
-import { store, ACTIONS } from '../game/Store';
+import { store, ACTIONS } from '../store';
 import { UIElements } from '../ui';
 import { TooltipManager } from './TooltipManager';
 import { ManaSource, DieState } from '../mana';

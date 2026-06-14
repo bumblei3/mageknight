@@ -31,32 +31,10 @@ export default defineConfig({
                         // Remaining vendor
                         return 'vendor';
                     }
-                    // App code - minimal main chunk (entry point only)
-                    if (id.includes('/constants') || id.includes('/utils/') || id.includes('/i18n/') || id.includes('/logger') || id.includes('/eventBus') || id.includes('/errorHandler') || id.includes('/performanceMonitor') || id.includes('/animator') || id.includes('/particles/') || id.includes('/soundManager') || id.includes('/statistics') || id.includes('/achievements') || id.includes('/tutorialManager') || id.includes('/touchController') || id.includes('/timeManager') || id.includes('/debug')) {
-                        return 'main';
-                    }
-                    // Core entities: shared between game-core and combat
-                    if (id.includes('/hero') || id.includes('/card') || id.includes('/enemy') || id.includes('/unit') || id.includes('/mana') || id.includes('/skills') || id.includes('/terrain') || id.includes('/hexgrid')) {
-                        return 'shared-core';
-                    }
-                    // Feature-based chunks
-                    if (id.includes('/game/')) {
-                        return 'game-core';
-                    }
-                    if (id.includes('/combat/')) {
-                        return 'combat';
-                    }
-                    if (id.includes('/sites/')) {
-                        return 'sites';
-                    }
-                    if (id.includes('/3d/')) {
-                        return 'game-3d';
-                    }
-                    if (id.includes('/ui/')) {
-                        return 'ui';
-                    }
+                    // All app code in one chunk to avoid circular dependencies
+                    return 'app';
                 }
-            }
+            },
         },
         chunkSizeWarningLimit: 800
     },

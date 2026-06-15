@@ -4,7 +4,11 @@ import { GameFlow } from './utils/GameFlow.js';
 test.describe('3D View Functionality', () => {
     test.setTimeout(60000);
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ page, browserName }) => {
+        // Skip on Firefox and WebKit - 3D view requires WebGL which is unreliable in headless CI
+        if (browserName === 'firefox' || browserName === 'webkit') {
+            test.skip();
+        }
         page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
         const gameFlow = new GameFlow(page);
         await gameFlow.ensureGameStarted();

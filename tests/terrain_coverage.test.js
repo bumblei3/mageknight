@@ -2,12 +2,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Terrain } from '../js/terrain.js';
 import { TERRAIN_TYPES } from '../js/constants.js';
+import { Hero } from '../js/hero.js';
 
 describe('Terrain Coverage Boost', () => {
     let terrain;
+    let mockHero;
 
     beforeEach(() => {
         terrain = new Terrain();
+        mockHero = new Hero('Test Hero');
     });
 
     describe('getTerrainInfo', () => {
@@ -36,6 +39,41 @@ describe('Terrain Coverage Boost', () => {
         it('should return default cost for unknown terrain', () => {
             const cost = terrain.getMovementCost('nonexistent');
             expect(cost).toBe(2);
+        });
+
+        it('should return 2 for flight skill (ignores terrain cost)', () => {
+            // Add flight skill to hero
+            mockHero.skills.push({ id: 'flight', name: 'Flug', type: 'active', description: '', icon: '🦅', cooldown: 'round' });
+            const cost = terrain.getMovementCost(TERRAIN_TYPES.MOUNTAINS, false, mockHero);
+            expect(cost).toBe(2);
+        });
+
+        it('should return 2 for flight skill at night', () => {
+            mockHero.skills.push({ id: 'flight', name: 'Flug', type: 'active', description: '', icon: '🦅', cooldown: 'round' });
+            const cost = terrain.getMovementCost(TERRAIN_TYPES.MOUNTAINS, true, mockHero);
+            expect(cost).toBe(2);
+        });
+
+        it('should reduce cost by 1 for forward_march skill (min 1)', () => {
+            mockHero.skills.push({ id: 'forward_march', name: 'Vorwärts Marsch', type: 'passive', description: '', icon: '🥾' });
+            // Plains is cost 2, should become 1
+            const cost = terrain.getMovementCost(TERRAIN_TYPES.PLAINS, false, mockHero);
+            expect(cost).toBe(1);
+        });
+
+        it('should not reduce below 1 for forward_march skill', () => {
+            mockHero.skills.push({ id: 'forward_march', name: 'Vorwärts Marsch', type: 'passive', description: '', icon: '🥾' });
+            // For valid terrain with cost 2, it becomes 1
+            const cost = terrain.getMovementCost(TERRAIN_TYPES.PLAINS, false, mockHero);
+            expect(cost).toBe(1);
+        });
+
+        it('should combine flight and forward_march (flight takes precedence)', () => {
+            mockHero.skills.push({ id: 'flight', name: 'Flug', type: 'active', description: '', icon: '🦅', cooldown: 'round' });
+            mockHero.skills.push({ id: 'forward_march', name: 'Vorwärts Marsch', type: 'passive', description: '', icon: '🥾' });
+            const cost = terrain.getMovementCost(TERRAIN_TYPES.MOUNTAINS, false, mockHero);
+            // Flight sets to 2, forward_march reduces to 1
+            expect(cost).toBe(1); // Both apply: flight -> 2, forward_march -> 1
         });
     });
 

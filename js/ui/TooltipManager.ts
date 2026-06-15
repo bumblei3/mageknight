@@ -4,6 +4,7 @@
 import i18n from '../i18n/index';
 const { t } = i18n as any;
 import { Enemy } from '../enemy';
+import { SITE_INFO } from '../sites';
 
 export class TooltipManager {
     private tooltip: HTMLElement | null = null;
@@ -548,32 +549,51 @@ export class TooltipManager {
      * @returns {string} HTML string
      */
     public createSiteTooltipHTML(site: any): string {
-        const info = site.getInfo();
-        const localizedName = (site.type && t(`sites.${site.type}`) !== `sites.${site.type}`) ? t(`sites.${site.type}`) : info.name;
+        // Handle both Site class instances and plain objects from saved games
+        const getInfo = typeof site.getInfo === 'function' 
+            ? site.getInfo() 
+            : this.getPlainObjectInfo(site);
+            
+        const localizedName = (site.type && t(`sites.${site.type}`) !== `sites.${site.type}`) ? t(`sites.${site.type}`) : getInfo.name;
         const status = site.conquered ? `<span class="status-conquered">👑 ${t('sites.conquered')}</span>` :
             site.visited ? `<span class="status-visited">✓ ${t('sites.visited')}</span>` : '';
 
         let actionsHtml = '';
-        if (info.actions) {
+        if (getInfo.actions) {
             actionsHtml = '<div class="tooltip-actions">';
-            (info.actions as string[]).forEach(action => {
+            (getInfo.actions as string[]).forEach(action => {
                 actionsHtml += `<span class="action-tag">${this.getActionIcon(action)} ${this.getActionName(action)}</span>`;
             });
             actionsHtml += '</div>';
         }
 
         return `
-            <div class="tooltip-site" style="border-left-color: ${info.color}">
+            <div class="tooltip-site" style="border-left-color: ${getInfo.color}">
                 <div class="tooltip-header">
-                    <span class="tooltip-icon">${info.icon}</span>
+                    <span class="tooltip-icon">${getInfo.icon}</span>
                     <span class="tooltip-name">${localizedName}</span>
                 </div>
                 ${status ? `<div class="tooltip-status">${status}</div>` : ''}
                 <div class="tooltip-divider"></div>
-                <div class="tooltip-description">${info.description}</div>
+                <div class="tooltip-description">${getInfo.description}</div>
                 ${actionsHtml}
             </div>
         `;
+    }
+
+    /**
+     * Extract info from plain site object (from loaded save games)
+     */
+    private getPlainObjectInfo(site: any): { name: string; icon: string; color: string; description: string; actions?: string[] } {
+        // Use SITE_INFO for metadata if available
+        const siteInfo = SITE_INFO[site.type] || { name: site.type || 'Unknown', icon: '?', color: '#888' };
+        return {
+            name: site.name || siteInfo.name,
+            icon: site.icon || siteInfo.icon,
+            color: site.color || siteInfo.color,
+            description: site.description || `A ${(site.name || siteInfo.name).toLowerCase()}`,
+            actions: site.actions || []
+        };
     }
 
     public getActionIcon(action: string): string {

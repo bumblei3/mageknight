@@ -47,6 +47,7 @@ export class Site {
     icon: string;
     color: string;
     conquered: boolean = false;
+    visited: boolean = false;
 
     constructor(type: string) {
         this.type = type;
@@ -70,5 +71,19 @@ export class Site {
 
     conquer(): void {
         this.conquered = true;
+    }
+
+    /**
+     * Returns site metadata for tooltips and UI
+     */
+    getInfo(): { name: string; icon: string; color: string; description: string; actions?: string[] } {
+        const info = SITE_INFO[this.type] || { name: this.type, icon: '?', color: '#888' };
+        return {
+            name: this.name,
+            icon: this.icon,
+            color: this.color,
+            description: `A ${this.name.toLowerCase()}`,
+            actions: [] // Overridden by specific site handlers
+        };
     }
 }

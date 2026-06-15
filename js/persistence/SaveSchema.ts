@@ -168,7 +168,7 @@ export const SaveStateSchema = z.object({
   achievements: AchievementsStateSchema.default({ unlocked: [] }),
   turn: TurnStateSchema,
   timestamp: z.number().int().positive(),
-});
+}).passthrough();
 
 export type SaveState = z.infer<typeof SaveStateSchema>;
 

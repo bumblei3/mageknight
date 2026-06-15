@@ -13,17 +13,18 @@ export class SaveManager {
         try {
             const key = String(slotKey);
             
-            // Add version and timestamp
+            // Add version and timestamp (use provided timestamp or generate new)
+            const timestamp = state.timestamp ?? Date.now();
             const versionedState = {
                 ...state,
                 version: CURRENT_SAVE_VERSION,
-                timestamp: Date.now(),
+                timestamp,
             };
             
             // Validate before saving
             const validation = validateSave(versionedState);
             if (!validation.success) {
-                console.error('Save validation failed:', validation.error.errors);
+                console.error('Save validation failed:', validation.error.issues);
                 return false;
             }
             

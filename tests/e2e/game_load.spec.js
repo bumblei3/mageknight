@@ -111,8 +111,11 @@ test.describe('Mage Knight Game Loading', () => {
                 // Force close any blocking modals (scenario/hero selection) that might auto-appear
                 document.querySelectorAll('.modal, .site-modal').forEach(el => el.classList.remove('active'));
 
-                const success = window.game.stateManager.loadGame('e2e_test_slot');
-                console.log('Game loaded result:', success);
+                const state = window.game.stateManager.loadGame('e2e_test_slot');
+                console.log('Game loaded result:', state ? 'found' : 'not found');
+                if (state) {
+                    window.game.stateManager.loadGameState(state);
+                }
             });
 
             // Wait for state to be applied

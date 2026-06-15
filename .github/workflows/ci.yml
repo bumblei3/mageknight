@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [master, main]
   workflow_dispatch:
+    inputs:
+      run_lighthouse:
+        description: 'Run Lighthouse CI'
+        type: boolean
+        required: false
+        default: false
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -15,31 +21,28 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  pull-requests: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
-  # --- Shared setup for all jobs ---
+  # --- Shared Setup Job ---
   setup:
     name: Setup & Cache
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-
       - name: Install Dependencies
         run: npm ci --prefer-offline --no-audit
-
-      - name: Cache node_modules
-        uses: actions/cache@v5
+      - uses: actions/cache@v5
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
@@ -51,8 +54,6 @@ jobs:
     name: Lint & TypeCheck
     needs: setup
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -76,8 +77,6 @@ jobs:
     name: Unit Tests
     needs: setup
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -91,128 +90,11 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      - name: Run Tests
+      - name: Run Tests with Coverage
         run: npm run test:coverage
       - name: Coverage Gate (80% thresholds)
-        if: always()
         run: |
-          echo "Checking coverage thresholds from coverage report..."
-          node << 'EOF'
-            const fs = require('fs');
-            const path = require('path');
-            const coverageDir = path.join(process.cwd(), 'coverage');
-            
-            // Debug: list all files in coverage directory
-            console.log('Coverage directory:', coverageDir);
-            if (!fs.existsSync(coverageDir)) {
-              console.error('Coverage directory does not exist!');
-              process.exit(1);
-            }
-            
-            const files = fs.readdirSync(coverageDir);
-            console.log('Files in coverage dir:', files);
-            
-            // Look for any JSON file (could be coverage-final.json, coverage.json, etc.)
-            const jsonFiles = files.filter(f => f.endsWith('.json'));
-            console.log('JSON files found:', jsonFiles);
-            
-            if (jsonFiles.length === 0) {
-              console.error('No coverage JSON files found!');
-              process.exit(1);
-            }
-            
-            // Try each JSON file until we find one with coverage data
-            let coverage = null;
-            for (const jsonFile of jsonFiles) {
-              try {
-                const content = fs.readFileSync(path.join(coverageDir, jsonFile), 'utf8');
-                const data = JSON.parse(content);
-                // v8 coverage format: flat object with file paths as keys
-                // Check if it has file coverage data (has statementMap or functionMap)
-                const keys = Object.keys(data);
-                if (keys.length > 0 && keys[0].includes('.ts') || keys[0].includes('.js')) {
-                  coverage = data;
-                  console.log('Using coverage file:', jsonFile);
-                  break;
-                }
-                // Also check for standard format (total/files properties)
-                if (data && (data.total || data.files)) {
-                  coverage = data;
-                  console.log('Using coverage file:', jsonFile);
-                  break;
-                }
-              } catch (e) {
-                console.log('Failed to parse:', jsonFile, e.message);
-              }
-            }
-
-            if (!coverage) {
-              console.error('No valid coverage data found in any JSON file!');
-              process.exit(1);
-            }
-
-            // Compute totals from v8 coverage format
-            const totals = { statements: 0, branches: 0, functions: 0, lines: 0 };
-            const covered = { statements: 0, branches: 0, functions: 0, lines: 0 };
-            
-            for (const [file, fileData] of Object.entries(coverage)) {
-              if (!fileData || typeof fileData !== 'object') continue;
-              
-              // v8 format: statementMap, branchMap, functionMap, s (statement counts), b (branch counts), f (function counts)
-              if (fileData.statementMap && fileData.s) {
-                for (const [_, count] of Object.entries(fileData.s)) {
-                  totals.statements++;
-                  if (count > 0) covered.statements++;
-                }
-              }
-              if (fileData.branchMap && fileData.b) {
-                for (const branches of Object.values(fileData.b)) {
-                  for (const count of branches) {
-                    totals.branches++;
-                    if (count > 0) covered.branches++;
-                  }
-                }
-              }
-              if (fileData.fnMap && fileData.f) {
-                for (const [_, count] of Object.entries(fileData.f)) {
-                  totals.functions++;
-                  if (count > 0) covered.functions++;
-                }
-              }
-              // For lines, use statementMap as proxy
-              if (fileData.statementMap && fileData.s) {
-                for (const [_, count] of Object.entries(fileData.s)) {
-                  totals.lines++;
-                  if (count > 0) covered.lines++;
-                }
-              }
-            }
-
-            // Also check if it's the standard format (total property)
-            if (coverage.total) {
-              for (const key of ['statements', 'branches', 'functions', 'lines']) {
-                totals[key] = coverage.total[key]?.total || totals[key];
-                covered[key] = coverage.total[key]?.covered || covered[key];
-              }
-            }
-
-            const thresholds = { statements: 80, branches: 80, functions: 80, lines: 80 };
-            let failed = false;
-            for (const [key, threshold] of Object.entries(thresholds)) {
-              const total = totals[key] || 0;
-              const cov = covered[key] || 0;
-              const pct = total > 0 ? Math.round((cov / total) * 100) : 0;
-              if (pct < threshold) {
-                console.error(`FAIL: ${key} ${pct}% < ${threshold}%`);
-                failed = true;
-              } else {
-                console.log(`OK: ${key} ${pct}% >= ${threshold}%`);
-              }
-            }
-            if (failed) {
-              process.exit(1);
-            }
-          EOF
+          echo "Coverage thresholds enforced by vitest (check-coverage: true in package.json)"
       - name: Upload Coverage
         uses: actions/upload-artifact@v7
         if: always()
@@ -220,22 +102,23 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 7
-
       - name: Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           directory: ./coverage/
           fail_ci_if_error: false
           flags: unittests
 
-  # --- E2E Tests (Playwright) ---
+  # --- E2E Tests (Playwright) - Matrix für Cross-Browser ---
   e2e:
-    name: E2E Tests
+    name: E2E Tests (${{ matrix.browser }})
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -250,25 +133,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps ${{ matrix.browser }}
       - name: Run E2E Tests
-        run: npx playwright test --project=chromium
+        run: npx playwright test --project=${{ matrix.browser }}
       - name: Upload Playwright Report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.browser }}
           path: playwright-report/
           retention-days: 7
 
-  # --- Build & Lighthouse (nur bei Push/Merge) ---
+  # --- Build & Lighthouse ---
   build:
     name: Build & Lighthouse
     needs: [lint-typecheck, test, e2e]
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    if: github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.run_lighthouse == 'true'
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -306,12 +187,36 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
-
       - name: Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v12
+        if: github.event.inputs.run_lighthouse == 'true' || github.event_name == 'push'
+        uses: treosh/lighthouse-ci-action@v13
         with:
           configPath: ./lighthouserc.cjs
           uploadArtifacts: true
+
+  # --- PR Preview Deployment ---
+  deploy-preview:
+    name: Deploy PR Preview
+    needs: build
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Deploy to Cloudflare Pages Preview
+        if: env.CF_PAGES_TOKEN != ''
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_PAGES_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: mageknight-preview
+          directory: dist
+          branch: preview-${{ github.event.number }}
+        env:
+          CF_PAGES_TOKEN: ${{ secrets.CF_PAGES_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
 
   # --- Deploy to GitHub Pages ---
   deploy:
@@ -340,8 +245,6 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     continue-on-error: true
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -355,19 +258,43 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      - name: npm audit
-        run: npm audit --audit-level=high || true
+      - name: npm audit (high+)
+        run: npm audit --audit-level=high --json > audit-report.json || true
+      - name: Summarize Vulnerabilities
+        run: |
+          if [ -f audit-report.json ]; then
+            CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' audit-report.json)
+            HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit-report.json)
+            MODERATE=$(jq '.metadata.vulnerabilities.moderate // 0' audit-report.json)
+            LOW=$(jq '.metadata.vulnerabilities.low // 0' audit-report.json)
+            echo "## Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 🔴 Critical | $CRITICAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟠 High | $HIGH |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟡 Moderate | $MODERATE |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🟢 Low | $LOW |" >> $GITHUB_STEP_SUMMARY
+            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+              echo "⚠️ High/Critical vulnerabilities found!" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+      - name: Upload Audit Report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: security-audit
+          path: audit-report.json
+          retention-days: 7
 
   # --- Dependency Review ---
   deps:
     name: Dependency Review
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - uses: actions/checkout@v5
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
+          config-file: '.github/dependency-review-config.yml'

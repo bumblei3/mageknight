@@ -116,8 +116,13 @@ test.describe('Mage Knight Game Loading', () => {
             await page.reload();
             await expect(page.locator('#loading-screen')).toBeHidden({ timeout: 60000 });
 
-            // Wait for game instance to be ready
-            await page.waitForFunction(() => !!window.game && !!window.game.stateManager);
+            // Wait for game instance to be ready AND for init to complete (hero created)
+            await page.waitForFunction(() => {
+                return !!window.game && !!window.game.hero && !!window.game.hero.position;
+            }, { timeout: 30000 });
+            
+            // Additional wait to ensure init() fully completed
+            await page.waitForTimeout(1000);
         });
 
         await test.step('Load Game', async () => {

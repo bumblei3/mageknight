@@ -24,15 +24,11 @@ export default defineConfig({
                         if (id.includes('three')) {
                             return 'vendor-three';
                         }
-                        // Game3D - only used when 3D view is toggled
-                        if (id.includes('Game3D') || id.includes('OrbitControls')) {
-                            return 'vendor-3d';
-                        }
                         // Remaining vendor
                         return 'vendor';
                     }
-                    // All app code in one chunk to avoid circular dependencies
-                    return 'app';
+                    // Let Vite handle dynamic import chunking for local modules
+                    // Dynamic imports like import('./3d/Game3D') will create separate chunks automatically
                 }
             },
         },

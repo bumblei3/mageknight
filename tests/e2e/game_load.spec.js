@@ -7,6 +7,10 @@ test.describe('Mage Knight Game Loading', () => {
     test.beforeEach(async ({ page }) => {
         page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
         await page.goto('/');
+        // Set test environment flag to prevent scenario selection from auto-opening
+        await page.evaluate(() => {
+            window.isTestEnvironment = true;
+        });
     });
 
     const waitForGameReady = async (page) => {

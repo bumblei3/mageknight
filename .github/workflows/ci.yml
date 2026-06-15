@@ -189,7 +189,7 @@ jobs:
           retention-days: 7
       - name: Lighthouse CI
         if: github.event.inputs.run_lighthouse == 'true' || github.event_name == 'push'
-        uses: treosh/lighthouse-ci-action@v13
+        uses: treosh/lighthouse-ci-action@v12
         with:
           configPath: ./lighthouserc.cjs
           uploadArtifacts: true

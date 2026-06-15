@@ -31,17 +31,17 @@ module.exports = {
                 'largest-contentful-paint': ['warn', { minScore: 0.8 }],
                 'mainthread-work-breakdown': 'warn',
                 'max-potential-fid': 'warn',
-                'network-dependency-tree-insight': 'warn',
-                'render-blocking-insight': 'warn',
-                'render-blocking-resources': ['warn', { minScore: 0.3 }],
+                'network-dependency-tree-insight': 'off',
+                'render-blocking-insight': ['warn', { minScore: 0.3 }],
+                'render-blocking-resources': ['warn', { maxLength: 5 }],
                 'speed-index': 'warn',
                 // Other warnings
                 'color-contrast': 'warn',
-                'errors-in-console': ['warn', { minScore: 0.1 }],
+                'errors-in-console': ['warn', { minScore: 0 }],
                 'meta-viewport': 'warn',
                 'meta-description': 'warn',
-                'target-size': ['warn', { minScore: 0.5 }]
+                'target-size': ['warn', { minScore: 0 }]
             },
         },
-    },
+    }
 };

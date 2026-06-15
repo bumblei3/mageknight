@@ -1,6 +1,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SaveManager } from '../../js/persistence/SaveManager.js';
+import { migrateSave, SaveStateSchema } from '../../js/persistence/SaveSchema.js';
 import { setupGlobalMocks, resetMocks, createMockLocalStorage } from '../test-mocks.js';
 
 setupGlobalMocks();
@@ -168,6 +169,125 @@ describe('SaveManager Extended Coverage', () => {
 
             const loaded = SaveManager.loadGame('slot');
             expect(loaded.timestamp).toBe(2000);
+        });
+    });
+
+    describe('migrateV0toV1 edge cases (branch coverage)', () => {
+        it('should handle null hero', () => {
+            const v0 = { hero: null, enemies: [], timestamp: 1000 };
+            const migrated = migrateSave(v0);
+            expect(migrated.hero).toBeNull();
+        });
+
+        it('should handle undefined hero', () => {
+            const v0 = { enemies: [], timestamp: 1000 };
+            delete v0.hero;
+            const migrated = migrateSave(v0);
+            expect(migrated.hero).toBeNull();
+        });
+
+        it('should handle non-array enemies', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: 'not-array', timestamp: 1000 };
+            const migrated = migrateSave(v0);
+            expect(migrated.enemies).toEqual([]);
+        });
+
+        it('should filter null enemy items', () => {
+            const v0 = { 
+                hero: { name: 'Test' }, 
+                enemies: [{ name: 'Valid' }, null, { type: 'invalid' }, { name: 'Also Valid' }], 
+                timestamp: 1000 
+            };
+            const migrated = migrateSave(v0);
+            // Null should be filtered out, invalid object should get defaults
+            expect(migrated.enemies.length).toBeGreaterThanOrEqual(2);
+        });
+
+        it('should handle missing combat', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            delete v0.combat;
+            const migrated = migrateSave(v0);
+            expect(migrated.combat).toBeNull();
+        });
+
+        it('should handle missing hexGrid', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            delete v0.hexGrid;
+            const migrated = migrateSave(v0);
+            expect(migrated.hexGrid).toBeNull();
+        });
+
+        it('should handle missing time', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            delete v0.time;
+            const migrated = migrateSave(v0);
+            expect(migrated.time).toEqual({ round: 1, timeOfDay: 'day' });
+        });
+
+        it('should handle missing statistics', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            delete v0.statistics;
+            const migrated = migrateSave(v0);
+            expect(migrated.statistics).toEqual({});
+        });
+
+        it('should handle missing achievements', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            delete v0.achievements;
+            const migrated = migrateSave(v0);
+            expect(migrated.achievements).toEqual({ unlocked: [] });
+        });
+
+        it('should handle achievements without unlocked array', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], achievements: {}, timestamp: 1000 };
+            const migrated = migrateSave(v0);
+            expect(migrated.achievements).toEqual({ unlocked: [] });
+        });
+
+        it('should handle missing turn', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            delete v0.turn;
+            const migrated = migrateSave(v0);
+            expect(migrated.turn).toBeNull();
+        });
+
+        it('should handle timeOfDay not day/night', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], time: { timeOfDay: 'twilight' }, timestamp: 1000 };
+            const migrated = migrateSave(v0);
+            expect(migrated.time.timeOfDay).toBe('day');
+        });
+
+        it('should handle enemy with missing fields getting defaults', () => {
+            const v0 = {
+                hero: { name: 'Test' },
+                enemies: [{ id: 'e1' }], // Minimal enemy
+                timestamp: 1000
+            };
+            const migrated = migrateSave(v0);
+            expect(migrated.enemies[0].id).toBe('e1');
+            expect(migrated.enemies[0].type).toBe('unknown');
+            expect(migrated.enemies[0].name).toBe('Unknown Enemy');
+            expect(migrated.enemies[0].armor).toBe(0);
+            expect(migrated.enemies[0].attack).toBe(0);
+            expect(migrated.enemies[0].fame).toBe(0);
+        });
+
+        it('should handle v0 save without version field', () => {
+            const v0 = { hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            delete v0.version;
+            const migrated = migrateSave(v0);
+            expect(migrated.version).toBe(1);
+        });
+
+        it('should throw on completely invalid save data', () => {
+            expect(() => migrateSave(null)).toThrow('Invalid save data: not an object');
+            expect(() => migrateSave('not an object')).toThrow('Invalid save data: not an object');
+            expect(() => migrateSave(123)).toThrow('Invalid save data: not an object');
+        });
+
+        it('should throw on unsupported version', () => {
+            const v2 = { version: 2, hero: { name: 'Test' }, enemies: [], timestamp: 1000 };
+            expect(() => migrateSave(v2)).toThrow('Unsupported save version: 2');
         });
     });
 });

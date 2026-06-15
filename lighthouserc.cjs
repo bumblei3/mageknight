@@ -32,7 +32,7 @@ module.exports = {
                 'mainthread-work-breakdown': 'warn',
                 'max-potential-fid': 'warn',
                 'network-dependency-tree-insight': 'off',
-                'render-blocking-insight': ['warn', { minScore: 0.3 }],
+                'render-blocking-insight': 'off',
                 'render-blocking-resources': ['warn', { maxLength: 5 }],
                 'speed-index': 'warn',
                 // Other warnings

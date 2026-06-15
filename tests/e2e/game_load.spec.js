@@ -87,6 +87,8 @@ test.describe('Mage Knight Game Loading', () => {
             // Verify position was set
             const verifyPos = await page.evaluate(() => window.game.hero.position);
             console.log('Hero position after move:', verifyPos);
+            expect(verifyPos.q).toBe(2);
+            expect(verifyPos.r).toBe(1);
         });
 
         await test.step('Save Game', async () => {
@@ -100,11 +102,13 @@ test.describe('Mage Knight Game Loading', () => {
                 const raw = localStorage.getItem('e2e_test_slot');
                 if (raw) {
                     const parsed = JSON.parse(raw);
+                    console.log('Full saved state hero:', JSON.stringify(parsed.hero, null, 2));
                     return parsed.hero?.position;
                 }
                 return null;
             });
             console.log('Saved hero position:', savedPos);
+            expect(savedPos).toEqual({ q: 2, r: 1 });
         });
 
         // Get expected values before reload
@@ -139,15 +143,22 @@ test.describe('Mage Knight Game Loading', () => {
                 console.log('Game loaded result:', state ? 'found' : 'not found');
                 if (state) {
                     console.log('Loaded hero position:', state.hero?.position);
+                    console.log('Full loaded state hero:', JSON.stringify(state.hero, null, 2));
                     window.game.stateManager.loadGameState(state);
                 }
                 return state;
             });
 
             console.log('Load step returned:', state ? 'state found' : 'null');
+            expect(state).toBeTruthy();
+            expect(state.hero?.position).toEqual({ q: 2, r: 1 });
 
             // Wait for state to be applied and any async operations to complete
             await page.waitForTimeout(2000);
+
+            // Verify immediately after loadGameState
+            const posAfterLoad = await page.evaluate(() => window.game.hero.position);
+            console.log('Hero position immediately after loadGameState:', posAfterLoad);
         });
 
         await test.step('Verify Restored State', async () => {

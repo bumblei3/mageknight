@@ -79,6 +79,10 @@ test.describe('Mage Knight Game Loading', () => {
                 window.game.hero.movementPoints = 5;
                 window.game.hero.position = { q: 2, r: 1 };
             });
+
+            // Verify position was set
+            const verifyPos = await page.evaluate(() => window.game.hero.position);
+            console.log('Hero position after move:', verifyPos);
         });
 
         await test.step('Save Game', async () => {
@@ -86,6 +90,17 @@ test.describe('Mage Knight Game Loading', () => {
                 console.log('Saving game...');
                 window.game.stateManager.saveGame('e2e_test_slot');
             });
+
+            // Verify save contains correct position
+            const savedPos = await page.evaluate(() => {
+                const raw = localStorage.getItem('e2e_test_slot');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    return parsed.hero?.position;
+                }
+                return null;
+            });
+            console.log('Saved hero position:', savedPos);
         });
 
         // Get expected values before reload
@@ -102,7 +117,7 @@ test.describe('Mage Knight Game Loading', () => {
         });
 
         await test.step('Load Game', async () => {
-            await page.evaluate(() => {
+            const state = await page.evaluate(() => {
                 console.log('Loading game...');
                 if (!window.game || !window.game.stateManager) {
                     throw new Error('Game or StateManager not initialized');
@@ -114,17 +129,24 @@ test.describe('Mage Knight Game Loading', () => {
                 const state = window.game.stateManager.loadGame('e2e_test_slot');
                 console.log('Game loaded result:', state ? 'found' : 'not found');
                 if (state) {
+                    console.log('Loaded hero position:', state.hero?.position);
                     window.game.stateManager.loadGameState(state);
                 }
+                return state;
             });
 
-            // Wait for state to be applied
-            await page.waitForTimeout(1000);
+            console.log('Load step returned:', state ? 'state found' : 'null');
+
+            // Wait for state to be applied and any async operations to complete
+            await page.waitForTimeout(2000);
         });
 
         await test.step('Verify Restored State', async () => {
             const pos = await page.evaluate(() => window.game.hero.position);
             const handSize = await page.evaluate(() => window.game.hero.hand.length);
+            console.log('Restored hero position:', pos);
+            console.log('Expected position q:', expectedPos.q, 'r:', expectedPos.r);
+            console.log('Expected hand size:', expectedHandSize);
 
             expect(pos.q).toBe(expectedPos.q);
             expect(pos.r).toBe(expectedPos.r);

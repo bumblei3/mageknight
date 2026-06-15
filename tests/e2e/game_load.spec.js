@@ -6,11 +6,11 @@ test.describe('Mage Knight Game Loading', () => {
 
     test.beforeEach(async ({ page }) => {
         page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
-        await page.goto('/');
-        // Set test environment flag to prevent scenario selection from auto-opening
-        await page.evaluate(() => {
+        // Set test environment flag BEFORE page load to prevent scenario selection from auto-opening
+        await page.addInitScript(() => {
             window.isTestEnvironment = true;
         });
+        await page.goto('/');
     });
 
     const waitForGameReady = async (page) => {

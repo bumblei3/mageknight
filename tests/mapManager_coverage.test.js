@@ -13,13 +13,12 @@ describe('MapManager - Coverage Boost', () => {
     beforeEach(() => {
         mockHexGrid = {
             setHex: vi.fn(),
-            getHex: vi.fn(),
-            getNeighbors: vi.fn(),
-            getRing: vi.fn(),
-            getHexesInRange: vi.fn(),
-            hasHex: vi.fn(),
-            getHexesInRange: vi.fn(),
-            distance: vi.fn()
+            getHex: vi.fn(() => ({ terrain: 'plains', revealed: false, site: null })),
+            getNeighbors: vi.fn(() => []),
+            getRing: vi.fn(() => []),
+            getHexesInRange: vi.fn(() => []),
+            hasHex: vi.fn(() => true),
+            distance: vi.fn(() => 1)
         };
 
         mockWorldEventManager = {
@@ -43,9 +42,10 @@ describe('MapManager - Coverage Boost', () => {
     });
 
     describe('constructor', () => {
-        it('should initialize with game and empty tilesDeck', () => {
+        it('should initialize with game and tilesDeck populated', () => {
             expect(mapManager).toBeDefined();
-            expect(mapManager.tilesDeck).toEqual([]);
+            expect(mapManager.tilesDeck).toBeDefined();
+            expect(mapManager.tilesDeck.length).toBe(10);
         });
 
         it('should initialize tilesDeck with 10 tiles', () => {
@@ -100,6 +100,8 @@ describe('MapManager - Coverage Boost', () => {
 
     describe('createStartingMap', () => {
         it('should generate default map when no scenario data', () => {
+            mockHexGrid.getRing.mockReturnValue([{ q: 1, r: 0 }]);
+            
             mapManager.createStartingMap(null);
             expect(mockHexGrid.setHex).toHaveBeenCalled();
         });

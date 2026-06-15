@@ -1051,8 +1051,8 @@ export function resetMocks() {
  */
 export function createMockHexGrid() {
     return {
-        getHex: createSpy(() => ({ q: 0, r: 0 })),
-        hasHex: createSpy(() => false),
+        getHex: createSpy(() => ({ q: 0, r: 0, terrain: 'plains', revealed: false, site: null })),
+        hasHex: createSpy(() => true),
         setHex: createSpy(),
         getNeighbors: createSpy(() => []),
         getHexesInRange: createSpy(() => []),

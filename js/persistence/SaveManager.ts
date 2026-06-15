@@ -1,14 +1,33 @@
 /**
  * SaveManager handles local storage of game state.
+ * Uses Zod schema validation and migration for robust persistence.
  */
+import { migrateSave, validateSave, SaveState, CURRENT_SAVE_VERSION } from './SaveSchema';
+
 export class SaveManager {
     /**
      * Saves a serializable state object to localStorage
+     * Adds version and timestamp automatically
      */
     static saveGame(slotKey: string | number, state: any): boolean {
         try {
             const key = String(slotKey);
-            const serialized = JSON.stringify(state);
+            
+            // Add version and timestamp
+            const versionedState = {
+                ...state,
+                version: CURRENT_SAVE_VERSION,
+                timestamp: Date.now(),
+            };
+            
+            // Validate before saving
+            const validation = validateSave(versionedState);
+            if (!validation.success) {
+                console.error('Save validation failed:', validation.error.errors);
+                return false;
+            }
+            
+            const serialized = JSON.stringify(validation.data);
             localStorage.setItem(key, serialized);
 
             // Update index of saves
@@ -28,13 +47,19 @@ export class SaveManager {
 
     /**
      * Loads a state object from localStorage
+     * Automatically migrates older save versions
      */
-    static loadGame(slotKey: string | number): any | null {
+    static loadGame(slotKey: string | number): SaveState | null {
         try {
             const key = String(slotKey);
             const serialized = localStorage.getItem(key);
             if (!serialized) return null;
-            return JSON.parse(serialized);
+            
+            const raw = JSON.parse(serialized);
+            
+            // Migrate and validate
+            const migrated = migrateSave(raw);
+            return migrated;
         } catch (e) {
             console.error('Failed to load game from localStorage', e);
             return null;

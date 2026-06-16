@@ -1,5 +1,6 @@
 import * as HexUtils from '../utils/hexUtils';
 import { Terrain } from '../terrain';
+import { Site } from '../sites';
 
 export interface HexData {
     q: number;
@@ -294,6 +295,16 @@ export class HexGridLogic {
                 this.hexes = new Map(state.hexes);
             } else if (typeof state.hexes === 'object') {
                 this.hexes = new Map(Object.entries(state.hexes));
+            }
+        }
+        // Re-instantiate Site objects to restore methods (getInfo, getIcon, etc.)
+        for (const [key, hex] of this.hexes.entries()) {
+            if (hex.site && hex.site.type && typeof hex.site.getInfo !== 'function') {
+                const site = new Site(hex.site.type);
+                // Restore properties
+                site.conquered = hex.site.conquered || false;
+                site.visited = hex.site.visited || false;
+                hex.site = site;
             }
         }
         if (state.hexSize) {

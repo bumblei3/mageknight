@@ -1,6 +1,7 @@
 import { COMBAT_PHASES, ACTION_TYPES } from '../constants';
 import { UIElements } from '../ui';
 import { t } from '../i18n/index';
+import { createPhaseIndicator, updatePhaseIndicator, renderPhaseIndicator } from './components';
 
 export class CombatUIManager {
     private elements: UIElements;
@@ -54,16 +55,47 @@ export class CombatUIManager {
         const info = this.elements.combatInfo;
         if (!info) return;
 
-        const phaseLabel = this.getCombatPhaseName(phase);
-        const colorClass = phase === COMBAT_PHASES.ATTACK ? 'attack-phase' : (phase === COMBAT_PHASES.RANGED ? 'ranged-phase' : 'block-phase');
+        // Use new PhaseIndicator component for phase display
+        const phaseContainer = document.createElement('div');
+        phaseContainer.id = 'combat-phase-container';
+        info.innerHTML = '';
+        info.appendChild(phaseContainer);
 
-        info.innerHTML = `
-            <div class="combat-status ${colorClass}">
-                <strong>${phaseLabel}</strong>
-                <small>${this.getPhaseHint(phase)}</small>
-            </div>
-        `;
+        renderPhaseIndicator(phaseContainer, {
+            phase,
+            inCombat: true,
+            onPhaseChange: (targetPhase: string) => {
+                const combat = this.ui?.game?.combat;
+                if (!combat) return;
+                
+                if (phase === COMBAT_PHASES.RANGED && targetPhase === COMBAT_PHASES.BLOCK) {
+                    combat.endRangedPhase();
+                } else if (phase === COMBAT_PHASES.BLOCK && targetPhase === COMBAT_PHASES.DAMAGE) {
+                    combat.endBlockPhase();
+                } else if (phase === COMBAT_PHASES.DAMAGE && targetPhase === COMBAT_PHASES.ATTACK) {
+                    combat.phase = COMBAT_PHASES.ATTACK;
+                    combat.attackPhase();
+                } else if (phase === COMBAT_PHASES.ATTACK && targetPhase === COMBAT_PHASES.NOT_IN_COMBAT) {
+                    // End combat
+                    const attackValue = this.ui?.game?.combatOrchestrator?.combatAttackTotal ?? 0;
+                    const attackElement = 'physical';
+                    combat.attackEnemies(attackValue, attackElement);
+                    combat.endCombat();
+                }
+            },
+            showActions: true,
+            labels: {
+                ranged: t('ui.phases.ranged'),
+                block: t('ui.phases.block'),
+                attack: t('ui.phases.attack'),
+                endCombat: t('combat.uiActions.endCombat'),
+                endRanged: t('combat.uiActions.endRanged'),
+                endBlock: t('combat.uiActions.endBlock'),
+                executeAttack: t('combat.uiActions.executeAttack')
+            }
+        });
 
+        // Render enemies
         enemies.forEach(enemy => {
             const enemyDiv = this.renderEnemy(enemy, phase, onEnemyClick);
             info.appendChild(enemyDiv);

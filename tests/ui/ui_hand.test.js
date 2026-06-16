@@ -54,11 +54,8 @@ describe('UI Hand Rendering', () => {
 
         const cardEl = ui.elements.handCards.children[0];
 
-        // Simulate click
-        // Simulate pointer events (as HandRenderer uses pointerup)
-        cardEl.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 0, clientY: 0 }));
-        cardEl.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: 0, clientY: 0 }));
-        cardEl.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 0, clientY: 0, button: 0 }));
+        // Simulate click (the new Card component uses standard click event)
+        cardEl.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0 }));
 
         expect(clickSpy.callCount).toBeGreaterThan(0);
         // Verify arguments passed to callback: index, card

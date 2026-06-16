@@ -3,6 +3,8 @@ import { t } from '../i18n/index';
 import * as CardAnimations from '../cardAnimations';
 import { UIElements } from '../ui';
 import { TooltipManager } from './TooltipManager';
+import { createCard, showCardPreview, injectCardPreviewStyles } from './components';
+import type { CardData } from './components';
 
 export class HandRenderer {
     private elements: UIElements;
@@ -13,6 +15,7 @@ export class HandRenderer {
         onCardRightClick: ((index: number, card: any) => void) | null;
     };
     private animatedCards: WeakMap<any, boolean> = new WeakMap(); // Track if a card instance has been animated
+    private stylesInjected: boolean = false;
 
     constructor(elements: UIElements, tooltipManager: TooltipManager, ui: any) {
         this.elements = elements;
@@ -46,11 +49,74 @@ export class HandRenderer {
         if (!this.elements || !this.elements.handCards) return;
         if (onCardClick) this.callbacks.onCardClick = onCardClick;
         if (onCardRightClick) this.callbacks.onCardRightClick = onCardRightClick;
+        
+        // Inject styles once
+        if (!this.stylesInjected) {
+            injectCardPreviewStyles();
+            this.stylesInjected = true;
+        }
+
         this.elements.handCards.innerHTML = '';
 
         hand.forEach((card, index) => {
             const isWound = typeof card.isWound === 'function' ? card.isWound() : !!card.isWound;
-            const cardEl = this.createCardElement(card, index);
+            
+            // Card data for new component
+            const cardData = {
+                id: card.id || `card_${index}`,
+                name: card.name,
+                color: card.color,
+                type: card.type,
+                basicEffect: card.basicEffect || {},
+                strongEffect: card.strongEffect,
+                isWound: () => isWound,
+                canPlaySideways: () => card.canPlaySideways?.() ?? !isWound,
+                getEffect: (strong: boolean) => strong ? card.strongEffect : card.basicEffect
+            };
+
+            const cardEl = createCard({
+                card: cardData,
+                compact: true,
+                showSideways: true,
+                showManaCost: true,
+                isWound,
+                disabled: false,
+                selected: false,
+                played: false,
+                onClick: (cardData: CardData, useStrong: boolean) => {
+                    if (this.ui && this.ui.game && this.ui.game.sound) {
+                        this.ui.game.sound[useStrong ? 'cardPlayStrong' : 'cardPlay']();
+                    }
+                    onCardClick(index, card);
+                },
+                onPreview: (cardData: CardData) => {
+                    showCardPreview({
+                        card: cardData,
+                        onPlay: (useStrong: boolean) => {
+                            if (this.ui && this.ui.game && this.ui.game.sound) {
+                                this.ui.game.sound[useStrong ? 'cardPlayStrong' : 'cardPlay']();
+                            }
+                            onCardClick(index, card);
+                        },
+                        onPlaySideways: (effectType: string) => {
+                            if (this.ui && this.ui.game && this.ui.game.sound) {
+                                this.ui.game.sound.cardPlaySideways();
+                            }
+                            // Handle sideways play via existing right-click or new system
+                            const actionManager = this.ui?.game?.actionManager;
+                            if (actionManager && typeof actionManager.playCardSideways === 'function') {
+                                actionManager.playCardSideways(index, effectType);
+                            }
+                        }
+                    });
+                },
+                onKeySelect: (cardData: CardData, useStrong: boolean) => {
+                    if (this.ui && this.ui.game && this.ui.game.sound) {
+                        this.ui.game.sound[useStrong ? 'cardPlayStrong' : 'cardPlay']();
+                    }
+                    onCardClick(index, card);
+                }
+            });
 
             // Animate card draw only if it's new
             if (!this.animatedCards.has(card)) {
@@ -64,59 +130,8 @@ export class HandRenderer {
             let startY = 0;
             let isClick = true;
 
-            cardEl.addEventListener('pointerdown', (e) => {
-                startX = e.clientX;
-                startY = e.clientY;
-                isClick = true;
-            });
-
-            cardEl.addEventListener('pointermove', (e) => {
-                if (!isClick) return;
-                const dist = Math.sqrt(Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2));
-                if (dist > CLICK_THRESHOLD) {
-                    isClick = false;
-                }
-            });
-
-            cardEl.addEventListener('pointerup', (e) => {
-                if (isClick && e.button === 0) { // Left click only
-                    if (this.ui && this.ui.game && this.ui.game.sound) {
-                        this.ui.game.sound.cardPlay();
-                    }
-                    onCardClick(index, card);
-                }
-            });
-
-            cardEl.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                if (this.ui && this.ui.game && this.ui.game.sound) {
-                    this.ui.game.sound.cardPlaySideways();
-                }
-                if (onCardRightClick) onCardRightClick(index, card);
-            });
-
-            // Add 3D tilt on mouse move
-            let isHovering = false;
-            let cachedRect: DOMRect | null = null;
-            cardEl.addEventListener('mouseenter', () => {
-                isHovering = true;
-                cachedRect = cardEl.getBoundingClientRect(); // Cache layout once
-                if (this.ui && this.ui.game && this.ui.game.sound) {
-                    this.ui.game.sound.hover();
-                }
-            });
-
-            cardEl.addEventListener('mousemove', (e: MouseEvent) => {
-                if (isHovering && !isWound) {
-                    // Pass cached rect to avoid forced reflow
-                    (CardAnimations as any).animate3DTilt(cardEl, e.clientX, e.clientY, cachedRect);
-                }
-            });
-
-            cardEl.addEventListener('mouseleave', () => {
-                isHovering = false;
-                (CardAnimations as any).reset3DTilt(cardEl);
-            });
+            // Note: createCard handles its own click/preview events
+            // We just need to add drag & drop and tooltip integration
 
             // Drag and Drop
             if (!isWound) {

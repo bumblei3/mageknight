@@ -1,0 +1,396 @@
+/**
+ * Card Component Styles
+ * Compact hand view + Full preview modal
+ * Uses CSS Custom Properties from Button.css
+ */
+
+/* ========================================
+   COMPACT CARD (Hand View)
+   ======================================== */
+
+.mk-card {
+    --card-width: 100px;
+    --card-height: 140px;
+    --card-radius: 10px;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.25);
+    --card-border-wound: #ef4444;
+    --card-border-played: #10b981;
+    --card-shadow-selected: 0 0 0 3px #3b82f6, 0 8px 24px rgba(59, 130, 246, 0.3);
+
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: var(--card-width);
+    min-height: var(--card-height);
+    max-height: var(--card-height);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    border: 2px solid transparent;
+    background: #1f2937;
+    color: #f9fafb;
+    font-family: var(--mk-font-ui, system-ui, sans-serif);
+    font-size: var(--mk-text-sm, 0.875rem);
+    line-height: 1.3;
+    cursor: pointer;
+    user-select: none;
+    transition: 
+        transform 150ms ease,
+        box-shadow 150ms ease,
+        border-color 150ms ease,
+        z-index 0ms;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.mk-card:hover:not(.mk-card--disabled):not(.mk-card--played) {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+    z-index: 10;
+}
+
+.mk-card:focus-visible {
+    outline: none;
+    box-shadow: var(--card-shadow-selected);
+    border-color: #3b82f6;
+}
+
+/* Compact sizing */
+.mk-card--compact {
+    --card-width: 100px;
+    --card-height: 140px;
+}
+
+/* Full preview sizing (not used inline, for reference) */
+.mk-card--full {
+    --card-width: 280px;
+    --card-height: 380px;
+}
+
+/* Color variants - colored top border */
+.mk-card--red { border-top: 4px solid #ef4444; }
+.mk-card--blue { border-top: 4px solid #3b82f6; }
+.mk-card--green { border-top: 4px solid #10b981; }
+.mk-card--white { border-top: 4px solid #f9fafb; }
+.mk-card--gold { border-top: 4px solid #fbbf24; }
+.mk-card--black { border-top: 4px solid #374151; }
+
+/* Wound card */
+.mk-card--wound {
+    background: linear-gradient(180deg, #7f1d1d 0%, #450a0a 100%);
+    border: 2px solid var(--card-border-wound);
+    color: #fecaca;
+}
+
+.mk-card--wound .mk-card__art {
+    font-size: 3rem;
+    opacity: 0.9;
+}
+
+.mk-card--wound .mk-card__name {
+    color: #ef4444;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Played card (in combat) */
+.mk-card--played {
+    opacity: 0.7;
+    pointer-events: none;
+    transform: none !important;
+    filter: grayscale(0.5);
+}
+
+.mk-card--played .mk-card__played-badge {
+    display: block !important;
+}
+
+/* Selected state */
+.mk-card--selected {
+    box-shadow: var(--card-shadow-selected);
+    border-color: #3b82f6;
+}
+
+/* Disabled */
+.mk-card--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none !important;
+}
+
+/* ========================================
+   CARD INTERNALS
+   ======================================== */
+
+.mk-card__art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex: 1;
+    font-size: 2.5rem;
+    line-height: 1;
+    margin: 8px 0 4px;
+    opacity: 0.9;
+}
+
+.mk-card__name {
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 0 6px;
+    margin: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.mk-card__type {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.mk-card__effects {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 6px;
+    margin: 2px 0;
+    font-size: 0.6rem;
+    line-height: 1.4;
+}
+
+.mk-card__effect {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 1px 6px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.mk-card--red .mk-card__effect { background: rgba(239, 68, 68, 0.3); }
+.mk-card--blue .mk-card__effect { background: rgba(59, 130, 246, 0.3); }
+.mk-card--green .mk-card__effect { background: rgba(16, 185, 129, 0.3); }
+.mk-card--white .mk-card__effect { background: rgba(249, 250, 251, 0.2); }
+.mk-card--gold .mk-card__effect { background: rgba(251, 191, 36, 0.3); }
+.mk-card--black .mk-card__effect { background: rgba(55, 65, 81, 0.3); }
+
+/* Mana cost badge */
+.mk-card__mana-cost {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.mk-card__mana-cost--red { background: #ef4444; }
+.mk-card__mana-cost--blue { background: #3b82f6; }
+.mk-card__mana-cost--green { background: #10b981; }
+.mk-card__mana-cost--white { background: #f9fafb; color: #1f2937; }
+.mk-card__mana-cost--gold { background: #fbbf24; color: #1f2937; }
+.mk-card__mana-cost--black { background: #374151; }
+
+/* Sideways indicator */
+.mk-card__sideways {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fbbf24;
+    color: #1f2937;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
+    animation: mk-pulse-gentle 2s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes mk-pulse-gentle {
+    0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 4px 12px rgba(251, 191, 36, 0.6); }
+}
+
+/* Played badge */
+.mk-card__played-badge {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 185, 129, 0.9);
+    color: white;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 5;
+    border-radius: 8px;
+}
+
+/* ========================================
+   CARD PREVIEW MODAL
+   ======================================== */
+
+.mk-card-preview-overlay {
+    animation: mk-fade-in 0.15s ease;
+}
+
+@keyframes mk-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.mk-card-preview {
+    animation: mk-slide-up 0.2s ease;
+}
+
+@keyframes mk-slide-up {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.mk-card-preview__header {
+    position: relative;
+}
+
+.mk-card-preview__effect-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+}
+
+.mk-card-preview__effect-grid > div {
+    transition: all 0.15s;
+}
+
+.mk-card-preview__effect-grid > div:hover {
+    transform: translateY(-2px);
+}
+
+.mk-card-preview__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.mk-card-preview__actions button {
+    transition: all 0.15s;
+}
+
+.mk-card-preview__actions button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.mk-card-preview__actions button:active {
+    transform: translateY(0);
+}
+
+/* Sideways buttons in preview */
+.mk-card-preview .mk-card-preview__effect-grid button[data-effect] {
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.mk-card-preview .mk-card-preview__effect-grid button[data-effect]:hover {
+    background: #374151 !important;
+    border-color: #3b82f6 !important;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 640px) {
+    .mk-card {
+        --card-width: 84px;
+        --card-height: 118px;
+    }
+    
+    .mk-card__art { font-size: 2rem; }
+    .mk-card__name { font-size: 0.7rem; }
+    .mk-card__type { font-size: 0.55rem; }
+    .mk-card__effect { font-size: 0.55rem; padding: 1px 4px; }
+    .mk-card__mana-cost { width: 18px; height: 18px; font-size: 0.65rem; }
+    .mk-card__sideways { width: 20px; height: 20px; font-size: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+    .mk-card-preview {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+        border-radius: 12px;
+    }
+    
+    .mk-card-preview__header {
+        border-radius: 10px 10px 0 0;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .mk-card,
+    .mk-card__sideways,
+    .mk-card-preview,
+    .mk-card-preview-overlay {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .mk-card:hover {
+        transform: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .mk-card {
+        border-width: 3px;
+    }
+    
+    .mk-card--red { border-color: #ef4444; }
+    .mk-card--blue { border-color: #3b82f6; }
+    .mk-card--green { border-color: #10b981; }
+    .mk-card--white { border-color: #f9fafb; }
+    .mk-card--gold { border-color: #fbbf24; }
+    .mk-card--black { border-color: #374151; }
+}
+
+/* Focus visible for keyboard nav on cards */
+.mk-card:focus-visible {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+    z-index: 20;
+}

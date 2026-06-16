@@ -1,0 +1,374 @@
+/**
+ * Phase Indicator Component Styles
+ * Clear visual combat phase progression
+ */
+
+.mk-phase-indicator {
+    --phase-spacing: 16px;
+    --phase-radius: 10px;
+    --phase-bg: #1f2937;
+    --phase-border: #374151;
+    --phase-text: #f9fafb;
+    --phase-muted: #9ca3af;
+    --phase-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--phase-spacing);
+    padding: 16px 20px;
+    background: var(--phase-bg);
+    border: 1px solid var(--phase-border);
+    border-radius: var(--phase-radius);
+    font-family: var(--mk-font-ui, system-ui, sans-serif);
+    transition: var(--phase-transition);
+}
+
+.mk-phase-indicator--inactive {
+    opacity: 0.6;
+    background: #111827;
+}
+
+/* ========================================
+   PHASE PROGRESS BAR
+   ======================================== */
+
+.mk-phase__progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 8px;
+    padding: 0 8px;
+}
+
+.mk-phase__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+    padding: 8px 4px;
+    transition: var(--phase-transition);
+    z-index: 1;
+}
+
+.mk-phase__step::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 3px;
+    transform: translate(-50%, -50%);
+    background: var(--mk-color-disabled-border, #4b5563);
+    border-radius: 2px;
+    z-index: -1;
+    transition: var(--phase-transition);
+}
+
+/* Hide connector on last step */
+.mk-phase__step:last-child::before {
+    display: none;
+}
+
+.mk-phase__step-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--mk-color-disabled-text, #9ca3af);
+    transition: var(--phase-transition);
+}
+
+.mk-phase__step-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--mk-color-disabled-text, #9ca3af);
+    text-align: center;
+    white-space: nowrap;
+    transition: var(--phase-transition);
+}
+
+/* Active step */
+.mk-phase__step--active {
+    z-index: 5;
+}
+
+.mk-phase__step--active .mk-phase__step-icon {
+    color: var(--phase-color);
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 8px var(--phase-color));
+}
+
+.mk-phase__step--active .mk-phase__step-label {
+    color: var(--phase-color);
+    font-weight: 700;
+}
+
+.mk-phase__step--active::before {
+    background: var(--phase-color);
+    height: 4px;
+    box-shadow: 0 0 8px var(--phase-color);
+}
+
+/* Completed step */
+.mk-phase__step--completed .mk-phase__step-icon {
+    color: #10b981;
+}
+
+.mk-phase__step--completed .mk-phase__step-label {
+    color: #10b981;
+}
+
+.mk-phase__step--completed::before {
+    background: #10b981;
+    height: 4px;
+}
+
+.mk-phase__step--completed .mk-phase__step-icon::after {
+    content: '✓';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Upcoming step */
+.mk-phase__step--upcoming {
+    opacity: 0.5;
+}
+
+/* ========================================
+   CURRENT PHASE DISPLAY
+   ======================================== */
+
+.mk-phase__current {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--phase-color) 15%, transparent) 0%, 
+        var(--phase-bg) 100%
+    );
+    border: 2px solid color-mix(in srgb, var(--phase-color) 40%, transparent);
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 
+        0 0 0 1px color-mix(in srgb, var(--phase-color) 20%, transparent),
+        0 4px 12px color-mix(in srgb, var(--phase-color) 10%, transparent);
+}
+
+.mk-phase__current-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.mk-phase__current-icon {
+    font-size: 2rem;
+    line-height: 1;
+    animation: mk-phase-pulse 2s ease-in-out infinite;
+}
+
+@keyframes mk-phase-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.mk-phase__current-label {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--phase-text);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: linear-gradient(90deg, var(--phase-color), color-mix(in srgb, var(--phase-color) 70%, white));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mk-phase__current-desc {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--phase-muted);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* ========================================
+   ACTION BUTTONS
+   ======================================== */
+
+.mk-phase__actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.mk-phase__actions .mk-btn {
+    min-width: 160px;
+}
+
+/* ========================================
+   PEACE STATE
+   ======================================== */
+
+.mk-phase__peace {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    background: #111827;
+    border: 1px dashed #374151;
+    border-radius: 10px;
+    color: var(--phase-muted);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.mk-phase__peace::before {
+    content: '⚔';
+    font-size: 1.5rem;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .mk-phase-indicator {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .mk-phase__progress {
+        overflow-x: auto;
+        padding: 0 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .mk-phase__progress::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mk-phase__step {
+        flex: 0 0 auto;
+        min-width: 80px;
+        padding: 6px 2px;
+    }
+
+    .mk-phase__step-label {
+        font-size: 0.55rem;
+    }
+
+    .mk-phase__current {
+        padding: 16px 20px;
+    }
+
+    .mk-phase__current-label {
+        font-size: 1.1rem;
+    }
+
+    .mk-phase__current-desc {
+        font-size: 0.8rem;
+    }
+
+    .mk-phase__actions {
+        width: 100%;
+    }
+
+    .mk-phase__actions .mk-btn {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .mk-phase-indicator {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .mk-phase__step-label {
+        display: none;
+    }
+
+    .mk-phase__step {
+        min-width: 60px;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .mk-phase__step,
+    .mk-phase__step-icon,
+    .mk-phase__step-label,
+    .mk-phase__current-icon,
+    .mk-phase__current-label {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .mk-phase-indicator {
+        border-width: 2px;
+    }
+
+    .mk-phase__step--active {
+        outline: 3px solid var(--phase-color);
+        outline-offset: 2px;
+    }
+
+    .mk-phase__current {
+        border-width: 3px;
+    }
+
+    .mk-phase__step--completed .mk-phase__step-icon::after {
+        border: 2px solid white;
+    }
+}
+
+/* Focus visible for keyboard nav */
+.mk-phase__actions .mk-btn:focus-visible,
+.mk-phase__progress .mk-phase__step:focus-visible {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+    z-index: 10;
+}
+
+/* Screen reader only */
+.mk-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

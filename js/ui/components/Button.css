@@ -1,0 +1,341 @@
+/**
+ * Button Component Styles
+ * Uses CSS Custom Properties for theming
+ */
+
+/* CSS Custom Properties (Design Tokens) */
+:root {
+    /* Colors */
+    --mk-color-primary: #3b82f6;
+    --mk-color-primary-hover: #2563eb;
+    --mk-color-primary-active: #1d4ed8;
+    --mk-color-primary-text: #ffffff;
+    
+    --mk-color-secondary: #6b7280;
+    --mk-color-secondary-hover: #4b5563;
+    --mk-color-secondary-active: #374151;
+    --mk-color-secondary-text: #ffffff;
+    
+    --mk-color-danger: #ef4444;
+    --mk-color-danger-hover: #dc2626;
+    --mk-color-danger-active: #b91c1c;
+    --mk-color-danger-text: #ffffff;
+    
+    --mk-color-ghost: transparent;
+    --mk-color-ghost-hover: rgba(59, 130, 246, 0.1);
+    --mk-color-ghost-active: rgba(59, 130, 246, 0.2);
+    --mk-color-ghost-text: #3b82f6;
+    
+    --mk-color-success: #10b981;
+    --mk-color-success-hover: #059669;
+    --mk-color-success-active: #047857;
+    --mk-color-success-text: #ffffff;
+    
+    --mk-color-disabled-bg: #e5e7eb;
+    --mk-color-disabled-text: #9ca3af;
+    --mk-color-disabled-border: #d1d5db;
+    
+    /* Spacing */
+    --mk-space-xs: 4px;
+    --mk-space-sm: 8px;
+    --mk-space-md: 16px;
+    --mk-space-lg: 24px;
+    --mk-space-xl: 32px;
+    
+    /* Typography */
+    --mk-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mk-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --mk-text-xs: 0.75rem;
+    --mk-text-sm: 0.875rem;
+    --mk-text-base: 1rem;
+    --mk-text-lg: 1.125rem;
+    --mk-text-xl: 1.25rem;
+    
+    /* Border Radius */
+    --mk-radius-sm: 4px;
+    --mk-radius-md: 6px;
+    --mk-radius-lg: 8px;
+    --mk-radius-xl: 12px;
+    --mk-radius-full: 9999px;
+    
+    /* Shadows */
+    --mk-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --mk-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --mk-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --mk-shadow-glow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+    
+    /* Transitions */
+    --mk-transition-fast: 100ms ease;
+    --mk-transition-normal: 200ms ease;
+    --mk-transition-slow: 300ms ease;
+    
+    /* Z-Index */
+    --mk-z-tooltip: 1000;
+    --mk-z-modal: 10000;
+    --mk-z-tutorial: 20000;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mk-color-disabled-bg: #374151;
+        --mk-color-disabled-text: #6b7280;
+        --mk-color-disabled-border: #4b5563;
+        --mk-color-ghost-hover: rgba(96, 165, 250, 0.15);
+        --mk-color-ghost-active: rgba(96, 165, 250, 0.25);
+    }
+}
+
+/* Base Button */
+.mk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mk-space-sm);
+    font-family: var(--mk-font-ui);
+    font-weight: 600;
+    border: 2px solid transparent;
+    border-radius: var(--mk-radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    transition: 
+        background-color var(--mk-transition-fast),
+        border-color var(--mk-transition-fast),
+        color var(--mk-transition-fast),
+        transform var(--mk-transition-fast),
+        box-shadow var(--mk-transition-fast);
+    outline: none;
+    position: relative;
+}
+
+/* Focus visible for keyboard navigation */
+.mk-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--mk-shadow-glow);
+}
+
+/* Sizes */
+.mk-btn--sm {
+    padding: var(--mk-space-xs) var(--mk-space-sm);
+    font-size: var(--mk-text-xs);
+    min-height: 32px;
+    gap: var(--mk-space-xs);
+}
+
+.mk-btn--md {
+    padding: var(--mk-space-sm) var(--mk-space-md);
+    font-size: var(--mk-text-sm);
+    min-height: 40px;
+    gap: var(--mk-space-sm);
+}
+
+.mk-btn--lg {
+    padding: var(--mk-space-md) var(--mk-space-lg);
+    font-size: var(--mk-text-base);
+    min-height: 48px;
+    gap: var(--mk-space-md);
+}
+
+.mk-btn--xl {
+    padding: var(--mk-space-lg) var(--mk-space-xl);
+    font-size: var(--mk-text-lg);
+    min-height: 56px;
+    gap: var(--mk-space-md);
+}
+
+/* Block (full width) */
+.mk-btn--block {
+    width: 100%;
+}
+
+/* Variants */
+.mk-btn--primary {
+    background-color: var(--mk-color-primary);
+    color: var(--mk-color-primary-text);
+    border-color: var(--mk-color-primary);
+}
+
+.mk-btn--primary:hover:not(:disabled) {
+    background-color: var(--mk-color-primary-hover);
+    border-color: var(--mk-color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--mk-shadow-md);
+}
+
+.mk-btn--primary:active:not(:disabled) {
+    background-color: var(--mk-color-primary-active);
+    border-color: var(--mk-color-primary-active);
+    transform: translateY(0);
+}
+
+.mk-btn--secondary {
+    background-color: var(--mk-color-secondary);
+    color: var(--mk-color-secondary-text);
+    border-color: var(--mk-color-secondary);
+}
+
+.mk-btn--secondary:hover:not(:disabled) {
+    background-color: var(--mk-color-secondary-hover);
+    border-color: var(--mk-color-secondary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--mk-shadow-md);
+}
+
+.mk-btn--secondary:active:not(:disabled) {
+    background-color: var(--mk-color-secondary-active);
+    border-color: var(--mk-color-secondary-active);
+    transform: translateY(0);
+}
+
+.mk-btn--danger {
+    background-color: var(--mk-color-danger);
+    color: var(--mk-color-danger-text);
+    border-color: var(--mk-color-danger);
+}
+
+.mk-btn--danger:hover:not(:disabled) {
+    background-color: var(--mk-color-danger-hover);
+    border-color: var(--mk-color-danger-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--mk-shadow-md);
+}
+
+.mk-btn--danger:active:not(:disabled) {
+    background-color: var(--mk-color-danger-active);
+    border-color: var(--mk-color-danger-active);
+    transform: translateY(0);
+}
+
+.mk-btn--ghost {
+    background-color: var(--mk-color-ghost);
+    color: var(--mk-color-ghost-text);
+    border-color: transparent;
+}
+
+.mk-btn--ghost:hover:not(:disabled) {
+    background-color: var(--mk-color-ghost-hover);
+    color: var(--mk-color-primary-hover);
+}
+
+.mk-btn--ghost:active:not(:disabled) {
+    background-color: var(--mk-color-ghost-active);
+}
+
+.mk-btn--success {
+    background-color: var(--mk-color-success);
+    color: var(--mk-color-success-text);
+    border-color: var(--mk-color-success);
+}
+
+.mk-btn--success:hover:not(:disabled) {
+    background-color: var(--mk-color-success-hover);
+    border-color: var(--mk-color-success-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--mk-shadow-md);
+}
+
+.mk-btn--success:active:not(:disabled) {
+    background-color: var(--mk-color-success-active);
+    border-color: var(--mk-color-success-active);
+    transform: translateY(0);
+}
+
+/* Disabled state */
+.mk-btn--disabled,
+.mk-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.mk-btn--disabled:hover,
+.mk-btn:disabled:hover {
+    background-color: var(--mk-color-disabled-bg) !important;
+    color: var(--mk-color-disabled-text) !important;
+    border-color: var(--mk-color-disabled-border) !important;
+}
+
+/* Loading state */
+.mk-btn--loading {
+    cursor: wait;
+    pointer-events: none;
+}
+
+.mk-btn__spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: mk-spin 0.75s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes mk-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Icon */
+.mk-btn__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* Shortcut hint */
+.mk-btn__shortcut {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5em;
+    height: 1.5em;
+    padding: 0 4px;
+    margin-left: var(--mk-space-xs);
+    font-family: var(--mk-font-mono);
+    font-size: 0.65em;
+    font-weight: 500;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: var(--mk-radius-sm);
+    color: inherit;
+    opacity: 0.8;
+}
+
+.mk-btn--ghost .mk-btn__shortcut {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* Button Group */
+.mk-btn-group {
+    display: inline-flex;
+    gap: var(--mk-space-xs);
+}
+
+.mk-btn-group .mk-btn {
+    border-radius: var(--mk-radius-md);
+}
+
+.mk-btn-group .mk-btn:first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.mk-btn-group .mk-btn:last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.mk-btn-group .mk-btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.mk-btn-group .mk-btn:not(:last-child) {
+    margin-right: -2px; /* Overlap borders */
+}
+
+/* Toast integration - for loading states in toasts */
+.mk-toast .mk-btn {
+    min-width: auto;
+}

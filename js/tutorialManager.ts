@@ -2,7 +2,7 @@
  * Manages the interactive tutorial
  */
 import { t } from './i18n/index';
-import { COMBAT_PHASES } from './constants';
+import { COMBAT_PHASES, GAME_EVENTS } from './constants';
 import { eventBus } from './eventBus';
 
 interface TutorialStep {
@@ -15,6 +15,9 @@ interface TutorialStep {
     waitForEvent?: string;
     condition?: (game: any) => boolean;
     nextOnAction?: string;
+    // New: custom handler for complex steps
+    onEnter?: (manager: TutorialManager) => void;
+    onAction?: (manager: TutorialManager, action: string) => boolean; // return true to advance
 }
 
 export default class TutorialManager {
@@ -24,7 +27,11 @@ export default class TutorialManager {
     public overlay: any;
     public tutorialBox: any;
     public spotlight: any;
+    public stepIndicator: any;
     public steps: TutorialStep[] = [];
+    private highlightedElements: HTMLElement[] = [];
+    private isWaitingForAction: boolean = false;
+    private boundOnKeyDown: ((e: KeyboardEvent) => void) | null = null;
 
     constructor(game: any) {
         this.game = game;
@@ -41,6 +48,7 @@ export default class TutorialManager {
                 titleKey: 'tutorial.welcome.title',
                 textKey: 'tutorial.welcome.text',
                 tutorialBoxPosition: 'center',
+                onEnter: () => this.showWelcomeAnimation(),
             },
             // Step 2: Hero & Stats
             {
@@ -63,14 +71,15 @@ export default class TutorialManager {
                 textKey: 'tutorial.manaSource.text',
                 highlightSelector: '#mana-source',
             },
-            // Step 5: Movement
+            // Step 5: Movement - wait for actual move action
             {
                 id: 'movement',
                 titleKey: 'tutorial.movement.title',
                 textKey: 'tutorial.movement.text',
                 highlightSelector: '#game-board',
                 action: 'move',
-                condition: (game) => game.reachableHexes && game.reachableHexes.length > 0,
+                nextOnAction: 'hero_moved',
+                onEnter: () => this.highlightReachableHexes(),
             },
             // Step 6: End Turn Button
             {
@@ -79,6 +88,7 @@ export default class TutorialManager {
                 textKey: 'tutorial.endTurn.text',
                 highlightSelector: '#end-turn-btn',
                 action: 'endTurn',
+                nextOnAction: 'turn_ended',
             },
             // Step 7: Combat Intro (when combat starts)
             {
@@ -95,6 +105,8 @@ export default class TutorialManager {
                 textKey: 'tutorial.rangedPhase.text',
                 highlightSelector: '#end-turn-btn',
                 condition: (game) => game.combat && game.combat.phase === COMBAT_PHASES.RANGED,
+                action: 'endTurn',
+                nextOnAction: 'phase_changed',
             },
             // Step 9: Block Phase
             {
@@ -112,6 +124,8 @@ export default class TutorialManager {
                 textKey: 'tutorial.attackPhase.text',
                 highlightSelector: '#end-turn-btn',
                 condition: (game) => game.combat && game.combat.phase === COMBAT_PHASES.ATTACK,
+                action: 'endTurn',
+                nextOnAction: 'phase_changed',
             },
             // Step 11: Complete
             {
@@ -119,8 +133,63 @@ export default class TutorialManager {
                 titleKey: 'tutorial.complete.title',
                 textKey: 'tutorial.complete.text',
                 tutorialBoxPosition: 'center',
+                onEnter: () => this.showCompletionConfetti(),
             },
         ];
+    }
+
+    private showWelcomeAnimation(): void {
+        if (this.tutorialBox) {
+            this.tutorialBox.style.animation = 'tutorial-pop-in 0.5s ease-out';
+            // Add keyframe if not exists
+            if (!document.getElementById('tutorial-animations')) {
+                const style = document.createElement('style');
+                style.id = 'tutorial-animations';
+                style.textContent = `
+                    @keyframes tutorial-pop-in {
+                        from { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
+                        to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+                    }
+                    @keyframes tutorial-pulse {
+                        0%, 100% { box-shadow: 0 0 0 4px #3b82f6, 0 0 0 8px rgba(59, 130, 246, 0.3); }
+                        50% { box-shadow: 0 0 0 6px #3b82f6, 0 0 0 12px rgba(59, 130, 246, 0.5); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+    }
+
+    private showCompletionConfetti(): void {
+        if (!this.game.particleSystem) return;
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        for (let i = 0; i < 30; i++) {
+            const angle = (i / 30) * Math.PI * 2;
+            const velocity = 150 + Math.random() * 100;
+            this.game.particleSystem.engine.emit('confetti', {
+                x: centerX,
+                y: centerY,
+                count: 1,
+                color: ['#3b82f6', '#10b981', '#fbbf24', '#ef4444', '#8b5cf6'][i % 5],
+                velocity,
+                angle,
+                life: 2,
+                size: 8,
+                gravity: 200
+            });
+        }
+    }
+
+    private highlightReachableHexes(): void {
+        if (!this.game.reachableHexes || !this.game.hexGrid) return;
+        this.game.reachableHexes.forEach((hex: any) => {
+            const el = this.game.hexGrid.getHexElement?.(hex.q, hex.r);
+            if (el) {
+                el.style.animation = 'tutorial-pulse 1s ease-in-out infinite';
+                this.highlightedElements.push(el);
+            }
+        });
     }
 
     nextStep(): void {
@@ -147,17 +216,50 @@ export default class TutorialManager {
         this.createTutorialUI();
         this.isActive = true;
         this.currentStep = 0;
+        this.bindKeyboardShortcuts();
         this.showStep(0);
+    }
+
+    private bindKeyboardShortcuts(): void {
+        this.boundOnKeyDown = (e: KeyboardEvent) => this.handleKeyDown(e);
+        document.addEventListener('keydown', this.boundOnKeyDown);
+    }
+
+    private handleKeyDown(e: KeyboardEvent): void {
+        if (!this.isActive) return;
+        // Arrow right / Enter -> Next
+        if (e.key === 'ArrowRight' || e.key === 'Enter') {
+            e.preventDefault();
+            this.nextStep();
+        }
+        // Arrow left -> Previous
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.prevStep();
+        }
+        // Escape -> Skip
+        if (e.key === 'Escape') {
+            this.skip();
+        }
     }
 
     stop(): void {
         this.isActive = false;
+        this.isWaitingForAction = false;
         this.clearHighlight();
+        this.unbindKeyboardShortcuts();
         if (this.overlay && this.overlay.parentNode) {
             this.overlay.parentNode.removeChild(this.overlay);
         }
         if (this.spotlight && this.spotlight.parentNode) {
             this.spotlight.parentNode.removeChild(this.spotlight);
+        }
+    }
+
+    private unbindKeyboardShortcuts(): void {
+        if (this.boundOnKeyDown) {
+            document.removeEventListener('keydown', this.boundOnKeyDown);
+            this.boundOnKeyDown = null;
         }
     }
 
@@ -171,6 +273,7 @@ export default class TutorialManager {
         }
 
         this.currentStep = stepIndex;
+        this.isWaitingForAction = !!step.action || !!step.waitForEvent;
 
         // Check condition
         if (step.condition && !step.condition(this.game)) {
@@ -199,19 +302,57 @@ export default class TutorialManager {
         }
 
         this.renderStep(step);
+        
+        // Call onEnter callback
+        if (step.onEnter) {
+            step.onEnter(this);
+        }
+        
+        // If waiting for action, set up listener
+        if (step.nextOnAction) {
+            this.setupActionListener(step.nextOnAction);
+        }
+    }
+
+    private setupActionListener(eventName: string): void {
+        const handler = () => {
+            eventBus.off(eventName, handler);
+            if (this.isActive && this.isWaitingForAction) {
+                this.isWaitingForAction = false;
+                this.nextStep();
+            }
+        };
+        eventBus.on(eventName, handler);
     }
 
     private renderStep(step: TutorialStep): void {
         if (!this.tutorialBox) return;
+
+        // Update step indicator
+        if (this.stepIndicator) {
+            this.stepIndicator.textContent = `${this.currentStep + 1} / ${this.steps.length}`;
+        }
 
         // Update content
         const titleEl = document.getElementById('tutorial-title');
         const contentEl = document.getElementById('tutorial-content');
         const nextBtn = document.getElementById('tutorial-next-btn');
         const prevBtn = document.getElementById('tutorial-prev-btn');
+        const shortcutHint = document.getElementById('tutorial-shortcut-hint');
         
         if (titleEl) titleEl.textContent = t(step.titleKey);
         if (contentEl) contentEl.textContent = t(step.textKey);
+        
+        // Add shortcut hint based on action
+        if (shortcutHint) {
+            let hint = '';
+            if (step.action === 'move') hint = t('tutorial.hint.move');
+            else if (step.action === 'endTurn') hint = t('tutorial.hint.endTurn');
+            else if (step.action === 'playCard') hint = t('tutorial.hint.playCard');
+            else if (step.action === 'block') hint = t('tutorial.hint.block');
+            else if (step.waitForEvent) hint = t('tutorial.hint.wait');
+            shortcutHint.textContent = hint;
+        }
         
         // Position box
         if (step.tutorialBoxPosition) {
@@ -239,8 +380,10 @@ export default class TutorialManager {
 
     complete(): void {
         this.isActive = false;
+        this.isWaitingForAction = false;
         localStorage.setItem('mk_tutorial_completed', 'true');
         this.clearHighlight();
+        this.unbindKeyboardShortcuts();
         if (this.overlay && this.overlay.parentNode) {
             this.overlay.parentNode.removeChild(this.overlay);
         }
@@ -256,6 +399,8 @@ export default class TutorialManager {
         if (document.getElementById('tutorial-overlay')) {
             this.overlay = document.getElementById('tutorial-overlay');
             this.tutorialBox = document.getElementById('tutorial-box');
+            this.spotlight = document.getElementById('tutorial-spotlight');
+            this.stepIndicator = document.getElementById('tutorial-step-indicator');
             return;
         }
 
@@ -276,13 +421,13 @@ export default class TutorialManager {
         this.tutorialBox.style.bottom = '20px';
         this.tutorialBox.style.left = '50%';
         this.tutorialBox.style.transform = 'translateX(-50%)';
-        this.tutorialBox.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        this.tutorialBox.style.backgroundColor = 'rgba(0, 0, 0, 0.95)';
         this.tutorialBox.style.color = 'white';
         this.tutorialBox.style.padding = '24px';
         this.tutorialBox.style.borderRadius = '12px';
         this.tutorialBox.style.pointerEvents = 'auto';
-        this.tutorialBox.style.maxWidth = '400px';
-        this.tutorialBox.style.boxShadow = '0 10px 40px rgba(0,0,0,0.5)';
+        this.tutorialBox.style.maxWidth = '420px';
+        this.tutorialBox.style.boxShadow = '0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(59, 130, 246, 0.3)';
         this.tutorialBox.style.border = '2px solid #3b82f6';
         this.tutorialBox.style.fontFamily = 'inherit';
 
@@ -290,16 +435,26 @@ export default class TutorialManager {
         const title = document.createElement('h3');
         title.id = 'tutorial-title';
         title.style.margin = '0 0 12px 0';
-        title.style.fontSize = '1.2rem';
+        title.style.fontSize = '1.25rem';
         title.style.color = '#3b82f6';
         this.tutorialBox.appendChild(title);
 
         // Content
         const content = document.createElement('div');
         content.id = 'tutorial-content';
-        content.style.lineHeight = '1.6';
+        content.style.lineHeight = '1.7';
         content.style.fontSize = '1rem';
         this.tutorialBox.appendChild(content);
+
+        // Shortcut hint
+        const shortcutHint = document.createElement('div');
+        shortcutHint.id = 'tutorial-shortcut-hint';
+        shortcutHint.style.fontSize = '0.8rem';
+        shortcutHint.style.color = '#9ca3af';
+        shortcutHint.style.marginTop = '8px';
+        shortcutHint.style.fontStyle = 'italic';
+        shortcutHint.style.minHeight = '1.2em';
+        this.tutorialBox.appendChild(shortcutHint);
 
         // Button container
         const btnContainer = document.createElement('div');
@@ -307,6 +462,7 @@ export default class TutorialManager {
         btnContainer.style.gap = '8px';
         btnContainer.style.marginTop = '20px';
         btnContainer.style.justifyContent = 'center';
+        btnContainer.style.flexWrap = 'wrap';
 
         const prevBtn = document.createElement('button');
         prevBtn.innerText = t('tutorial.btn.prev');
@@ -333,13 +489,13 @@ export default class TutorialManager {
         this.tutorialBox.appendChild(btnContainer);
 
         // Step indicator
-        const stepIndicator = document.createElement('div');
-        stepIndicator.id = 'tutorial-step-indicator';
-        stepIndicator.style.textAlign = 'center';
-        stepIndicator.style.marginTop = '12px';
-        stepIndicator.style.fontSize = '0.85rem';
-        stepIndicator.style.color = '#9ca3af';
-        this.tutorialBox.appendChild(stepIndicator);
+        this.stepIndicator = document.createElement('div');
+        this.stepIndicator.id = 'tutorial-step-indicator';
+        this.stepIndicator.style.textAlign = 'center';
+        this.stepIndicator.style.marginTop = '12px';
+        this.stepIndicator.style.fontSize = '0.85rem';
+        this.stepIndicator.style.color = '#9ca3af';
+        this.tutorialBox.appendChild(this.stepIndicator);
 
         // Spotlight element
         this.spotlight = document.createElement('div');
@@ -378,6 +534,7 @@ export default class TutorialManager {
             element.dataset.tutorialHighlight = 'true';
             element.style.boxShadow = '0 0 0 4px #3b82f6, 0 0 0 8px rgba(59, 130, 246, 0.3)';
             element.style.transition = 'box-shadow 0.3s ease';
+            this.highlightedElements.push(element);
 
             const rect = element.getBoundingClientRect();
             this.spotlight.style.display = 'block';
@@ -390,12 +547,23 @@ export default class TutorialManager {
     }
 
     clearHighlight(): void {
-        const highlighted = document.querySelector('[data-tutorial-highlight="true"]') as HTMLElement;
-        if (highlighted) {
-            highlighted.style.zIndex = '';
-            highlighted.style.boxShadow = '';
-            delete highlighted.dataset.tutorialHighlight;
-        }
+        // Clear elements tracked in array
+        this.highlightedElements.forEach(el => {
+            el.style.zIndex = '';
+            el.style.boxShadow = '';
+            el.style.animation = '';
+            delete el.dataset.tutorialHighlight;
+        });
+        // Also clear any elements that might have been highlighted outside our tracking
+        const highlighted = document.querySelectorAll('[data-tutorial-highlight="true"]');
+        highlighted.forEach(el => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.zIndex = '';
+            htmlEl.style.boxShadow = '';
+            htmlEl.style.animation = '';
+            delete htmlEl.dataset.tutorialHighlight;
+        });
+        this.highlightedElements = [];
         if (this.spotlight) {
             this.spotlight.style.display = 'none';
         }

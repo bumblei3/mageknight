@@ -430,6 +430,13 @@ const en = {
             skip: 'Skip',
             start: 'Let\'s go!'
         },
+        hint: {
+            move: '💡 Click a highlighted hex to move (or Arrow keys + Space)',
+            endTurn: '💡 Press "End Turn" (or E key) when done',
+            playCard: '💡 Left-click a card to play, right-click for strong effect',
+            block: '💡 Select block cards, click enemy, then "End Turn"',
+            wait: '⏳ Waiting for event...'
+        },
         completed: 'Tutorial completed!'
     }
 };

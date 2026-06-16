@@ -466,6 +466,13 @@ const de = {
             skip: 'Überspringen',
             start: 'Los geht\'s!'
         },
+        hint: {
+            move: '💡 Klicke auf ein leuchtendes Feld, um dich zu bewegen (oder Pfeiltasten + Leertaste)',
+            endTurn: '💡 Drücke "Zug beenden" (oder Taste E), wenn du fertig bist',
+            playCard: '💡 Linksklick auf eine Karte zum Spielen, Rechtsklick für starken Effekt',
+            block: '💡 Wähle Blockkarten, klicke auf den Feind, dann "Zug beenden"',
+            wait: '⏳ Warte auf Ereignis...'
+        },
         completed: 'Tutorial abgeschlossen!'
     }
 };

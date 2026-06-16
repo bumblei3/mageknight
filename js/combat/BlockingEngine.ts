@@ -64,7 +64,10 @@ export class BlockingEngine {
             totalInputBlock += val;
             let efficiency = 1.0;
 
-            if (enemyElement === ATTACK_ELEMENTS.FIRE) {
+            // Cold Fire blocks act as WILDCARD - full efficiency against ANY attack element
+            if (el === ATTACK_ELEMENTS.COLD_FIRE) {
+                efficiency = 1.0;
+            } else if (enemyElement === ATTACK_ELEMENTS.FIRE) {
                 if (el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
                     isInefficient = true;
@@ -79,6 +82,8 @@ export class BlockingEngine {
                     else inefficiencyReasons.add('physical_vs_ice');
                 }
             } else if (enemyElement === ATTACK_ELEMENTS.COLD_FIRE) {
+                // Only Cold Fire blocks are full efficiency against Cold Fire
+                // (Handled above by the el === COLD_FIRE check)
                 if (el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
                     isInefficient = true;
@@ -97,7 +102,10 @@ export class BlockingEngine {
             const el = block.element || ATTACK_ELEMENTS.PHYSICAL;
             let efficiency = 1.0;
 
-            if (enemyElement === ATTACK_ELEMENTS.FIRE) {
+            // Cold Fire blocks act as WILDCARD - full efficiency against ANY attack element
+            if (el === ATTACK_ELEMENTS.COLD_FIRE) {
+                efficiency = 1.0;
+            } else if (enemyElement === ATTACK_ELEMENTS.FIRE) {
                 if (el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
                     isInefficient = true;
@@ -112,6 +120,8 @@ export class BlockingEngine {
                     else inefficiencyReasons.add('unit_vs_elemental');
                 }
             } else if (enemyElement === ATTACK_ELEMENTS.COLD_FIRE) {
+                // Only Cold Fire blocks are full efficiency against Cold Fire
+                // (Handled above by the el === COLD_FIRE check)
                 if (el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
                     isInefficient = true;
@@ -140,9 +150,16 @@ export class BlockingEngine {
                     const el = b.element || ATTACK_ELEMENTS.PHYSICAL;
                     let eff = 1.0;
                     const enemyEl = enemy.attackType || ATTACK_ELEMENTS.PHYSICAL;
-                    if (enemyEl === ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) eff = 0.5;
-                    else if (enemyEl === ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) eff = 0.5;
-                    else if (enemyEl === ATTACK_ELEMENTS.COLD_FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) eff = 0.5;
+                    // Cold Fire blocks act as WILDCARD
+                    if (el === ATTACK_ELEMENTS.COLD_FIRE) {
+                        eff = 1.0;
+                    } else if (enemyEl === ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                        eff = 0.5;
+                    } else if (enemyEl === ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                        eff = 0.5;
+                    } else if (enemyEl === ATTACK_ELEMENTS.COLD_FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
+                        eff = 0.5;
+                    }
                     return sum + Math.floor(b.value * eff);
                 }, 0);
 

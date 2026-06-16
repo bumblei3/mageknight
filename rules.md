@@ -21,7 +21,7 @@ This document serves as a reference for the official game rules (based on *Mage 
 | **Cumbersome** | *Schwerfällig* | Can spend Movement Points to reduce attack value in Block phase. | ✅ **Implemented** (Smart Auto-Spend UI) |
 | **Assassinate** | *Attentäter* | Damage **cannot** be assigned to Units. Must hit Hero. | ⚠️ **Partial** (Effectively active due to missing Unit Assignment) |
 | **Elusive** | *Ausweichend* | Higher base armor. Armor drops only in Attack phase AND if fully blocked. | ✅ **Verified** (Correctly handles dynamic armor) |
-| **Fortified** | *Befestigt* | Immune to Ranged (unless Siege) in Ranged Phase. | ✅ Implemented |
+| **Fortified** | *Befestigt* | Immune to Ranged (unless Siege) in Ranged Phase. **Ignored in Attack Phase.** | ✅ Implemented |
 
 ## 2. Combat Rules
 

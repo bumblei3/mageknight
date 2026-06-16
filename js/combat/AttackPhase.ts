@@ -58,22 +58,65 @@ export class AttackPhase {
     }
 
     private _handleRegularEnemies(regularEnemies: any[], totalAttack: number, attackElement: string, result: any): void {
-        let remainingAttack = totalAttack;
-        const defeated: any[] = [];
+        // Calculate armor needed for each enemy (considering resistances and block status)
+        const enemiesWithArmor = regularEnemies.map(enemy => ({
+            enemy,
+            multiplier: enemy.getResistanceMultiplier(attackElement),
+            isBlocked: this.combat.blockedEnemies.has(enemy.id),
+            armor: typeof enemy.getCurrentArmor === 'function' ? enemy.getCurrentArmor(this.combat.blockedEnemies.has(enemy.id), true) : enemy.armor
+        }));
 
-        for (const enemy of regularEnemies) {
-            const multiplier = enemy.getResistanceMultiplier(attackElement);
-            const isBlocked = this.combat.blockedEnemies.has(enemy.id);
-            const currentArmor = typeof enemy.getCurrentArmor === 'function' ? enemy.getCurrentArmor(isBlocked, true) : enemy.armor;
-            const neededForThis = currentArmor / multiplier;
-
-            if (remainingAttack >= neededForThis) {
-                remainingAttack -= neededForThis;
-                defeated.push(enemy);
+        // Try to find the largest group that can be defeated together
+        // Strategy: Try all combinations from largest to smallest
+        const n = enemiesWithArmor.length;
+        let bestGroup: any[] = [];
+        
+        // Try groups from largest to smallest
+        for (let size = n; size >= 1; size--) {
+            const combinations = this._getCombinations(enemiesWithArmor, size);
+            for (const combo of combinations) {
+                const totalNeeded = combo.reduce((sum, e) => sum + (e.armor / e.multiplier), 0);
+                if (totalAttack >= totalNeeded) {
+                    bestGroup = combo;
+                    break;
+                }
             }
+            if (bestGroup.length > 0) break;
         }
 
-        if (defeated.length > 0) {
+        const defeated: any[] = [];
+        if (bestGroup.length > 0) {
+            // Defeat the grouped enemies
+            bestGroup.forEach(groupMember => {
+                const enemy = groupMember.enemy;
+                this.combat.defeatedEnemies.push(enemy);
+                this.combat.hero.gainFame(enemy.fame);
+                result.defeated.push(enemy);
+                result.fameGained += enemy.fame;
+                this.combat.enemies = this.combat.enemies.filter((e: any) => e.id !== enemy.id);
+            });
+            result.messages.push(t('combat.enemiesDefeated', { count: bestGroup.length }));
+            result.success = true;
+        }
+
+        // Try to defeat remaining enemies with sequential logic
+        const remainingEnemies = enemiesWithArmor.filter(e => !bestGroup.includes(e));
+        if (remainingEnemies.length > 0) {
+            let remainingAttack = totalAttack;
+            const defeated: any[] = [];
+            
+            // Use the same amount as if we attacked the best group
+            const groupArmor = bestGroup.reduce((sum, e) => sum + (e.armor / e.multiplier), 0);
+            remainingAttack -= groupArmor;
+            
+            for (const member of remainingEnemies) {
+                const neededForThis = member.armor / member.multiplier;
+                if (remainingAttack >= neededForThis) {
+                    remainingAttack -= neededForThis;
+                    defeated.push(member.enemy);
+                }
+            }
+
             defeated.forEach(enemy => {
                 this.combat.defeatedEnemies.push(enemy);
                 this.combat.hero.gainFame(enemy.fame);
@@ -81,21 +124,50 @@ export class AttackPhase {
                 result.fameGained += enemy.fame;
                 this.combat.enemies = this.combat.enemies.filter((e: any) => e.id !== enemy.id);
             });
-            result.messages.push(t('combat.enemiesDefeated', { count: defeated.length }));
-            result.success = true;
+
+            if (defeated.length > 0) {
+                result.messages.push(t('combat.enemiesDefeated', { count: defeated.length }));
+                result.success = true;
+            }
         }
 
-        if (defeated.length < regularEnemies.length) {
+        // Report remaining enemies
+        const allDefeated = [...bestGroup, ...defeated].map(d => d.enemy || d);
+        if (allDefeated.length < regularEnemies.length) {
+            const remainingArmorSum = allDefeated.reduce((sum, d) => {
+                const m = d.getResistanceMultiplier(attackElement);
+                const isB = this.combat.blockedEnemies.has(d.id);
+                const arm = typeof d.getCurrentArmor === 'function' ? d.getCurrentArmor(isB, true) : d.armor;
+                return sum + (arm / m);
+            }, 0);
+
+            const remainingAttackUsed = totalAttack - remainingArmorSum;
             const totalRemainingArmor = regularEnemies
-                .filter(e => !defeated.includes(e))
+                .filter(e => !allDefeated.includes(e))
                 .reduce((sum, e) => {
                     const mult = e.getResistanceMultiplier(attackElement);
                     const isB = this.combat.blockedEnemies.has(e.id);
                     const armor = typeof e.getCurrentArmor === 'function' ? e.getCurrentArmor(isB, true) : e.armor;
                     return sum + (armor / mult);
                 }, 0);
-            result.messages.push(t('combat.attackWeak', { attack: Math.floor(remainingAttack), armor: Math.floor(totalRemainingArmor) }));
+            result.messages.push(t('combat.attackWeak', { attack: Math.floor(remainingAttackUsed), armor: Math.floor(totalRemainingArmor) }));
         }
+    }
+
+    // Helper to get all combinations of size k
+    private _getCombinations(arr: any[], k: number): any[][] {
+        if (k === 0) return [[]];
+        if (k > arr.length) return [];
+        if (k === arr.length) return [arr];
+        
+        const result: any[][] = [];
+        for (let i = 0; i <= arr.length - k; i++) {
+            const rest = this._getCombinations(arr.slice(i + 1), k - 1);
+            for (const combo of rest) {
+                result.push([arr[i], ...combo]);
+            }
+        }
+        return result;
     }
 
     private _handleBosses(bosses: any[], totalAttack: number, attackElement: string, result: any): void {

@@ -357,6 +357,32 @@ export class Hero {
         return true;
     }
 
+    /** Use artifact's Strong Effect (unequips and applies strongEffect) */
+    useArtifactStrongEffect(): { success: boolean; effect?: any; message: string } {
+        if (!this.equippedArtifact) {
+            return { success: false, message: 'Kein Artefakt ausgerüstet.' };
+        }
+
+        const artifact = this.equippedArtifact;
+        const strongEffect = artifact.strongEffect;
+
+        if (!strongEffect || Object.keys(strongEffect).length === 0) {
+            return { success: false, message: 'Dieses Artefakt hat keinen starken Effekt.' };
+        }
+
+        // Unequip artifact (removes passive effects, returns to hand)
+        this.unequipArtifact();
+
+        // Apply strong effect
+        this.applyArtifactEffects(strongEffect);
+
+        return { 
+            success: true, 
+            effect: strongEffect, 
+            message: `Starke Wirkung von ${artifact.name} aktiviert!` 
+        };
+    }
+
     /** Unequip current artifact */
     unequipArtifact(): Card | null {
         if (!this.equippedArtifact) {

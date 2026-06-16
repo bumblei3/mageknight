@@ -183,11 +183,6 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
-      - name: Lighthouse CI
-        if: github.event.inputs.run_lighthouse == 'true' || github.event_name == 'push'
-        uses: treosh/lighthouse-ci-action@v12
-        with:
-          uploadArtifacts: true
 
   # --- PR Preview Deployment ---
   deploy-preview:

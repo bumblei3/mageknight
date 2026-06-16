@@ -2,6 +2,7 @@ import { MageKnightGame } from './game';
 // Game3D is lazy-loaded via dynamic import
 import i18n from './i18n/index';
 import { ErrorHandler } from './errorHandler';
+import { initErrorBoundary } from './errorBoundary';
 
 /**
  * Handles dynamic import errors (common after new deployments due to hash mismatch)
@@ -74,6 +75,13 @@ const hideLoadingScreen = (): void => {
  * Uses a global guard and state check to ensure only one instance runs.
  */
 const startMageKnight = async (): Promise<void> => {
+    // Initialize global error boundary FIRST
+    initErrorBoundary({
+        enableAutoRecovery: true,
+        showReportButton: true,
+        maxErrorsPerSession: 10
+    });
+
     // Global singleton guard (synchronous check)
     if ((window as any).game || (window as any).mk_initializing) {
         console.warn('Mage Knight already initialized or initializing. Skipping.');

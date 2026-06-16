@@ -39,6 +39,7 @@ import { HeroController } from './game/HeroController';
 import { InputController } from './game/InputController';
 import { RenderController } from './game/RenderController';
 import { ShortcutManager } from './game/ShortcutManager';
+import { UndoManager } from './game/undo/UndoManager';
 import { HeroManager } from './game/HeroManager';
 import { store } from './store';
 
@@ -102,6 +103,7 @@ export class MageKnightGame {
     public phaseManager: PhaseManager;
     public entityManager: EntityManager;
     public actionManager: ActionManager;
+    public undoManager: UndoManager;
     public stateManager: GameStateManager;
     public combatOrchestrator: CombatOrchestrator;
     public heroController: HeroController;
@@ -194,6 +196,7 @@ export class MageKnightGame {
         this.phaseManager = new PhaseManager(this);
         this.entityManager = new EntityManager(this);
         this.actionManager = new ActionManager(this);
+        this.undoManager = new UndoManager(this);
         this.stateManager = new GameStateManager(this);
         this.combatOrchestrator = new CombatOrchestrator(this);
         this.heroController = new HeroController(this);

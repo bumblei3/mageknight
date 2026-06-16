@@ -8,6 +8,7 @@ export interface HexData {
     site?: any;
     revealed?: boolean;
     cost?: number; // for pathfinding
+    enemies?: any[];
 }
 
 export class HexGridLogic {

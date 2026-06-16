@@ -66,7 +66,8 @@ describe('Undo in Combat', () => {
 
         // Add a Block card to hand
         hero.hand = [{
-            name: 'Block Card',
+            id: 'determination',
+            name: 'Determination',
             color: 'blue',
             isWound: () => false,
             getEffect: () => ({ block: 2, element: 'ice' }),
@@ -94,7 +95,7 @@ describe('Undo in Combat', () => {
         // Verify restored
         expect(game.combatOrchestrator.combatBlockTotal).toBe(0);
         expect(hero.hand.length).toBe(1);
-        expect(hero.hand[0].name).toBe('Block Card');
+        expect(hero.hand[0].name).toBe('Determination');
         expect(game.actionManager.history.length).toBe(0);
     });
 

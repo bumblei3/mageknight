@@ -1,6 +1,7 @@
 // Hero class for Mage Knight
 
 import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_ARTIFACTS, Card, CardData } from './card';
+import { CARD_DEFINITIONS } from './card/CardDefinitions';
 import { MANA_COLORS, ManaColor } from './constants';
 import { HeroInventory } from './hero/HeroInventory';
 import { HeroSkills } from './hero/HeroSkills';
@@ -106,10 +107,10 @@ export interface HeroState {
     handLimit: number;
     commandLimit: number;
     position: Position;
-    deck: Card[];
-    hand: Card[];
-    discard: Card[];
-    wounds: Card[];
+    deck: string[];
+    hand: string[];
+    discard: string[];
+    wounds: string[];
     crystals: Record<string, number>;
     skills: Skill[];
     tempMana: ManaColor[];
@@ -586,10 +587,22 @@ export class Hero {
         if (state.commandLimit !== undefined) this.commandLimit = state.commandLimit;
         if (state.position) this.position = { ...state.position };
         this.displayPosition = { ...this.position };
-        if (state.deck) this.deck = [...state.deck];
-        if (state.hand) this.hand = [...state.hand];
-        if (state.discard) this.discard = [...state.discard];
-        if (state.wounds) this.wounds = [...state.wounds];
+        // Convert string IDs back to Card objects
+        const idsToCards = (ids: (string | Card)[]): Card[] => {
+            return ids.map(id => {
+                if (typeof id === 'string') {
+                    const def = CARD_DEFINITIONS[id];
+                    if (def) return new Card(def);
+                    console.warn(`Card definition not found for ID: ${id}`);
+                    return new Card({ id, name: 'Unknown Card', color: null });
+                }
+                return id;
+            });
+        };
+        if (state.deck) this.deck = idsToCards(state.deck);
+        if (state.hand) this.hand = idsToCards(state.hand);
+        if (state.discard) this.discard = idsToCards(state.discard);
+        if (state.wounds) this.wounds = idsToCards(state.wounds);
         if (state.crystals) this.crystals = { ...state.crystals };
         if (state.skills) this.skills = [...state.skills];
         if (state.tempMana) this.tempMana = [...state.tempMana];

@@ -166,7 +166,7 @@ export class GameStateManager {
                 this.game.phaseManager.updatePhaseIndicator();
             }
             // Skip rendering in test environment to avoid issues with NaN/Infinity in loaded hex data
-            if (!window.isTestEnvironment) {
+            if (!(window as any).isTestEnvironment) {
                 this.game.render();
             }
 

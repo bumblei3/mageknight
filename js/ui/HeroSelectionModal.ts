@@ -51,6 +51,7 @@ export class HeroSelectionModal {
     private createHeroCard(hero: any): HTMLElement {
         const card = document.createElement('div');
         card.className = 'hero-card';
+        card.dataset.hero = hero.id;
         card.style.setProperty('--hero-color', hero.color);
 
         card.innerHTML = `

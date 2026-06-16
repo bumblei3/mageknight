@@ -55,6 +55,7 @@ export class ScenarioSelectionModal {
     private createScenarioCard(scenario: any): HTMLElement {
         const card = document.createElement('div');
         card.className = 'scenario-card';
+        card.dataset.scenario = scenario.id;
 
         const difficulty = this.getDifficultyLabel(scenario.id);
         const imagePath = `assets/scenarios/${scenario.id}_medium.webp`;

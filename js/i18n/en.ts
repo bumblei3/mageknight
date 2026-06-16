@@ -376,6 +376,61 @@ const en = {
     // PWA
     pwa: {
         ready_offline: 'Game is now available offline! 🚀'
+    },
+
+    // Tutorial
+    tutorial: {
+        welcome: {
+            title: 'Welcome to Mage Knight!',
+            text: 'In this tutorial you\'ll learn the basics. Click "Next" to get started.'
+        },
+        heroStats: {
+            title: 'Your Hero',
+            text: 'Here you see your name, fame, armor, movement points, and hand limit. Fame lets you level up.'
+        },
+        handCards: {
+            title: 'Your Hand',
+            text: 'Your action cards. Left-click to play, right-click for strong effects (+1). Wounds block card slots.'
+        },
+        manaSource: {
+            title: 'Mana Source',
+            text: 'Roll mana dice at the start of your turn. Day: Red, Blue, Green, White, Gold. Night: Black instead of Gold. Gold = Wild!'
+        },
+        movement: {
+            title: 'Movement',
+            text: 'Click a highlighted hex to move. Cost depends on terrain (Plains=2, Forest=3, Mountains=5).'
+        },
+        endTurn: {
+            title: 'End Turn',
+            text: 'When done, click "End Turn". Unused movement/influence is lost. Then the enemy takes their turn.'
+        },
+        combatIntro: {
+            title: 'Combat!',
+            text: 'You\'re engaged in combat. Combat has phases: Ranged -> Block -> Damage -> Attack.'
+        },
+        rangedPhase: {
+            title: 'Ranged Phase',
+            text: 'Play attack/siege cards to weaken enemies before blocking. Many enemies are immune to ranged (Fortified).'
+        },
+        blockPhase: {
+            title: 'Block Phase',
+            text: 'Block enemy attacks with block cards. Watch elements: Fire is blocked by Ice, Ice by Fire. "End Turn" enters Block Phase.'
+        },
+        attackPhase: {
+            title: 'Attack Phase',
+            text: 'Now you attack! Play attack cards to defeat enemies. "End Turn" executes the attack.'
+        },
+        complete: {
+            title: 'Tutorial Complete!',
+            text: 'You now know the basics. Good luck conquering Mage Knight!'
+        },
+        btn: {
+            next: 'Next',
+            prev: 'Back',
+            skip: 'Skip',
+            start: 'Let\'s go!'
+        },
+        completed: 'Tutorial completed!'
     }
 };
 

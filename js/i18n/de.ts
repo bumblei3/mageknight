@@ -412,6 +412,61 @@ const de = {
     // PWA
     pwa: {
         ready_offline: 'Spiel ist jetzt offline verfügbar! 🚀'
+    },
+
+    // Tutorial
+    tutorial: {
+        welcome: {
+            title: 'Willkommen bei Mage Knight!',
+            text: 'In diesem Tutorial lernst du die Grundlagen. Klicke auf "Weiter", um loszulegen.'
+        },
+        heroStats: {
+            title: 'Dein Held',
+            text: 'Hier siehst du deinen Namen, Ruhm, Rüstung, Bewegungspunkte und Handlimit. Ruhm bringt dich im Level nach oben.'
+        },
+        handCards: {
+            title: 'Deine Hand',
+            text: 'Deine Aktionskarten. Linksklick zum Spielen, Rechtsklick für starke Effekte (+1). Wunden blockieren Karten-Slots.'
+        },
+        manaSource: {
+            title: 'Mana-Quelle',
+            text: 'Würfle zu Beginn deines Zuges Mana. Tagsüber: Rot, Blau, Grün, Weiß, Gold. Nachts: Schwarz statt Gold. Gold = Joker!'
+        },
+        movement: {
+            title: 'Bewegung',
+            text: 'Klicke auf ein leuchtendes Feld, um dich zu bewegen. Kosten hängen vom Gelände ab (Ebenen=2, Wald=3, Berge=5).'
+        },
+        endTurn: {
+            title: 'Zug beenden',
+            text: 'Wenn du fertig bist, klicke "Zug beenden". Nicht genutzte Bewegung/Einfluss verfallen. Dann ist der Gegner dran.'
+        },
+        combatIntro: {
+            title: 'Kampf!',
+            text: 'Du bist in einen Kampf verwickelt. Der Kampf hat Phasen: Fernkampf → Blocken → Schaden → Angriff.'
+        },
+        rangedPhase: {
+            title: 'Fernkampf-Phase',
+            text: 'Spiele Angriffs-/Belagerungskarten, um Feinde vor dem Blocken zu schwächen. Viele Feinde sind gegen Fernkampf immun (Befestigt).'
+        },
+        blockPhase: {
+            title: 'Block-Phase',
+            text: 'Blocke Feind-Angriffe mit Blockkarten. Element beachten: Feuer blockt man mit Eis, Eis mit Feuer. "Zug beenden" → Block-Phase.'
+        },
+        attackPhase: {
+            title: 'Angriffs-Phase',
+            text: 'Jetzt greifst du an! Spiele Angriffskarten, um Feinde zu besiegen. "Zug beenden" führt den Angriff aus.'
+        },
+        complete: {
+            title: 'Tutorial abgeschlossen!',
+            text: 'Du kennst jetzt die Grundlagen. Viel Erfolg bei der Eroberung von Mage Knight!'
+        },
+        btn: {
+            next: 'Weiter',
+            prev: 'Zurück',
+            skip: 'Überspringen',
+            start: 'Los geht\'s!'
+        },
+        completed: 'Tutorial abgeschlossen!'
     }
 };
 

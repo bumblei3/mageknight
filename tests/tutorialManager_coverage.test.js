@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import TutorialManager from '../js/tutorialManager.js';
 
-describe('TutorialManager - Coverage Boost', () => {
+describe('TutorialManager - New System', () => {
     let tutorialManager;
     let mockGame;
     let localStorageMock;
@@ -16,13 +16,14 @@ describe('TutorialManager - Coverage Boost', () => {
         
         global.localStorage = localStorageMock;
         
-        // Mock document methods
         document.body.innerHTML = '';
         
         mockGame = {
             showToast: vi.fn(),
             addLog: vi.fn(),
-            isTestEnvironment: true
+            isTestEnvironment: true,
+            reachableHexes: [{ q: 1, r: 0 }],
+            combat: null
         };
         
         tutorialManager = new TutorialManager(mockGame);
@@ -35,9 +36,10 @@ describe('TutorialManager - Coverage Boost', () => {
     });
 
     describe('constructor', () => {
-        it('should initialize with default steps', () => {
-            expect(tutorialManager.steps.length).toBe(4);
-            expect(tutorialManager.steps[0].text).toBe('Willkommen bei Mage Knight!');
+        it('should initialize with 11 tutorial steps', () => {
+            expect(tutorialManager.steps.length).toBe(11);
+            expect(tutorialManager.steps[0].id).toBe('welcome');
+            expect(tutorialManager.steps[10].id).toBe('complete');
         });
 
         it('should have isActive false initially', () => {
@@ -83,7 +85,6 @@ describe('TutorialManager - Coverage Boost', () => {
         });
 
         it('should reuse existing overlay if present', () => {
-            // Create existing overlay
             const existingOverlay = document.createElement('div');
             existingOverlay.id = 'tutorial-overlay';
             document.body.appendChild(existingOverlay);
@@ -117,14 +118,6 @@ describe('TutorialManager - Coverage Boost', () => {
             tutorialManager.start();
             tutorialManager.nextStep();
             expect(tutorialManager.currentStep).toBe(1);
-            expect(mockGame.showToast).toHaveBeenCalled();
-        });
-
-        it('should show step 1 when advancing from 0', () => {
-            tutorialManager.start();
-            tutorialManager.nextStep();
-            // nextStep calls showStep(this.currentStep + 1) then increments
-            // So it shows step 1, then currentStep becomes 1
         });
     });
 
@@ -145,7 +138,6 @@ describe('TutorialManager - Coverage Boost', () => {
             tutorialManager.currentStep = 2;
             tutorialManager.prevStep();
             expect(tutorialManager.currentStep).toBe(1);
-            expect(mockGame.showToast).toHaveBeenCalled();
         });
     });
 
@@ -155,60 +147,21 @@ describe('TutorialManager - Coverage Boost', () => {
             tutorialManager.skip();
             expect(tutorialManager.isActive).toBe(false);
             expect(global.localStorage.getItem('mk_tutorial_completed')).toBe('true');
-            expect(mockGame.showToast).toHaveBeenCalledWith('Tutorial abgeschlossen!', 'success');
+            expect(mockGame.showToast).toHaveBeenCalledWith('Tutorial completed!', 'success');
         });
     });
 
     describe('showStep', () => {
-        it('should complete if step > steps.length', () => {
+        it('should complete if step index exceeds steps', () => {
             tutorialManager.start();
-            tutorialManager.showStep(10);
-            expect(tutorialManager.isActive).toBe(false);
-        });
-
-        it('should complete if step < 1', () => {
-            tutorialManager.start();
-            tutorialManager.showStep(0);
+            tutorialManager.showStep(15); // Out of bounds (11 steps)
             expect(tutorialManager.isActive).toBe(false);
         });
 
         it('should show step within bounds', () => {
             tutorialManager.start();
             tutorialManager.showStep(2);
-            expect(mockGame.showToast).toHaveBeenCalledWith('Tutorial: Willkommen! (Schritt 2)', 'info');
-        });
-
-        it('should update button text for last step', () => {
-            tutorialManager.start();
-            document.body.innerHTML = '<div id="tutorial-box"><div id="tutorial-content"></div><button id="tutorial-next-btn"></button></div>';
-            tutorialManager.tutorialBox = document.getElementById('tutorial-box');
-            
-            tutorialManager.showStep(4); // Last step (4 steps total)
-            
-            const nextBtn = document.getElementById('tutorial-next-btn');
-            expect(nextBtn.innerText).toBe("Los geht's!");
-        });
-
-        it('should update button text for non-last step', () => {
-            tutorialManager.start();
-            document.body.innerHTML = '<div id="tutorial-box"><div id="tutorial-content"></div><button id="tutorial-next-btn"></button></div>';
-            tutorialManager.tutorialBox = document.getElementById('tutorial-box');
-            
-            tutorialManager.showStep(2);
-            
-            const nextBtn = document.getElementById('tutorial-next-btn');
-            expect(nextBtn.innerText).toBe('Weiter');
-        });
-
-        it('should update content text', () => {
-            tutorialManager.start();
-            document.body.innerHTML = '<div id="tutorial-box"><div id="tutorial-content"></div><button id="tutorial-next-btn"></button></div>';
-            tutorialManager.tutorialBox = document.getElementById('tutorial-box');
-            
-            tutorialManager.showStep(1);
-            
-            const content = document.getElementById('tutorial-content');
-            expect(content.innerText).toBe('Willkommen bei Mage Knight!');
+            expect(tutorialManager.currentStep).toBe(2);
         });
 
         it('should handle missing tutorialBox gracefully', () => {
@@ -224,7 +177,7 @@ describe('TutorialManager - Coverage Boost', () => {
             tutorialManager.complete();
             expect(tutorialManager.isActive).toBe(false);
             expect(global.localStorage.getItem('mk_tutorial_completed')).toBe('true');
-            expect(mockGame.showToast).toHaveBeenCalledWith('Tutorial abgeschlossen!', 'success');
+            expect(mockGame.showToast).toHaveBeenCalledWith('Tutorial completed!', 'success');
         });
 
         it('should remove overlay from DOM', () => {
@@ -255,6 +208,9 @@ describe('TutorialManager - Coverage Boost', () => {
             tutorialManager.createTutorialUI();
             expect(document.getElementById('tutorial-prev-btn')).not.toBeNull();
             expect(document.getElementById('tutorial-skip-btn')).not.toBeNull();
+            expect(document.getElementById('tutorial-next-btn')).not.toBeNull();
+            expect(document.getElementById('tutorial-title')).not.toBeNull();
+            expect(document.getElementById('tutorial-content')).not.toBeNull();
         });
     });
 
@@ -331,7 +287,7 @@ describe('TutorialManager - Coverage Boost', () => {
             tutorialManager.tutorialBox = document.createElement('div');
             tutorialManager.positionTutorialBox('center');
             expect(tutorialManager.tutorialBox.style.top).toBe('50%');
-            expect(tutorialManager.tutorialBox.style.bottom).toBe('');
+            expect(tutorialManager.tutorialBox.style.transform).toBe('translate(-50%, -50%)');
         });
     });
 

@@ -1,7 +1,6 @@
-
 import { describe, it, expect, beforeEach } from 'vitest';
 import TutorialManager from '../../js/tutorialManager.js';
-import { setupGlobalMocks, resetMocks, setupStandardGameDOM, createMockElement } from '../test-mocks.js';
+import { setupGlobalMocks, resetMocks, setupStandardGameDOM } from '../test-mocks.js';
 
 setupGlobalMocks();
 
@@ -15,13 +14,14 @@ describe('TutorialManager Coverage Boost', () => {
 
         mockGame = {
             ui: { showToast: () => { } },
-            hero: { position: { q: 0, r: 0 } }
+            hero: { position: { q: 0, r: 0 } },
+            reachableHexes: [{ q: 1, r: 0 }],
+            combat: null
         };
     });
 
     describe('createTutorialUI branches', () => {
         it('should create new UI elements when overlay does not exist', () => {
-            // Ensure overlay does not exist
             const existingOverlay = document.getElementById('tutorial-overlay-custom');
             if (existingOverlay && existingOverlay.parentNode) {
                 existingOverlay.parentNode.removeChild(existingOverlay);
@@ -35,20 +35,13 @@ describe('TutorialManager Coverage Boost', () => {
         });
 
         it('should reuse existing UI elements when overlay already exists', () => {
-            // Create overlay manually
             const overlay = document.createElement('div');
-            overlay.id = 'tutorial-overlay-custom';
-
+            overlay.id = 'tutorial-overlay';
+            
             const spotlight = document.createElement('div');
             spotlight.id = 'tutorial-spotlight';
 
             const box = document.createElement('div');
-            box.id = 'tutorial-box-custom';
-
-            // Ensure tutorial manager looks for THESE specific IDs if we are testing reuse
-            // However, the class uses hardcoded IDs 'tutorial-overlay' and 'tutorial-box'
-            // So we must match those
-            overlay.id = 'tutorial-overlay';
             box.id = 'tutorial-box';
 
             document.body.appendChild(overlay);
@@ -58,7 +51,6 @@ describe('TutorialManager Coverage Boost', () => {
             tutorialManager = new TutorialManager(mockGame);
             tutorialManager.createTutorialUI();
 
-            // Should reuse existing elements
             expect(tutorialManager.overlay.id).toBe('tutorial-overlay');
         });
     });
@@ -66,21 +58,20 @@ describe('TutorialManager Coverage Boost', () => {
     describe('showStep edge cases', () => {
         it('should complete tutorial when step index exceeds steps', () => {
             tutorialManager = new TutorialManager(mockGame);
-            tutorialManager.createTutorialUI();
+            tutorialManager.start(); // Need to start first
             tutorialManager.steps = [{ title: 'Test', text: 'test' }];
 
-            // Spy on complete
             let completed = false;
             tutorialManager.complete = () => { completed = true; };
 
-            tutorialManager.showStep(5); // Out of bounds
+            tutorialManager.showStep(5); // Out of bounds (only 1 step)
 
             expect(completed).toBe(true);
         });
 
         it('should complete tutorial when step index is negative', () => {
             tutorialManager = new TutorialManager(mockGame);
-            tutorialManager.createTutorialUI();
+            tutorialManager.start(); // Need to start first
             tutorialManager.steps = [{ title: 'Test', text: 'test' }];
 
             let completed = false;

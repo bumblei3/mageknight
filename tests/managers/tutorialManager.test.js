@@ -8,12 +8,14 @@ describe('TutorialManager', () => {
     let game;
 
     beforeEach(() => {
-        setLanguage('de');
+        setLanguage('en');
         document.body.innerHTML = '';
         game = {
             addLog: vi.fn(),
             showToast: vi.fn(),
-            ui: { showToast: vi.fn() }
+            ui: { showToast: vi.fn() },
+            reachableHexes: [{ q: 1, r: 0 }],
+            combat: null
         };
         tutorial = new TutorialManager(game);
         localStorage.clear();
@@ -30,7 +32,7 @@ describe('TutorialManager', () => {
     it('should initialize correctly', () => {
         expect(tutorial.currentStep).toBe(0);
         expect(tutorial.isActive).toBe(false);
-        expect(tutorial.steps.length).toBeGreaterThan(0);
+        expect(tutorial.steps.length).toBe(11);
     });
 
     it('should start tutorial', () => {

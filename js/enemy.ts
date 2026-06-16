@@ -1,9 +1,11 @@
 // Enemy system for Mage Knight
 
 import { ENEMY_TYPES, BOSS_PHASES, ENEMY_DEFINITIONS, BOSS_DEFINITIONS, EnemyDefinition } from './constants';
+import { type EnemyType } from './constants';
 import { t } from './i18n/index';
 
 export { ENEMY_TYPES, BOSS_PHASES, ENEMY_DEFINITIONS, BOSS_DEFINITIONS };
+export type { EnemyType };
 
 export interface Position {
     q: number;

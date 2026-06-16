@@ -17,7 +17,7 @@
         "@axe-core/playwright": "^4.11.3",
         "@eslint/js": "^10.0.1",
         "@playwright/test": "^1.61.0",
-        "@types/node": "^25.3.3",
+        "@types/node": "^25.9.3",
         "@types/pngjs": "^6.0.5",
         "@types/three": "^0.183.1",
         "@vitest/coverage-istanbul": "^4.1.9",

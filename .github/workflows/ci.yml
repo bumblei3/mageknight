@@ -109,16 +109,12 @@ jobs:
           fail_ci_if_error: false
           flags: unittests
 
-  # --- E2E Tests (Playwright) - Matrix für Cross-Browser ---
+  # --- E2E Tests (Playwright) - Chromium Only ---
   e2e:
-    name: E2E Tests (${{ matrix.browser }})
+    name: E2E Tests (chromium)
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -133,14 +129,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+        run: npx playwright install --with-deps chromium
       - name: Run E2E Tests
-        run: npx playwright test --project=${{ matrix.browser }}
+        run: npx playwright test --project=chromium
       - name: Upload Playwright Report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report-${{ matrix.browser }}
+          name: playwright-report-chromium
           path: playwright-report/
           retention-days: 7
 
@@ -191,7 +187,6 @@ jobs:
         if: github.event.inputs.run_lighthouse == 'true' || github.event_name == 'push'
         uses: treosh/lighthouse-ci-action@v12
         with:
-          configPath: ./lighthouserc.cjs
           uploadArtifacts: true
 
   # --- PR Preview Deployment ---

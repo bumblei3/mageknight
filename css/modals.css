@@ -1050,7 +1050,8 @@ input:checked+.slider:before {
 
 .select-hero-btn {
     width: 100%;
-    background: var(--hero-color);
+    /* Use color from --hero-color but ensure WCAG AA contrast with white text */
+    background: var(--hero-color-darker, var(--hero-color));
     border: none;
     color: #fff;
     padding: 0.75rem;
@@ -1061,7 +1062,7 @@ input:checked+.slider:before {
 }
 
 .hero-card:hover .select-hero-btn {
-    filter: brightness(1.2);
+    filter: brightness(1.1);
 }
 
 /* --- Sideways Play Modal --- */

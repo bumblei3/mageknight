@@ -52,7 +52,12 @@ export class HeroSelectionModal {
         const card = document.createElement('div');
         card.className = 'hero-card';
         card.dataset.hero = hero.id;
-        card.style.setProperty('--hero-color', hero.color);
+        
+        // Calculate darker variant for WCAG AA contrast (need 4.5:1 for bold 13px text)
+        const color = hero.color || '#888';
+        const darkerColor = this.darkenColor(color, 0.4);
+        card.style.setProperty('--hero-color', color);
+        card.style.setProperty('--hero-color-darker', darkerColor);
 
         card.innerHTML = `
             <div class="hero-card-inner">
@@ -85,5 +90,35 @@ export class HeroSelectionModal {
     private confirmSelection(heroId: string): void {
         (logger as any).info(`Hero selected: ${heroId} for scenario: ${this.selectedScenarioId}`);
         this.ui.game.finishGameSetup(this.selectedScenarioId, heroId);
+    }
+
+    /**
+     * Darkens a hex color by a given amount for better contrast
+     * @param hex - Hex color string (e.g., '#ff4d4d')
+     * @param amount - Amount to darken (0-1)
+     * @returns Darker hex color
+     */
+    private darkenColor(hex: string, amount: number): string {
+        // Remove # if present
+        hex = hex.replace('#', '');
+        
+        // Handle shorthand hex (e.g., #fff -> #ffffff)
+        if (hex.length === 3) {
+            hex = hex.split('').map(c => c + c).join('');
+        }
+        
+        // Parse RGB components
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        
+        // Darken each component
+        const darken = (c: number) => Math.max(0, Math.round(c * (1 - amount)));
+        
+        const newR = darken(r).toString(16).padStart(2, '0');
+        const newG = darken(g).toString(16).padStart(2, '0');
+        const newB = darken(b).toString(16).padStart(2, '0');
+        
+        return `#${newR}${newG}${newB}`;
     }
 }

@@ -139,7 +139,8 @@ test.describe('Mage Knight Game Loading', () => {
                 // Force close any blocking modals (scenario/hero selection) that might auto-appear
                 document.querySelectorAll('.modal, .site-modal').forEach(el => el.classList.remove('active'));
 
-                const state = window.game.stateManager.loadGame('e2e_test_slot');
+                // Use loadGameRaw to get the state object (loadGame returns boolean)
+                const state = window.game.stateManager.loadGameRaw('e2e_test_slot');
                 console.log('Game loaded result:', state ? 'found' : 'not found');
                 if (state) {
                     console.log('Loaded hero position:', state.hero?.position);

@@ -31,12 +31,19 @@ export class EnemyAI {
         this.worker = null;
         this.pendingResolve = null;
 
-        try {
-            this.worker = new Worker(new URL('./workers/aiWorker.js', import.meta.url), { type: 'module' });
-            this.worker.onmessage = this.handleWorkerMessage.bind(this);
-            console.log('AI Worker initialized');
-        } catch (e) {
-            console.error('Failed to initialize AI Worker:', e);
+        // Only initialize Worker in browser environment (not Node.js/vitest)
+        // Check for browser Worker (not Node's worker_threads)
+        const isBrowser = typeof window !== 'undefined' && typeof Worker !== 'undefined';
+        if (isBrowser) {
+            try {
+                this.worker = new Worker(new URL('./workers/aiWorker.js', import.meta.url), { type: 'module' });
+                this.worker.onmessage = this.handleWorkerMessage.bind(this);
+                console.log('AI Worker initialized');
+            } catch (e) {
+                console.error('Failed to initialize AI Worker:', e);
+            }
+        } else {
+            console.log('AI Worker skipped (non-browser environment)');
         }
     }
 

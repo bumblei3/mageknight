@@ -44,6 +44,15 @@ export class GameStateManager {
     }
 
     /**
+     * Loads game state from a specific slot without applying it
+     * @param {number|string} slotId
+     * @returns {SaveState | null} The raw state object
+     */
+    loadGameRaw(slotId: number | string): any {
+        return SaveManager.loadGame(`slot_${slotId}`);
+    }
+
+    /**
      * Compiles the full game state object
      * @returns {any}
      /** Compiles the full game state object @returns {any} */

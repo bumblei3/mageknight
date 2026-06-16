@@ -472,5 +472,141 @@ export const SAMPLE_ADVANCED_ACTIONS: any[] = [
         basicEffect: { type: 'heal', value: 2 },
         advancedEffect: { type: 'heal', value: 4 },
         image: 'refresh.png'
+    },
+
+    // ============================================
+    // ARTIFACTS (Gold cards - Equip for permanent effects)
+    // ============================================
+    {
+        id: 'banner_of_glory',
+        name: 'Banner of Glory',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 3 },
+        advancedEffect: { type: 'influence', value: 6 },
+        description: 'Grants massive influence.',
+        image: 'banner_of_glory.png'
+    },
+    {
+        id: 'soul_stealer',
+        name: 'Soul Stealer',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'attack', value: 4, vampirism: true },
+        advancedEffect: { type: 'attack', value: 8, vampirism: true },
+        description: 'Steals life from enemies.',
+        image: 'soul_stealer.png'
+    },
+    {
+        id: 'crystal_of_insight',
+        name: 'Crystal of Insight',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'mana_token', value: 2 },
+        advancedEffect: { type: 'mana_token', value: 4 },
+        description: 'Generates mana crystals.',
+        image: 'crystal_of_insight.png'
+    },
+    {
+        id: 'staff_of_asar',
+        name: 'Staff of Asar',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'attack', value: 3, element: 'fire' },
+        advancedEffect: { type: 'attack', value: 6, element: 'fire' },
+        description: 'Channels fire magic.',
+        image: 'staff_of_asar.png'
+    },
+    {
+        id: 'dragon_heart',
+        name: 'Dragon Heart',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'attack', value: 5, element: 'cold_fire' },
+        advancedEffect: { type: 'attack', value: 10, element: 'cold_fire' },
+        description: 'Grants cold fire attack.',
+        image: 'dragon_heart.png'
+    },
+    {
+        id: 'boots_of_flight',
+        name: 'Boots of Flight',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'move', value: 4 },
+        advancedEffect: { type: 'move', value: 8 },
+        description: 'Allows rapid movement.',
+        image: 'boots_of_flight.png'
+    },
+    {
+        id: 'amulet_of_protection',
+        name: 'Amulet of Protection',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'block', value: 6 },
+        advancedEffect: { type: 'block', value: 12 },
+        description: 'Provides strong protection.',
+        image: 'amulet_of_protection.png'
+    },
+    {
+        id: 'ring_of_power',
+        name: 'Ring of Power',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 2, attack: 2, block: 2 },
+        advancedEffect: { type: 'influence', value: 4, attack: 4, block: 4 },
+        description: 'Boosts all abilities.',
+        image: 'ring_of_power.png'
+    },
+    {
+        id: 'banner_of_fear',
+        name: 'Banner of Fear',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 5, condition: 'reputation_loss' },
+        advancedEffect: { type: 'influence', value: 10, condition: 'reputation_loss' },
+        description: 'Inspires fear, great influence.',
+        image: 'banner_of_fear.png'
+    },
+    {
+        id: 'circlet_of_command',
+        name: 'Circlet of Command',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'command', value: 1 },
+        advancedEffect: { type: 'command', value: 2 },
+        description: 'Increases command limit.',
+        image: 'circlet_of_command.png'
+    },
+    {
+        id: 'rune_sword',
+        name: 'Rune Sword',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'attack', value: 4, element: 'ice' },
+        advancedEffect: { type: 'attack', value: 8, element: 'ice' },
+        description: 'Cold steel strikes.',
+        image: 'rune_sword.png'
+    },
+    {
+        id: 'horn_of_valor',
+        name: 'Horn of Valor',
+        type: CARD_TYPES.ARTIFACT,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 4, attack: 3 },
+        advancedEffect: { type: 'influence', value: 8, attack: 6 },
+        description: 'Rallies troops for battle.',
+        image: 'horn_of_valor.png'
     }
 ];

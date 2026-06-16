@@ -115,6 +115,7 @@ export interface HeroState {
     skills: Skill[];
     tempMana: ManaColor[];
     units: unknown[];
+    equippedArtifact: string | null;
 }
 
 export class Hero {
@@ -144,6 +145,9 @@ export class Hero {
     wounds: Card[];
     units: Unit[];
     statuses: Set<string>;
+
+    // Artifact system
+    equippedArtifact: Card | null = null;
 
     movementPoints: number;
     attackPoints: number;
@@ -322,6 +326,82 @@ export class Hero {
         this.discard.push(card);
         this.syncStore();
         return { card, effect: { [effectType]: 1 } };
+    }
+
+    // ========== Artifact System ==========
+
+    /** Equip an artifact from hand */
+    equipArtifact(cardIndex: number): boolean {
+        if (cardIndex < 0 || cardIndex >= this.hand.length) {
+            return false;
+        }
+
+        const card = this.hand[cardIndex];
+        if (!card.isArtifact()) {
+            return false;
+        }
+
+        // Unequip current artifact if any
+        if (this.equippedArtifact) {
+            this.unequipArtifact();
+        }
+
+        // Remove from hand and equip
+        this.hand.splice(cardIndex, 1);
+        this.equippedArtifact = card;
+
+        // Apply artifact passive effects immediately
+        this.applyArtifactEffects(card.basicEffect);
+
+        this.syncStore();
+        return true;
+    }
+
+    /** Unequip current artifact */
+    unequipArtifact(): Card | null {
+        if (!this.equippedArtifact) {
+            return null;
+        }
+
+        // Remove passive effects
+        this.removeArtifactEffects(this.equippedArtifact.basicEffect);
+
+        const oldArtifact = this.equippedArtifact;
+        this.equippedArtifact = null;
+
+        // Return to hand (or discard?)
+        this.hand.push(oldArtifact);
+        this.syncStore();
+        return oldArtifact;
+    }
+
+    /** Apply artifact passive effects */
+    private applyArtifactEffects(effect: any): void {
+        if (!effect) return;
+
+        if (effect.attack) this.attackPoints += effect.attack;
+        if (effect.block) this.blockPoints += effect.block;
+        if (effect.movement) this.movementPoints += effect.movement;
+        if (effect.influence) this.influencePoints += effect.influence;
+        if (effect.command) this.commandLimit += effect.command;
+
+        // Special effects: vampirism, mana_token, etc. would need game integration
+    }
+
+    /** Remove artifact passive effects */
+    private removeArtifactEffects(effect: any): void {
+        if (!effect) return;
+
+        if (effect.attack) this.attackPoints = Math.max(0, this.attackPoints - effect.attack);
+        if (effect.block) this.blockPoints = Math.max(0, this.blockPoints - effect.block);
+        if (effect.movement) this.movementPoints = Math.max(0, this.movementPoints - effect.movement);
+        if (effect.influence) this.influencePoints = Math.max(0, this.influencePoints - effect.influence);
+        if (effect.command) this.commandLimit = Math.max(1, this.commandLimit - effect.command);
+    }
+
+    /** Get equipped artifact */
+    getEquippedArtifact(): Card | null {
+        return this.equippedArtifact;
     }
 
     discardCard(cardIndex: number): Card | null {
@@ -567,7 +647,8 @@ export class Hero {
             crystals: { ...this.crystals },
             skills: [...this.skills],
             tempMana: [...this.tempMana],
-            units: this.units.map(u => (typeof u.getState === 'function' ? u.getState() : u))
+            units: this.units.map(u => (typeof u.getState === 'function' ? u.getState() : u)),
+            equippedArtifact: this.equippedArtifact ? this.equippedArtifact.id : null
         };
     }
 
@@ -607,6 +688,15 @@ export class Hero {
         if (state.skills) this.skills = [...state.skills];
         if (state.tempMana) this.tempMana = [...state.tempMana];
         if (state.units) this.units = state.units as Unit[];
+        // Restore equipped artifact
+        if (state.equippedArtifact) {
+            const def = CARD_DEFINITIONS[state.equippedArtifact];
+            if (def) {
+                this.equippedArtifact = new Card(def);
+                // Apply passive effects on load
+                this.applyArtifactEffects(this.equippedArtifact.basicEffect);
+            }
+        }
     }
 
     addStatus(status: string): void {

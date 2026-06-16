@@ -87,6 +87,10 @@ export class Card {
         return this.type === CARD_TYPES.WOUND;
     }
 
+    isArtifact(): boolean {
+        return this.type === CARD_TYPES.ARTIFACT;
+    }
+
     clone(): Card {
         return new Card({
             id: this.id,

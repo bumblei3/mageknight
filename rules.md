@@ -60,9 +60,9 @@ This document serves as a reference for the official game rules (based on *Mage 
     *   ✅ Implemented in `MapManager` / `InteractionController`.
 *   **Sites**:
     *   *Villages*: Heal, Recruit. (✅ Implemented)
-    *   *Monasteries*: Train Advanced Actions. (✅ Implemented)
-    *   *Mage Towers*: Recruit Spells. (✅ Implemented)
-    *   *Keeps*: Recruit Units. (✅ Implemented)
+    *   *Monasteries*: Train Advanced Actions. (✅ Implemented + **Artifact Reward**)
+    *   *Mage Towers*: Recruit Spells. (✅ Implemented + **Artifact Reward after Conquest**)
+    *   *Keeps*: Recruit Units. (✅ Implemented + **Artifact Reward after Conquest**)
     *   *Dungeons/Tombs/Ruins*: Adventure sites. (⚠️ Partial implementation - Reward rules needed)
     *   *Spawning Grounds*: Brutstätten. (❌ Missing)
     *   *Mazes/Labyrinths*: (❌ Missing)
@@ -73,6 +73,38 @@ This document serves as a reference for the official game rules (based on *Mage 
 *   **Interactive Tooltips**: Mouseover enemy icons for exact rules.
 *   **Undo**: Allow taking back actions within a phase if no new info was revealed.
 
+## 6. Artefakte (Gold Cards)
+
+Artefakte sind spezielle Gold-Karten (=Artifacts), die permanent ausgerüstet werden können. Sie bieten passive Boni solange sie ausgerüstet sind.
+
+| Artefakt | Typ | Basiseffekt | Verstärkter Effekt |
+|----------|-----|-------------|-------------------|
+| Banner of Glory | Influence | +3 Einfluss | +6 Einfluss |
+| Soul Stealer | Attack | +4 Angriff (Vampirism) | +8 Angriff (Vampirism) |
+| Crystal of Insight | Mana | +2 Mana Token | +4 Mana Token |
+| Staff of Asar | Attack | +3 Angriff (Fire) | +6 Angriff (Fire) |
+| Dragon Heart | Attack | +5 Angriff (Cold Fire) | +10 Angriff (Cold Fire) |
+| Boots of Flight | Movement | +4 Bewegung | +8 Bewegung |
+| Amulet of Protection | Block | +6 Block | +12 Block |
+| Ring of Power | All | +2 Inf/Att/Block | +4 Inf/Att/Block |
+| Banner of Fear | Influence | +5 Inf (Rep loss) | +10 Inf (Rep loss) |
+| Circlet of Command | Command | +1 Command Limit | +2 Command Limit |
+| Rune Sword | Attack | +4 Angriff (Ice) | +8 Angriff (Ice) |
+| Horn of Valor | Hybrid | +4 Inf, +3 Att | +8 Inf, +6 Att |
+| Banner of Glory | Influence | +3 Einfluss | +6 Einfluss |
+
+### Spielmechanik
+- **Ziehen**: Artefakte kommen in die Hand wie normale Karten
+- **Ausrüsten**: Klick auf Artefakt in der Hand → ersetzt aktuelles Artefakt (altes kehrt in Hand zurück)
+- **Effekte**: Passive Boni werden sofort angewendet (Attack, Block, Movement, Influence, Command)
+- **Save/Load**: Ausgerüstetes Artefakt wird persistiert
+- **Nur 1 Artefakt gleichzeitig**
+
+### Artefakt Belohnungen (Site Handlers)
+- **Mage Tower** (nach Eroberung): "Artefakt suchen" → zufälliges Artefakt in Discard
+- **Monastery**: "Artefakt suchen" → zufälliges Artefakt in Discard (1x pro Spiel)
+- **Keep** (nach Eroberung): "Artefakt suchen" → zufälliges Artefakt in Discard
+
 ---
 
-*Last Updated: 2026-01-06*
+*Last Updated: 2026-06-16*

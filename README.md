@@ -6,6 +6,10 @@
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
+- **Speichern & Laden**: Speichere deinen Fortschritt in mehreren Slots
+- **Artefakte**: 13 Gold-Artefakte mit permanenten Boni (Ausrüsten für passive Effekte)
+- **Feinde verfolgen Helden**: KI-gesteuerte Bewegung über Web Worker
+
 ## 🎮 Über das Spiel
 
 Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Das Spiel bietet die Kern-Mechaniken des Originals in vereinfachter Form:
@@ -16,6 +20,7 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 - **Taktischer Kampf**: Bekämpfe Feinde in einem vereinfachten Kampfsystem
 - **Ressourcen-Management**: Verwalte Mana, Ruhm und Verletzungen
 - **Speichern & Laden**: Speichere deinen Fortschritt in mehreren Slots
+- **Artefakte**: 13 Gold-Artefakte mit permanenten Boni (Ausrüsten für passive Effekte)
 
 ## 🚀 Spielstart
 
@@ -127,6 +132,7 @@ Das Spiel ist modular aufgebaut:
 - `js/mana.ts` - Mana-Quelle und Kristall-Verwaltung
 - `js/persistence/SaveManager.ts` - Robustes Speichersystem (Zod Schema + Migration)
 - `js/persistence/SaveSchema.ts` - Zod Schemas & Migration für Save/Load
+- `js/card/CardDefinitions.ts` - Karten-Definitionen + 13 Artefakte (Gold)
 - `js/statistics.js` - Performance- und Spielstatistiken
 - `js/terrain.ts` - Terrain-Definitionen
 - `js/ui.ts` - UI-Rendering und Interaktion

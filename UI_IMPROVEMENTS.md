@@ -327,9 +327,38 @@ updatePhaseIndicator() {
 - Professionelleres UX
 - Höhere Accessibility
 
-**Performance:**
-- Keine Performance-Einbußen
-- Event-Handler optimiert
-- Minimal Memory-Footprint
+### 6. Lokalisierte Tooltips 🌍
 
-Das Spiel fühlt sich jetzt deutlich "responsiver" und professioneller an! 🎮✨
+**Dynamisches Tooltip-System:**
+
+- Terrain-Daten kommen jetzt aus `i18n` (de.js)
+- Zeigt lokalisierte Namen & Beschreibungen
+- Bewegungskosten werden korrekt angezeigt
+- Fallback-System für fehlende Übersetzungen
+
+---
+
+## 🎨 7. Touch & Mobile Optimizations 📱
+
+### Touch Drag & Drop für Karten
+- **Drag Ghost**: Visueller Klon der Karte folgt dem Finger
+- **Drop Zones**: Pulsierende Zielbereiche für Bewegung/Angriff
+- **Visual Feedback**: Grün = gültig, Gelb = ungültig
+
+### Pinch-to-Zoom & Pan
+- **2-Finger Zoom**: 0.5x - 2.5x auf der Map
+- **Pan**: 2-Finger Verschieben oder 1 Finger auf leerer Fläche
+
+### Touch-optimierte Modals
+- **Card Play Modal**: Vertikal gestapelte Buttons (Basis/Verstärkt)
+- **Sideways Modal**: 2×2 Grid für Bewegung/Angriff/Block/Einfluss
+- **Level Up Modal**: Größere Karten/Buttons
+- **Alle Buttons**: 52px Mindest-Touch-Target
+
+### Horizontal Card Scroll
+- **Scroll Snap**: Karten rasten mittig ein
+- **Gradient Indikatoren**: Links/rechts verblassend
+
+---
+
+*Last Updated: 2026-06-16*

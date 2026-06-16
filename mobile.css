@@ -333,6 +333,43 @@
 }
 
 /* ========================================
+   TOUCH DRAG & DROP STYLES
+   ======================================== */
+
+.card-drag-ghost {
+    border: 2px solid #fbbf24;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transform-origin: center center;
+    transition: transform 0.1s ease-out;
+}
+
+.card.dragging {
+    opacity: 0.5 !important;
+    transform: scale(0.95);
+}
+
+.touch-drop-zone {
+    animation: pulse-drop-zone 1.5s ease-in-out infinite;
+}
+
+.touch-drop-zone.valid {
+    border-color: #10b981 !important;
+    background: rgba(16, 185, 129, 0.4) !important;
+}
+
+@keyframes pulse-drop-zone {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* ========================================
    LANDSCAPE ORIENTATION
    ======================================== */
 @media (max-width: 768px) and (orientation: landscape) {

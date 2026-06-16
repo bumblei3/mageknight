@@ -177,6 +177,32 @@ export class StatisticsManager {
     }
 
     /**
+     * Gets state for persistence - returns flat record of numbers to match schema.
+     */
+    public getState(): Record<string, number> {
+        const flat: Record<string, number> = {};
+        const stats = this.stats;
+       
+        // Add all numeric fields directly
+        Object.entries(stats).forEach(([key, value]) => {
+            if (typeof value === 'number') {
+                flat[key] = value;
+            } else if (typeof value === 'boolean') {
+                flat[key] = value ? 1 : 0;
+            } else if (value && typeof value === 'object') {
+                // Flatten nested objects (e.g., manaByColor)
+                Object.entries(value as Record<string, number>).forEach(([subKey, subValue]) => {
+                    if (typeof subValue === 'number') {
+                        flat[`${key}.${subKey}`] = subValue;
+                    }
+                });
+            }
+        });
+       
+        return flat;
+    }
+
+    /**
      * Track card played
      */
     public trackCardPlayed(card: any): void {
@@ -418,13 +444,6 @@ export class StatisticsManager {
      */
     public export(): string {
         return JSON.stringify(this.stats, null, 2);
-    }
-
-    /**
-     * Gets state for persistence.
-     */
-    public getState(): GameStats {
-        return { ...this.stats };
     }
 
     /**

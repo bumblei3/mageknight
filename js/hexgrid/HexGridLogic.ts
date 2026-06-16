@@ -270,15 +270,33 @@ export class HexGridLogic {
     // ========== State Persistence ==========
 
     getState(): any {
+        const hexesObj: Record<string, any> = {};
+        for (const [key, hex] of this.hexes.entries()) {
+            hexesObj[key] = {
+                terrain: hex.terrain,
+                revealed: hex.revealed ?? false,
+                site: hex.site ?? null,
+                enemies: hex.enemies ?? []
+            };
+        }
         return {
-            hexes: Array.from(this.hexes.entries())
+            hexes: hexesObj,
+            hexSize: this.hexSize ?? 40
         };
     }
 
     loadState(state: any): void {
         if (!state) return;
         if (state.hexes) {
-            this.hexes = new Map(state.hexes);
+            // Handle both old format (array of entries) and new format (object)
+            if (Array.isArray(state.hexes)) {
+                this.hexes = new Map(state.hexes);
+            } else if (typeof state.hexes === 'object') {
+                this.hexes = new Map(Object.entries(state.hexes));
+            }
+        }
+        if (state.hexSize) {
+            this.hexSize = state.hexSize;
         }
     }
 

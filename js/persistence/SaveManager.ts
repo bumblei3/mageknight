@@ -24,7 +24,12 @@ export class SaveManager {
             // Validate before saving
             const validation = validateSave(versionedState);
             if (!validation.success) {
-                console.error('Save validation failed:', validation.error.issues);
+                const mappedIssues = validation.error.issues.map((i: any) => ({
+                    path: i.path.join('.'),
+                    message: i.message,
+                    code: i.code
+                }));
+                console.error('Save validation failed:', JSON.stringify(mappedIssues, null, 2));
                 return false;
             }
             

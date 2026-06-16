@@ -99,7 +99,7 @@ test.describe('Mage Knight Game Loading', () => {
 
             // Verify save contains correct position
             const savedPos = await page.evaluate(() => {
-                const raw = localStorage.getItem('e2e_test_slot');
+                const raw = localStorage.getItem('slot_e2e_test_slot');
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     console.log('Full saved state hero:', JSON.stringify(parsed.hero, null, 2));

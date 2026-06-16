@@ -41,7 +41,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - name: Install Dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --legacy-peer-deps
       - uses: actions/cache@v5
         with:
           path: node_modules
@@ -109,8 +109,8 @@ jobs:
           fail_ci_if_error: false
           flags: unittests
 
-  # --- E2E Tests (Playwright) - Chromium Only ---
-  e2e:
+  # --- E2E Tests (Playwright) - Parallel per Browser ---
+  e2e-chromium:
     name: E2E Tests (chromium)
     needs: setup
     runs-on: ubuntu-latest
@@ -140,10 +140,70 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  e2e-firefox:
+    name: E2E Tests (firefox)
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Restore node_modules
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps firefox
+      - name: Run E2E Tests
+        run: npx playwright test --project=firefox
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-firefox
+          path: playwright-report/
+          retention-days: 7
+
+  e2e-webkit:
+    name: E2E Tests (webkit)
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Restore node_modules
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps webkit
+      - name: Run E2E Tests
+        run: npx playwright test --project=webkit
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-webkit
+          path: playwright-report/
+          retention-days: 7
+
   # --- Build & Lighthouse ---
   build:
-    name: Build & Lighthouse
-    needs: [lint-typecheck, test, e2e]
+    name: Build
+    needs: [lint-typecheck, test, e2e-chromium, e2e-firefox, e2e-webkit]
     if: github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.run_lighthouse == 'true'
     runs-on: ubuntu-latest
     steps:

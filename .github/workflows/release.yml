@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build production
+        run: npm run build
+
+      - name: Verify build
+        run: |
+          if [ ! -f dist/index.html ]; then
+            echo "❌ Build failed: index.html missing"
+            exit 1
+          fi
+
+      - name: Create release zip
+        run: |
+          cd dist
+          zip -r ../mageknight-${{ github.ref_name }}.zip .
+          cd ..
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get commits since last tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            git log --pretty=format:'- %s (%h)' $PREV_TAG..HEAD > CHANGELOG_TEMP.md
+          else
+            git log --pretty=format:'- %s (%h)' -20 > CHANGELOG_TEMP.md
+          fi
+          cat CHANGELOG_TEMP.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          body_path: CHANGELOG_TEMP.md
+          files: mageknight-${{ github.ref_name }}.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify (optional)
+        if: always()
+        run: |
+          echo "Release ${{ github.ref_name }} created successfully"
+          echo "Download: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"

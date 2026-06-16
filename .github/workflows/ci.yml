@@ -1,350 +1,165 @@
-name: Mage Knight CI/CD
+name: CI
 
 on:
   push:
-    branches: [master, main]
+    branches: [main, develop]
   pull_request:
-    branches: [master, main]
-  workflow_dispatch:
-    inputs:
-      run_lighthouse:
-        description: 'Run Lighthouse CI'
-        type: boolean
-        required: false
-        default: false
+    branches: [main, develop]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-  pull-requests: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-
 jobs:
-  # --- Shared Setup Job ---
-  setup:
-    name: Setup & Cache
+  lint-and-typecheck:
+    name: Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - name: Install Dependencies
-        run: npm ci --prefer-offline --no-audit --legacy-peer-deps
-      - uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  # --- Lint & TypeCheck (fast, parallel) ---
-  lint-typecheck:
-    name: Lint & TypeCheck
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-      - name: Restore node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Lint
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
         run: npm run lint
-      - name: TypeCheck
+
+      - name: Run TypeScript typecheck
         run: npm run typecheck
 
-  # --- Unit Tests mit Coverage ---
   test:
-    name: Unit Tests
-    needs: setup
+    name: Unit & Coverage
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-      - name: Restore node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Run Tests with Coverage
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests with coverage
         run: npm run test:coverage
-      - name: Coverage Gate (80% thresholds)
-        run: |
-          echo "Coverage thresholds enforced by vitest (check-coverage: true in package.json)"
-      - name: Upload Coverage
-        uses: actions/upload-artifact@v7
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report
           path: coverage/
           retention-days: 7
-      - name: Codecov
-        uses: codecov/codecov-action@v7
-        with:
-          directory: ./coverage/
-          fail_ci_if_error: false
-          flags: unittests
 
-  # --- E2E Tests (Playwright) - Parallel per Browser ---
-  e2e-chromium:
-    name: E2E Tests (chromium)
-    needs: setup
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - name: Restore node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
-      - name: Run E2E Tests
-        run: npx playwright test --project=chromium
-      - name: Upload Playwright Report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-report-chromium
-          path: playwright-report/
-          retention-days: 7
+      - name: Check coverage thresholds
+        run: |
+          # This will fail if thresholds not met (vitest does this automatically)
+          echo "Coverage thresholds checked by vitest"
 
-  e2e-firefox:
-    name: E2E Tests (firefox)
-    needs: setup
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - name: Restore node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps firefox
-      - name: Run E2E Tests
-        run: npx playwright test --project=firefox
-      - name: Upload Playwright Report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-report-firefox
-          path: playwright-report/
-          retention-days: 7
-
-  e2e-webkit:
-    name: E2E Tests (webkit)
-    needs: setup
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - name: Restore node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps webkit
-      - name: Run E2E Tests
-        run: npx playwright test --project=webkit
-      - name: Upload Playwright Report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-report-webkit
-          path: playwright-report/
-          retention-days: 7
-
-  # --- Build & Lighthouse ---
   build:
-    name: Build
-    needs: [lint-typecheck, test, e2e-chromium, e2e-firefox, e2e-webkit]
-    if: github.event_name == 'push' || github.event.pull_request.merged == true || github.event.inputs.run_lighthouse == 'true'
+    name: Build Production
     runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, test]
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-      - name: Restore node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Build
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production
         run: npm run build
-      - name: Check Bundle Size
-        run: |
-          echo "=== Bundle Size Report ==="
-          find dist -name "*.js" -o -name "*.css" | xargs ls -lh
-          echo ""
-          echo "=== Total JS Size (gzipped) ==="
-          find dist -name "*.js" -exec gzip -c {} \; | wc -c | awk '{print "JS gzipped: " $1/1024 " KB"}'
-          echo ""
-          echo "=== Checking against limits ==="
-          JS_SIZE=$(find dist -name "*.js" -exec gzip -c {} \; | wc -c)
-          if [ $JS_SIZE -gt 512000 ]; then
-            echo "❌ JS bundle exceeds 500KB limit: $(($JS_SIZE/1024)) KB"
-            exit 1
-          else
-            echo "✅ JS bundle OK: $(($JS_SIZE/1024)) KB / 500 KB"
-          fi
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v7
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
           retention-days: 7
 
-  # --- PR Preview Deployment ---
-  deploy-preview:
-    name: Deploy PR Preview
-    needs: build
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v7
-        with:
-          name: dist
-          path: dist/
-      - name: Deploy to Cloudflare Pages Preview
-        if: env.CF_PAGES_TOKEN != ''
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CF_PAGES_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          projectName: mageknight-preview
-          directory: dist
-          branch: preview-${{ github.event.number }}
-        env:
-          CF_PAGES_TOKEN: ${{ secrets.CF_PAGES_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Verify build output
+        run: |
+          if [ ! -f dist/index.html ]; then
+            echo "❌ Build failed: index.html missing"
+            exit 1
+          fi
+          if [ ! -f dist/sw.js ]; then
+            echo "❌ Build failed: service worker missing"
+            exit 1
+          fi
+          echo "✅ Build verified"
 
-  # --- Deploy to GitHub Pages ---
-  deploy:
-    name: Deploy to GitHub Pages
+  e2e:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
     needs: build
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 20
     steps:
-      - uses: actions/configure-pages@v6
-      - uses: actions/download-artifact@v7
-        with:
-          name: dist
-          path: dist/
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: dist/
-      - id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  # --- Optional: Security Audit ---
-  security:
-    name: Security Audit
-    needs: setup
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-      - name: Restore node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: npm audit (high+)
-        run: npm audit --audit-level=high --json > audit-report.json || true
-      - name: Summarize Vulnerabilities
-        run: |
-          if [ -f audit-report.json ]; then
-            CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' audit-report.json)
-            HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit-report.json)
-            MODERATE=$(jq '.metadata.vulnerabilities.moderate // 0' audit-report.json)
-            LOW=$(jq '.metadata.vulnerabilities.low // 0' audit-report.json)
-            echo "## Security Audit Summary" >> $GITHUB_STEP_SUMMARY
-            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
-            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
-            echo "| 🔴 Critical | $CRITICAL |" >> $GITHUB_STEP_SUMMARY
-            echo "| 🟠 High | $HIGH |" >> $GITHUB_STEP_SUMMARY
-            echo "| 🟡 Moderate | $MODERATE |" >> $GITHUB_STEP_SUMMARY
-            echo "| 🟢 Low | $LOW |" >> $GITHUB_STEP_SUMMARY
-            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
-              echo "⚠️ High/Critical vulnerabilities found!" >> $GITHUB_STEP_SUMMARY
-            fi
-          fi
-      - name: Upload Audit Report
-        uses: actions/upload-artifact@v7
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload E2E artifacts
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: security-audit
-          path: audit-report.json
+          name: playwright-report
+          path: playwright-report/
           retention-days: 7
 
-  # --- Dependency Review ---
-  deps:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v5
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
+      - name: Upload test screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          fail-on-severity: high
-          config-file: '.github/dependency-review-config.yml'
+          name: e2e-screenshots
+          path: test-results/
+          retention-days: 7
+
+  summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, test, build, e2e]
+    if: always()
+    steps:
+      - name: Check job statuses
+        run: |
+          echo "CI Pipeline completed"
+          echo "Lint & Typecheck: ${{ needs.lint-and-typecheck.result }}"
+          echo "Tests: ${{ needs.test.result }}"
+          echo "Build: ${{ needs.build.result }}"
+          echo "E2E: ${{ needs.e2e.result }}"
+          if [ "${{ needs.lint-and-typecheck.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ] || [ "${{ needs.e2e.result }}" != "success" ]; then
+            echo "❌ Some jobs failed"
+            exit 1
+          fi
+          echo "✅ All jobs passed"

@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/bumblei3/mageknight/ci.yml?branch=master&label=build&logo=github)](https://github.com/bumblei3/mageknight/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/bumblei3/mageknight?logo=codecov)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 1227 passing](https://img.shields.io/badge/tests-1227%20passing-brightgreen)
+![Tests: 2506 passing](https://img.shields.io/badge/tests-2506%20passing-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -122,18 +122,22 @@ Das Spiel ist modular aufgebaut:
 - `js/hero.ts` - Helden-Klasse mit Stats und Deck-Management
 - `js/card.ts` - Kartensystem und Karten-Definitionen
 - `js/enemy.ts` - Feind-System
+- `js/enemyAI.ts` - KI-gesteuerte Feind-Entscheidungen (Web Worker)
 - `js/combat.ts` - Kampf-Mechanik
 - `js/mana.ts` - Mana-Quelle und Kristall-Verwaltung
-- `js/saveManager.js` - Robustes Speichersystem
+- `js/persistence/SaveManager.ts` - Robustes Speichersystem (Zod Schema + Migration)
+- `js/persistence/SaveSchema.ts` - Zod Schemas & Migration für Save/Load
 - `js/statistics.js` - Performance- und Spielstatistiken
 - `js/terrain.ts` - Terrain-Definitionen
 - `js/ui.ts` - UI-Rendering und Interaktion
 - `js/particles.js` - Leistungsstarkes Partikelsystem
 - `js/skills.js` - Fähigkeiten-System
 - `js/tutorialManager.js` - Erweitertes Tutorial-System
-- `js/combat/CombatPredictor.ts` - **NEU**: Kampf-Vorhersage-System
-- `js/combat/CombatUnitManager.ts` - **NEU**: Elementare Unit-Angriffe/Blöcke
-- `js/game/CombatOrchestrator.ts` - **NEU**: Combat UI Orchestrierung
+- `js/combat/CombatPredictor.ts` - Kampf-Vorhersage-System
+- `js/combat/CombatUnitManager.ts` - Elementare Unit-Angriffe/Blöcke
+- `js/game/CombatOrchestrator.ts` - Combat UI Orchestrierung
+- `js/game/GameStateManager.ts` - Save/Load State Management
+- `js/workers/aiWorker.js` - Web Worker für KI-Pfadfindung
 
 ### Technologie-Stack
 
@@ -149,7 +153,7 @@ Das Spiel ist modular aufgebaut:
 
 ## 🧪 Testing
 
-Das Projekt verfügt über eine hochmoderne Test-Suite mit **1227 Tests**.
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **2506 Tests**.
 
 ```bash
 # Alle Tests ausführen

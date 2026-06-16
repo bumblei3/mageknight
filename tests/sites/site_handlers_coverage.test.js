@@ -49,9 +49,17 @@ describe('Site Handlers - Coverage Boost', () => {
         it('should return recruit option for conquered keep', () => {
             const site = { conquered: true, getName: () => 'Test Keep' };
             const options = handler.getOptions(site);
-            expect(options.length).toBe(1);
-            expect(options[0].id).toBe('recruit');
-            expect(options[0].label).toBe('Einheiten rekrutieren');
+            // Now includes recruit + artifact reward
+            expect(options.length).toBe(2);
+            const recruit = options.find(o => o.id === 'recruit');
+            expect(recruit).toBeDefined();
+            expect(recruit.id).toBe('recruit');
+            expect(recruit.label).toBe('Einheiten rekrutieren');
+
+            const artifact = options.find(o => o.id === 'artifact');
+            expect(artifact).toBeDefined();
+            expect(artifact.id).toBe('artifact');
+            expect(artifact.label).toBe('Artefakt suchen');
         });
 
         it('should attack site and start combat', () => {

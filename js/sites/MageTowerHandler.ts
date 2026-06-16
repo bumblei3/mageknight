@@ -1,9 +1,6 @@
 import { BaseSiteHandler, SiteOption } from './BaseSiteHandler';
-import { CARD_DEFINITIONS, SAMPLE_SPELLS } from '../card/CardDefinitions';
-// ...
-// ...
-// ...
-// Spells
+import { CARD_DEFINITIONS, SAMPLE_SPELLS, SAMPLE_ARTIFACTS } from '../card/CardDefinitions';
+import { createDeck } from '../card/CardFactory';
 
 export class MageTowerHandler extends BaseSiteHandler {
     public override getOptions(site: any): SiteOption[] {
@@ -18,22 +15,50 @@ export class MageTowerHandler extends BaseSiteHandler {
             });
         } else {
             // Spells
-            const cards = SAMPLE_SPELLS; // These are now objects, not IDs
+            const spells = SAMPLE_SPELLS;
             options.push({
                 id: 'spells',
                 label: 'Zauber lernen (7 Einfluss + Mana)',
-                subItems: cards.map(c => ({
+                subItems: spells.map(c => ({
                     id: `spell_${c.id}`,
                     label: c.name,
                     type: 'card' as const,
                     data: c,
-                    cost: 7, // Simplified cost
+                    cost: 7,
                     action: () => this.buyCard(c, 7)
                 }))
             });
+
+            // Artifact reward (once per conquest)
+            if (!site.artifactClaimed) {
+                options.push({
+                    id: 'artifact',
+                    label: 'Artefakt suchen',
+                    action: () => this.claimArtifact(site),
+                    enabled: true
+                });
+            }
         }
 
         return options;
+    }
+
+    private claimArtifact(site: any): { success: boolean, message: string } {
+        if (!this.game.hero) return { success: false, message: 'Kein Held vorhanden.' };
+
+        // Award random artifact
+        const randomArt = SAMPLE_ARTIFACTS[Math.floor(Math.random() * SAMPLE_ARTIFACTS.length)];
+        const card = createDeck([randomArt])[0];
+        this.game.hero.discard.push(card);
+
+        // Mark as claimed
+        site.artifactClaimed = true;
+
+        const msg = `Du hast ein Artefakt gefunden: ${card.name}! Es liegt in deinem Ablagestapel.`;
+        this.game.addLog(msg, 'success');
+        this.game.showNotification?.(`🏆 ${card.name} gefunden!`, 'success');
+
+        return { success: true, message: msg };
     }
 
     public attackSite(site: any): { success: boolean, message: string } {

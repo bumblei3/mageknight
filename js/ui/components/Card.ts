@@ -5,6 +5,7 @@
  */
 
 import { Card as CardClass } from '../../card';
+import { t } from '../../i18n/index';
 
 export interface CardData {
     id: string;
@@ -250,7 +251,89 @@ function buildCardHTML(params: {
         html += `<div class="mk-card__played-badge">Gesetzt</div>`;
     }
 
+    // Hover Tooltip (desktop only) - shows effects + shortcuts on card hover
+    if (!wound && !played) {
+        html += buildCardTooltip({ basicEffect, strongEffect, color });
+    }
+
     return html;
+}
+
+const _effectIcons: Record<string, string> = {
+    movement: '⬆',
+    attack: '⚔',
+    block: '🛡',
+    influence: '💬',
+    healing: '❤',
+    mana: '💎'
+};
+
+const _effectNames: Record<string, string> = {
+    movement: 'Bewegung',
+    attack: 'Angriff',
+    block: 'Block',
+    influence: 'Einfluss',
+    healing: 'Heilung',
+    mana: 'Mana'
+};
+
+const _manaCostColors: Record<string, string> = {
+    red: 'var(--color-mana-red)',
+    blue: 'var(--color-mana-blue)',
+    green: 'var(--color-mana-green)',
+    white: 'var(--color-mana-white)',
+    gold: 'var(--color-mana-gold)',
+    black: 'var(--color-mana-black)'
+};
+
+function buildCardTooltip(params: { basicEffect: any; strongEffect?: any; color: string | null }): string {
+    const { basicEffect, strongEffect, color } = params;
+    if (!basicEffect || Object.keys(basicEffect).length === 0) return '';
+
+    let tooltip = '<div class="card-tooltip"><div class="card-tooltip-content">';
+    tooltip += `<div class="tooltip-title">Kartendetails</div>`;
+
+    if (Object.keys(basicEffect).length > 0) {
+        tooltip += '<div class="tooltip-section"><div class="tooltip-section-title">Basis</div>';
+        Object.entries(basicEffect).forEach(([key, value]) => {
+            if (value) {
+                const strongVal = strongEffect?.[key];
+                tooltip += `<div class="effect-row">
+                    <span class="effect-label">${_effectIcons[key] || '•'} ${_effectNames[key] || key}</span>
+                    <span class="effect-value">${value}${strongVal ? ` <span style="color:#3b82f6">(+${strongVal})</span>` : ''}</span>
+                </div>`;
+            }
+        });
+        tooltip += '</div>';
+    }
+
+    if (strongEffect && Object.keys(strongEffect).length > 0) {
+        tooltip += '<div class="tooltip-section"><div class="tooltip-section-title">Stark (Mana)</div>';
+        Object.entries(strongEffect).forEach(([key, value]) => {
+            if (value) {
+                tooltip += `<div class="effect-row">
+                    <span class="effect-label">${_effectIcons[key] || '•'} ${_effectNames[key] || key}</span>
+                    <span class="effect-value">${value}</span>
+                </div>`;
+            }
+        });
+        if (color) {
+            tooltip += `<div class="effect-row">
+                <span class="effect-label">Mana-Kosten</span>
+                <span class="effect-value mana-cost" style="color: ${_manaCostColors[color] || 'var(--color-text-primary)'};">1 ${color.charAt(0).toUpperCase() + color.slice(1)}</span>
+            </div>`;
+        }
+        tooltip += '</div>';
+    }
+
+    tooltip += '<div class="tooltip-section"><div class="tooltip-section-title">Aktionen</div>';
+    tooltip += `<div class="effect-row"><span class="effect-label">Klick</span><span class="effect-value">Basis</span></div>`;
+    if (strongEffect && Object.keys(strongEffect).length > 0) {
+        tooltip += `<div class="effect-row"><span class="effect-label">Shift+Klick</span><span class="effect-value">Stark</span></div>`;
+    }
+    tooltip += `<div class="effect-row"><span class="effect-label">Rechtsklick</span><span class="effect-value">Seitlich (+1)</span></div>`;
+    tooltip += '</div></div></div>';
+    return tooltip;
 }
 
 function getManaSymbol(color: string): string {

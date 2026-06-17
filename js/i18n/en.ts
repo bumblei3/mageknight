@@ -68,10 +68,32 @@ const en = {
             highestLevel: 'Highest Level',
             perfectCombats: 'Perfect Combats'
         },
+        actions: {
+            confirmMove: 'Confirm Move',
+            cancelMove: 'Cancel',
+            playBasic: 'Play Basic',
+            playStrong: 'Play Strong',
+            playSideways: 'Play Sideways',
+            skipRanged: 'Skip Ranged',
+            block: 'Block',
+            attack: 'Attack',
+            endCombat: 'End Combat',
+            explore: 'Explore',
+            takeMana: 'Take Mana',
+        },
         hints: {
             end: '🏁 Combat ends',
             movement: '👣 {points} points - Click a hex',
-            exploration: '🎴 Play cards or move (1-5)'
+            exploration: '🎴 Play cards or move (1-5)',
+            moveHint: 'Select target hex, then Enter to confirm',
+            rangedHint: 'Play siege/fire cards, Space = skip',
+            blockHint: 'Click block card → click enemy → Space',
+            attackHint: 'Play attack cards, Space = execute',
+            cardPlayHint: 'Left-click = Basic, Shift+Click = Strong (+Mana)',
+            exploreHint: 'Explore site for rewards',
+            manaHint: 'Click mana die to collect',
+            restHint: 'Rest heals wounds & resets cards',
+            shortcut: 'Shortcut',
         },
         phases: {
             exploration: 'Exploration',

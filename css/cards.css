@@ -547,3 +547,462 @@
     display: flex;
     gap: var(--spacing-sm);
 }
+
+/* ===================================
+   CONTEXTUAL ACTION BAR
+   =================================== */
+
+.action-bar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: rgba(5, 5, 16, 0.95);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    pointer-events: auto;
+    min-height: 56px;
+    transition: var(--transition-normal);
+}
+
+.action-bar-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    align-items: center;
+    min-height: 36px;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    white-space: nowrap;
+    box-shadow: var(--glass-shadow);
+}
+
+.action-btn:hover:not(:disabled) {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-highlight);
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.6),
+        0 0 15px rgba(168, 85, 247, 0.3);
+}
+
+.action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+    border-color: transparent;
+    color: #000;
+    font-weight: 600;
+}
+
+.action-btn.primary:hover:not(:disabled) {
+    filter: brightness(1.15);
+    box-shadow:
+        0 8px 25px rgba(168, 85, 247, 0.5),
+        0 0 20px rgba(236, 72, 153, 0.4);
+}
+
+.action-btn.danger {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+}
+
+.action-btn.danger:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: #ef4444;
+    color: #fecaca;
+}
+
+.action-btn kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 20px;
+    padding: 0 6px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-accent-gold);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.action-btn-icon {
+    font-size: 1rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.action-bar-hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    min-height: 20px;
+    opacity: 0.8;
+}
+
+.action-bar-hint .hint-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.action-bar-hint .hint-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--glass-border);
+}
+
+.action-bar-hint kbd {
+    background: rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Card hover tooltip enhancement */
+.card-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    max-width: 280px;
+}
+
+.card:hover .card-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-12px);
+}
+
+.card-tooltip-content {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--glass-shadow);
+    color: var(--color-text-primary);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.card-tooltip-content .tooltip-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-accent-gold);
+    margin-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: var(--spacing-xs);
+}
+
+.card-tooltip-content .tooltip-section {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--glass-border);
+}
+
+.card-tooltip-content .tooltip-section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+}
+
+.card-tooltip-content .effect-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin: 2px 0;
+}
+
+.card-tooltip-content .effect-label {
+    color: var(--color-text-secondary);
+}
+
+.card-tooltip-content .effect-value {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.card-tooltip-content .mana-cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.card-tooltip-content .mana-cost.red { color: var(--color-mana-red); }
+.card-tooltip-content .mana-cost.blue { color: var(--color-mana-blue); }
+.card-tooltip-content .mana-cost.green { color: var(--color-mana-green); }
+.card-tooltip-content .mana-cost.white { color: var(--color-mana-white); }
+.card-tooltip-content .mana-cost.gold { color: var(--color-mana-gold); }
+
+/* Combat Phase Indicator Enhancement */
+.phase-indicator {
+    background: var(--parchment-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border: 2px solid var(--parchment-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: center;
+    transition: var(--transition-slow);
+    position: relative;
+    overflow: hidden;
+}
+
+.phase-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: phase-sweep 3s ease-in-out infinite;
+}
+
+@keyframes phase-sweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.phase-indicator.exploration {
+    border-color: var(--color-mana-green);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.phase-indicator.combat {
+    border-color: var(--color-mana-red);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+    animation: combat-pulse 2s ease-in-out infinite;
+}
+
+@keyframes combat-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+    50% { box-shadow: 0 0 35px rgba(239, 68, 68, 0.5); }
+}
+
+.phase-indicator.ranged { --phase-color: var(--color-mana-blue); }
+.phase-indicator.block { --phase-color: var(--color-mana-gold); }
+.phase-indicator.attack { --phase-color: var(--color-mana-red); }
+
+.phase-text {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-primary);
+    text-shadow: 0 0 10px var(--phase-color, var(--color-accent-gold));
+}
+
+.phase-subtext {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+    opacity: 0.9;
+}
+
+.phase-hint {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* Smart Tooltip - First-time hints */
+.smart-tooltip {
+    position: absolute;
+    z-index: 2000;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 320px;
+}
+
+.smart-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.smart-tooltip-content {
+    background: linear-gradient(135deg, rgba(20, 20, 40, 0.98), rgba(10, 10, 20, 0.98));
+    border: 1px solid var(--color-accent-gold);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(251, 191, 36, 0.3);
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.smart-tooltip-content .tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-accent-gold);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.smart-tooltip-content .tooltip-header::before {
+    content: '💡';
+    font-size: 1.1rem;
+}
+
+.smart-tooltip-content .shortcut-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(251, 191, 36, 0.2);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-accent-gold);
+    margin: 2px 0;
+}
+
+.smart-tooltip-content .shortcut-badge kbd {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(251, 191, 36, 0.3);
+    color: var(--color-accent-gold);
+}
+
+/* Keyboard Shortcuts Overlay */
+.shortcuts-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.shortcuts-overlay.visible {
+    display: flex;
+    opacity: 1;
+}
+
+.shortcuts-overlay-content {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border-highlight);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--glass-shadow);
+    transform: scale(0.95);
+    transition: transform 0.3s var(--transition-bounce);
+}
+
+.shortcuts-overlay.visible .shortcuts-overlay-content {
+    transform: scale(1);
+}
+
+.shortcuts-overlay h2 {
+    font-family: var(--font-display);
+    color: var(--color-accent-gold);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.shortcuts-category {
+    margin-bottom: var(--spacing-lg);
+}
+
+.shortcuts-category h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: var(--spacing-xs);
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.shortcut-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+.shortcut-row kbd {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    color: var(--color-accent-gold);
+    font-family: var(--font-body);
+}
+
+.shortcut-row .shortcut-desc {
+    color: var(--color-text-secondary);
+}

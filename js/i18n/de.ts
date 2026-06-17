@@ -68,10 +68,32 @@ const de = {
             highestLevel: 'Höchstes Level',
             perfectCombats: 'Perfekte Kämpfe'
         },
+        actions: {
+            confirmMove: 'Bewegung bestätigen',
+            cancelMove: 'Abbrechen',
+            playBasic: 'Basis spielen',
+            playStrong: 'Stark spielen',
+            playSideways: 'Seitlich spielen',
+            skipRanged: 'Fernkampf überspringen',
+            block: 'Blocken',
+            attack: 'Angreifen',
+            endCombat: 'Kampf beenden',
+            explore: 'Erkunden',
+            takeMana: 'Mana nehmen',
+        },
         hints: {
             end: '🏁 Kampf endet',
             movement: '👣 {points} Punkte - Klicke auf ein Feld',
-            exploration: '🎴 Spiele Karten oder bewege dich (1-5)'
+            exploration: '🎴 Spiele Karten oder bewege dich (1-5)',
+            moveHint: 'Wähle Ziel-Hex, dann Enter zum Bestätigen',
+            rangedHint: 'Spiele Belarter/Feuer Karten, Space = überspringen',
+            blockHint: 'Klicke Blockkarte → klicke Feind → Space',
+            attackHint: 'Spiele Angriffskarten, Space = ausführen',
+            cardPlayHint: 'Linksklick = Basis, Shift+Klick = Stark (+Mana)',
+            exploreHint: 'Ort erkunden für Belohnungen',
+            manaHint: 'Klicke Mana-Würfel zum Aufnehmen',
+            restHint: 'Rasten heilt Wunden & resetet Karten',
+            shortcut: 'Tastenkürzel',
         },
         phases: {
             exploration: 'Erkundung',

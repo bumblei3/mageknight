@@ -1,5 +1,6 @@
 import { TurnManager } from './turnManager';
 import { InteractionController } from './interactionController';
+import { ActionBarManager } from './ui/ActionBarManager';
 
 import { HexGrid } from './hexgrid';
 import Hero from './hero';
@@ -99,6 +100,9 @@ export class MageKnightGame {
     public renderController: RenderController;
     public touchController: TouchController;
 
+    // UX Improvements
+    public actionBarManager: ActionBarManager;
+
     // Core Game Managers
     public phaseManager: PhaseManager;
     public entityManager: EntityManager;
@@ -191,6 +195,9 @@ export class MageKnightGame {
 
         // UI Helpers
         this.touchController = new TouchController(this);
+
+        // UX Improvements
+        this.actionBarManager = new ActionBarManager(this);
 
         // Core Game Managers
         this.phaseManager = new PhaseManager(this);

@@ -1,0 +1,239 @@
+/* ===================================
+   CARD COMPONENT
+   =================================== */
+
+/* Base Card */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--card-width);
+  height: var(--card-height);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-base);
+  cursor: pointer;
+  user-select: none;
+}
+
+.card:hover:not(.card-played):not(.card-disabled) {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent-primary);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Card Color Accents */
+.card-red { border-top: 3px solid var(--color-mana-red); }
+.card-blue { border-top: 3px solid var(--color-mana-blue); }
+.card-green { border-top: 3px solid var(--color-mana-green); }
+.card-white { border-top: 3px solid var(--color-mana-white); }
+.card-gold { border-top: 3px solid var(--color-mana-gold); }
+
+/* Card States */
+.card-played {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+  cursor: default;
+}
+
+.card-selected {
+  border-color: var(--color-accent-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.card-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-type {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Card Body */
+.card-body {
+  flex: 1;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow: hidden;
+}
+
+/* Card Effects */
+.card-effect {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.card-effect strong {
+  color: var(--color-accent-primary);
+}
+
+/* Card Footer */
+.card-footer {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border-default);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Mana Cost Badge */
+.card-mana-cost {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  background: var(--color-bg-overlay);
+  border: 1px solid var(--color-border-default);
+}
+
+.card-mana-cost.red { color: var(--color-mana-red); }
+.card-mana-cost.blue { color: var(--color-mana-blue); }
+.card-mana-cost.green { color: var(--color-mana-green); }
+.card-mana-cost.white { color: var(--color-mana-white); }
+.card-mana-cost.gold { color: var(--color-mana-gold); }
+
+/* Card Art/Icon */
+.card-art {
+  font-size: 2.5rem;
+  text-align: center;
+  opacity: 0.3;
+  position: absolute;
+  top: 50%;
+  right: var(--space-2);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Card Hint */
+.card-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-1);
+}
+
+/* Wound Card */
+.card-wound {
+  background: var(--color-gray-800);
+  border-color: var(--color-gray-600);
+}
+
+.card-wound .card-art {
+  opacity: 0.5;
+}
+
+/* Card Container (Hand) */
+.cards-container {
+  display: flex;
+  gap: var(--card-gap);
+  padding: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cards-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card Tooltip */
+.card-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  z-index: var(--z-tooltip);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  width: 280px;
+}
+
+.card:hover .card-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-12px);
+}
+
+.card-tooltip-content {
+  background: var(--color-bg-overlay);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.card-tooltip-title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-primary);
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.card-tooltip-section {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.card-tooltip-section-title {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+/* Card Animations */
+.card-enter {
+  animation: cardDraw 0.5s var(--transition-bounce) backwards;
+}
+
+.card-play-anim {
+  animation: cardPlay 0.4s ease forwards;
+}

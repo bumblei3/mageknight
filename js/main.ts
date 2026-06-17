@@ -26,10 +26,17 @@ const handleImportError = (error: any) => {
 };
 
 // Import all CSS for Vite bundling
-import '../css/reset.css';
+// New design system (Phase 1)
+import '../css/tokens.css';
+import '../css/base.css';
+import '../css/animations.css';
+import '../css/components/buttons.css';
+import '../css/components/cards.css';
+import '../css/components/panels.css';
 import '../css/layout.css';
+
+// Legacy CSS (to be migrated)
 import '../css/hud.css';
-import '../css/cards.css';
 import '../css/modals.css';
 import '../css/tooltips.css';
 import '../css/loading.css';

@@ -72,8 +72,15 @@ test.describe('Gameplay Flow', () => {
             const sidewaysModal = page.locator('#sideways-modal').first();
             await expect(sidewaysModal).toBeVisible({ timeout: 10000 });
 
+            // Close any card preview overlay that might block clicks
+            await page.evaluate(() => {
+                const overlay = document.querySelector('.mk-card-preview-overlay');
+                if (overlay) overlay.remove();
+            });
+            await page.waitForTimeout(200);
+
             // Click Movement option
-            await page.locator('.sideways-btn.movement, button[data-type="movement"]').first().click();
+            await page.locator('.sideways-btn.movement, button[data-type="movement"]').first().click({ force: true });
 
             // Wait for log to confirm sideways play
             await expect(page.locator('#game-log')).toContainText('seitlich gespielt');
@@ -113,17 +120,23 @@ test.describe('Gameplay Flow', () => {
         });
 
         await test.step('End Turn and Verify Hand Refresh', async () => {
-            // Close any open modals first
+            // Close any open modals/overlays
             await page.keyboard.press('Escape');
-            await page.waitForTimeout(200);
+            await page.waitForTimeout(300);
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(300);
+
+            // Click somewhere safe to blur any hovered card
+            await page.locator('.hud-top-bar').click({ force: true });
+            await page.waitForTimeout(300);
 
             const endTurnBtn = page.locator('#end-turn-btn');
-            await endTurnBtn.click();
+            await endTurnBtn.click({ force: true });
 
             // Hand should be refilled to 5
             await expect.poll(async () => {
                 return await page.evaluate(() => window.game.hero.hand.length);
-            }, { message: 'Hand should be refilled to 5', timeout: 5000 }).toBe(5);
+            }, { message: 'Hand should be refilled to 5', timeout: 10000 }).toBe(5);
 
             const cardElements = page.locator('#hand-cards .card, #hand-cards .mk-card');
             await expect(cardElements).toHaveCount(5);

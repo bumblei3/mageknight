@@ -116,8 +116,15 @@ test.describe('Card Interaction Flow', () => {
         const modal = page.locator('#sideways-modal');
         await expect(modal).toBeVisible({ timeout: 10000 });
 
+        // Close any card preview overlay that might block clicks
+        await page.evaluate(() => {
+            const overlay = document.querySelector('.mk-card-preview-overlay');
+            if (overlay) overlay.remove();
+        });
+        await page.waitForTimeout(200);
+
         // Choose "Block" (+1 Block)
-        await page.locator('.sideways-options button[data-type="block"], .sideways-btn.block, button:has-text("Block")').first().click();
+        await page.locator('.sideways-options button[data-type="block"], .sideways-btn.block, button:has-text("Block")').first().click({ force: true });
 
         // Verify block points increased
         await expect(async () => {

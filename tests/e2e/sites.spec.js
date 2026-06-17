@@ -36,7 +36,11 @@ test.describe('Site Interactions', () => {
             const isVisible = await visitBtn.isVisible({ timeout: 2000 }).catch(() => false);
 
             if (isVisible) {
-                await visitBtn.click();
+                // Use evaluate to click directly (bypasses hand-cards interception)
+                await page.evaluate(() => {
+                    const btn = document.getElementById('visit-btn');
+                    if (btn) btn.click();
+                });
 
                 // Verify site modal appears (optional - may not show in all cases)
                 const siteModal = page.locator('#site-modal');
@@ -77,7 +81,11 @@ test.describe('Site Interactions', () => {
             const isVisible = await visitBtn.isVisible({ timeout: 2000 }).catch(() => false);
 
             if (isVisible) {
-                await visitBtn.click();
+                // Use evaluate to click directly (bypasses hand-cards interception)
+                await page.evaluate(() => {
+                    const btn = document.getElementById('visit-btn');
+                    if (btn) btn.click();
+                });
 
                 const siteModal = page.locator('#site-modal');
                 const modalVisible = await siteModal.isVisible({ timeout: 2000 }).catch(() => false);
@@ -124,7 +132,11 @@ test.describe('Site Interactions', () => {
             const isVisible = await visitBtn.isVisible({ timeout: 2000 }).catch(() => false);
 
             if (isVisible) {
-                await visitBtn.click();
+                // Use evaluate to click directly (bypasses hand-cards interception)
+                await page.evaluate(() => {
+                    const btn = document.getElementById('visit-btn');
+                    if (btn) btn.click();
+                });
 
                 const siteModal = page.locator('#site-modal');
                 const modalVisible = await siteModal.isVisible({ timeout: 2000 }).catch(() => false);

@@ -1,186 +1,123 @@
 /* ===================================
-   CSS VARIABLES & DESIGN SYSTEM
+   CSS RESET & BASE STYLES
+   Uses design tokens from tokens.css
    =================================== */
-/* Fonts loaded in HTML for better performance */
 
-:root {
-    /* Fantasy Fonts */
-    --font-display: 'Cinzel', serif;
-    --font-heading: 'Outfit', sans-serif;
-    --font-body: 'Inter', sans-serif;
-
-    /* Colors - Fantasy Theme (HSL for better control) */
-    --h-gold: 43;
-    --h-crimson: 355;
-    --h-teal: 168;
-    --h-primary: 262;
-
-    --color-bg-primary: hsl(var(--h-primary), 30%, 5%);
-    --color-bg-secondary: hsl(30, 20%, 8%);
-    --color-bg-tertiary: hsl(30, 30%, 12%);
-
-    --color-accent-primary: hsl(var(--h-gold), 60%, 70%);
-    /* Antique Gold - Lighter */
-    --color-accent-secondary: hsl(var(--h-crimson), 70%, 60%);
-    /* Deep Crimson - Lighter */
-    --color-accent-cyan: hsl(var(--h-teal), 50%, 55%);
-    /* Muted Teal - Lighter */
-    --color-accent-gold: hsl(var(--h-gold), 90%, 60%);
-    /* Goldenrod - Lighter/Brighter */
-
-    /* Glassmorphism - Premium Fantasy */
-    --glass-bg: hsla(30, 20%, 5%, 0.9);
-    /* Darker background for better contrast */
-    --glass-bg-hover: hsla(30, 30%, 10%, 0.95);
-    --glass-border: hsla(var(--h-gold), 50%, 65%, 0.3);
-    --glass-border-highlight: hsla(var(--h-gold), 80%, 50%, 0.6);
-    --glass-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 0, 0, 0.5);
-    --backdrop-blur: blur(16px) saturate(180%);
-
-    /* Parchment Texture */
-    --parchment-bg: linear-gradient(145deg, hsla(30, 30%, 15%, 0.95), hsla(30, 20%, 10%, 0.98));
-    --parchment-border: 2px solid hsla(30, 50%, 40%, 0.5);
-
-    /* Mana Colors */
-    --color-mana-red: hsl(0, 85%, 60%);
-    --color-mana-blue: hsl(210, 85%, 60%);
-    --color-mana-white: hsl(0, 0%, 100%);
-    --color-mana-green: hsl(150, 85%, 50%);
-    --color-mana-gold: hsl(45, 95%, 60%);
-    --color-mana-black: hsl(220, 20%, 15%);
-
-    /* Text Colors - WCAG AA compliant contrast on dark backgrounds */
-    --color-text-primary: hsl(0, 0%, 100%);
-    /* White */
-    --color-text-secondary: hsl(210, 20%, 98%);
-    /* Lighter Grey for better readability */
-    --color-text-muted: hsl(210, 15%, 95%);
-    /* Lighter Muted */
-
-    /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2.5rem;
-
-    /* Border Radius */
-    --radius-sm: 0.4rem;
-    --radius-md: 0.75rem;
-    --radius-lg: 1.25rem;
-    --radius-xl: 2.5rem;
-
-    /* Transitions */
-    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-normal: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-    /* Animation Keyframes Shorthand */
-    --anim-float: float 3s ease-in-out infinite;
-    --anim-glow: gold-glow 2s ease-in-out infinite alternate;
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-5px);
-    }
-}
-
-@keyframes gold-glow {
-    from {
-        filter: drop-shadow(0 0 2px hsla(43, 80%, 50%, 0.4));
-    }
-
-    to {
-        filter: drop-shadow(0 0 10px hsla(43, 80%, 50%, 0.7));
-    }
-}
-
-/* ===================================
-   RESET & BASE STYLES
-   =================================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--color-bg-primary);
-    background-image:
-        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%),
-        linear-gradient(to bottom, #0f0f1e, #05050a);
-    color: var(--color-text-primary);
-    min-height: 100vh;
-    overflow: hidden;
-    /* Prevent scroll on body, handle in containers */
-    transition: background-color 2s ease, background-image 2s ease, filter 2s ease;
+  font-family: var(--font-body);
+  background-color: var(--color-bg-primary);
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%),
+    linear-gradient(to bottom, #0f0f1e, #05050a);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  overflow: hidden;
+  transition: background-color 2s ease, background-image 2s ease, filter 2s ease;
 }
 
 /* Dynamic Background Mesh */
 body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    z-index: -1;
-    pointer-events: none;
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  z-index: -1;
+  pointer-events: none;
 }
 
 body.night-mode {
-    background-image:
-        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.2), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(30, 58, 138, 0.3), transparent 25%),
-        linear-gradient(to bottom, #050510, #000000);
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.2), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(30, 58, 138, 0.3), transparent 25%),
+    linear-gradient(to bottom, #050510, #000000);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.3);
-    border-radius: 4px;
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.5);
 }
 
-body>* {
-    position: relative;
-    z-index: 1;
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Legacy CSS Variables (for backward compatibility) */
+:root {
+  /* Map new token names to old names */
+  --color-bg-primary: var(--color-bg-base);
+  --color-bg-secondary: var(--color-bg-surface);
+  --color-bg-tertiary: var(--color-bg-elevated);
+  --color-accent-primary: var(--color-gold-400);
+  --color-accent-secondary: var(--color-purple-400);
+  --color-accent-cyan: var(--color-cyan-400);
+  --color-accent-gold: var(--color-gold-400);
+  --glass-bg: var(--color-bg-overlay);
+  --glass-bg-hover: rgba(30, 41, 59, 0.95);
+  --glass-border: var(--color-border-default);
+  --glass-border-highlight: var(--color-border-hover);
+  --glass-shadow: var(--shadow-lg);
+  --backdrop-blur: blur(8px);
+  --parchment-bg: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+  --parchment-border: 2px solid rgba(148, 163, 184, 0.3);
+  --color-mana-red: #ef4444;
+  --color-mana-blue: #3b82f6;
+  --color-mana-white: #f9fafb;
+  --color-mana-green: #22c55e;
+  --color-mana-gold: #fbbf24;
+  --color-mana-black: #374151;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #64748b;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2.5rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+  --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }

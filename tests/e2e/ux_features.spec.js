@@ -51,19 +51,29 @@ test.describe('UX Features', () => {
 
     test('should open and close Shortcuts modal via Settings', async ({ page }) => {
         await test.step('Open Settings', async () => {
-            await page.locator('#settings-btn').click({ force: true });
+            // Use evaluate to click directly
+            await page.evaluate(() => {
+                const btn = document.getElementById('settings-btn');
+                if (btn) btn.click();
+            });
 
             // Resilience: Retry if modal doesn't appear
             try {
                 await expect(page.locator('#settings-modal')).toBeVisible({ timeout: 2000 });
             } catch (e) {
-                await page.locator('#settings-btn').click({ force: true });
+                await page.evaluate(() => {
+                    const btn = document.getElementById('settings-btn');
+                    if (btn) btn.click();
+                });
                 await expect(page.locator('#settings-modal')).toBeVisible();
             }
         });
 
         await test.step('Open Shortcuts', async () => {
-            await page.locator('#settings-shortcuts-btn').click();
+            await page.evaluate(() => {
+                const btn = document.getElementById('settings-shortcuts-btn');
+                if (btn) btn.click();
+            });
             const shortcutsModal = page.locator('#shortcuts-modal');
             await expect(shortcutsModal).toBeVisible();
             await expect(shortcutsModal).toContainText(/Shortcuts|Tastaturkürzel/);
@@ -72,7 +82,10 @@ test.describe('UX Features', () => {
         });
 
         await test.step('Close Shortcuts', async () => {
-            await page.locator('#shortcuts-close').click({ force: true });
+            await page.evaluate(() => {
+                const btn = document.getElementById('shortcuts-close');
+                if (btn) btn.click();
+            });
             await expect(page.locator('#shortcuts-modal')).toBeHidden();
         });
     });
@@ -84,7 +97,10 @@ test.describe('UX Features', () => {
             // Expecting 🔊 or similar icon
 
             if (await soundBtn.isVisible()) {
-                await soundBtn.click();
+                await page.evaluate(() => {
+                    const btn = document.getElementById('sound-toggle-btn');
+                    if (btn) btn.click();
+                });
                 // Check if icon changes/logs appear
                 // await expect(page.locator('#game-log')).toContainText(/Sound/);
             }

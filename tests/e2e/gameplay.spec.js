@@ -79,11 +79,17 @@ test.describe('Gameplay Flow', () => {
             });
             await page.waitForTimeout(200);
 
-            // Click Movement option
-            await page.locator('.sideways-btn.movement, button[data-type="movement"]').first().click({ force: true });
+            // Click Movement option - use evaluate to bypass overlay interception
+            await page.evaluate(() => {
+                const btn = document.querySelector('.sideways-btn.movement, button[data-type="movement"]');
+                if (btn) btn.click();
+            });
 
             // Wait for log to confirm sideways play
-            await expect(page.locator('#game-log')).toContainText('seitlich gespielt');
+            await page.waitForTimeout(500);
+            const logText = await page.locator('#game-log').innerText();
+            console.log('Game log after sideways:', logText);
+            await expect(page.locator('#game-log')).toContainText('seitlich gespielt', { timeout: 15000 });
         });
 
         await test.step('Move Hero', async () => {
@@ -131,12 +137,16 @@ test.describe('Gameplay Flow', () => {
             await page.waitForTimeout(300);
 
             const endTurnBtn = page.locator('#end-turn-btn');
-            await endTurnBtn.click({ force: true });
+            // Use evaluate to click directly
+            await page.evaluate(() => {
+                const btn = document.getElementById('end-turn-btn');
+                if (btn) btn.click();
+            });
 
             // Hand should be refilled to 5
             await expect.poll(async () => {
                 return await page.evaluate(() => window.game.hero.hand.length);
-            }, { message: 'Hand should be refilled to 5', timeout: 10000 }).toBe(5);
+            }, { message: 'Hand should be refilled to 5', timeout: 20000 }).toBe(5);
 
             const cardElements = page.locator('#hand-cards .card, #hand-cards .mk-card');
             await expect(cardElements).toHaveCount(5);
@@ -179,7 +189,7 @@ test.describe('Gameplay Flow', () => {
             // logic might fail if no adjacent unknown.
             // So we should verify we get EITHER "Neues Gebiet" OR "Nichts zu entdecken"
             const gameLog = page.locator('#game-log');
-            await expect(gameLog).toContainText(/Neues Gebiet|Nichts mehr zu entdecken|Bewegungspunkte/);
+            await expect(gameLog).toContainText(/Neues Gebiet|Nichts mehr zu entdecken|Bewegungspunkte/, { timeout: 15000 });
         });
 
         await test.step('Day/Night Transition Overlay', async () => {

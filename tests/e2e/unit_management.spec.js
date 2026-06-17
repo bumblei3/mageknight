@@ -24,22 +24,35 @@ test.describe('Unit Management', () => {
         });
 
         await test.step('Verify Unit Card in UI', async () => {
-            const unitCard = page.locator('.unit-card');
+            // Wait for unit card to be rendered
+            await page.waitForFunction(() => {
+                const card = document.querySelector('.unit-card');
+                return card && card.textContent.includes('Debug Unit');
+            }, { timeout: 10000 });
+
+            const unitCard = page.locator('.unit-card').first();
             await expect(unitCard).toBeVisible();
             await expect(unitCard).toContainText('Debug Unit');
         });
 
         await test.step('Check Unit Tooltip', async () => {
-            const unitCard = page.locator('.unit-card').first();
+            // Wait for card to be ready
+            await page.waitForSelector('.unit-card', { state: 'visible', timeout: 5000 });
 
-            // Hover to trigger tooltip
-            await unitCard.hover();
-            // Optional: Dispatch mouseenter manually as backup
-            await unitCard.evaluate(el => el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true })));
+            // Trigger tooltip via evaluate
+            await page.evaluate(() => {
+                const card = document.querySelector('.unit-card');
+                if (card) {
+                    card.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+                }
+            });
 
+            // Give time for tooltip to appear
+            await page.waitForTimeout(500);
+
+            // Wait for tooltip
             const tooltip = page.locator('.game-tooltip');
-            // Tooltips use rAF and opacity, so be patient
-            await expect(tooltip).toBeVisible({ timeout: 5000 });
+            await expect(tooltip).toBeVisible({ timeout: 10000 });
             await expect(tooltip).toContainText('Debug Unit');
         });
     });

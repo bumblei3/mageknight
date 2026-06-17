@@ -29,14 +29,11 @@ const handleImportError = (error: any) => {
 // New design system (Phase 1)
 import '../css/tokens.css';
 import '../css/base.css';
-import '../css/animations.css';
-import '../css/components/buttons.css';
-import '../css/components/cards.css';
-import '../css/components/panels.css';
-import '../css/layout.css';
 
-// Legacy CSS (to be migrated)
+// Legacy CSS (to be migrated incrementally)
+import '../css/reset.css';
 import '../css/hud.css';
+import '../css/cards.css';
 import '../css/modals.css';
 import '../css/tooltips.css';
 import '../css/loading.css';

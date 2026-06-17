@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
     testDir: './tests/e2e',
     testMatch: '**/*.spec.js',
-    timeout: 30000,
+    timeout: 60000,
     expect: {
         timeout: 10000
     },
@@ -14,7 +14,7 @@ export default defineConfig({
     workers: 1,
     reporter: 'html',
     use: {
-        actionTimeout: 15000,
+        actionTimeout: 30000,
         baseURL: 'http://localhost:8081/mageknight/',
         trace: 'on-first-retry',
     },

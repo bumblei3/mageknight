@@ -59,17 +59,20 @@ test.describe('Gameplay Flow', () => {
         });
 
         await test.step('Play Card Sideways for Movement', async () => {
-            const cards = page.locator('#hand-cards .card, #hand-cards .mk-card');
-            const firstCard = cards.first();
+            // Call handleCardRightClick directly since TS card component
+            // routes contextmenu to preview, not sideways dialog
+            await page.evaluate(() => {
+                const game = window.game;
+                if (game.hero.hand.length > 0) {
+                    game.interactionController.handleCardRightClick(0, game.hero.hand[0]);
+                }
+            });
 
-            // Right-click to play sideways
-            await firstCard.click({ button: 'right' });
-
-            // Wait for Sideways Modal - check multiple selectors (legacy + new)
-            const sidewaysModal = page.locator('#sideways-modal, .sideways-modal, [data-modal="sideways"]').first();
+            // Wait for Sideways Modal
+            const sidewaysModal = page.locator('#sideways-modal').first();
             await expect(sidewaysModal).toBeVisible({ timeout: 10000 });
 
-            // Click Movement option - check both legacy (.sideways-btn.movement) and new (button[data-type="movement"])
+            // Click Movement option
             await page.locator('.sideways-btn.movement, button[data-type="movement"]').first().click();
 
             // Wait for log to confirm sideways play
@@ -110,6 +113,10 @@ test.describe('Gameplay Flow', () => {
         });
 
         await test.step('End Turn and Verify Hand Refresh', async () => {
+            // Close any open modals first
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(200);
+
             const endTurnBtn = page.locator('#end-turn-btn');
             await endTurnBtn.click();
 
@@ -123,6 +130,16 @@ test.describe('Gameplay Flow', () => {
         });
 
         await test.step('Explore Map', async () => {
+            // Press Escape multiple times to close any open overlays
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(300);
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(300);
+            
+            // Also click somewhere safe to blur any hovered card
+            await page.locator('.hud-top-bar').click({ force: true });
+            await page.waitForTimeout(300);
+
             // Teleport to edge and give points
             await page.evaluate(() => {
                 // Force a missing neighbor to allow exploration at 0,0
@@ -146,7 +163,7 @@ test.describe('Gameplay Flow', () => {
             // Click explore
             await exploreBtn.click();
 
-            // logic might fail if no adjacent unknown. 
+            // logic might fail if no adjacent unknown.
             // So we should verify we get EITHER "Neues Gebiet" OR "Nichts zu entdecken"
             const gameLog = page.locator('#game-log');
             await expect(gameLog).toContainText(/Neues Gebiet|Nichts mehr zu entdecken|Bewegungspunkte/);

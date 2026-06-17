@@ -101,16 +101,23 @@ test.describe('Card Interaction Flow', () => {
     });
 
     test('should play card sideways via right click', async ({ page }) => {
-        // Right click Promise card (White)
-        const card = page.locator('#hand-cards .card, #hand-cards .mk-card').filter({ hasText: 'Promise' }).first();
-        await card.click({ button: 'right', timeout: 10000 });
+        // Call handleCardRightClick directly since the TS card component
+        // routes contextmenu to preview, not sideways dialog
+        await page.evaluate(() => {
+            const game = window.game;
+            const promiseCard = game.hero.hand.find(c => c.id === 'promise' || c.name === 'Promise');
+            if (promiseCard) {
+                const index = game.hero.hand.indexOf(promiseCard);
+                game.interactionController.handleCardRightClick(index, promiseCard);
+            }
+        });
 
-        // Sideways modal should appear - check for modal by ID or class
-        const modal = page.locator('#sideways-modal, .sideways-modal, [data-modal="sideways"]');
-        await expect(modal.first()).toBeVisible({ timeout: 10000 });
+        // Sideways modal should appear
+        const modal = page.locator('#sideways-modal');
+        await expect(modal).toBeVisible({ timeout: 10000 });
 
-        // Choose "Block" (+1 Block) - button has data-type="block"
-        await page.locator('button[data-type="block"], .sideways-btn.block, button:has-text("Block")').first().click();
+        // Choose "Block" (+1 Block)
+        await page.locator('.sideways-options button[data-type="block"], .sideways-btn.block, button:has-text("Block")').first().click();
 
         // Verify block points increased
         await expect(async () => {

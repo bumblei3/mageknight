@@ -18,12 +18,11 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "baseUrl": ".",
-        "paths": {},
         "typeRoots": [
             "./types",
             "./node_modules/@types"
-        ]
+        ],
+        "types": ["node"]
     },
     "include": [
         "js/**/*",

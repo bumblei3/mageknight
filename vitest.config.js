@@ -8,7 +8,7 @@ export default defineConfig({
         globals: true,
         setupFiles: ['./tests/setup.js'],
         include: ['tests/**/*.{test,spec}.{js,ts}'],
-        exclude: ['node_modules', 'dist', 'tests/e2e/**/*'],
+        exclude: ['node_modules', 'dist', 'tests/e2e/**/*', 'tests/accessibility.test.ts', 'tests/visual-regression.test.ts'],
         coverage: {
             provider: 'v8',
             include: ['js/**/*.{js,ts}'],

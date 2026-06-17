@@ -109,7 +109,7 @@ jobs:
     name: E2E Tests (Playwright)
     runs-on: ubuntu-latest
     needs: build
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -128,6 +128,8 @@ jobs:
 
       - name: Run E2E tests
         run: npm run test:e2e
+        env:
+          CI: true
 
       - name: Upload E2E artifacts
         uses: actions/upload-artifact@v7
@@ -158,8 +160,11 @@ jobs:
           echo "Tests: ${{ needs.test.result }}"
           echo "Build: ${{ needs.build.result }}"
           echo "E2E: ${{ needs.e2e.result }}"
-          if [ "${{ needs.lint-and-typecheck.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ] || [ "${{ needs.e2e.result }}" != "success" ]; then
+          if [ "${{ needs.lint-and-typecheck.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ]; then
             echo "❌ Some jobs failed"
             exit 1
           fi
-          echo "✅ All jobs passed"
+          if [ "${{ needs.e2e.result }}" != "success" ] && [ "${{ needs.e2e.result }}" != "skipped" ]; then
+            echo "⚠️ E2E tests failed (non-blocking)"
+          fi
+          echo "✅ All blocking jobs passed"

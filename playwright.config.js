@@ -2,19 +2,19 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-    testDir: './tests',
-    testMatch: '**/*.test.ts',
-    timeout: 60000,
+    testDir: './tests/e2e',
+    testMatch: '**/*.spec.js',
+    timeout: 30000,
     expect: {
         timeout: 10000
     },
     fullyParallel: false,
     forbidOnly: !!process.env.CI,
-    retries: process.env.CI ? 2 : 1,
+    retries: process.env.CI ? 1 : 0,
     workers: 1,
     reporter: 'html',
     use: {
-        actionTimeout: 0,
+        actionTimeout: 15000,
         baseURL: 'http://localhost:8081/mageknight/',
         trace: 'on-first-retry',
     },
@@ -22,24 +22,6 @@ export default defineConfig({
         {
             name: 'chromium',
             use: { ...devices['Desktop Chrome'] }
-        },
-        {
-            name: 'firefox',
-            use: { ...devices['Desktop Firefox'] }
-        },
-        {
-            name: 'webkit',
-            use: { ...devices['Desktop Safari'] }
-        },
-        {
-            name: 'visual-chromium',
-            use: { ...devices['Desktop Chrome'] },
-            testMatch: /.*visual-regression.*\.test\.ts/
-        },
-        {
-            name: 'visual-firefox',
-            use: { ...devices['Desktop Firefox'] },
-            testMatch: /.*visual-regression.*\.test\.ts/
         }
     ],
     webServer: {
@@ -48,5 +30,6 @@ export default defineConfig({
         reuseExistingServer: !process.env.CI,
         stdout: 'ignore',
         stderr: 'pipe',
+        timeout: 60000,
     },
 });

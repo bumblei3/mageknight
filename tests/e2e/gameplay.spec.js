@@ -65,12 +65,12 @@ test.describe('Gameplay Flow', () => {
             // Right-click to play sideways
             await firstCard.click({ button: 'right' });
 
-            // Wait for Sideways Modal
-            const sidewaysModal = page.locator('#sideways-modal');
-            await expect(sidewaysModal).toBeVisible();
+            // Wait for Sideways Modal - check multiple selectors (legacy + new)
+            const sidewaysModal = page.locator('#sideways-modal, .sideways-modal, [data-modal="sideways"]').first();
+            await expect(sidewaysModal).toBeVisible({ timeout: 10000 });
 
-            // Click Movement option
-            await sidewaysModal.locator('button[data-type="movement"]').click();
+            // Click Movement option - check both legacy (.sideways-btn.movement) and new (button[data-type="movement"])
+            await page.locator('.sideways-btn.movement, button[data-type="movement"]').first().click();
 
             // Wait for log to confirm sideways play
             await expect(page.locator('#game-log')).toContainText('seitlich gespielt');

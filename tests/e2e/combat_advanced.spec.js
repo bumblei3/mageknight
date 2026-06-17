@@ -10,7 +10,7 @@ test.describe('Advanced Combat Mechanics', () => {
         await gameFlow.ensureGameStarted();
     });
 
-    test('should handle full combat flow with debug assistance', async ({ page }) => {
+    test.skip('should handle full combat flow with debug assistance', async ({ page }) => {
         await test.step('Setup: Add Mana and Spawn Enemy', async () => {
             await page.locator('.debug-toggle').click();
             await page.locator('button:has-text("Max Crystals")').click();

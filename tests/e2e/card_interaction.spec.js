@@ -47,11 +47,10 @@ test.describe('Card Interaction Flow', () => {
         const initialPoints = await page.evaluate(() => window.game.hero.movementPoints);
         expect(initialPoints).toBe(0);
 
-        // Click Stamina card (Green) - use pointer events to match HandRenderer
+        // Click Stamina card (Green) - use .card or .mk-card selector
         // Since no mana is available, the basic effect should auto-play without modal
-        const card = page.locator('.card', { hasText: 'Stamina' });
-        await card.dispatchEvent('pointerdown', { button: 0, clientX: 0, clientY: 0 });
-        await card.dispatchEvent('pointerup', { button: 0, clientX: 0, clientY: 0 });
+        const card = page.locator('#hand-cards .card, #hand-cards .mk-card').filter({ hasText: 'Stamina' }).first();
+        await card.click({ timeout: 10000 });
 
         // No modal should appear (auto-play basic effect)
         // Verify movement points increased (Stamina gives 2)
@@ -66,12 +65,11 @@ test.describe('Card Interaction Flow', () => {
     });
 
     test('should show error when clicking wound card', async ({ page }) => {
-        const woundCard = page.locator('.card.wound-card, .mk-card--wound');
+        const woundCard = page.locator('.card.wound-card, .mk-card--wound').first();
         await expect(woundCard).toBeVisible();
 
-        // Click it using pointer events
-        await woundCard.dispatchEvent('pointerdown', { button: 0, clientX: 0, clientY: 0 });
-        await woundCard.dispatchEvent('pointerup', { button: 0, clientX: 0, clientY: 0 });
+        // Click it
+        await woundCard.click();
 
         // Hand size should NOT change (3 cards)
         const handSize = await page.locator('#hand-cards .card, #hand-cards .mk-card').count();
@@ -84,10 +82,9 @@ test.describe('Card Interaction Flow', () => {
             window.game.hero.tempMana = ['green'];
         });
 
-        // Click Stamina card (Green) using pointer events
-        const card = page.locator('.card', { hasText: 'Stamina' });
-        await card.dispatchEvent('pointerdown', { button: 0, clientX: 0, clientY: 0 });
-        await card.dispatchEvent('pointerup', { button: 0, clientX: 0, clientY: 0 });
+        // Click Stamina card (Green)
+        const card = page.locator('#hand-cards .card, #hand-cards .mk-card').filter({ hasText: 'Stamina' }).first();
+        await card.click({ timeout: 10000 });
 
         // Modal should appear
         const modal = page.locator('#card-play-modal');
@@ -105,15 +102,15 @@ test.describe('Card Interaction Flow', () => {
 
     test('should play card sideways via right click', async ({ page }) => {
         // Right click Promise card (White)
-        const card = page.locator('.card', { hasText: 'Promise' });
-        await card.click({ button: 'right' });
+        const card = page.locator('#hand-cards .card, #hand-cards .mk-card').filter({ hasText: 'Promise' }).first();
+        await card.click({ button: 'right', timeout: 10000 });
 
-        // Sideways modal should appear
-        const modal = page.locator('#sideways-modal');
-        await expect(modal).toBeVisible();
+        // Sideways modal should appear - check for modal by ID or class
+        const modal = page.locator('#sideways-modal, .sideways-modal, [data-modal="sideways"]');
+        await expect(modal.first()).toBeVisible({ timeout: 10000 });
 
-        // Choose "Block" (+1 Block)
-        await page.locator('.sideways-btn.block').click();
+        // Choose "Block" (+1 Block) - button has data-type="block"
+        await page.locator('button[data-type="block"], .sideways-btn.block, button:has-text("Block")').first().click();
 
         // Verify block points increased
         await expect(async () => {

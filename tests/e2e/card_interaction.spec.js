@@ -61,12 +61,12 @@ test.describe('Card Interaction Flow', () => {
         }).toPass();
 
         // Verify card moved (hand size 3 -> 2)
-        const handSize = await page.locator('#hand-cards .card').count();
+        const handSize = await page.locator('#hand-cards .card, #hand-cards .mk-card').count();
         expect(handSize).toBe(2);
     });
 
     test('should show error when clicking wound card', async ({ page }) => {
-        const woundCard = page.locator('.card.wound-card');
+        const woundCard = page.locator('.card.wound-card, .mk-card--wound');
         await expect(woundCard).toBeVisible();
 
         // Click it using pointer events
@@ -74,7 +74,7 @@ test.describe('Card Interaction Flow', () => {
         await woundCard.dispatchEvent('pointerup', { button: 0, clientX: 0, clientY: 0 });
 
         // Hand size should NOT change (3 cards)
-        const handSize = await page.locator('#hand-cards .card').count();
+        const handSize = await page.locator('#hand-cards .card, #hand-cards .mk-card').count();
         expect(handSize).toBe(3);
     });
 

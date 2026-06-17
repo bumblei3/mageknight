@@ -63,7 +63,7 @@ test.describe('Mage Knight Game Loading', () => {
 
         await test.step('Modify Game State', async () => {
             // Play a card to change hand size
-            const cards = page.locator('#hand-cards .card');
+            const cards = page.locator('#hand-cards .card, #hand-cards .mk-card');
             const initialCount = await cards.count();
             expect(initialCount).toBeGreaterThan(0);
 

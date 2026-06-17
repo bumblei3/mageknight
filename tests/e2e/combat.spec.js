@@ -96,7 +96,7 @@ test.describe('Combat Flow', () => {
             await expect(page.locator('#execute-attack-btn')).toHaveText(/Blocken beenden|End Block/);
 
             // Play Block Card (Index 0 in our mocked hand)
-            const cards = page.locator('.card');
+            const cards = page.locator('.card, .mk-card');
             await cards.nth(0).click();
 
             // End Block Phase (advance to Attack/Damage)

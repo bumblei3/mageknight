@@ -62,13 +62,13 @@ test.describe('Advanced Combat Mechanics', () => {
         await test.step('Play Ranged Attack', async () => {
             // Find a card that can do attack (Angriff)
             // Use regex to be flexible with German/English or specific card names
-            const attackCard = page.locator('.card').filter({ hasText: /Angriff|Attack|Rage|Zorn/ }).first();
+            const attackCard = page.locator('.card, .mk-card').filter({ hasText: /Angriff|Attack|Rage|Zorn/ }).first();
 
             if (await attackCard.count() > 0) {
                 await attackCard.click();
             } else {
                 // Fallback: Click first card and hope
-                await page.locator('#hand-cards .card').first().click();
+                await page.locator('#hand-cards .card, #hand-cards .mk-card').first().click();
             }
 
             // If strong play modal appears, use strong effect (since we have mana)

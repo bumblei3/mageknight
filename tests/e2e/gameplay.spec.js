@@ -17,7 +17,7 @@ test.describe('Gameplay Flow', () => {
             const handContainer = page.locator('#hand-cards');
             await expect(handContainer).toBeVisible();
 
-            const cards = handContainer.locator('.card');
+            const cards = handContainer.locator('.card, .mk-card');
             await expect(cards.first()).toBeVisible({ timeout: 10000 });
 
             const cardCount = await cards.count();
@@ -26,7 +26,7 @@ test.describe('Gameplay Flow', () => {
         });
 
         await test.step('Hover and Play Card', async () => {
-            const cards = page.locator('#hand-cards .card');
+            const cards = page.locator('#hand-cards .card, #hand-cards .mk-card');
             const firstCard = cards.first();
 
             // Capture card name for verification
@@ -59,7 +59,7 @@ test.describe('Gameplay Flow', () => {
         });
 
         await test.step('Play Card Sideways for Movement', async () => {
-            const cards = page.locator('#hand-cards .card');
+            const cards = page.locator('#hand-cards .card, #hand-cards .mk-card');
             const firstCard = cards.first();
 
             // Right-click to play sideways
@@ -118,7 +118,7 @@ test.describe('Gameplay Flow', () => {
                 return await page.evaluate(() => window.game.hero.hand.length);
             }, { message: 'Hand should be refilled to 5', timeout: 5000 }).toBe(5);
 
-            const cardElements = page.locator('#hand-cards .card');
+            const cardElements = page.locator('#hand-cards .card, #hand-cards .mk-card');
             await expect(cardElements).toHaveCount(5);
         });
 

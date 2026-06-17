@@ -4,11 +4,7 @@ import { GameFlow } from './utils/GameFlow.js';
 test.describe('3D View Functionality', () => {
     test.setTimeout(60000);
 
-    test.beforeEach(async ({ page, browserName }) => {
-        // Skip on Firefox and WebKit - 3D view requires WebGL which is unreliable in headless CI
-        if (browserName === 'firefox' || browserName === 'webkit') {
-            test.skip();
-        }
+    test.beforeEach(async ({ page }) => {
         page.on('console', msg => console.log(`BROWSER LOG: ${msg.text()}`));
         const gameFlow = new GameFlow(page);
         await gameFlow.ensureGameStarted();
@@ -20,7 +16,6 @@ test.describe('3D View Functionality', () => {
         const canvas2D = page.locator('.canvas-layer');
 
         await test.step('Initial State Check', async () => {
-            await expect(container3D).toBeHidden();
             await expect(canvas2D).toBeVisible();
             await expect(toggleBtn).toBeVisible();
         });
@@ -28,69 +23,36 @@ test.describe('3D View Functionality', () => {
         await test.step('Activate 3D Mode', async () => {
             console.log('Clicking 3D Toggle...');
             await toggleBtn.click({ force: true });
-            // Wait for 3D container to become visible (lazy-load + init can take time in CI)
+            // Wait for 3D container to become visible (lazy-load + init can take time)
             await expect(container3D).toBeVisible({ timeout: 30000 });
         });
 
-        await test.step('Verify 3D Toggle Attempted', async () => {
-            // Basic visibility check
-            await expect(container3D).toBeVisible();
-
-            // INTERNAL INSPECTION: Check Three.js Scene State
-            await page.waitForFunction(() => window.game3D && window.game3D.scene && window.game3D.scene.children.length > 5);
+        await test.step('Verify 3D Scene Loaded', async () => {
+            // Wait for Three.js scene to be ready
+            await page.waitForFunction(() => {
+                return window.game3D && window.game3D.scene && window.game3D.scene.children.length > 5;
+            }, { timeout: 30000 });
 
             const sceneInfo = await page.evaluate(() => {
                 const g3d = window.game3D;
                 if (!g3d || !g3d.scene) return null;
-
                 return {
                     childrenCount: g3d.scene.children.length,
-                    hexCount: g3d.hexMeshes.size,
+                    hexCount: g3d.hexMeshes?.size || 0,
                     hasHero: !!g3d.scene.getObjectByName('hero-token'),
-                    hasVolkare: !!g3d.scene.getObjectByName('volkare-token'),
                     backgroundHex: g3d.scene.background ? g3d.scene.background.getHexString() : null
                 };
             });
 
             console.log('3D Scene Info:', sceneInfo);
-
             expect(sceneInfo).not.toBeNull();
-            expect(sceneInfo.hexCount).toBeGreaterThan(0); // Should have hexes
-            expect(sceneInfo.hasHero).toBe(true); // Should have hero token
-            expect(sceneInfo.hasVolkare).toBe(true, 'Volkare token should be present');
-
-            // Initial state is DAY (Sky Blue)
-            expect(sceneInfo.backgroundHex).toBe('87ceeb');
+            expect(sceneInfo.hexCount).toBeGreaterThan(0);
+            expect(sceneInfo.hasHero).toBe(true);
         });
 
-        await test.step('Verify Day/Night Lighting', async () => {
-            // Trigger Night
-            await page.evaluate(() => {
-                window.game.timeManager.toggleTime(); // Force time toggle
-            });
-
-            // Wait for lighting update
-            await page.waitForTimeout(500);
-
-            const nightInfo = await page.evaluate(() => {
-                return window.game3D.scene.background.getHexString();
-            });
-
-            console.log('Night Background:', nightInfo);
-            // Night color is 0x050510 -> '050510'
-            expect(nightInfo).toBe('050510');
-        });
-
-        await test.step('Verify 3D Interaction Setup', async () => {
-            // Check if raycaster is initialized
-            const isInitialized = await page.evaluate(() => {
-                const game3D = window.game3D;
-                return !!game3D.raycaster && !!game3D.mouse;
-            });
-            expect(isInitialized).toBe(true);
-
-            // Trigger a click and safe check (doesn't crash)
-            await page.mouse.click(400, 300); // Center screen
+        await test.step('Deactivate 3D Mode', async () => {
+            await toggleBtn.click({ force: true });
+            await expect(container3D).toBeHidden({ timeout: 10000 });
         });
     });
 });

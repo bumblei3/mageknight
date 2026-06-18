@@ -465,6 +465,116 @@ export const SAMPLE_SPELLS: any[] = [
         basicEffect: { type: 'mana_token', value: 2 },
         advancedEffect: { type: 'mana_token', value: 1, crystal: 1 },
         image: 'crystallize.png'
+    },
+    {
+        id: 'speed',
+        name: 'Speed',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GREEN,
+        cost: 0,
+        basicEffect: { type: 'move', value: 3 },
+        advancedEffect: { type: 'move', value: 4 },
+        image: 'speed.png'
+    },
+    {
+        id: 'cold_toughness',
+        name: 'Cold Toughness',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.BLUE,
+        cost: 0,
+        basicEffect: { type: 'block', value: 3, element: 'ice' },
+        advancedEffect: { type: 'block', value: 4, element: 'ice' },
+        image: 'cold_toughness.png'
+    },
+    {
+        id: 'power',
+        name: 'Power',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.RED,
+        cost: 0,
+        basicEffect: { type: 'attack', value: 4 },
+        advancedEffect: { type: 'attack', value: 5, block: 2 },
+        image: 'power.png'
+    },
+    {
+        id: 'battle_cry',
+        name: 'Battle Cry',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.RED,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 4 },
+        advancedEffect: { type: 'influence', value: 7 },
+        image: 'battle_cry.png'
+    },
+    {
+        id: 'mana_draw',
+        name: 'Mana Draw',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'mana_token', value: 1 },
+        advancedEffect: { type: 'mana_token', value: 3 },
+        image: 'mana_draw.png'
+    },
+    {
+        id: 'mana_surge',
+        name: 'Mana Surge',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'mana_token', value: 2 },
+        advancedEffect: { type: 'mana_token', value: 5 },
+        image: 'mana_surge.png'
+    },
+    {
+        id: 'will_focus',
+        name: 'Will Focus',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.BLUE,
+        cost: 0,
+        basicEffect: { type: 'hand_limit', value: 1 },
+        advancedEffect: { type: 'hand_limit', value: 2 },
+        image: 'will_focus.png'
+    },
+    {
+        id: 'improvisation',
+        name: 'Improvisation',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.WHITE,
+        cost: 0,
+        basicEffect: { type: 'copy_card', value: 1 },
+        advancedEffect: { type: 'copy_card', value: 2 },
+        image: 'improvisation.png'
+    },
+    {
+        id: 'spell_mastery',
+        name: 'Spell Mastery',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.BLUE,
+        cost: 0,
+        basicEffect: { type: 'spell_effect', value: 1 },
+        advancedEffect: { type: 'spell_effect', value: 2 },
+        image: 'spell_mastery.png'
+    },
+    {
+        id: 'crystal_magic',
+        name: 'Crystal Magic',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'crystal_effect', value: 1 },
+        advancedEffect: { type: 'crystal_effect', value: 2 },
+        image: 'crystal_magic.png'
+    },
+    {
+        id: 'battle_versatility',
+        name: 'Battle Versatility',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.WHITE,
+        cost: 0,
+        basicEffect: { type: 'versatile', attack: 2, block: 2, move: 2, influence: 2 },
+        advancedEffect: { type: 'versatile', attack: 3, block: 3, move: 3, influence: 3 },
+        image: 'battle_versatility.png'
     }
 ];
 

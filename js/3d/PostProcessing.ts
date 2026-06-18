@@ -416,6 +416,7 @@ export class PostProcessingManager {
     private filmEffectsPass: ShaderPass | null = null;
     private dofPass: ShaderPass | null = null;
     private gammaPass: ShaderPass | null = null;
+    private depthRenderTarget: THREE.WebGLRenderTarget | null = null;
 
     constructor(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera, options?: Partial<PostProcessingOptions>) {
         this.renderer = renderer;
@@ -457,10 +458,19 @@ export class PostProcessingManager {
         this.updateFilmEffectsUniforms();
         this.composer.addPass(this.filmEffectsPass);
 
-        // 5. Depth of Field Pass (optional - needs depth texture)
-        // this.dofPass = new ShaderPass(DepthOfFieldShader);
-        // this.dofPass.enabled = this.options.depthOfField.enabled;
-        // this.composer.addPass(this.dofPass);
+        // 5. Depth of Field Pass (needs depth texture)
+        // Create a separate render target for depth
+        this.depthRenderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+            type: THREE.UnsignedIntType,
+            format: THREE.DepthFormat,
+        }) as THREE.WebGLRenderTarget & { depthTexture: THREE.DepthTexture };
+
+        this.dofPass = new ShaderPass(DepthOfFieldShader);
+        this.dofPass.enabled = this.options.depthOfField.enabled;
+        // Set depth texture
+        this.dofPass.uniforms.tDepth.value = this.depthRenderTarget.depthTexture as THREE.DepthTexture;
+        this.updateDOFUniforms();
+        this.composer.addPass(this.dofPass);
 
         // 6. Gamma Correction Pass (final)
         this.gammaPass = new ShaderPass(GammaCorrectionShader);
@@ -489,6 +499,16 @@ export class PostProcessingManager {
         this.filmEffectsPass.uniforms.uScanlineIntensity.value = f.scanlines;
     }
 
+    private updateDOFUniforms(): void {
+        if (!this.dofPass) return;
+        const d = this.options.depthOfField;
+        this.dofPass.uniforms.uFocusDistance.value = d.focusDistance;
+        this.dofPass.uniforms.uFocusRange.value = d.focusRange;
+        this.dofPass.uniforms.uAperture.value = d.aperture;
+        this.dofPass.uniforms.uNearBlur.value = d.nearBlur;
+        this.dofPass.uniforms.uFarBlur.value = d.farBlur;
+    }
+
     // Public API
     render(): void {
         if (!this.composer || !this.options.enabled) {
@@ -502,6 +522,13 @@ export class PostProcessingManager {
             this.filmEffectsPass.uniforms.uTime.value = elapsed;
         }
 
+        // Render depth for DOF (if enabled)
+        if (this.options.depthOfField.enabled && this.depthRenderTarget && this.dofPass) {
+            this.renderer.setRenderTarget(this.depthRenderTarget);
+            this.renderer.render(this.scene, this.camera);
+            this.renderer.setRenderTarget(null);
+        }
+
         this.composer.render();
     }
 
@@ -511,6 +538,12 @@ export class PostProcessingManager {
         }
         if (this.bloomPass) {
             this.bloomPass.resolution.set(width, height);
+        }
+        if (this.depthRenderTarget) {
+            this.depthRenderTarget.setSize(width, height);
+        }
+        if (this.dofPass) {
+            this.dofPass.uniforms.uResolution.value.set(width, height);
         }
     }
 
@@ -546,7 +579,10 @@ export class PostProcessingManager {
 
     setDepthOfField(params: Partial<PostProcessingOptions['depthOfField']>): void {
         this.options.depthOfField = { ...this.options.depthOfField, ...params };
-        // if (this.dofPass) this.dofPass.enabled = this.options.depthOfField.enabled;
+        if (this.dofPass) {
+            this.dofPass.enabled = this.options.depthOfField.enabled;
+            this.updateDOFUniforms();
+        }
     }
 
     setEnabled(enabled: boolean): void {

@@ -120,10 +120,20 @@ export class MageKnightGame {
     public selectedCard: Card | null = null;
 
     /**
+     * Haptic feedback helper — vibrates on supported devices
+     * @param pattern - single duration in ms or array of [vibrate, pause, vibrate, ...]
+     */
+    public haptics(pattern: number | number[]): void {
+        const nav = navigator as any;
+        if (nav.vibration) {
+            nav.vibration(pattern);
+        }
+    }
+
+    /**
      * Initializes the game engine and subsystems.
      */
     constructor() {
-        // Clear global event bus and store listeners to prevent listener accumulation from previous instances
         eventBus.clear();
         if (store) {
             (store as any).clearListeners();
@@ -721,6 +731,7 @@ export class MageKnightGame {
         eventBus.on(GAME_EVENTS.LOG_ADDED, (data: any) => {
             if (data.type === 'error' && (data.message.includes('Verletzung') || data.message.includes('Damage'))) {
                 this.particleSystem.triggerShake(5, 0.4);
+                this.haptics(50);
             }
         });
 
@@ -741,7 +752,10 @@ export class MageKnightGame {
             const pixel = this.hexGrid.axialToPixel(data.targetPos.q, data.targetPos.r);
             this.particleSystem.damageSplatter(pixel.x, pixel.y, data.amount);
             this.particleSystem.createDamageNumber(pixel.x, pixel.y, data.amount, data.amount >= 5);
-            if (data.amount >= 3) this.particleSystem.triggerShake(data.amount, 0.3);
+            if (data.amount >= 3) {
+                this.particleSystem.triggerShake(data.amount, 0.3);
+                this.haptics(Math.min(100, data.amount * 20));
+            }
         });
     }
 

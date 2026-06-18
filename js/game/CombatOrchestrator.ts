@@ -158,6 +158,7 @@ export class CombatOrchestrator {
             if (result.unitDestroyed && this.game.particleSystem) {
                 this.game.particleSystem.triggerShake(8, 0.4);
                 this.game.particleSystem.freeze(0.1);
+                if (this.game.haptics) this.game.haptics(80);
             }
 
             this.updateCombatInfo();

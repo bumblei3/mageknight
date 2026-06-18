@@ -19,6 +19,9 @@ export class InputController {
         if (this.game.ui.elements.endTurnBtn) {
             this.game.ui.elements.endTurnBtn.addEventListener('click', () => {
                 if (this.isUIBlocked()) return;
+                if (this.game.hero.movementPoints > 0 || this.game.hero.hand.length > 0) {
+                    if (!confirm('Zug beenden? Du hast noch verfügbare Aktionen.')) return;
+                }
                 this.game.turnManager.endTurn();
             }, { signal });
         }
@@ -255,6 +258,9 @@ export class InputController {
 
                 switch (action) {
                     case 'END_TURN':
+                        if (this.game.hero.movementPoints > 0 || this.game.hero.hand.length > 0) {
+                            if (!confirm('Zug beenden? Du hast noch verfügbare Aktionen.')) return;
+                        }
                         this.game.turnManager.endTurn();
                         e.preventDefault();
                         break;

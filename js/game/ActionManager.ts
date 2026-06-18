@@ -316,6 +316,7 @@ export class ActionManager {
                 this.game.particleSystem.discoveryEffect(screenPos.x, screenPos.y);
                 this.game.particleSystem.triggerShake(4, 0.4);
                 this.game.particleSystem.freeze(0.05);
+                if (this.game.haptics) this.game.haptics(30);
             }
 
             this.game.entityManager.createEnemies();

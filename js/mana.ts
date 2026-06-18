@@ -163,6 +163,40 @@ export class ManaSource {
         this.dice = [...(state.dice || [])];
         this.usedDice = new Set(state.usedDice || []);
     }
+
+    /**
+     * Count how many hand cards are playable with current mana
+     */
+    public getPlayableCardsCount(hand: any[]): { playable: number; total: number } {
+        if (!hand || hand.length === 0) return { playable: 0, total: 0 };
+
+        const available: Record<string, number> = {};
+        let goldCount = 0;
+        for (let i = 0; i < this.dice.length; i++) {
+            if (this.usedDice.has(i)) continue;
+            const color = this.dice[i];
+            if (color === 'gold') {
+                goldCount++;
+            } else {
+                available[color] = (available[color] || 0) + 1;
+            }
+        }
+        const totalAvailable = goldCount + Object.values(available).reduce((a, b) => a + b, 0);
+
+        let playable = 0;
+        for (const card of hand) {
+            if (card.isWound && card.isWound()) continue;
+            const cost = card.manaCost || 0;
+            if (cost === 0) { playable++; continue; }
+            const color = card.color;
+            if (color && available[color] && available[color] > 0) {
+                playable++;
+            } else if (cost <= totalAvailable) {
+                playable++;
+            }
+        }
+        return { playable, total: hand.length };
+    }
 }
 
 // Crystal storage for players

@@ -683,6 +683,14 @@ export class MageKnightGame {
     rest(): void { this.phaseManager.rest(); }
 
     /**
+     * Count how many hand cards are playable with current mana
+     * Delegates to ManaSource.getPlayableCardsCount()
+     */
+    getPlayableCardsCount(): { playable: number; total: number } {
+        return this.manaSource?.getPlayableCardsCount(this.hero?.hand || []) ?? { playable: 0, total: 0 };
+    }
+
+    /**
      * Ends the current turn.
      */
     endTurn(): void { this.phaseManager.endTurn(); }

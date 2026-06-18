@@ -202,10 +202,6 @@
   --tooltip-divider: var(--color-border-default);
   --tooltip-text-secondary: var(--color-text-secondary);
 
-  /* Tutorial tokens */
-  --tutorial-accent: var(--color-accent-primary);
-  --tutorial-primary: var(--color-accent-primary);
-
   /* Hero/Modal color tokens */
   --hero-color: var(--color-accent-primary);
   --hero-color-darker: var(--color-accent-secondary);

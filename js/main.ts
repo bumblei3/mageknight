@@ -26,11 +26,9 @@ const handleImportError = (error: any) => {
 };
 
 // Import all CSS for Vite bundling
-// New design system (Phase 1)
+// Design tokens (single source of truth)
 import '../css/tokens.css';
-import '../css/base.css';
-
-// Legacy CSS (to be migrated incrementally)
+// Base styles & reset
 import '../css/reset.css';
 import '../css/hud.css';
 import '../css/cards.css';

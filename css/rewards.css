@@ -1,29 +1,29 @@
 /* Rewards Modal Styling */
 .reward-content {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border: 2px solid #fbbf24;
+    background: linear-gradient(135deg, var(--color-bg-base) 0%, var(--color-bg-surface) 100%);
+    border: 2px solid var(--color-gold-400);
     box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
     max-width: 900px;
     width: 90%;
-    color: #fff;
-    padding: 2rem;
+    color: var(--color-text-primary);
+    padding: var(--space-10);
     position: relative;
     overflow: hidden;
 }
 
 .reward-message {
     text-align: center;
-    font-size: 1.2rem;
-    color: #e2e8f0;
-    margin-bottom: 2rem;
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-10);
 }
 
 .reward-grid {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: var(--space-8);
     flex-wrap: wrap;
-    padding: 1rem;
+    padding: var(--space-4);
 }
 
 /* Reward Card Styling */
@@ -44,9 +44,9 @@
 .reward-card-inner {
     width: 100%;
     height: 100%;
-    background: #1e293b;
-    border-radius: 12px;
-    border: 1px solid #475569;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-gray-600);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -55,13 +55,13 @@
 }
 
 .reward-card:hover .reward-card-inner {
-    border-color: #fbbf24;
+    border-color: var(--color-gold-400);
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
 /* Card Type Specifics */
 .reward-card-inner[data-type="spell"] {
-    border-color: #8b5cf6;
+    border-color: var(--color-purple-400);
 }
 
 .reward-card-inner[data-type="spell"]:hover {
@@ -69,7 +69,7 @@
 }
 
 .reward-card-inner[data-type="artifact"] {
-    border-color: #fbbf24;
+    border-color: var(--color-gold-400);
 }
 
 /* Header */
@@ -78,9 +78,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-display);
     font-weight: bold;
-    color: white;
+    color: var(--color-text-primary);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     background-size: cover;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -89,7 +89,7 @@
 /* Body */
 .card-body {
     flex: 1;
-    padding: 1.5rem;
+    padding: var(--space-6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -97,22 +97,22 @@
 }
 
 .card-desc {
-    font-size: 0.95rem;
+    font-size: var(--font-size-base);
     line-height: 1.5;
     text-align: center;
-    color: #e2e8f0;
+    color: var(--color-text-secondary);
 }
 
 /* Footer */
 .card-footer {
-    padding: 0.8rem;
+    padding: var(--space-3);
     text-align: center;
     background: rgba(0, 0, 0, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card-type {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     text-transform: uppercase;
     letter-spacing: 1px;
     opacity: 0.8;
@@ -129,12 +129,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
     font-weight: bold;
-    color: #1a1a2e;
+    color: var(--color-bg-base);
     opacity: 0;
     transition: opacity 0.2s;
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     pointer-events: none;
 }
 
@@ -144,8 +144,8 @@
 
 .reward-hint {
     text-align: center;
-    margin-top: 2rem;
-    color: #94a3b8;
+    margin-top: var(--space-10);
+    color: var(--color-gray-400);
     font-style: italic;
-    font-size: 0.9rem;
+    font-size: var(--font-size-base);
 }

@@ -153,6 +153,73 @@
   --glass-bg: rgba(15, 23, 42, 0.85);
   --glass-border: rgba(148, 163, 184, 0.15);
   --glass-blur: blur(8px);
+
+  /* === Semantic Aliases (Legacy Compatibility) === */
+  /* Colors - Semantic */
+  --color-accent-gold: var(--color-gold-400);
+  --color-accent-cyan: var(--color-cyan-400);
+  --color-bg-primary: var(--color-bg-base);
+  --color-bg-secondary: var(--color-bg-surface);
+  --color-bg-tertiary: var(--color-bg-elevated);
+
+  /* Glassmorphism */
+  --glass-bg-hover: var(--color-bg-elevated);
+  --glass-border-highlight: var(--color-border-hover);
+  --glass-shadow: var(--shadow-lg);
+
+  /* Effects */
+  --backdrop-blur: var(--glass-blur);
+  --parchment-bg: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+  --parchment-border: 2px solid rgba(148, 163, 184, 0.3);
+
+  /* Spacing aliases */
+  --spacing-xs: var(--space-1);
+  --spacing-sm: var(--space-2);
+  --spacing-md: var(--space-4);
+  --spacing-lg: var(--space-6);
+  --spacing-xl: var(--space-10);
+  --spacing-2xl: var(--space-12);
+
+  /* Transition aliases */
+  --transition-normal: var(--transition-base);
+  --transition-medium: var(--transition-slow);
+
+  /* Layout aliases */
+  --hud-width: var(--sidebar-width);
+
+  /* Icon tokens */
+  --icon-size: 1.5rem;
+  --icon-size-lg: 2rem;
+  --icon-color: var(--color-text-secondary);
+  --icon-stroke-width: 2;
+
+  /* Tooltip tokens */
+  --tooltip-bg: var(--color-bg-overlay);
+  --tooltip-border: var(--color-border-default);
+  --tooltip-shadow: var(--shadow-lg);
+  --tooltip-text-primary: var(--color-text-primary);
+  --tooltip-header-bg: var(--color-bg-elevated);
+  --tooltip-divider: var(--color-border-default);
+  --tooltip-text-secondary: var(--color-text-secondary);
+
+  /* Tutorial tokens */
+  --tutorial-accent: var(--color-accent-primary);
+  --tutorial-primary: var(--color-accent-primary);
+
+  /* Hero/Modal color tokens */
+  --hero-color: var(--color-accent-primary);
+  --hero-color-darker: var(--color-accent-secondary);
+  --primary-main: var(--color-accent-primary);
+  --primary-rgb: 168, 85, 247;
+  --primary-light: var(--color-purple-400);
+  --text-main: var(--color-text-primary);
+  --text-muted: var(--color-text-muted);
+
+  /* HSL hue values for gradient animations */
+  --h-gold: 43;
+  --h-crimson: 355;
+  --h-teal: 168;
+  --h-primary: 262;
 }
 
 /* === Dark Mode (default) === */

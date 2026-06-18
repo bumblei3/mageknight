@@ -20,7 +20,7 @@ const STATIC_ASSETS = [
     './styles-events.css',
     './combat-effects.css',
     './time-effects.css',
-    './mobile.css'
+    './css/mobile.css'
     // Note: main.ts is served via Vite, not cached by SW
 ];
 

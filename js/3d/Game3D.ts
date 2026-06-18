@@ -2,6 +2,11 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { eventBus } from '../eventBus';
 import { GAME_EVENTS } from '../constants';
+import { hexShaderManager, HexShaderManager } from './HexShaders';
+import { PostProcessingManager, PostProcessingOptions } from './PostProcessing';
+import { ParticleSystemManager } from './ParticleSystem';
+import { SpriteAnimationSystem, createHeroAtlasConfig, createEnemyAtlasConfig, createSpellEffectAtlasConfig } from './SpriteAnimation';
+import { DynamicLightingManager } from './DynamicLighting';
 
 export class Game3D {
     private game: any;
@@ -20,6 +25,21 @@ export class Game3D {
     private clock: THREE.Clock = new THREE.Clock();
     private waterMaterials: THREE.ShaderMaterial[] = [];
 
+    // Shader System
+    private shaderManager: HexShaderManager = hexShaderManager;
+
+    // Post-Processing
+    private postProcessing: PostProcessingManager | null = null;
+
+    // Particle System
+    private particleSystem: ParticleSystemManager | null = null;
+
+    // Sprite Animation System
+    private spriteAnimation: SpriteAnimationSystem | null = null;
+
+    // Dynamic Lighting System
+    private dynamicLighting: DynamicLightingManager | null = null;
+
     // Hero Animation
     private heroMesh: THREE.Group | null = null;
     private heroTargetPosition: THREE.Vector3 | null = null;
@@ -29,7 +49,7 @@ export class Game3D {
     private raycaster: THREE.Raycaster;
     private mouse: THREE.Vector2;
     private hoveredHex: THREE.Object3D | null = null;
-    private originalMaterial: THREE.Material | null = null;
+    private hoveredTerrain: string | null = null;
 
     constructor(game: any) {
         this.game = game;
@@ -56,6 +76,9 @@ export class Game3D {
         this.camera.position.set(0, 10, 10);
         this.camera.lookAt(0, 0, 0);
 
+        // Initialize Shader Manager with camera
+        this.shaderManager.setCamera(this.camera);
+
         // 3. Setup Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setSize(width, height);
@@ -64,18 +87,29 @@ export class Game3D {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
         this.container.appendChild(this.renderer.domElement);
 
+        // Initialize Post-Processing
+        this.postProcessing = new PostProcessingManager(
+            this.renderer,
+            this.scene!,
+            this.camera!
+        );
+
+        // Initialize Particle System
+        this.particleSystem = new ParticleSystemManager(this.renderer, this.scene!);
+        // Create ambient particles
+        this.particleSystem.createAmbientParticles(new THREE.Vector3(0, 0, 0), 3000);
+
+        // Initialize Sprite Animation System
+        this.spriteAnimation = new SpriteAnimationSystem(this.renderer, this.scene!, this.camera!);
+        // Register default atlases (will load async)
+        this.initializeSpriteAtlases();
+
+        // Initialize Dynamic Lighting System
+        this.dynamicLighting = new DynamicLightingManager(this.renderer, this.scene!, this.camera!);
+
         // Interaction Listeners
         this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
         this.renderer.domElement.addEventListener('click', this.onClick.bind(this));
-
-        // 4. Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        this.scene.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(10, 20, 10);
-        dirLight.castShadow = true;
-        this.scene.add(dirLight);
 
         // 5. Controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -135,6 +169,28 @@ export class Game3D {
         console.log('Game3D initialized (Active)');
     }
 
+    private async initializeSpriteAtlases(): Promise<void> {
+        if (!this.spriteAnimation) return;
+
+        try {
+            // Register hero atlas (placeholder texture - replace with actual sprite sheet)
+            await this.spriteAnimation.registerAtlas('hero', createHeroAtlasConfig('assets/sprites/hero.png'));
+
+            // Register enemy atlases
+            await this.spriteAnimation.registerAtlas('enemy-orc', createEnemyAtlasConfig('assets/sprites/enemy-orc.png', 'orc'));
+            await this.spriteAnimation.registerAtlas('enemy-dragon', createEnemyAtlasConfig('assets/sprites/enemy-dragon.png', 'dragon'));
+            await this.spriteAnimation.registerAtlas('enemy-phantom', createEnemyAtlasConfig('assets/sprites/enemy-phantom.png', 'phantom'));
+            await this.spriteAnimation.registerAtlas('enemy-guardian', createEnemyAtlasConfig('assets/sprites/enemy-guardian.png', 'guardian'));
+
+            // Spell effects
+            await this.spriteAnimation.registerAtlas('spells', createSpellEffectAtlasConfig('assets/sprites/spells.png'));
+
+            console.log('Sprite atlases registered successfully');
+        } catch (error) {
+            console.warn('Failed to load sprite atlases (expected if assets not present):', error);
+        }
+    }
+
     // Interaction Handlers
     onMouseMove(event: MouseEvent): void {
         if (!this.renderer) return;
@@ -174,6 +230,7 @@ export class Game3D {
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
         let targetHex: THREE.Object3D | null = null;
+        let targetTerrain: string | null = null;
 
         for (const intersect of intersects) {
             // Traverse up to find the Group representing the hex
@@ -181,6 +238,7 @@ export class Game3D {
             while (obj.parent && obj.parent !== this.scene) {
                 if (obj.parent.userData && obj.parent.userData.isHex) {
                     targetHex = obj.parent;
+                    targetTerrain = obj.parent.userData.terrain || null;
                     break;
                 }
                 obj = obj.parent;
@@ -190,22 +248,16 @@ export class Game3D {
 
         if (this.hoveredHex !== targetHex) {
             // Restore previous
-            if (this.hoveredHex) {
-                // Reset emissive or color
-                const mesh = this.hoveredHex.children.find(c => c instanceof THREE.Mesh) as THREE.Mesh;
-                if (mesh && (mesh.material as THREE.MeshStandardMaterial).emissive) {
-                    (mesh.material as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
-                }
+            if (this.hoveredHex && this.hoveredTerrain) {
+                this.shaderManager.setHexHighlight(this.hoveredTerrain, false);
             }
 
             this.hoveredHex = targetHex;
+            this.hoveredTerrain = targetTerrain;
 
             // Highlight new
-            if (this.hoveredHex) {
-                const mesh = this.hoveredHex.children.find(c => c instanceof THREE.Mesh) as THREE.Mesh;
-                if (mesh && (mesh.material as THREE.MeshStandardMaterial).emissive) {
-                    (mesh.material as THREE.MeshStandardMaterial).emissive.setHex(0x555555);
-                }
+            if (this.hoveredHex && this.hoveredTerrain) {
+                this.shaderManager.setHexHighlight(this.hoveredTerrain, true, false);
             }
         }
     }
@@ -245,21 +297,8 @@ export class Game3D {
         const baseSize = hexSize * 0.95 * scale;
 
         let geometry: THREE.BufferGeometry;
-        let material: THREE.Material;
+        let material: THREE.Material = new THREE.MeshBasicMaterial(); // placeholder, will be replaced
         let yOffset = 0;
-
-        // Base color mapping
-        let color = 0xcccccc;
-        switch (hex.terrain) {
-            case 'plains': color = 0x2ecc71; break;
-            case 'forest': color = 0x27ae60; break;
-            case 'mountains': color = 0x7f8c8d; break;
-            case 'hills': color = 0x95a5a6; break;
-            case 'water': color = 0x3498db; break;
-            case 'desert': color = 0xf1c40f; break;
-            case 'swamp': color = 0x8e44ad; break;
-            case 'wasteland': color = 0xc0392b; break;
-        }
 
         // Custom Geometries based on Terrain
         if (hex.terrain === 'mountains') {
@@ -281,8 +320,9 @@ export class Game3D {
             yOffset = 0;
         }
 
-        if (!material!) {
-            material = new THREE.MeshStandardMaterial({ color: color, roughness: 0.8 });
+        // Use Shader Material for all terrain types (including water fallback)
+        if (!material) {
+            material = this.shaderManager.getMaterial(hex.terrain);
         }
 
         const mesh = new THREE.Mesh(geometry, material);
@@ -651,12 +691,14 @@ export class Game3D {
 
         const isNight = this.game.timeManager ? this.game.timeManager.isNight() : false;
 
-        // Find existing lights
+        // Use Shader Manager for time of day
+        this.shaderManager.setTimeOfDay(isNight);
+
+        // Keep legacy lights for non-shader objects (hero, sites, etc.)
         const ambientLight = this.scene.children.find(c => c instanceof THREE.AmbientLight) as THREE.AmbientLight;
         const dirLight = this.scene.children.find(c => c instanceof THREE.DirectionalLight) as THREE.DirectionalLight;
 
         if (isNight) {
-            // Night Mode: Cool blue, dimmer
             if (ambientLight) ambientLight.color.setHex(0x1a2b3c);
             if (ambientLight) ambientLight.intensity = 0.4;
 
@@ -669,7 +711,6 @@ export class Game3D {
             if (this.scene.fog) this.scene.fog.color.setHex(0x050510);
 
         } else {
-            // Day Mode: Warm yellow/white, bright
             if (ambientLight) ambientLight.color.setHex(0xffffff);
             if (ambientLight) ambientLight.intensity = 0.6;
 
@@ -732,6 +773,9 @@ export class Game3D {
         const delta = this.clock.getDelta();
         const elapsed = this.clock.getElapsedTime();
 
+        // Update shader manager
+        this.shaderManager.update(delta);
+
         // Update water shader uniforms
         this.waterMaterials.forEach(mat => {
             mat.uniforms.uTime.value = elapsed;
@@ -751,7 +795,27 @@ export class Game3D {
 
         this.handleHoverInteraction(); // Update hover effects
 
-        if (this.renderer && this.scene && this.camera) {
+        // Update particle system
+        const cameraPos = new THREE.Vector3();
+        this.camera!.getWorldPosition(cameraPos);
+        if (this.particleSystem) {
+            this.particleSystem.update(this.clock.getDelta(), cameraPos);
+        }
+
+        // Update sprite animation system
+        if (this.spriteAnimation) {
+            this.spriteAnimation.update(this.clock.getDelta());
+        }
+
+        // Update dynamic lighting system
+        if (this.dynamicLighting) {
+            this.dynamicLighting.update(this.clock.getDelta());
+        }
+
+        // Render via Post-Processing or directly
+        if (this.postProcessing && this.enabled) {
+            this.postProcessing.render();
+        } else if (this.renderer && this.scene && this.camera) {
             this.renderer.render(this.scene, this.camera);
         }
     }
@@ -765,6 +829,16 @@ export class Game3D {
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+
+        // Resize post-processing
+        if (this.postProcessing) {
+            this.postProcessing.resize(width, height);
+        }
+
+        // Resize dynamic lighting
+        if (this.dynamicLighting) {
+            this.dynamicLighting.resize(width, height);
+        }
     }
 
     destroy(): void {
@@ -774,6 +848,33 @@ export class Game3D {
 
         this.listeners.forEach(cleanup => cleanup());
         this.listeners = [];
+
+        // Dispose post-processing
+        if (this.postProcessing) {
+            this.postProcessing.dispose();
+            this.postProcessing = null;
+        }
+
+        // Dispose shader manager
+        this.shaderManager.dispose();
+
+        // Dispose particle system
+        if (this.particleSystem) {
+            this.particleSystem.dispose();
+            this.particleSystem = null;
+        }
+
+        // Dispose sprite animation system
+        if (this.spriteAnimation) {
+            this.spriteAnimation.dispose();
+            this.spriteAnimation = null;
+        }
+
+        // Dispose dynamic lighting system
+        if (this.dynamicLighting) {
+            this.dynamicLighting.dispose();
+            this.dynamicLighting = null;
+        }
 
         if (this.container) {
             this.container.innerHTML = '';

@@ -1,21 +1,21 @@
 /* Event Modal specific styles (extending Modal) */
 .event-modal-content {
     background: linear-gradient(135deg, rgba(20, 20, 35, 0.95), rgba(10, 10, 20, 0.98));
-    border: 1px solid var(--color-accent-gold);
+    border: 1px solid var(--color-gold-400);
     max-width: 500px;
 }
 
 .event-header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
     border-bottom: 2px solid rgba(251, 191, 36, 0.3);
-    padding-bottom: var(--spacing-sm);
+    padding-bottom: var(--space-2);
 }
 
 .event-header h2 {
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     font-size: 1.5rem;
     text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
     margin: 0;
@@ -24,25 +24,25 @@
 .event-description {
     font-size: 1.1rem;
     line-height: 1.6;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--space-6);
     color: var(--color-text-secondary);
     font-style: italic;
     background: rgba(0, 0, 0, 0.2);
-    padding: var(--spacing-md);
+    padding: var(--space-4);
     border-radius: var(--radius-md);
 }
 
 .event-options {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .event-option {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-md);
+    padding: var(--space-4);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.2s ease;
@@ -51,7 +51,7 @@
 .event-option:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateX(5px);
-    border-color: var(--color-accent-gold);
+    border-color: var(--color-gold-400);
 }
 
 .event-option .option-label {

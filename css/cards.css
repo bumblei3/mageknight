@@ -10,38 +10,38 @@
 
 /* Hand Cards Area */
 .hand-area {
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
+    background: var(--color-bg-overlay);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
-    box-shadow: var(--glass-shadow);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-lg);
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: var(--spacing-lg);
+    gap: var(--space-6);
     align-items: flex-start;
     min-height: 320px;
     /* Increased and fixed height to prevent CLS */
-    padding-top: var(--spacing-xl);
+    padding-top: var(--space-10);
     perspective: 1000px;
 }
 
 .hand-area h2 {
     font-size: 1rem;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--space-2);
     color: var(--color-accent-primary);
     grid-column: 1 / -1;
 }
 
 .cards-container {
     display: flex;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
     overflow-x: auto;
-    padding-bottom: var(--spacing-sm);
+    padding-bottom: var(--space-2);
     align-items: center;
     height: 240px;
     /* Fixed height for card container to prevent shift */
-    padding-top: var(--spacing-lg);
+    padding-top: var(--space-6);
     scrollbar-width: none;
 }
 
@@ -54,12 +54,12 @@
     min-width: 140px;
     width: 140px;
     height: 220px;
-    background: var(--parchment-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
-    padding: var(--spacing-md);
+    padding: var(--space-4);
     cursor: pointer;
     transition: transform 0.4s var(--transition-bounce), box-shadow 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
     position: relative;
@@ -70,7 +70,7 @@
     perspective: 1000px;
     will-change: transform;
     animation: cardEnter 0.6s var(--transition-bounce) backwards;
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Card corner decorations */
@@ -80,7 +80,7 @@
     top: 3px;
     left: 5px;
     font-size: 12px;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     opacity: 0.4;
 }
 
@@ -104,7 +104,7 @@
         0 30px 60px rgba(0, 0, 0, 0.8),
         0 0 40px hsla(var(--h-gold), 80%, 50%, 0.4),
         inset 0 1px 0 rgba(255, 220, 150, 0.3);
-    border-color: var(--glass-border-highlight);
+    border-color: var(--color-border-hover);
     filter: brightness(1.1);
 }
 
@@ -152,9 +152,9 @@
 
 /* Card Header Typography */
 .card .card-header {
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--space-2);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: var(--spacing-xs);
+    padding-bottom: var(--space-1);
 }
 
 .card .card-title {
@@ -179,7 +179,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: var(--spacing-xs);
+    gap: var(--space-1);
     font-size: 0.8rem;
     line-height: 1.4;
     color: var(--color-text-secondary);
@@ -195,7 +195,7 @@
 }
 
 .card[data-type="artifact"] {
-    border-top: 3px solid var(--color-accent-gold);
+    border-top: 3px solid var(--color-gold-400);
 }
 
 .card[data-type="wound"] {
@@ -235,9 +235,9 @@
 }
 
 .card.selected {
-    border-color: var(--color-accent-gold);
+    border-color: var(--color-gold-400);
     box-shadow:
-        0 0 30px var(--color-accent-gold),
+        0 0 30px var(--color-gold-400),
         0 10px 30px rgba(251, 191, 36, 0.4);
     animation: pulse 2s ease-in-out infinite;
 }
@@ -246,11 +246,11 @@
 
     0%,
     100% {
-        box-shadow: 0 0 20px var(--color-accent-gold);
+        box-shadow: 0 0 20px var(--color-gold-400);
     }
 
     50% {
-        box-shadow: 0 0 40px var(--color-accent-gold), 0 0 60px rgba(251, 191, 36, 0.3);
+        box-shadow: 0 0 40px var(--color-gold-400), 0 0 60px rgba(251, 191, 36, 0.3);
     }
 }
 
@@ -266,7 +266,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--space-2);
     position: relative;
     z-index: 1;
 }
@@ -275,11 +275,11 @@
     font-weight: bold;
     font-size: 0.875rem;
     color: var(--color-text-primary);
-    transition: var(--transition-normal);
+    transition: var(--transition-base);
 }
 
 .card:hover .card-name {
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     transform: scale(1.05);
 }
 
@@ -293,26 +293,26 @@
 .card-effects {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
-    margin-top: var(--spacing-sm);
+    gap: var(--space-1);
+    margin-top: var(--space-2);
 }
 
 .card-effect {
     font-size: 0.75rem;
-    padding: var(--spacing-xs);
-    background: var(--color-bg-primary);
+    padding: var(--space-1);
+    background: var(--color-bg-base);
     border-radius: var(--radius-sm);
     color: var(--color-text-secondary);
 }
 
 .card-effect strong {
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
 }
 
 .card-mana-cost {
     position: absolute;
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
+    top: var(--space-2);
+    right: var(--space-2);
     background: var(--color-accent-primary);
     color: white;
     width: 24px;
@@ -357,7 +357,7 @@
 .mana-dice {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .mana-die {
@@ -508,12 +508,12 @@
 
 .hand-cards-container {
     display: flex;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-lg);
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
     background: rgba(15, 23, 42, 0.85);
     /* Dark semi-transparent rail */
     backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
     height: 260px;
@@ -522,7 +522,7 @@
     align-items: center;
     pointer-events: auto;
     /* Rail captures clicks */
-    transition: transform var(--transition-normal);
+    transition: transform var(--transition-base);
 }
 
 .hand-cards-container:hover {
@@ -534,18 +534,18 @@
 .play-area {
     display: flex;
     flex-direction: column;
-    margin-right: var(--spacing-md);
-    padding: var(--spacing-md);
+    margin-right: var(--space-4);
+    padding: var(--space-4);
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     pointer-events: auto;
 }
 
 .played-cards-container {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 /* ===================================
@@ -555,22 +555,22 @@
 .action-bar {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm) var(--spacing-lg);
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-6);
     background: rgba(5, 5, 16, 0.95);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border-top: 1px solid var(--glass-border);
-    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border-default);
     pointer-events: auto;
     min-height: 56px;
-    transition: var(--transition-normal);
+    transition: var(--transition-base);
 }
 
 .action-bar-content {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     justify-content: center;
     align-items: center;
     min-height: 36px;
@@ -581,9 +581,9 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
+    background: var(--color-bg-overlay);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     color: var(--color-text-primary);
     font-family: var(--font-body);
@@ -592,12 +592,12 @@
     cursor: pointer;
     transition: var(--transition-fast);
     white-space: nowrap;
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--shadow-lg);
 }
 
 .action-btn:hover:not(:disabled) {
     background: var(--glass-bg-hover);
-    border-color: var(--glass-border-highlight);
+    border-color: var(--color-border-hover);
     transform: translateY(-2px);
     box-shadow:
         0 8px 20px rgba(0, 0, 0, 0.6),
@@ -648,7 +648,7 @@
     font-family: var(--font-body);
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         0 1px 2px rgba(0, 0, 0, 0.3);
@@ -664,7 +664,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
     font-size: 0.75rem;
     color: var(--color-text-muted);
     min-height: 20px;
@@ -684,7 +684,7 @@
 
 .action-bar-hint .hint-item:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: var(--glass-border);
+    border-color: var(--color-border-default);
 }
 
 .action-bar-hint kbd {
@@ -711,12 +711,12 @@
 }
 
 .card-tooltip-content {
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
+    background: var(--color-bg-overlay);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    box-shadow: var(--glass-shadow);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-lg);
     color: var(--color-text-primary);
     font-size: 0.8rem;
     line-height: 1.5;
@@ -725,16 +725,16 @@
 .card-tooltip-content .tooltip-title {
     font-family: var(--font-heading);
     font-weight: 700;
-    color: var(--color-accent-gold);
-    margin-bottom: var(--spacing-xs);
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: var(--spacing-xs);
+    color: var(--color-gold-400);
+    margin-bottom: var(--space-1);
+    border-bottom: 1px solid var(--color-border-default);
+    padding-bottom: var(--space-1);
 }
 
 .card-tooltip-content .tooltip-section {
-    margin-top: var(--spacing-sm);
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--glass-border);
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border-default);
 }
 
 .card-tooltip-content .tooltip-section-title {
@@ -748,7 +748,7 @@
 .card-tooltip-content .effect-row {
     display: flex;
     justify-content: space-between;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     margin: 2px 0;
 }
 
@@ -780,11 +780,11 @@
 
 /* Combat Phase Indicator Enhancement */
 .phase-indicator {
-    background: var(--parchment-bg);
-    backdrop-filter: var(--backdrop-blur);
-    border: 2px solid var(--parchment-border);
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    backdrop-filter: var(--glass-blur);
+    border: 2px solid 2px solid rgba(148, 163, 184, 0.3);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--space-4) var(--space-6);
     text-align: center;
     transition: var(--transition-slow);
     position: relative;
@@ -834,7 +834,7 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-text-primary);
-    text-shadow: 0 0 10px var(--phase-color, var(--color-accent-gold));
+    text-shadow: 0 0 10px var(--phase-color, var(--color-gold-400));
 }
 
 .phase-subtext {
@@ -869,9 +869,9 @@
 
 .smart-tooltip-content {
     background: linear-gradient(135deg, rgba(20, 20, 40, 0.98), rgba(10, 10, 20, 0.98));
-    border: 1px solid var(--color-accent-gold);
+    border: 1px solid var(--color-gold-400);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    padding: var(--space-4);
     box-shadow:
         0 10px 40px rgba(0, 0, 0, 0.8),
         0 0 20px rgba(251, 191, 36, 0.3);
@@ -883,9 +883,9 @@
 .smart-tooltip-content .tooltip-header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-accent-gold);
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+    color: var(--color-gold-400);
     font-weight: 600;
     font-size: 0.9rem;
 }
@@ -905,14 +905,14 @@
     border-radius: var(--radius-sm);
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     margin: 2px 0;
 }
 
 .smart-tooltip-content .shortcut-badge kbd {
     background: rgba(0, 0, 0, 0.5);
     border-color: rgba(251, 191, 36, 0.3);
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
 }
 
 /* Keyboard Shortcuts Overlay */
@@ -938,15 +938,15 @@
 }
 
 .shortcuts-overlay-content {
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border-highlight);
+    background: var(--color-bg-overlay);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-border-hover);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+    padding: var(--space-10);
     max-width: 600px;
     max-height: 80vh;
     overflow-y: auto;
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--shadow-lg);
     transform: scale(0.95);
     transition: transform 0.3s var(--transition-bounce);
 }
@@ -957,13 +957,13 @@
 
 .shortcuts-overlay h2 {
     font-family: var(--font-display);
-    color: var(--color-accent-gold);
-    margin-bottom: var(--spacing-lg);
+    color: var(--color-gold-400);
+    margin-bottom: var(--space-6);
     text-align: center;
 }
 
 .shortcuts-category {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--space-6);
 }
 
 .shortcuts-category h3 {
@@ -971,24 +971,24 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: var(--spacing-xs);
+    margin-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border-default);
+    padding-bottom: var(--space-1);
 }
 
 .shortcuts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .shortcut-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--space-1) var(--space-2);
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
 }
@@ -999,7 +999,7 @@
     border-radius: 4px;
     padding: 2px 8px;
     font-size: 0.75rem;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     font-family: var(--font-body);
 }
 

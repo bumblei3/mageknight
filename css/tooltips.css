@@ -1,32 +1,21 @@
 /* Mage Knight Tooltips - Premium Fantasy Style */
 
-:root {
-    --tooltip-bg: rgba(15, 23, 42, 0.95);
-    --tooltip-border: 1px solid rgba(251, 191, 36, 0.4);
-    --tooltip-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(251, 191, 36, 0.1);
-    --tooltip-text-primary: #f3f4f6;
-    --tooltip-text-secondary: #e2e8f0;
-    --tooltip-header-bg: linear-gradient(90deg, rgba(251, 191, 36, 0.1), transparent);
-    --tooltip-divider: linear-gradient(90deg, rgba(251, 191, 36, 0.5), transparent);
-    --z-tooltip: 10000;
-}
-
 .game-tooltip {
     position: fixed;
-    z-index: var(--z-tooltip);
+    z-index: var(--z-toast);
     background: var(--tooltip-bg);
     border: var(--tooltip-border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     box-shadow: var(--tooltip-shadow);
     padding: 0;
     max-width: 320px;
     pointer-events: none;
     /* Allows mouse to pass through to underlying elements if needed, but important for custom cursor feels */
     color: var(--tooltip-text-primary);
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-heading);
     font-size: 0.9rem;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     transition: opacity 0.2s ease, transform 0.2s ease;
     overflow: hidden;
 }
@@ -47,7 +36,7 @@
 
 .game-tooltip .tooltip-name {
     font-weight: 700;
-    color: #fbbf24;
+    color: var(--color-gold-400);
     /* Amber-400 */
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -61,27 +50,27 @@
 }
 
 .game-tooltip .tooltip-card-color.red {
-    color: #ef4444;
+    color: var(--color-mana-red);
     text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.blue {
-    color: #3b82f6;
+    color: var(--color-mana-blue);
     text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.green {
-    color: #10b981;
+    color: var(--color-mana-green);
     text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.white {
-    color: #f3f4f6;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    color: var(--color-mana-white);
+    text-shadow: 0 0 8px rgba(249, 250, 251, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.gold {
-    color: #fbbf24;
+    color: var(--color-mana-gold);
     text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
 }
 
@@ -115,7 +104,7 @@
 
 .game-tooltip .tooltip-section strong {
     display: block;
-    color: #e2e8f0;
+    color: var(--color-text-secondary);
     margin-bottom: 2px;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -124,13 +113,13 @@
 
 .game-tooltip .tooltip-hint {
     font-style: italic;
-    color: #cbd5e1;
+    color: var(--color-text-secondary);
     font-size: 0.8rem;
     margin-top: 2px;
 }
 
 .game-tooltip .value {
-    color: #fff;
+    color: var(--color-text-primary);
     font-weight: 700;
 }
 
@@ -152,10 +141,10 @@
     margin-top: 4px;
     padding: 4px 8px;
     background: rgba(251, 191, 36, 0.1);
-    border-left: 2px solid #fbbf24;
-    color: #fcd34d;
+    border-left: 2px solid var(--color-gold-400);
+    color: var(--color-gold-300);
     font-size: 0.8rem;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 /* Site Specifics */
@@ -173,11 +162,11 @@
 }
 
 .game-tooltip .status-conquered {
-    color: #fbbf24;
+    color: var(--color-gold-400);
 }
 
 .game-tooltip .status-visited {
-    color: #10b981;
+    color: var(--color-mana-green);
 }
 
 .game-tooltip .tooltip-actions {
@@ -192,8 +181,8 @@
     font-size: 0.7rem;
     padding: 2px 6px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    color: #e2e8f0;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
     display: flex;
     align-items: center;
     gap: 4px;
@@ -212,8 +201,8 @@
 
 /* Glossary Terms in Description */
 .game-tooltip .glossary-term {
-    color: #d8b4fe;
-    border-bottom: 1px dotted #c084fc;
+    color: var(--color-purple-400);
+    border-bottom: 1px dotted var(--color-purple-500);
 }
 
 /* Generic Tooltip (Stat Pill) */

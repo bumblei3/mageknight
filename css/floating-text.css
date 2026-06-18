@@ -13,7 +13,7 @@
 
 .floating-text {
     position: absolute;
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-display);
     font-weight: bold;
     font-size: 24px;
     text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -26,34 +26,34 @@
 
 /* Specific Types */
 .ft-damage {
-    color: #ef4444;
+    color: var(--color-mana-red);
     /* bright red */
     font-size: 28px;
     animation: floatUpBounce 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .ft-heal {
-    color: #34d399;
+    color: var(--color-green-400);
     /* emerald green */
     text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
     animation: floatUpFade 2s ease-out forwards;
 }
 
 .ft-xp {
-    color: #f59e0b;
+    color: var(--color-mana-gold);
     /* amber/gold */
     font-size: 20px;
 }
 
 .ft-mana {
-    color: #60a5fa;
+    color: var(--color-blue-400);
     /* blue */
-    font-family: 'Roboto', sans-serif;
-    text-shadow: 0 0 5px #2563eb;
+    font-family: var(--font-body);
+    text-shadow: 0 0 5px var(--color-blue-600);
 }
 
 .ft-crit {
-    color: #fbbf24;
+    color: var(--color-gold-400);
     /* yellow/gold */
     font-size: 42px;
     z-index: 10;
@@ -61,9 +61,9 @@
 }
 
 .ft-block {
-    color: #94a3b8;
+    color: var(--color-gray-400);
     /* slate/grey */
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-body);
 }
 
 /* Animations */

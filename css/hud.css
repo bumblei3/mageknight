@@ -3,32 +3,32 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
+    background: var(--color-bg-overlay);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     padding: 0.75rem 2rem;
     height: 64px;
     /* Fixed height to prevent CLS */
     box-sizing: border-box;
     border-radius: var(--radius-md);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--color-border-default);
+    box-shadow: var(--shadow-lg);
     pointer-events: auto;
     z-index: 20;
-    transition: var(--transition-normal);
+    transition: var(--transition-base);
 }
 
 .header-left,
 .header-right {
     display: flex;
     align-items: center;
-    gap: var(--spacing-lg);
+    gap: var(--space-6);
 }
 
 .game-logo {
     font-family: var(--font-display);
     font-size: 1.5rem;
-    background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-primary));
+    background: linear-gradient(135deg, var(--color-gold-400), var(--color-accent-primary));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -39,13 +39,13 @@
 /* Header Controls */
 .header-controls {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .hud-sidebar {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
     width: 320px;
     height: calc(100vh - 100px);
     overflow-y: auto;
@@ -93,21 +93,21 @@
 /* Panel Override for Fantasy Parchment Look */
 .panel,
 .debug-panel {
-    background: var(--parchment-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.6),
         inset 0 1px 0 rgba(255, 220, 150, 0.1),
         inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-    border: var(--parchment-border);
+    border: 2px solid rgba(148, 163, 184, 0.3);
     border-radius: var(--radius-sm);
-    padding: var(--spacing-md);
+    padding: var(--space-4);
     margin-bottom: 0;
     pointer-events: auto;
     overflow: hidden;
     position: relative;
-    transition: var(--transition-normal);
+    transition: var(--transition-base);
 }
 
 .panel::before {
@@ -116,9 +116,9 @@
     top: 6px;
     left: 10px;
     font-size: 0.9rem;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     opacity: 0.3;
-    transition: var(--transition-normal);
+    transition: var(--transition-base);
 }
 
 .panel::after {
@@ -127,20 +127,20 @@
     top: 6px;
     right: 10px;
     font-size: 0.9rem;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     opacity: 0.3;
-    transition: var(--transition-normal);
+    transition: var(--transition-base);
 }
 
 .panel:hover::before,
 .panel:hover::after {
     opacity: 0.7;
-    filter: drop-shadow(0 0 5px var(--color-accent-gold));
+    filter: drop-shadow(0 0 5px var(--color-gold-400));
 }
 
 .panel:hover,
 .debug-panel:hover {
-    border-color: var(--glass-border-highlight);
+    border-color: var(--color-border-hover);
     background: var(--glass-bg-hover);
     transform: translateY(-2px);
     box-shadow:
@@ -154,7 +154,7 @@
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--color-text-primary);
-    margin: 0 0 var(--spacing-sm) 0;
+    margin: 0 0 var(--space-2) 0;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -164,7 +164,7 @@
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--color-text-secondary);
-    margin: var(--spacing-sm) 0;
+    margin: var(--space-2) 0;
 }
 
 /* Collapsible Panel Headers */
@@ -173,7 +173,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--space-2);
 }
 
 .panel-toggle,
@@ -194,7 +194,7 @@
 
 /* Hero Avatar in HUD Sidebar */
 .hero-panel {
-    padding-bottom: var(--spacing-lg);
+    padding-bottom: var(--space-6);
     /* More space at bottom */
 }
 
@@ -202,7 +202,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
     /* Increased gap */
 }
 
@@ -258,12 +258,12 @@
 
 /* Skills List */
 .skill-list-container {
-    margin-top: var(--spacing-md);
+    margin-top: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
-    border-top: 1px solid var(--glass-border);
-    padding-top: var(--spacing-sm);
+    gap: var(--space-1);
+    border-top: 1px solid var(--color-border-default);
+    padding-top: var(--space-2);
 }
 
 .skills-header {
@@ -277,9 +277,9 @@
 
 /* Movement Preview */
 .movement-preview {
-    margin-top: var(--spacing-sm);
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--glass-border);
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border-default);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -301,10 +301,10 @@
 .skill-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     padding: 6px 10px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
     transition: var(--transition-fast);
@@ -355,7 +355,7 @@
 .action-grid {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     /* Increased gap */
 }
 
@@ -365,9 +365,9 @@
 }
 
 .debug-section {
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--space-2);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: var(--spacing-sm);
+    padding-bottom: var(--space-2);
 }
 
 .debug-section button {
@@ -388,10 +388,10 @@
 
 .debug-toggle {
     width: 100%;
-    padding: var(--spacing-sm);
+    padding: var(--space-2);
     background: rgba(0, 0, 0, 0.3);
-    border: 1px dashed var(--glass-border);
-    margin-bottom: var(--spacing-sm);
+    border: 1px dashed var(--color-border-default);
+    margin-bottom: var(--space-2);
     cursor: pointer;
     text-align: center;
     border-radius: var(--radius-md);
@@ -402,9 +402,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-xs);
+    gap: var(--space-1);
     font-size: 1.2rem;
-    padding: var(--spacing-xs);
+    padding: var(--space-1);
 }
 
 .movement-panel .stat-icon {
@@ -414,7 +414,7 @@
 .movement-panel .stat-value {
     font-weight: bold;
     font-size: 1.5rem;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
 }
 
 /* Collapsible Panels */
@@ -456,13 +456,13 @@
 /* Removed redundant redundant .hud-sidebar definition */
 
 .toast {
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
+    background: var(--color-bg-overlay);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-border-default);
     padding: 1rem 1.5rem;
     border-radius: var(--radius-md);
     color: white;
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -507,17 +507,17 @@
 .stat-pill {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     background: rgba(255, 255, 255, 0.03);
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-md);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--color-border-default);
     transition: var(--transition-fast);
 }
 
 .stat-pill:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: var(--glass-border-highlight);
+    border-color: var(--color-border-hover);
     transform: translateY(-1px);
 }
 
@@ -534,7 +534,7 @@
     font-family: 'Outfit', sans-serif;
     font-size: 1.4rem;
     font-weight: 800;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     text-shadow: 0 0 10px hsla(var(--h-gold), 80%, 50%, 0.3);
 }
 
@@ -575,13 +575,13 @@
 .time-indicator-container {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     background: rgba(0, 0, 0, 0.4);
     padding: 0.4rem 1rem;
     border-radius: 2rem;
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--color-border-default);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-    margin-left: var(--spacing-lg);
+    margin-left: var(--space-6);
 }
 
 .time-icon {
@@ -626,12 +626,12 @@
     font-size: 0.875rem;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
-    padding-right: var(--spacing-xs);
+    gap: var(--space-1);
+    padding-right: var(--space-1);
 }
 
 .log-entry {
-    padding: var(--spacing-sm);
+    padding: var(--space-2);
     background: rgba(255, 255, 255, 0.03);
     border-radius: var(--radius-sm);
     border-left: 3px solid var(--color-accent-primary);
@@ -726,7 +726,7 @@
 }
 
 .log-message strong {
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
 }
 
 .log-message em {
@@ -940,7 +940,7 @@
 .enemy-card {
     position: relative;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     padding: 1rem;
     margin-bottom: 1rem;
@@ -961,7 +961,7 @@
 }
 
 .enemy-card.boss-card {
-    border: 2px solid var(--color-accent-gold);
+    border: 2px solid var(--color-gold-400);
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(0, 0, 0, 0.4));
     box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
 }
@@ -1062,7 +1062,7 @@
     border-radius: 4px;
     font-size: 0.7rem;
     font-weight: bold;
-    border: 1px solid var(--color-accent-gold);
+    border: 1px solid var(--color-gold-400);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     z-index: 5;
 }
@@ -1179,7 +1179,7 @@
 }
 
 .boss-phase-name {
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     font-weight: 600;
 }
 
@@ -1202,13 +1202,13 @@
     z-index: 10000;
     pointer-events: none;
     max-width: 320px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
+    background: var(--color-bg-overlay);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    box-shadow: var(--glass-shadow);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-lg);
     color: var(--color-text-primary);
     font-size: 0.9rem;
     line-height: 1.5;
@@ -1224,21 +1224,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--space-2);
 }
 
 .tooltip-name {
     font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
     letter-spacing: 0.05em;
 }
 
 .tooltip-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--glass-border-highlight), transparent);
-    margin: var(--spacing-sm) 0;
+    background: linear-gradient(90deg, transparent, var(--color-border-hover), transparent);
+    margin: var(--space-2) 0;
 }
 
 .tooltip-description {
@@ -1262,7 +1262,7 @@
 
 .tooltip-stat-row .value {
     font-weight: 700;
-    color: var(--color-accent-gold);
+    color: var(--color-gold-400);
 }
 
 /* Tooltip Mana & Colors */
@@ -1279,5 +1279,5 @@
 /* Elemental Tooltip Styling */
 .tooltip-header .tooltip-icon {
     font-size: 1.5rem;
-    margin-right: var(--spacing-sm);
+    margin-right: var(--space-2);
 }

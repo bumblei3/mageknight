@@ -80,12 +80,12 @@
     /* Sidebars turn into Drawers or Bottom Sheets */
     .hud-sidebar {
         position: fixed;
-        background: var(--glass-bg);
+        background: var(--color-bg-overlay);
         backdrop-filter: blur(10px);
         z-index: 100;
         transition: transform 0.3s ease;
         max-height: 80vh;
-        border: 1px solid var(--glass-border);
+        border: 1px solid var(--color-border-default);
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     }
 
@@ -137,7 +137,7 @@
         width: 40px;
         height: 40px;
         background: rgba(0, 0, 0, 0.6);
-        border: 1px solid var(--color-accent-gold);
+        border: 1px solid var(--color-gold-400);
         border-radius: 5px;
         display: flex;
         align-items: center;
@@ -187,5 +187,383 @@
     .hero-cards-grid {
         grid-template-columns: 1fr;
         /* Stack hero cards */
+    }
+}
+
+/* ========================================
+   TOUCH ENHANCEMENTS
+   ======================================== */
+
+/* Larger tap targets for interactive elements */
+@media (hover: none) and (pointer: coarse) {
+
+    .card,
+    .mana-die,
+    .btn,
+    button {
+        min-height: 44px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(139, 92, 246, 0.3);
+    }
+
+    /* Remove hover effects on touch devices */
+    .card:hover {
+        transform: translateY(0);
+    }
+
+    /* Add active state for touch feedback */
+    .card:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+
+    .btn:active,
+    button:active {
+        transform: scale(0.97);
+    }
+
+    .mana-die:active {
+        transform: scale(0.9);
+    }
+
+    /* Prevent text selection on touch */
+    .card,
+    .btn,
+    button,
+    .mana-die,
+    .panel h2,
+    .shortcuts-bar {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+}
+
+/* ========================================
+   TOUCH DRAG & DROP STYLES
+   ======================================== */
+
+.card-drag-ghost {
+    border: 2px solid var(--color-gold-400);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transform-origin: center center;
+    transition: transform 0.1s ease-out;
+}
+
+.card.dragging {
+    opacity: 0.5 !important;
+    transform: scale(0.95);
+}
+
+.touch-drop-zone {
+    animation: pulse-drop-zone 1.5s ease-in-out infinite;
+}
+
+.touch-drop-zone.valid {
+    border-color: var(--color-mana-green) !important;
+    background: rgba(16, 185, 129, 0.4) !important;
+}
+
+@keyframes pulse-drop-zone {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* ========================================
+   HAND CARDS - HORIZONTAL SCROLL (TOUCH)
+   ======================================== */
+
+@media (max-width: 1024px) {
+    .cards-container {
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding: 0 var(--space-4);
+    }
+
+    .cards-container .card {
+        scroll-snap-align: center;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .cards-container {
+        height: auto;
+        min-height: 240px;
+        padding: var(--space-4);
+        gap: var(--space-2);
+    }
+    
+    .card {
+        min-width: 120px;
+        width: 120px;
+        height: 190px;
+    }
+}
+
+/* Scroll indicators for horizontal scroll */
+.cards-container::before,
+.cards-container::after {
+    content: '';
+    position: sticky;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.cards-container::before {
+    left: 0;
+    background: linear-gradient(to right, var(--color-bg-overlay), transparent);
+}
+
+.cards-container::after {
+    right: 0;
+    background: linear-gradient(to left, var(--color-bg-overlay), transparent);
+}
+
+/* ========================================
+   MODALS - TOUCH IMPROVEMENTS
+   ======================================== */
+
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets for modal buttons */
+    .modal-close {
+        min-width: 48px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Card Play Modal - Touch optimized */
+    .play-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .play-option-btn {
+        min-width: 100%;
+        min-height: 100px;
+        padding: 1.5rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    .play-option-btn.basic,
+    .play-option-btn.strong {
+        width: 100%;
+    }
+
+    .option-header {
+        font-size: 1.3rem;
+    }
+
+    .option-effect {
+        font-size: 1.1rem;
+    }
+
+    .option-cost {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Sideways Modal - Touch optimized */
+    .sideways-options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-4);
+        margin-top: var(--space-6);
+    }
+
+    .sideways-btn {
+        min-height: 100px;
+        padding: var(--space-6);
+        font-size: 1rem;
+    }
+
+    .sideways-btn .btn-icon {
+        font-size: 2rem;
+    }
+
+    .sideways-btn .btn-label {
+        font-size: 1rem;
+    }
+
+    .sideways-cancel {
+        width: 100%;
+        min-height: 56px;
+        font-size: 1.1rem;
+        margin-top: var(--space-6);
+    }
+
+    /* Level Up Modal - Touch optimized */
+    .skill-choice {
+        min-width: 160px;
+        min-height: 160px;
+        padding: var(--space-6);
+    }
+
+    .card-choice {
+        min-width: 140px;
+    }
+
+    /* Help Modal Tabs - Touch scrollable */
+    .help-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: var(--space-2);
+        gap: var(--space-2);
+    }
+
+    .help-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .help-tab {
+        flex-shrink: 0;
+        min-width: 120px;
+        min-height: 48px;
+        padding: var(--space-2) var(--space-4);
+        font-size: 0.9rem;
+    }
+
+    /* Rest/Site/Scenario Modals */
+    .rest-content,
+    .site-content,
+    .scenario-content {
+        max-height: 85vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Buttons in modals */
+    .modal-content .btn,
+    .modal-content button {
+        min-height: 52px;
+        min-width: 52px;
+        font-size: 1rem;
+        padding: 0.8rem 1.2rem;
+    }
+
+    .modal-content .btn-primary,
+    .modal-content .btn-secondary {
+        width: 100%;
+        margin-top: var(--space-4);
+    }
+
+    /* Combat UI buttons */
+    .combat-actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .combat-action-btn {
+        min-height: 60px;
+        font-size: 1.1rem;
+        padding: var(--space-4) var(--space-10);
+    }
+}
+
+/* ========================================
+   LANDSCAPE ORIENTATION (MOBILE)
+   ======================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .game-main {
+        flex-direction: row;
+    }
+
+    .sidebar-left,
+    .sidebar-right {
+        width: 30%;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+    }
+
+    .game-board-container {
+        width: 40%;
+        order: 0;
+    }
+
+    #game-board {
+        aspect-ratio: 4 / 3;
+    }
+
+    .hand-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(15, 15, 30, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 100;
+        padding: var(--space-2);
+    }
+
+    .cards-container {
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .card,
+    .panel,
+    .btn {
+        border-width: 2px;
+    }
+
+    .card-name,
+    .stat-value,
+    h2 {
+        font-weight: 700;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .card:hover,
+    .card:active {
+        transform: none;
+    }
+}
+
+/* Print styles */
+@media print {
+    .shortcuts-bar,
+    .btn,
+    button,
+    .modal-close,
+    header .header-right {
+        display: none;
+    }
+
+    .game-main {
+        flex-direction: column;
+    }
+
+    .panel {
+        page-break-inside: avoid;
     }
 }

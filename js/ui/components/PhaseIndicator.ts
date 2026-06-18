@@ -4,6 +4,7 @@
  * Keyboard accessible, screen reader friendly
  */
 
+import './PhaseIndicator.css';
 import { COMBAT_PHASES } from '../../constants';
 
 export interface PhaseIndicatorProps {

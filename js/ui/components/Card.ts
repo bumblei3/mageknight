@@ -4,6 +4,7 @@
  * Keyboard accessible, touch-friendly
  */
 
+import './Card.css';
 import { Card as CardClass } from '../../card';
 import { t } from '../../i18n/index';
 

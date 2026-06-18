@@ -357,14 +357,114 @@ export const SAMPLE_SPELLS: any[] = [
         image: 'meteor_storm.png'
     },
     {
-        id: 'healing_touch',
-        name: 'Healing Touch',
-        type: CARD_TYPES.SPELL,
+        id: 'refresh',
+        name: 'Refresh',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GREEN,
+        cost: 0,
+        basicEffect: { type: 'heal', value: 2 },
+        advancedEffect: { type: 'heal', value: 4 },
+        image: 'refresh.png'
+    },
+    {
+        id: 'march',
+        name: 'March',
+        type: CARD_TYPES.ACTION,
         color: CARD_COLORS.WHITE,
-        cost: 1,
-        basicEffect: { type: 'heal', value: 5 },
-        advancedEffect: { type: 'heal', value: 10, full_heal: true },
-        image: 'healing_touch.png'
+        cost: 0,
+        basicEffect: { type: 'move', value: 5 },
+        advancedEffect: { type: 'move', value: 3 },
+        image: 'march.png'
+    },
+    {
+        id: 'stamina',
+        name: 'Stamina',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GREEN,
+        cost: 0,
+        basicEffect: { type: 'move', value: 4 },
+        advancedEffect: { type: 'move', value: 2, block: 2 },
+        image: 'stamina.png'
+    },
+    {
+        id: 'concentration',
+        name: 'Concentration',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.BLUE,
+        cost: 0,
+        basicEffect: { type: 'draw', value: 3 },
+        advancedEffect: { type: 'draw', value: 1, keep: true },
+        image: 'concentration.png'
+    },
+    {
+        id: 'determination',
+        name: 'Determination',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.WHITE,
+        cost: 0,
+        basicEffect: { type: 'block', value: 5 },
+        advancedEffect: { type: 'block', value: 2, attack: 2 },
+        image: 'determination.png'
+    },
+    {
+        id: 'rage',
+        name: 'Rage',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.RED,
+        cost: 0,
+        basicEffect: { type: 'attack', value: 5 },
+        advancedEffect: { type: 'attack', value: 2, move: 2 },
+        image: 'rage.png'
+    },
+    {
+        id: 'swiftness',
+        name: 'Swiftness',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GREEN,
+        cost: 0,
+        basicEffect: { type: 'move', value: 3 },
+        advancedEffect: { type: 'move', value: 2, attack: 2 },
+        image: 'swiftness.png'
+    },
+    {
+        id: 'tranquility',
+        name: 'Tranquility',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.WHITE,
+        cost: 0,
+        basicEffect: { type: 'heal', value: 2 },
+        advancedEffect: { type: 'heal', value: 1, draw: 1 },
+        image: 'tranquility.png'
+    },
+    {
+        id: 'promise',
+        name: 'Promise',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GREEN,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 5 },
+        advancedEffect: { type: 'influence', value: 2, draw: 1 },
+        image: 'promise.png'
+    },
+    {
+        id: 'threaten',
+        name: 'Threaten',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.RED,
+        cost: 0,
+        basicEffect: { type: 'influence', value: 5 },
+        advancedEffect: { type: 'influence', value: 2, attack: 2 },
+        image: 'threaten.png'
+    },
+    {
+        id: 'crystallize',
+        name: 'Crystallize',
+        type: CARD_TYPES.ACTION,
+        color: CARD_COLORS.GOLD,
+        cost: 0,
+        basicEffect: { type: 'mana_token', value: 2 },
+        advancedEffect: { type: 'mana_token', value: 1, crystal: 1 },
+        image: 'crystallize.png'
     }
 ];
 

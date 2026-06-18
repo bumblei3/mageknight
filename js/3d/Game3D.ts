@@ -147,11 +147,60 @@ export class Game3D {
             }
         };
 
+        // Particle effects for combat & spells
+        const onCombatDamage = (data: any) => {
+            if (this.enabled && this.particleSystem && data.position) {
+                const pos = new THREE.Vector3(data.position.x, 0.5, data.position.z);
+                const dir = data.direction ? new THREE.Vector3(data.direction.x, 0, data.direction.z).normalize() : new THREE.Vector3(1, 0, 0);
+                this.particleSystem.createCombatImpact(pos, dir);
+            }
+        };
+
+        const onCombatBlock = (data: any) => {
+            if (this.enabled && this.particleSystem && data.position) {
+                const pos = new THREE.Vector3(data.position.x, 0.5, data.position.z);
+                // Block: small sparkle effect at impact point
+                const system = this.particleSystem.createSystem('block-' + Date.now(), {
+                    position: pos,
+                    particleType: 1,
+                    lifeTime: 0.8,
+                    speed: 6.0,
+                    spread: 1.5,
+                    radius: 0.2,
+                    maxParticles: 300,
+                    particleSize: 0.08,
+                    gravity: new THREE.Vector3(0, -5, 0),
+                });
+                // Auto-remove after short time
+                if (system) setTimeout(() => this.particleSystem?.removeSystem('block-' + (Date.now() - 100)), 1000);
+            }
+        };
+
+        const onCardPlayed = (data: any) => {
+            if (this.enabled && this.particleSystem && data.position) {
+                const pos = new THREE.Vector3(data.position.x, 0.5, data.position.z);
+                // Spell card effect
+                this.particleSystem.createSpellEffect(pos);
+            }
+        };
+
+        const onManaSourceUpdated = (data: any) => {
+            if (this.enabled && this.particleSystem && data.position) {
+                const pos = new THREE.Vector3(data.position.x, 0.5, data.position.z);
+                const color = data.color ? new THREE.Color(data.color) : new THREE.Color(0x00ffff);
+                this.particleSystem.createManaGatherEffect(pos, color);
+            }
+        };
+
         eventBus.on(GAME_EVENTS.HERO_MOVED, onHeroMove);
         eventBus.on(GAME_EVENTS.LOG_ADDED, onMapUpdate);
         eventBus.on(GAME_EVENTS.TIME_CHANGED, onTimeChange);
         eventBus.on(GAME_EVENTS.PHASE_CHANGED, onTimeChange);
         eventBus.on('VOLKARE_UPDATED', onVolkareUpdate);
+        eventBus.on(GAME_EVENTS.COMBAT_DAMAGE, onCombatDamage);
+        eventBus.on(GAME_EVENTS.COMBAT_BLOCK, onCombatBlock);
+        eventBus.on(GAME_EVENTS.CARD_PLAYED, onCardPlayed);
+        eventBus.on(GAME_EVENTS.MANA_SOURCE_UPDATED, onManaSourceUpdated);
 
         this.listeners.push(() => {
             eventBus.off(GAME_EVENTS.HERO_MOVED, onHeroMove);
@@ -159,6 +208,10 @@ export class Game3D {
             eventBus.off(GAME_EVENTS.TIME_CHANGED, onTimeChange);
             eventBus.off(GAME_EVENTS.PHASE_CHANGED, onTimeChange);
             eventBus.off('VOLKARE_UPDATED', onVolkareUpdate);
+            eventBus.off(GAME_EVENTS.COMBAT_DAMAGE, onCombatDamage);
+            eventBus.off(GAME_EVENTS.COMBAT_BLOCK, onCombatBlock);
+            eventBus.off(GAME_EVENTS.CARD_PLAYED, onCardPlayed);
+            eventBus.off(GAME_EVENTS.MANA_SOURCE_UPDATED, onManaSourceUpdated);
 
             if (this.renderer) {
                 this.renderer.domElement.removeEventListener('mousemove', this.onMouseMove.bind(this));

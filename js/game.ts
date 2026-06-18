@@ -119,6 +119,27 @@ export class MageKnightGame {
     public reachableHexes: { q: number; r: number }[] = [];
     public selectedCard: Card | null = null;
 
+    // Auto-save timer (every 30 seconds during active gameplay)
+    private autoSaveInterval: ReturnType<typeof setInterval> | null = null;
+
+    /** Start the auto-save timer (every 30s) */
+    private startAutoSave(): void {
+         this.stopAutoSave();
+         this.autoSaveInterval = setInterval(() => {
+             if (this.gameState === 'playing' && !this.isTestEnvironment) {
+                 this.stateManager.saveGame('auto');
+             }
+         }, 30000);
+     }
+
+     /** Stop the auto-save timer */
+     private stopAutoSave(): void {
+         if (this.autoSaveInterval) {
+             clearInterval(this.autoSaveInterval);
+             this.autoSaveInterval = null;
+         }
+     }
+
     /**
      * Haptic feedback helper — vibrates on supported devices
      * @param pattern - single duration in ms or array of [vibrate, pause, vibrate, ...]
@@ -224,6 +245,7 @@ export class MageKnightGame {
         this.combat = null;
 
         this.ui.setGame(this);
+        this.startAutoSave();
         this.init();
     }
 
@@ -394,6 +416,7 @@ export class MageKnightGame {
      * Cleans up resources and listeners when the game instance is destroyed.
      */
     destroy(): void {
+        this.stopAutoSave();
         this.activeTimeouts.forEach(id => clearTimeout(id as any));
         this.activeTimeouts.clear();
         this.abortController.abort();

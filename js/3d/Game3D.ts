@@ -689,38 +689,33 @@ export class Game3D {
     updateLighting(): void {
         if (!this.scene) return;
 
-        const isNight = this.game.timeManager ? this.game.timeManager.isNight() : false;
+        // Use DynamicLightingManager for full time of day data
+        if (this.dynamicLighting) {
+            const tod = this.dynamicLighting.getTimeOfDay();
+            this.shaderManager.setTimeOfDayFull(tod);
 
-        // Use Shader Manager for time of day
-        this.shaderManager.setTimeOfDay(isNight);
-
-        // Keep legacy lights for non-shader objects (hero, sites, etc.)
-        const ambientLight = this.scene.children.find(c => c instanceof THREE.AmbientLight) as THREE.AmbientLight;
-        const dirLight = this.scene.children.find(c => c instanceof THREE.DirectionalLight) as THREE.DirectionalLight;
-
-        if (isNight) {
-            if (ambientLight) ambientLight.color.setHex(0x1a2b3c);
-            if (ambientLight) ambientLight.intensity = 0.4;
-
-            if (dirLight) {
-                dirLight.color.setHex(0xaaccff); // Moon blue
-                dirLight.intensity = 0.5;
-                dirLight.position.set(-10, 20, -5); // Moon position
-            }
-            this.scene.background = new THREE.Color(0x050510); // Dark night sky
-            if (this.scene.fog) this.scene.fog.color.setHex(0x050510);
-
+            // Sync scene background & fog from dynamic lighting
+            this.scene.background = tod.skyColor;
+            if (this.scene.fog) this.scene.fog.color.copy(tod.fogColor);
         } else {
-            if (ambientLight) ambientLight.color.setHex(0xffffff);
-            if (ambientLight) ambientLight.intensity = 0.6;
+            // Fallback to legacy timeManager
+            const isNight = this.game.timeManager ? this.game.timeManager.isNight() : false;
+            this.shaderManager.setTimeOfDay(isNight);
 
-            if (dirLight) {
-                dirLight.color.setHex(0xfffee0); // Sun warm
-                dirLight.intensity = 0.9;
-                dirLight.position.set(10, 20, 10); // Sun position
+            const ambientLight = this.scene.children.find(c => c instanceof THREE.AmbientLight) as THREE.AmbientLight;
+            const dirLight = this.scene.children.find(c => c instanceof THREE.DirectionalLight) as THREE.DirectionalLight;
+
+            if (isNight) {
+                if (ambientLight) { ambientLight.color.setHex(0x1a2b3c); ambientLight.intensity = 0.4; }
+                if (dirLight) { dirLight.color.setHex(0xaaccff); dirLight.intensity = 0.5; dirLight.position.set(-10, 20, -5); }
+                this.scene.background = new THREE.Color(0x050510);
+                if (this.scene.fog) this.scene.fog.color.setHex(0x050510);
+            } else {
+                if (ambientLight) { ambientLight.color.setHex(0xffffff); ambientLight.intensity = 0.6; }
+                if (dirLight) { dirLight.color.setHex(0xfffee0); dirLight.intensity = 0.9; dirLight.position.set(10, 20, 10); }
+                this.scene.background = new THREE.Color(0x87CEEB);
+                if (this.scene.fog) this.scene.fog.color.setHex(0x87CEEB);
             }
-            this.scene.background = new THREE.Color(0x87CEEB); // Sky blue
-            if (this.scene.fog) this.scene.fog.color.setHex(0x87CEEB);
         }
     }
 

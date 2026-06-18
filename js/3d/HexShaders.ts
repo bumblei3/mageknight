@@ -635,6 +635,16 @@ export class HexShaderManager {
         this.updateAllMaterials();
     }
 
+    setTimeOfDayFull(tod: any): void {
+        this.isNight = tod.isDay === false;
+        this.sunDirection.copy(tod.sunPosition.clone().normalize().negate());
+        this.sunColor.copy(tod.sunColor);
+        this.sunIntensity = tod.sunIntensity;
+        this.ambientColor.copy(tod.ambientColor);
+        this.ambientIntensity = tod.ambientIntensity;
+        this.updateAllMaterials();
+    }
+
     update(deltaTime: number): void {
         if (!this.camera) return;
 

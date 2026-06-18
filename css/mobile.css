@@ -12,7 +12,7 @@
     }
 
     .hud-top-bar {
-        padding: 0.5rem 1rem;
+        padding: var(--space-2) 1rem;
     }
 
     .game-logo {
@@ -20,7 +20,7 @@
     }
 
     .stat-pill {
-        padding: 4px 8px;
+        padding: var(--space-1) var(--space-2);
     }
 
     .stat-value {
@@ -28,8 +28,8 @@
     }
 
     .header-controls .btn-icon {
-        width: 32px;
-        height: 32px;
+        width: var(--space-8);
+        height: var(--space-8);
     }
 }
 
@@ -49,7 +49,7 @@
         grid-row: 1;
         border-radius: 0;
         justify-content: space-between;
-        padding: 0.25rem 0.5rem;
+        padding: var(--space-1) var(--space-2);
     }
 
     .game-logo {
@@ -58,7 +58,7 @@
     }
 
     .player-stats {
-        gap: 0.5rem;
+        gap: var(--space-2);
     }
 
     .stat-pill {
@@ -66,7 +66,7 @@
     }
 
     .header-controls {
-        gap: 0.25rem;
+        gap: var(--space-1);
     }
 
     /* Hide less important buttons on mobile */
@@ -86,7 +86,7 @@
         transition: transform 0.3s ease;
         max-height: 80vh;
         border: 1px solid var(--color-border-default);
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 var(--space-5) rgba(0, 0, 0, 0.5);
     }
 
     /* Left HUD (Hero) -> Bottom Sheet or Toggleable Drawer */
@@ -94,7 +94,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        border-radius: 16px 16px 0 0;
+        border-radius: var(--space-4) var(--space-4) 0 0;
         transform: translateY(85%);
         /* Show only header hint */
         padding: 10px;
@@ -112,7 +112,7 @@
         width: 250px;
         height: auto;
         transform: translateX(100%);
-        border-radius: 8px 0 0 8px;
+        border-radius: var(--space-2) 0 0 var(--space-2);
     }
 
     .hud-right.expanded {
@@ -157,7 +157,7 @@
     /* Mobile Interaction Hints */
     .mobile-drawer-handle {
         width: 40px;
-        height: 4px;
+        height: var(--space-1);
         background: rgba(255, 255, 255, 0.3);
         border-radius: 2px;
         margin: 0 auto 10px auto;
@@ -244,8 +244,8 @@
 
 .card-drag-ghost {
     border: 2px solid var(--color-gold-400);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border-radius: var(--space-2);
+    box-shadow: 0 var(--space-2) var(--space-6) rgba(0, 0, 0, 0.4);
     transform-origin: center center;
     transition: transform 0.1s ease-out;
 }
@@ -372,7 +372,7 @@
 
     .option-cost {
         font-size: 1rem;
-        padding: 0.5rem 1rem;
+        padding: var(--space-2) 1rem;
     }
 
     /* Sideways Modal - Touch optimized */

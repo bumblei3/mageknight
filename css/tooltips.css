@@ -13,7 +13,7 @@
     /* Allows mouse to pass through to underlying elements if needed, but important for custom cursor feels */
     color: var(--tooltip-text-primary);
     font-family: var(--font-heading);
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -23,14 +23,14 @@
 /* Tooltip Header */
 .game-tooltip .tooltip-header {
     background: var(--tooltip-header-bg);
-    padding: 8px 12px;
+    padding: var(--space-2) var(--space-3);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .game-tooltip .tooltip-icon {
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
 }
 
@@ -51,27 +51,27 @@
 
 .game-tooltip .tooltip-card-color.red {
     color: var(--color-mana-red);
-    text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    text-shadow: 0 0 var(--space-2) rgba(239, 68, 68, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.blue {
     color: var(--color-mana-blue);
-    text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    text-shadow: 0 0 var(--space-2) rgba(59, 130, 246, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.green {
     color: var(--color-mana-green);
-    text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    text-shadow: 0 0 var(--space-2) rgba(16, 185, 129, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.white {
     color: var(--color-mana-white);
-    text-shadow: 0 0 8px rgba(249, 250, 251, 0.6);
+    text-shadow: 0 0 var(--space-2) rgba(249, 250, 251, 0.6);
 }
 
 .game-tooltip .tooltip-card-color.gold {
     color: var(--color-mana-gold);
-    text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+    text-shadow: 0 0 var(--space-2) rgba(251, 191, 36, 0.6);
 }
 
 /* Divider */
@@ -89,24 +89,24 @@
 .game-tooltip .tooltip-section,
 .game-tooltip .tooltip-ability,
 .game-tooltip .tooltip-actions {
-    padding: 8px 12px;
+    padding: var(--space-2) var(--space-3);
 }
 
 .game-tooltip .tooltip-description {
     color: var(--tooltip-text-secondary);
     line-height: 1.4;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
 }
 
 .game-tooltip .tooltip-section {
-    padding-bottom: 4px;
+    padding-bottom: var(--space-1);
 }
 
 .game-tooltip .tooltip-section strong {
     display: block;
     color: var(--color-text-secondary);
     margin-bottom: 2px;
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     text-transform: uppercase;
     opacity: 0.9;
 }
@@ -114,7 +114,7 @@
 .game-tooltip .tooltip-hint {
     font-style: italic;
     color: var(--color-text-secondary);
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     margin-top: 2px;
 }
 
@@ -128,8 +128,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: var(--space-1);
+    padding-bottom: var(--space-1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -138,12 +138,12 @@
 }
 
 .game-tooltip .tooltip-ability {
-    margin-top: 4px;
-    padding: 4px 8px;
+    margin-top: var(--space-1);
+    padding: var(--space-1) var(--space-2);
     background: rgba(251, 191, 36, 0.1);
     border-left: 2px solid var(--color-gold-400);
     color: var(--color-gold-300);
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
@@ -154,8 +154,8 @@
 }
 
 .game-tooltip .tooltip-status {
-    padding: 4px 12px;
-    font-size: 0.75rem;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--space-3);
     font-weight: 700;
     text-transform: uppercase;
     background: rgba(0, 0, 0, 0.2);
@@ -172,8 +172,8 @@
 .game-tooltip .tooltip-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    padding-top: 8px;
+    gap: var(--space-1);
+    padding-top: var(--space-2);
     background: rgba(255, 255, 255, 0.02);
 }
 
@@ -185,7 +185,7 @@
     color: var(--color-text-secondary);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 /* Mana Icons */
@@ -193,9 +193,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    font-size: 0.8rem;
+    width: var(--space-5);
+    height: var(--space-5);
+    font-size: var(--font-size-sm);
     /* Styles handled by css/mana.css or similar generally, but fallback here */
 }
 
@@ -207,7 +207,7 @@
 
 /* Generic Tooltip (Stat Pill) */
 .game-tooltip .tooltip-generic {
-    padding: 12px;
+    padding: var(--space-3);
 }
 
 /* Adjustments for positioning context */

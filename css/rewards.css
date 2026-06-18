@@ -50,13 +50,13 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px var(--space-5) rgba(0, 0, 0, 0.5);
     position: relative;
 }
 
 .reward-card:hover .reward-card-inner {
     border-color: var(--color-gold-400);
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 var(--space-5) rgba(251, 191, 36, 0.4);
 }
 
 /* Card Type Specifics */
@@ -65,7 +65,7 @@
 }
 
 .reward-card-inner[data-type="spell"]:hover {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 var(--space-5) rgba(139, 92, 246, 0.4);
 }
 
 .reward-card-inner[data-type="artifact"] {

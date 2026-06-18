@@ -15,8 +15,8 @@
     position: absolute;
     font-family: var(--font-display);
     font-weight: bold;
-    font-size: 24px;
-    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    font-size: var(--space-6);
+    text-shadow: 2px 2px 0 var(--color-black), -1px -1px 0 var(--color-black), 1px -1px 0 var(--color-black), -1px 1px 0 var(--color-black), 1px 1px 0 var(--color-black);
     user-select: none;
     pointer-events: none;
     white-space: nowrap;
@@ -42,7 +42,7 @@
 .ft-xp {
     color: var(--color-mana-gold);
     /* amber/gold */
-    font-size: 20px;
+    font-size: var(--space-5);
 }
 
 .ft-mana {
@@ -93,7 +93,7 @@
 
     20% {
         opacity: 1;
-        transform: translateY(-20px) scale(1.2);
+        transform: translateY(-var(--space-5)) scale(1.2);
     }
 
     40% {

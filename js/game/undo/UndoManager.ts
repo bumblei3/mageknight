@@ -365,17 +365,73 @@ export class UndoManager {
             }
         }
 
-        // Update state display
-        if (this.stateDisplay) {
-            this.stateDisplay.textContent = state.canUndo || state.canRedo
-                ? `↩${this.undoStack.length} ↪${this.redoStack.length}`
-                : '';
-        }
+        // Update state display with action history icons
+        this.updateHistoryDisplay();
 
         // Legacy support
         if (this.game.actionManager?.updateUndoUI) {
             this.game.actionManager.updateUndoUI();
         }
+    }
+
+    /** Update the undo history display showing last 5 actions as icons */
+    private updateHistoryDisplay(): void {
+        if (!this.stateDisplay) return;
+
+        const state = this.getState();
+        if (!state.canUndo && !state.canRedo) {
+            this.stateDisplay.textContent = '';
+            this.stateDisplay.innerHTML = '';
+            return;
+        }
+
+        // Build history list (last 5 undoable actions)
+        const historyItems = this.undoStack.slice(-5);
+        const total = this.undoStack.length;
+
+        // Create icon list
+        const container = document.createElement('div');
+        container.className = 'undo-history-bar';
+        container.style.cssText = 'display:flex;gap:2px;align-items:center;';
+
+        historyItems.forEach((item, i) => {
+            const icon = document.createElement('span');
+            icon.className = 'undo-history-icon';
+            icon.textContent = this.getActionIcon(item.actionType);
+            icon.title = item.description || item.actionType || 'Aktion';
+            icon.style.cssText = `
+                font-size: 0.65rem;
+                opacity: ${0.4 + (i / historyItems.length) * 0.6};
+                cursor: default;
+            `;
+            container.appendChild(icon);
+        });
+
+        // Count badge
+        const badge = document.createElement('span');
+        badge.textContent = `${total}`;
+        badge.style.cssText = 'font-size:0.6rem;color:#64748b;margin-left:4px;';
+        container.appendChild(badge);
+
+        this.stateDisplay.innerHTML = '';
+        this.stateDisplay.appendChild(container);
+    }
+
+    /** Map action type to emoji icon */
+    private getActionIcon(actionType?: string): string {
+        const icons: Record<string, string> = {
+            'move': '🚶',
+            'playCard': '🃏',
+            'endTurn': '⏭',
+            'explore': '🔍',
+            'combat': '⚔',
+            'site': '🏰',
+            'recruit': '👥',
+            'heal': '💚',
+            'rest': '🛏',
+            'other': '•'
+        };
+        return icons[actionType || 'other'] || '•';
     }
 
     // ========== Cleanup ==========

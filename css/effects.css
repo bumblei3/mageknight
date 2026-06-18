@@ -6,7 +6,7 @@
     border-radius: var(--radius-md);
     font-size: 0.9rem;
     font-weight: 600;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-heading);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     cursor: pointer;
@@ -57,14 +57,14 @@
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, var(--color-red-500) 0%, var(--color-red-600) 100%);
     box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
     border: 1px solid rgba(239, 68, 68, 0.5);
     color: white;
 }
 
 .btn-danger:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    background: linear-gradient(135deg, var(--color-red-600) 0%, var(--color-red-600) 100%);
     box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
     transform: translateY(-2px);
 }
@@ -136,7 +136,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: var(--z-max);
     animation: victoryFadeIn 0.5s ease-out;
     pointer-events: none;
 }
@@ -192,7 +192,7 @@
 .victory-title {
     font-size: 4rem;
     font-weight: bold;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-500));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -202,7 +202,7 @@
 
 .victory-subtitle {
     font-size: 2rem;
-    color: #fbbf24;
+    color: var(--color-gold-400);
     text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
 }
 
@@ -217,7 +217,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: var(--z-max);
     animation: defeatFadeIn 0.5s ease-out;
     pointer-events: none;
 }
@@ -262,14 +262,14 @@
 .defeat-title {
     font-size: 3rem;
     font-weight: bold;
-    color: #ef4444;
+    color: var(--color-red-500);
     text-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
     margin-bottom: 0.5rem;
 }
 
 .defeat-subtitle {
     font-size: 1.5rem;
-    color: #fca5a5;
+    color: var(--color-red-400);
 }
 
 /* Combat Impact Flash */
@@ -280,7 +280,7 @@
     transform: translate(-50%, -50%);
     border-radius: 50%;
     pointer-events: none;
-    z-index: 9998;
+    z-index: calc(var(--z-max) - 1);
     animation: impactFlash 0.5s ease-out forwards;
 }
 
@@ -302,7 +302,7 @@
     font-size: 4rem;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 9998;
+    z-index: calc(var(--z-max) - 1);
     animation: blockEffect 0.8s ease-out forwards;
     filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.8));
 }
@@ -330,7 +330,7 @@
     font-weight: bold;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 9999;
+    z-index: var(--z-max);
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
     animation: damageFloat 1s ease-out forwards;
 }
@@ -369,11 +369,11 @@
 
     0%,
     100% {
-        box-shadow: 0 0 10px var(--pulse-color, #8b5cf6);
+        box-shadow: 0 0 10px var(--pulse-color, var(--color-purple-400));
     }
 
     50% {
-        box-shadow: 0 0 30px var(--pulse-color, #8b5cf6);
+        box-shadow: 0 0 30px var(--pulse-color, var(--color-purple-400));
     }
 }
 
@@ -408,7 +408,7 @@
     font-family: var(--font-heading);
     font-weight: 800;
     font-size: 1.5rem;
-    z-index: 1000;
+    z-index: var(--z-modal);
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.8);
     animation: floatUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     white-space: nowrap;
@@ -443,7 +443,7 @@
     background: white;
     opacity: 0;
     pointer-events: none;
-    z-index: 9999;
+    z-index: var(--z-max);
 }
 
 .impact-flash.active {
@@ -661,11 +661,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(0, 0, 0, 0.8), #000);
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.8), var(--color-black));
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10001;
+    z-index: var(--z-max);
     /* Above victory overlay or high enough */
     opacity: 0;
     pointer-events: none;
@@ -679,8 +679,8 @@
 
 .day-night-message {
     font-size: 4rem;
-    font-family: 'Cinzel Decorative', serif;
-    color: #fbbf24;
+    font-family: var(--font-display);
+    color: var(--color-gold-400);
     text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
     transform: scale(0.8);
     transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);

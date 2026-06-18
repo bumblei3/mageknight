@@ -10,16 +10,12 @@ const STATIC_ASSETS = [
     './manifest.json',
     './favicon.png',
     './css/reset.css',
-    './css/layout.css',
     './css/hud.css',
     './css/cards.css',
     './css/modals.css',
     './css/tutorial.css',
     './css/effects.css',
     './css/loading.css',
-    './styles-events.css',
-    './combat-effects.css',
-    './time-effects.css',
     './css/mobile.css'
     // Note: main.ts is served via Vite, not cached by SW
 ];

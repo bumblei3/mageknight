@@ -305,6 +305,66 @@ export const SAMPLE_SPELLS: any[] = [
         basicEffect: { type: 'attack', value: 5, element: 'cold_fire', area: true },
         advancedEffect: { type: 'attack', value: 8, element: 'cold_fire', area: true },
         image: 'disenchant.png'
+    },
+    {
+        id: 'summon_spell',
+        name: 'Summon',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.GREEN,
+        cost: 1,
+        basicEffect: { type: 'summon_unit', value: 1 },
+        advancedEffect: { type: 'summon_unit', value: 2 },
+        image: 'summon.png'
+    },
+    {
+        id: 'time_walk',
+        name: 'Time Walk',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.BLUE,
+        cost: 1,
+        basicEffect: { type: 'extra_turn', value: 1 },
+        advancedEffect: { type: 'extra_turn', value: 2 },
+        image: 'time_walk.png'
+    },
+    {
+        id: 'disintegrate',
+        name: 'Disintegrate',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.BLACK,
+        cost: 1,
+        basicEffect: { type: 'destroy_enemy', value: 1 },
+        advancedEffect: { type: 'destroy_enemy', value: 2 },
+        image: 'disintegrate.png'
+    },
+    {
+        id: 'wish',
+        name: 'Wish',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.GOLD,
+        cost: 1,
+        basicEffect: { type: 'wish', value: 1 },
+        advancedEffect: { type: 'wish', value: 2 },
+        image: 'wish.png'
+    },
+    {
+        id: 'meteor_storm',
+        name: 'Meteor Storm',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.RED,
+        cost: 1,
+        basicEffect: { type: 'attack', value: 7, element: 'fire', area: true, target: 'all' },
+        advancedEffect: { type: 'attack', value: 12, element: 'fire', area: true, target: 'all' },
+        image: 'meteor_storm.png'
+    },
+    {
+        id: 'healing_touch',
+        name: 'Healing Touch',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.WHITE,
+        cost: 1,
+        basicEffect: { type: 'heal', value: 5 },
+        advancedEffect: { type: 'heal', value: 10, full_heal: true },
+        image: 'healing_touch.png'
     }
 ];
 

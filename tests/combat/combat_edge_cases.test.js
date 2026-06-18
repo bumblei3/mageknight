@@ -35,6 +35,9 @@ describe('MageKnightGame Coverage Boost v2', () => {
 
         game = new MageKnightGame();
         game.startNewGame();
+        // Mock confirm to auto-accept (for end-turn confirmation)
+        game._originalConfirm = window.confirm;
+        window.confirm = () => true;
         // Ensure sound mock exists globally for all tests in this suite
         game.sound = {
             cardPlay: vi.fn(),
@@ -48,6 +51,9 @@ describe('MageKnightGame Coverage Boost v2', () => {
     });
 
     afterEach(() => {
+        if (window.confirm.mock) {
+            window.confirm = () => true; // Ensure confirm stays mocked during cleanup
+        }
         if (game && game.inputController) {
             game.inputController.destroy();
         }

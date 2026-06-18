@@ -40,10 +40,11 @@ export class Game3D {
     // Dynamic Lighting System
     private dynamicLighting: DynamicLightingManager | null = null;
 
-    // Hero Animation
-    private heroMesh: THREE.Group | null = null;
-    private heroTargetPosition: THREE.Vector3 | null = null;
-    private heroAnimating: boolean = false;
+    // Animation state tracking
+    private heroSpriteId: string = 'hero-sprite';
+    private enemySpriteIds: Map<string, string> = new Map();
+    private heroState: 'idle' | 'move' | 'attack' | 'cast' | 'hurt' | 'death' | 'spawn' = 'idle';
+    private heroAnimTimeout: NodeJS.Timeout | null = null;
 
     // Interaction
     private raycaster: THREE.Raycaster;
@@ -597,10 +598,11 @@ export class Game3D {
     }
 
     animateHeroToPosition(to: { q: number, r: number }): void {
-        if (!this.heroMesh || !this.game.hexGrid) {
+        if (!this.game.hexGrid) {
             // Fallback: just re-render if hero mesh not available
             this.renderMap();
             this.centerCameraOnHero();
+            this.heroState = 'move';
             return;
         }
 
@@ -608,8 +610,8 @@ export class Game3D {
         const pixel = grid.axialToPixelOffset(to.q, to.r);
         const scale = 0.02;
 
-        this.heroTargetPosition = new THREE.Vector3(pixel.x * scale, 0, pixel.y * scale);
-        this.heroAnimating = true;
+        // Update hero state for animation
+        this.heroState = 'move';
     }
 
     addTreesToGroup(group: THREE.Group, baseSize: number, scale: number): void {
@@ -647,48 +649,97 @@ export class Game3D {
     }
 
     renderHero(): void {
-        if (!this.game.hero || !this.scene || !this.game.hexGrid) return;
-
-        // Remove existing hero mesh if any (not tracking separate ref currently, but could)
-        const heroName = 'hero-token';
-        const existingHero = this.scene.getObjectByName(heroName);
-        if (existingHero) this.scene.remove(existingHero);
+        if (!this.game.hero || !this.scene || !this.game.hexGrid || !this.spriteAnimation) return;
 
         const pos = this.game.hero.position;
         const grid = this.game.hexGrid;
         const pixel = grid.axialToPixelOffset(pos.q, pos.r);
         const scale = 0.02;
+        const worldX = pixel.x * scale;
+        const worldZ = pixel.y * scale;
 
-        // Hero Geometry (Pawn style)
-        const group = new THREE.Group();
-        group.name = heroName;
+        // Create or update hero sprite
+        if (!this.spriteAnimation.getInstance(this.heroSpriteId)) {
+            this.spriteAnimation.createInstance(
+                this.heroSpriteId,
+                'hero',
+                'spawn', // Start with spawn animation
+                {
+                    position: new THREE.Vector3(worldX, 0.5, worldZ),
+                    scale: new THREE.Vector3(2 * scale * 20, 2 * scale * 20, 1),
+                    speed: 1.0,
+                }
+            );
+            // After spawn, transition to idle
+            if (this.heroAnimTimeout) clearTimeout(this.heroAnimTimeout);
+            this.heroAnimTimeout = setTimeout(() => {
+                if (this.spriteAnimation) {
+                    this.spriteAnimation.playAnimation(this.heroSpriteId, 'idle');
+                }
+            }, 800);
+        } else {
+            // Update position
+            this.spriteAnimation.setInstancePosition(this.heroSpriteId, new THREE.Vector3(worldX, 0.5, worldZ));
+            // Play appropriate animation based on state
+            this.updateHeroAnimation();
+        }
+    }
 
-        // Base
-        const baseGeo = new THREE.CylinderGeometry(0.5 * scale * 20, 0.6 * scale * 20, 0.2 * scale * 20, 16);
-        const baseMat = new THREE.MeshStandardMaterial({ color: 0xFFD700, roughness: 0.3, metalness: 0.8 }); // Gold
-        const base = new THREE.Mesh(baseGeo, baseMat);
-        base.position.y = 0.1 * scale * 20;
-        base.castShadow = true;
-        group.add(base);
+    private updateHeroAnimation(): void {
+        if (!this.spriteAnimation) return;
 
-        // Body
-        const bodyGeo = new THREE.ConeGeometry(0.3 * scale * 20, 0.8 * scale * 20, 16);
-        const body = new THREE.Mesh(bodyGeo, baseMat);
-        body.position.y = 0.6 * scale * 20;
-        body.castShadow = true;
-        group.add(body);
+        const instance = this.spriteAnimation.getInstance(this.heroSpriteId);
+        if (!instance) return;
 
-        // Head
-        const headGeo = new THREE.SphereGeometry(0.25 * scale * 20, 16, 16);
-        const head = new THREE.Mesh(headGeo, baseMat);
-        head.position.y = 1.0 * scale * 20;
-        head.castShadow = true;
-        group.add(head);
+        const currentAnim = instance.currentAnimation;
 
-        group.position.set(pixel.x * scale, 0, pixel.y * scale);
-
-        this.heroMesh = group;
-        this.scene.add(group);
+        switch (this.heroState) {
+            case 'move':
+                if (currentAnim !== 'move') {
+                    this.spriteAnimation.playAnimation(this.heroSpriteId, 'move');
+                }
+                break;
+            case 'attack':
+                if (currentAnim !== 'attack') {
+                    this.spriteAnimation.playAnimation(this.heroSpriteId, 'attack');
+                    // Return to idle after attack
+                    setTimeout(() => {
+                        if (this.spriteAnimation && this.heroState !== 'attack') {
+                            this.spriteAnimation.playAnimation(this.heroSpriteId, this.heroState === 'move' ? 'move' : 'idle');
+                        }
+                    }, 600);
+                }
+                break;
+            case 'cast':
+                if (currentAnim !== 'cast') {
+                    this.spriteAnimation.playAnimation(this.heroSpriteId, 'cast');
+                    setTimeout(() => {
+                        if (this.spriteAnimation && this.heroState !== 'cast') {
+                            this.spriteAnimation.playAnimation(this.heroSpriteId, this.heroState === 'move' ? 'move' : 'idle');
+                        }
+                    }, 700);
+                }
+                break;
+            case 'hurt':
+                if (currentAnim !== 'hurt') {
+                    this.spriteAnimation.playAnimation(this.heroSpriteId, 'hurt');
+                    setTimeout(() => {
+                        if (this.spriteAnimation) {
+                            this.spriteAnimation.playAnimation(this.heroSpriteId, this.heroState === 'move' ? 'move' : 'idle');
+                        }
+                    }, 300);
+                }
+                break;
+            case 'death':
+                if (currentAnim !== 'death') {
+                    this.spriteAnimation.playAnimation(this.heroSpriteId, 'death');
+                }
+                break;
+            default: // idle
+                if (currentAnim !== 'idle' && currentAnim !== 'spawn') {
+                    this.spriteAnimation.playAnimation(this.heroSpriteId, 'idle');
+                }
+        }
     }
 
     renderVolkare(): void {
@@ -828,16 +879,6 @@ export class Game3D {
         this.waterMaterials.forEach(mat => {
             mat.uniforms.uTime.value = elapsed;
         });
-
-        // Animate hero movement
-        if (this.heroAnimating && this.heroMesh && this.heroTargetPosition) {
-            this.heroMesh.position.lerp(this.heroTargetPosition, 0.1);
-            if (this.heroMesh.position.distanceTo(this.heroTargetPosition) < 0.01) {
-                this.heroMesh.position.copy(this.heroTargetPosition);
-                this.heroAnimating = false;
-                this.centerCameraOnHero();
-            }
-        }
 
         if (this.controls) this.controls.update();
 

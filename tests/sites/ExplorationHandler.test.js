@@ -69,16 +69,19 @@ describe('ExplorationHandler', () => {
         });
 
         it('should handle random branching (Elemental vs Draconian)', () => {
-            const enemies = new Set();
-            for (let i = 0; i < 20; i++) {
-                vi.spyOn(Math, 'random').mockReturnValueOnce(i % 2 === 0 ? 0.6 : 0.4);
-                handler.exploreDungeon();
-                const enemy = mockGame.combatOrchestrator.initiateCombat.mock.calls[i][0];
-                enemies.add(enemy.name);
-                vi.restoreAllMocks();
-            }
-            expect(enemies).toContain('Feuer-Elementar');
-            expect(enemies).toContain('Drakonier-Elite');
+            // Test first branch
+            vi.spyOn(Math, 'random').mockReturnValue(0.8);
+            handler.exploreDungeon();
+            const call = mockGame.combatOrchestrator.initiateCombat.mock.calls[mockGame.combatOrchestrator.initiateCombat.mock.calls.length - 1];
+            const enemy = call[0];
+            expect(enemy.name).toBe('Feuer-Elemental');
+
+            // Test second branch
+            vi.spyOn(Math, 'random').mockReturnValue(0.4);
+            handler.exploreDungeon();
+            const call2 = mockGame.combatOrchestrator.initiateCombat.mock.calls[mockGame.combatOrchestrator.initiateCombat.mock.calls.length - 1];
+            const enemy2 = call2[0];
+            expect(enemy2.name).toBe('Drakonier-Elite');
         });
     });
 
@@ -109,7 +112,7 @@ describe('ExplorationHandler', () => {
             vi.spyOn(Math, 'random').mockReturnValueOnce(0.2);
             handler.exploreTomb();
 
-            const calls = mockGame.initiateCombat.mock.calls;
+            const calls = mockGame.combatOrchestrator.initiateCombat.mock.calls;
             expect(calls[0][0].name).toBe('Vampir-Lord');
             expect(calls[1][0].name).toBe('Phantom');
             expect(calls[2][0].name).toBe('Skelett-Krieger');
@@ -126,21 +129,41 @@ describe('ExplorationHandler', () => {
             expect(enemies.length).toBe(2);
         });
 
+        it('should handle random branching (Summoner vs Guard)', () => {
+            const enemies = new Set();
+            for (let i = 0; i < 20; i++) {
+                const mathRandomSpy = vi.spyOn(Math, 'random').mockReturnValue(i % 2 === 0 ? 0.5 : 0.3);
+                handler.exploreRuin();
+                const call = mockGame.combatOrchestrator.initiateCombat.mock.calls[mockGame.combatOrchestrator.initiateCombat.mock.calls.length - 1];
+                const enemy = call[0];
+                enemies.add(enemy.name);
+                mathRandomSpy.mockRestore();
+            }
+            expect(enemies).toContain('Ruinen-Beschwörer');
+            expect(enemies).toContain('Ruinen-Wächter');
+        });
+
         it('should handle random branching for enemies', () => {
-            vi.spyOn(Math, 'random').mockReturnValueOnce(0.6).mockReturnValueOnce(0.7);
+            // Test first branch: math.random 0.6 (>0.5=magemage), 0.7 (>0.6=dragon)
+            const mathRandomSpy1 = vi.spyOn(Math, 'random').mockReturnValueOnce(0.6).mockReturnValueOnce(0.7);
             handler.exploreLabyrinth();
+            mathRandomSpy1.mockRestore();
 
-            vi.spyOn(Math, 'random').mockReturnValueOnce(0.4).mockReturnValueOnce(0.4);
+            // Test second branch: <= 0.5 = golem, <= 0.6 = orc
+            const mathRandomSpy2 = vi.spyOn(Math, 'random').mockReturnValueOnce(0.4).mockReturnValueOnce(0.4);
             handler.exploreLabyrinth();
+            mathRandomSpy2.mockRestore();
 
-            const call1 = mockGame.combatOrchestrator.initiateCombat.mock.calls[0][0];
-            const call2 = mockGame.combatOrchestrator.initiateCombat.mock.calls[1][0];
+            const call1 = mockGame.combatOrchestrator.initiateCombat.mock.calls[mockGame.combatOrchestrator.initiateCombat.mock.calls.length - 2];
+            const call2 = mockGame.combatOrchestrator.initiateCombat.mock.calls[mockGame.combatOrchestrator.initiateCombat.mock.calls.length - 1];
+            
+            const enemies1 = call1[0];
+            const enemies2 = call2[0];
 
-            expect(call1[0].name).toBe('Labyrinth-Magier');
-            expect(call1[1].name).toBe('Drakonier');
-            expect(call2[0].name).toBe('Stein-Golem');
-            expect(call2[1].name).toBe('Minotaurus');
-            vi.restoreAllMocks();
+            expect(enemies1[0].name).toBe('Labyrinth-Magier');
+            expect(enemies1[1].name).toBe('Drakonier');
+            expect(enemies2[0].name).toBe('Stein-Golem');
+            expect(enemies2[1].name).toBe('Minotaurus');
         });
     });
 

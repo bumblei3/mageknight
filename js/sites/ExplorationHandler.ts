@@ -1,12 +1,13 @@
 import { BaseSiteHandler, SiteOption } from './BaseSiteHandler';
 import { SITE_TYPES } from '../sites';
+import { SiteRewardManager } from './SiteRewards';
 
 export class ExplorationHandler extends BaseSiteHandler {
     public override getOptions(site: any): SiteOption[] {
         if (site.conquered) {
             const labels: Record<string, string> = {
                 [SITE_TYPES.DUNGEON]: 'Verlies bereits geplündert',
-                [SITE_TYPES.RUINS]: 'Ruine bereits geplündert', // SITE_TYPES.RUINS is likely 'ruins', test expects 'Ruine'
+                [SITE_TYPES.RUINS]: 'Ruine bereits geplündert',
                 [SITE_TYPES.TOMB]: 'Grabstätte bereits geplündert',
                 [SITE_TYPES.LABYRINTH]: 'Labyrinth bereits durchquert',
                 [SITE_TYPES.SPAWNING_GROUNDS]: 'Brutstätte bereits gesäubert'
@@ -61,10 +62,38 @@ export class ExplorationHandler extends BaseSiteHandler {
         return [];
     }
 
+    private getSiteRewardConfig(siteType: string): { difficulty: 'common' | 'uncommon' | 'rare', count: number } {
+        switch (siteType) {
+            case SITE_TYPES.DUNGEON:
+                return { difficulty: 'uncommon', count: 2 };
+            case SITE_TYPES.RUINS:
+                return { difficulty: 'common', count: 1 };
+            case SITE_TYPES.TOMB:
+                return { difficulty: 'uncommon', count: 1 };
+            case SITE_TYPES.LABYRINTH:
+                return { difficulty: 'rare', count: 3 };
+            case SITE_TYPES.SPAWNING_GROUNDS:
+                return { difficulty: 'uncommon', count: 2 };
+            default:
+                return { difficulty: 'common', count: 1 };
+        }
+    }
+
+    private onCombatEnd(siteType: string): void {
+        const rewardManager = SiteRewardManager.getInstance();
+        const config = this.getSiteRewardConfig(siteType);
+        const rolls = rewardManager.rollRewards(siteType, config.difficulty, config.count);
+        const messages = rewardManager.applyRewards(this.game.hero, rolls);
+        
+        if (messages.length > 0) {
+            this.game.addLog(`Belohnung: ${messages.join(', ')}`, 'success');
+        }
+    }
+
     public exploreDungeon(): { success: boolean, message: string } {
         const isElemental = Math.random() > 0.5;
         const enemy = isElemental ? {
-            name: 'Feuer-Elementar',
+            name: 'Feuer-Elemental',
             armor: 4,
             attack: 5,
             attackType: 'fire',
@@ -86,7 +115,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Du betrittst das Dunkel... ${enemy.name} greift an!`;
         this.game.addLog(msg, 'warning');
-        this.game.combatOrchestrator.initiateCombat(enemy);
+        this.game.combatOrchestrator.initiateCombat(enemy, () => this.onCombatEnd(SITE_TYPES.DUNGEON));
         return { success: true, message: 'Verlies betreten!' };
     }
 
@@ -114,7 +143,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Du untersuchst die Trümmer... ${enemy.name} erscheint!`;
         this.game.addLog(msg, 'warning');
-        this.game.combatOrchestrator.initiateCombat(enemy);
+        this.game.combatOrchestrator.initiateCombat(enemy, () => this.onCombatEnd(SITE_TYPES.RUINS));
         return { success: true, message: 'Ruine betreten!' };
     }
 
@@ -157,7 +186,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Die Krypta öffnet sich... ${enemy.name} erhebt sich!`;
         this.game.addLog(msg, 'warning');
-        this.game.initiateCombat(enemy);
+        this.game.combatOrchestrator.initiateCombat(enemy, () => this.onCombatEnd(SITE_TYPES.TOMB));
         return { success: true, message: 'Grabstätte betreten!' };
     }
 
@@ -213,7 +242,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Du betrittst das Labyrinth... ${enemies.length} Feinde blockieren den Weg!`;
         this.game.addLog(msg, 'warning');
-        this.game.combatOrchestrator.initiateCombat(enemies);
+        this.game.combatOrchestrator.initiateCombat(enemies, () => this.onCombatEnd(SITE_TYPES.LABYRINTH));
         return { success: true, message: 'Labyrinth betreten!' };
     }
 
@@ -260,7 +289,7 @@ export class ExplorationHandler extends BaseSiteHandler {
 
         const msg = `Die Brutstätte ist voller Monster... Eine Welle von ${enemies.length} Gegnern greift an!`;
         this.game.addLog(msg, 'warning');
-        this.game.combatOrchestrator.initiateCombat(enemies);
+        this.game.combatOrchestrator.initiateCombat(enemies, () => this.onCombatEnd(SITE_TYPES.SPAWNING_GROUNDS));
         return { success: true, message: 'Brutstätte betreten!' };
     }
 }

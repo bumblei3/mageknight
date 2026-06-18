@@ -1,5 +1,6 @@
 import { BaseSiteHandler, SiteOption } from './BaseSiteHandler';
 import { SITE_TYPES } from '../sites';
+import { SiteRewardManager } from './SiteRewards';
 
 export class SpawningGroundsHandler extends BaseSiteHandler {
     public override getOptions(site: any): SiteOption[] {
@@ -63,7 +64,21 @@ export class SpawningGroundsHandler extends BaseSiteHandler {
 
         const msg = `Die Brutstätte ist voller Monster... Eine Welle von ${enemies.length} Gegnern greift an!`;
         this.game.addLog(msg, 'warning');
-        this.game.combatOrchestrator.initiateCombat(enemies);
+        this.game.combatOrchestrator.initiateCombat(enemies, () => this.onCombatEnd(enemies));
         return { success: true, message: 'Brutstätte betreten!' };
+    }
+
+    private onCombatEnd(defeatedEnemies: any[]): void {
+        // Award rewards for clearing spawning grounds
+        const rewardManager = SiteRewardManager.getInstance();
+        const rolls = rewardManager.rollRewards('spawning_grounds', 'uncommon', 2);
+        const messages = rewardManager.applyRewards(this.game.hero, rolls);
+        
+        if (messages.length > 0) {
+            this.game.addLog(`Belohnung: ${messages.join(', ')}`, 'success');
+        }
+        
+        // Mark as conquered
+        // The combatOrchestrator will handle site.conquered = true
     }
 }

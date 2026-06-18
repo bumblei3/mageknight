@@ -47,6 +47,11 @@ export class HexGridRenderer {
     // ========== Coordinate Helpers (delegate to logic with canvas offset) ==========
 
     axialToPixel(q: number, r: number) {
+        // Guard against invalid coordinates (e.g., from corrupted save state)
+        if (!Number.isFinite(q) || !Number.isFinite(r)) {
+            console.warn('[HexGridRenderer] Invalid coordinates for axialToPixel:', q, r);
+            return { x: this.canvas.width / 2, y: this.canvas.height / 2 };
+        }
         const offset = this.logic.axialToPixelOffset(q, r);
         return {
             x: offset.x + this.canvas.width / 2,

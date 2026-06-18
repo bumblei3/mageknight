@@ -288,7 +288,7 @@ export class CombatOrchestrator {
         }
     }
 
-    initiateCombat(enemyOrEnemies: any): void {
+    initiateCombat(enemyOrEnemies: any, onEndCallback?: () => void): void {
         if (this.game.combat) return;
         if (!enemyOrEnemies) return;
 
@@ -339,7 +339,7 @@ export class CombatOrchestrator {
 
         this.game.addLog(t('combat.fightAgainst', { enemy: names }), 'combat');
 
-        this.game.combat = new Combat(this.game.hero, enemies, (result: any) => this.onCombatEnd(result));
+        this.game.combat = new Combat(this.game.hero, enemies, (result: any) => this.onCombatEnd(result, onEndCallback));
         this.game.combat.start();
         this.game.gameState = 'combat';
 
@@ -410,7 +410,7 @@ export class CombatOrchestrator {
         this.game.ui.updateCombatTotals(this.combatAttackTotal, this.combatBlockTotal, this.game.combat.phase);
     }
 
-    onCombatEnd(result: any): void {
+    onCombatEnd(result: any, siteCallback?: () => void): void {
         this.game.gameState = 'playing';
         const enemy = result.enemy || (this.game.combat ? this.game.combat.enemies[0] : null);
         this.game.combat = null;
@@ -504,6 +504,11 @@ export class CombatOrchestrator {
         }
 
         eventBus.emit(GAME_EVENTS.COMBAT_ENDED, { victory: result.victory, enemy: enemy });
+        
+        // Call site-specific callback if provided
+        if (siteCallback) {
+            siteCallback();
+        }
     }
 
     executeRangedAttack(enemy: Enemy): void {

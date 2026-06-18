@@ -20,11 +20,14 @@ export class NotificationManager {
     private elements: UIElements;
     private tooltipManager: TooltipManager;
     private toastContainer: HTMLElement | null = null;
+    private activeFilters: Set<string> = new Set(['all']);
+    private filterBar: HTMLElement | null = null;
 
     constructor(elements: UIElements, tooltipManager: TooltipManager) {
         this.elements = elements;
         this.tooltipManager = tooltipManager;
         this.setupToastContainer();
+        this.createFilterBar();
 
         // Allow tooltips on log container
         if (this.elements.gameLog && this.tooltipManager) {
@@ -36,6 +39,83 @@ export class NotificationManager {
         this.toastContainer = document.createElement('div');
         this.toastContainer.className = 'toast-container';
         document.body.appendChild(this.toastContainer);
+    }
+
+    /** Create the log filter bar */
+    private createFilterBar(): void {
+        const logContainer = this.elements.gameLog;
+        if (!logContainer || !logContainer.parentElement) return;
+
+        this.filterBar = document.createElement('div');
+        this.filterBar.className = 'log-filter-bar';
+        this.filterBar.style.cssText = 'display:flex;gap:4px;padding:4px 8px;background:rgba(0,0,0,0.2);border-bottom:1px solid rgba(255,255,255,0.1);';
+
+        const filters = [
+            { id: 'all', label: 'Alle', icon: '📋' },
+            { id: 'combat', label: 'Kampf', icon: '⚔️' },
+            { id: 'success', label: 'Erfolg', icon: '✅' },
+            { id: 'error', label: 'Fehler', icon: '❌' },
+            { id: 'warning', label: 'Warnung', icon: '⚠️' },
+            { id: 'info', label: 'Info', icon: 'ℹ️' },
+        ];
+
+        filters.forEach(f => {
+            const btn = document.createElement('button');
+            btn.className = `log-filter-btn ${f.id === 'all' ? 'active' : ''}`;
+            btn.dataset.filter = f.id;
+            btn.title = f.label;
+            btn.style.cssText = 'font-size:0.7rem;padding:2px 6px;border:1px solid rgba(255,255,255,0.15);background:' + (f.id === 'all' ? 'rgba(251,191,36,0.3)' : 'transparent') + ';color:#cbd5e1;border-radius:4px;cursor:pointer;';
+            btn.textContent = f.icon;
+            btn.addEventListener('click', () => this.toggleFilter(f.id));
+            this.filterBar!.appendChild(btn);
+        });
+
+        logContainer.parentElement.insertBefore(this.filterBar, logContainer);
+    }
+
+    /** Toggle a filter on/off */
+    private toggleFilter(filterId: string): void {
+        if (filterId === 'all') {
+            this.activeFilters = new Set(['all']);
+        } else {
+            this.activeFilters.delete('all');
+            if (this.activeFilters.has(filterId)) {
+                this.activeFilters.delete(filterId);
+                if (this.activeFilters.size === 0) {
+                    this.activeFilters.add('all');
+                }
+            } else {
+                this.activeFilters.add(filterId);
+            }
+        }
+        this.updateFilterButtons();
+        this.applyFilters();
+    }
+
+    /** Update filter button visual state */
+    private updateFilterButtons(): void {
+        if (!this.filterBar) return;
+        this.filterBar.querySelectorAll('.log-filter-btn').forEach(btn => {
+            const htmlBtn = btn as HTMLElement;
+            const filterId = htmlBtn.dataset.filter!;
+            const isActive = this.activeFilters.has(filterId);
+            htmlBtn.style.background = isActive ? 'rgba(251,191,36,0.3)' : 'transparent';
+            htmlBtn.style.borderColor = isActive ? 'rgba(251,191,36,0.5)' : 'rgba(255,255,255,0.15)';
+        });
+    }
+
+    /** Apply active filters to log entries */
+    private applyFilters(): void {
+        const logContainer = this.elements.gameLog;
+        if (!logContainer) return;
+        const entries = logContainer.querySelectorAll('.log-entry');
+        entries.forEach(entry => {
+            const htmlEntry = entry as HTMLElement;
+            const classes = htmlEntry.className.split(' ');
+            const type = classes.length > 1 ? classes[1] : 'info';
+            const visible = this.activeFilters.has('all') || this.activeFilters.has(type);
+            htmlEntry.style.display = visible ? '' : 'none';
+        });
     }
 
     /**

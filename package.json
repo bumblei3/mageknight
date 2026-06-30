@@ -19,7 +19,7 @@
         "@playwright/test": "^1.61.0",
         "@types/node": "^25.9.3",
         "@types/pngjs": "^6.0.5",
-        "@types/three": "^0.184.0",
+        "@types/three": "^0.185.0",
         "@vitest/coverage-istanbul": "^4.1.9",
         "@vitest/coverage-v8": "^4.1.9",
         "c8": "^11.0.0",
@@ -78,7 +78,7 @@
         "statements": 80
     },
     "dependencies": {
-        "three": "^0.184.0",
+        "three": "^0.185.0",
         "zod": "^4.4.3"
     }
 }

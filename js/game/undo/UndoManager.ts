@@ -289,6 +289,7 @@ export class UndoManager {
     // ========== Toolbar Buttons ==========
 
     private createToolbarButtons(): void {
+        if (typeof document === 'undefined') return;
         // Wait for toolbar to exist
         const checkToolbar = () => {
             const toolbar = document.getElementById('action-toolbar') || document.getElementById('toolbar');

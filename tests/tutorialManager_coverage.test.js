@@ -36,8 +36,8 @@ describe('TutorialManager - New System', () => {
     });
 
     describe('constructor', () => {
-        it('should initialize with 11 tutorial steps', () => {
-            expect(tutorialManager.steps.length).toBe(11);
+        it('should initialize with 14 tutorial steps', () => {
+            expect(tutorialManager.steps.length).toBe(14);
             expect(tutorialManager.steps[0].id).toBe('welcome');
             expect(tutorialManager.steps[10].id).toBe('complete');
         });

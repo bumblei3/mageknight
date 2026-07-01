@@ -292,17 +292,22 @@ export class UndoManager {
         if (typeof document === 'undefined') return;
         // Wait for toolbar to exist
         const checkToolbar = () => {
+            if (typeof document === 'undefined') return;
             const toolbar = document.getElementById('action-toolbar') || document.getElementById('toolbar');
             if (toolbar) {
                 this.injectButtons(toolbar);
             } else {
-                // Check again shortly
-                setTimeout(checkToolbar, 100);
+                // Check again shortly if DOM is available
+                if (typeof window !== 'undefined') {
+                    setTimeout(checkToolbar, 100);
+                }
             }
         };
 
         // Also listen for toolbar creation
-        eventBus.on(GAME_EVENTS.PHASE_CHANGED, checkToolbar);
+        if (typeof window !== 'undefined') {
+            eventBus.on(GAME_EVENTS.PHASE_CHANGED, checkToolbar);
+        }
         checkToolbar();
     }
 

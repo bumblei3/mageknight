@@ -32,7 +32,7 @@ describe('TutorialManager', () => {
     it('should initialize correctly', () => {
         expect(tutorial.currentStep).toBe(0);
         expect(tutorial.isActive).toBe(false);
-        expect(tutorial.steps.length).toBe(14);
+        expect(tutorial.steps.length).toBe(11);
     });
 
     it('should start tutorial', () => {

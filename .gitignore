@@ -26,3 +26,7 @@ blob-report/
 playwright/.cache/
 dist/
 .lighthouseci/
+
+# TypeScript build artifacts
+*.tsbuildinfo
+tsconfig.tsbuildinfo

@@ -56,9 +56,9 @@ export class SpellEngine {
 
         switch (spellType) {
             case 'direct_damage':
-                return this.castDirectDamage(value, effect.element);
+                return this.castDirectDamage(value, effect.element, effect);
             case 'area_damage':
-                return this.castAreaDamage(value, effect.element);
+                return this.castAreaDamage(value, effect.element, effect);
             case 'heal':
                 return this.castHeal(value);
             case 'draw':
@@ -92,20 +92,22 @@ export class SpellEngine {
     /**
      * Direct damage spell — ignores armor
      */
-    private castDirectDamage(value: number, element?: string): SpellResult {
+    private castDirectDamage(value: number, element?: string, effect?: any): SpellResult {
         const combat = this.game?.combat;
         if (!combat?.enemies?.length) {
             return { success: false, message: 'Kein Ziel' };
         }
 
+        // Prefer explicit value, fall back to attack for attack-based spell effects
+        const damage = value || effect?.attack || 0;
+
         // Target first unblocked enemy
         const target = combat.enemies.find((e: any) => !combat.blockedEnemies.has(e.id)) || combat.enemies[0];
-        const damage = value;
 
         // Apply elemental stacks
-        if (element === 'fire') target.fireStacks = (target.fireStacks || 0) + value;
+        if (element === 'fire') target.fireStacks = (target.fireStacks || 0) + damage;
         else if (element === 'ice') {
-            target.iceStacks = (target.iceStacks || 0) + value;
+            target.iceStacks = (target.iceStacks || 0) + damage;
             target.slowed = true;
         }
 
@@ -115,7 +117,7 @@ export class SpellEngine {
             target.armorBonus = -target.armor; // Can't go below 0 armor
         }
 
-        const msg = `${target.name} erleidet ${value} ${element || 'Magie'}-Schaden (ignoriert Rüstung)`;
+        const msg = `${target.name} erleidet ${damage} ${element || 'Magie'}-Schaden (ignoriert Rüstung)`;
         this.game.addLog(msg, 'combat');
 
         return {
@@ -129,16 +131,19 @@ export class SpellEngine {
     /**
      * Area damage spell — hits all enemies
      */
-    private castAreaDamage(value: number, element?: string): SpellResult {
+    private castAreaDamage(value: number, element?: string, effect?: any): SpellResult {
         const combat = this.game?.combat;
         if (!combat?.enemies?.length) {
             return { success: false, message: 'Keine Ziele' };
         }
 
+        // Prefer explicit value, fall back to attack for attack-based spell effects
+        const baseDamage = value || effect?.attack || 0;
+
         const targets: string[] = [];
         combat.enemies.forEach((enemy: any) => {
             const resistance = enemy.getResistanceMultiplier?.(element || 'physical') || 1;
-            const actualDamage = Math.ceil(value * resistance);
+            const actualDamage = Math.ceil(baseDamage * resistance);
 
             if (element === 'fire') enemy.fireStacks = (enemy.fireStacks || 0) + actualDamage;
             else if (element === 'ice') {
@@ -153,13 +158,13 @@ export class SpellEngine {
             targets.push(enemy.name);
         });
 
-        const msg = `Flächenschaden! Alle Feinde erleiden ${value} ${element || 'Magie'}-Schaden`;
+        const msg = `Flächenschaden! Alle Feinde erleiden ${baseDamage} ${element || 'Magie'}-Schaden`;
         this.game.addLog(msg, 'combat');
 
         return {
             success: true,
             message: msg,
-            damageDealt: value * combat.enemies.length,
+            damageDealt: baseDamage * combat.enemies.length,
             targetsAffected: targets
         };
     }

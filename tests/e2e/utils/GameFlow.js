@@ -6,6 +6,13 @@ export class GameFlow {
      */
     constructor(page) {
         this.page = page;
+        // Auto-accept native dialogs (confirm/alert) so tests don't hang in
+        // headless Chromium. The End-Turn button, for example, shows a
+        // confirm() prompt when actions remain; without this handler the
+        // handler aborts and the turn never ends.
+        this.page.on('dialog', (dialog) => {
+            dialog.accept().catch(() => {});
+        });
     }
 
     async loadGame() {

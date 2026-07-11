@@ -74,6 +74,11 @@ describe('RenderController', () => {
             expect(args[0]).toBe(game.hero.hand);
             expect(typeof args[1]).toBe('function');
             expect(typeof args[2]).toBe('function');
+            // Exercise the click callbacks -> delegate to interactionController
+            args[1](2, { name: 'C' });
+            args[2](3, { name: 'D' });
+            expect(game.interactionController.handleCardClick).toHaveBeenCalledWith(2, { name: 'C' });
+            expect(game.interactionController.handleCardRightClick).toHaveBeenCalledWith(3, { name: 'D' });
         });
 
         it('is a no-op without ui', () => {
@@ -89,6 +94,10 @@ describe('RenderController', () => {
             const args = game.ui.renderManaSource.mock.calls[0];
             expect(args[0]).toBe(game.manaSource);
             expect(args[2]).toBe(false); // isNight
+            // Exercise the mana click callback -> delegate to interactionController
+            expect(typeof args[1]).toBe('function');
+            args[1](1, 'blue');
+            expect(game.interactionController.handleManaClick).toHaveBeenCalledWith(1, 'blue');
         });
 
         it('is a no-op without ui', () => {

@@ -296,7 +296,7 @@ export class BossEnemy extends Enemy {
 
         this.isBoss = true;
         this.maxHealth = data.maxHealth || 30;
-        this.currentHealth = data.currentHealth || this.maxHealth;
+        this.currentHealth = data.currentHealth !== undefined ? data.currentHealth : this.maxHealth;
         this.phases = data.phases || (data.type === 'volkare' ? [
             { threshold: 0.75, name: t('ui.phases.phase1') || 'Phase 1', triggered: false },
             { threshold: 0.5, name: t('ui.phases.phase2') || 'Phase 2', triggered: false },

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../../js/game.js';
 import { setupGlobalMocks } from '../test-mocks.js';
 import { animator } from '../../js/animator.js';
@@ -44,26 +44,21 @@ describe('Coverage Boost v5 - Deep Integration & Animator', () => {
     });
 
     describe('Game Logic & Time Transitions', () => {
-        it('should handle complex time transition with timeouts', (done) => {
-            // Trigger time change
-            game.timeManager.endRound(); // Should trigger listener
+        it('should handle complex time transition with timeouts', () => {
+            vi.useFakeTimers();
+            // Trigger time change (dispatches a store event the game listens to)
+            game.timeManager.endRound();
 
-            // Wait for first timeout (1000ms)
-            setTimeout(() => {
-                try {
-                    // After 1s, it should have toggled to Night (initially Day)
-                    expect(game.timeManager.isNight()).toBe(true);
-                    // Wait for second timeout (1500ms)
-                    setTimeout(() => {
-                        try {
-                            const overlay = document.getElementById('day-night-overlay');
-                            // After another 1.5s, the overlay should be removed
-                            expect(overlay.classList.contains('active')).toBe(false);
-                            done();
-                        } catch (e) { done(e); }
-                    }, 2000);
-                } catch (e) { done(e); }
-            }, 1200);
+            // After ~1000ms it should have toggled to Night (initially Day)
+            vi.advanceTimersByTime(1000);
+            expect(game.timeManager.isNight()).toBe(true);
+
+            // After another ~1500ms the day-night overlay should be removed
+            vi.advanceTimersByTime(1500);
+            const overlay = document.getElementById('day-night-overlay');
+            expect(overlay.classList.contains('active')).toBe(false);
+
+            vi.useRealTimers();
         });
 
         it('should execute ranged attack from game controller', () => {

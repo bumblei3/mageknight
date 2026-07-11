@@ -291,11 +291,22 @@ export class HexGridLogic {
         if (!state) return;
         if (state.hexes) {
             // Handle both old format (array of entries) and new format (object)
+            let entries: [string, any][];
             if (Array.isArray(state.hexes)) {
-                this.hexes = new Map(state.hexes);
+                entries = state.hexes;
             } else if (typeof state.hexes === 'object') {
-                this.hexes = new Map(Object.entries(state.hexes));
+                entries = Object.entries(state.hexes);
+            } else {
+                entries = [];
             }
+            this.hexes = new Map(
+                entries.map(([key, hex]) => {
+                    // getState() does not serialize q/r (they live in the map key),
+                    // so restore them from the key to keep coordinate-based rendering working.
+                    const [q, r] = key.split(',').map(Number);
+                    return [key, { ...hex, q, r }];
+                })
+            );
         }
         // Re-instantiate Site objects to restore methods (getInfo, getIcon, etc.)
         for (const [key, hex] of this.hexes.entries()) {

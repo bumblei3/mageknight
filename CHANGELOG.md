@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full integration of new UI components into HandRenderer and CombatUIManager
 - Contextual Action Bar, Card Hover Tooltips, Phase Indicator (Phase 1 UX: Design Tokens, Base Styles & Component System)
 - Quick Wins: Combat Log Filterbar, Auto-Save Timer (30s), Undo Stack Visualisierung, Haptic Feedback, End-Turn Confirm, Animation Speed control
-- Mana Prediction (foundation)
 - Spells: 6 missing spells added → 16/16 complete
 - Advanced Actions: 24/24 complete
 - Site Rewards system (Phase 2 rules completeness)

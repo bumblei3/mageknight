@@ -3,7 +3,7 @@ import { setupGlobalMocks } from './test-mocks.js';
 import { MageKnightGame } from '../js/game.js';
 import { Hero } from '../js/hero.js';
 import { Unit } from '../js/unit.js';
-import { SKILL_TYPES } from '../js/skills.js';
+import { SKILL_TYPES } from '../js/skills/skillDefinitions.js';
 
 describe('Hero Skills Implementation', () => {
     let game;

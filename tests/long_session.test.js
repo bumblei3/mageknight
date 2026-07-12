@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
-import { SKILLS } from '../js/skills.js';
+import { SKILLS } from '../js/skills/skillDefinitions.js';
 import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
 import { setLanguage } from '../js/i18n/index.js';
 import { store } from '../js/store.js';

@@ -12,6 +12,13 @@ export interface Skill {
     cooldown?: 'round';
 }
 
+export const SKILL_TYPES = {
+    PASSIVE: 'passive',
+    ACTIVE: 'active'
+} as const;
+
+export type SkillType = typeof SKILL_TYPES[keyof typeof SKILL_TYPES];
+
 export interface HeroSkills {
     [key: string]: {
         common: Skill[];
@@ -105,3 +112,10 @@ export function getRandomSkills(
     // Shuffle and slice
     return available.sort(() => 0.5 - Math.random()).slice(0, count);
 }
+
+/**
+ * Uppercase-keyed skill table (mirrors HERO_SKILLS) for test/consumer convenience.
+ */
+export const SKILLS: Record<string, Skill[]> = Object.fromEntries(
+    Object.entries(HERO_SKILLS).map(([key, value]) => [key.toUpperCase(), value.common])
+);

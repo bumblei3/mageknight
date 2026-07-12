@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MageKnightGame } from '../js/game.js';
 import { setupGlobalMocks, createMockUI } from './test-mocks.js';
 import { LevelUpManager } from '../js/game/LevelUpManager.js';
-import { SKILLS } from '../js/skills.js';
+import { SKILLS } from '../js/skills/skillDefinitions.js';
 import { SAMPLE_ADVANCED_ACTIONS } from '../js/card.js';
 
 // Mock Store to prevent external dependencies

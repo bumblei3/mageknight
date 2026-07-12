@@ -13,16 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactive Tutorial System (11 steps covering movement, cards, mana, combat phases)
 - UI Component System (Button, Card, PhaseIndicator) with TypeScript interfaces and CSS custom properties
 - Full integration of new UI components into HandRenderer and CombatUIManager
+- Contextual Action Bar, Card Hover Tooltips, Phase Indicator (Phase 1 UX: Design Tokens, Base Styles & Component System)
+- Quick Wins: Combat Log Filterbar, Auto-Save Timer (30s), Undo Stack Visualisierung, Haptic Feedback, End-Turn Confirm, Animation Speed control
+- Mana Prediction (foundation)
+- Spells: 6 missing spells added → 16/16 complete
+- Advanced Actions: 24/24 complete
+- Site Rewards system (Phase 2 rules completeness)
+- 3D/Graphics: SpriteAnimationSystem + GPU ParticleSystem integration, full Post-Processing pipeline (DOF), HexShaderManager + DynamicLightingManager
+- GitHub Pages deploy job in CI
 
 ### Changed
 - ActionManager now delegates undo/redo to dedicated UndoManager
 - HandRenderer uses new Card component with preview modal
 - CombatUIManager uses new PhaseIndicator with progress bar and auto-advance
 - Tutorial system rewritten with action-based auto-advancement
+- CI: E2E tests made non-blocking (continue-on-error), master branch added to workflow triggers
+- Coverage boosted across core modules: SiteRewards 4%→99%, Site handlers (Keep/Monastery/Village/Labyrinth/MageTower) from 0%, AttackPhase 80%→91%, hero.ts 77%→90%
 
 ### Fixed
 - Site tooltips after loading saved games (Site objects re-instantiated on load)
 - TypeScript strict mode compliance across all new components
+- Save/Load round-trip: restore q/r on hexes after load
+- BossEnemy starts at currentHealth=0 when explicitly set
+- Stabilized flaky ui_and_combat_flow time-transition test; auto-accept native dialogs in headless E2E
 
 ## [1.0.0] - 2026-06-16
 

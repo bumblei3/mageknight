@@ -64,6 +64,7 @@ export class GameStateManager {
              const combatEnemies = [];
              if (this.game.combat.enemies) {
                  for (const e of this.game.combat.enemies) {
+                     if (!e) continue; // Skip corrupt null/foreign entries
                      const state = e.getState ? e.getState() : e;
                      if (state && typeof state === 'object') {
                          combatEnemies.push({

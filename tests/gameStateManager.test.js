@@ -139,6 +139,19 @@ describe('GameStateManager - getGameState', () => {
         expect(state.combat.enemies[0].id).toBe('p');
         expect(state.combat.enemies[0].type).toBe('ghost');
     });
+
+    it('skips a null entry inside combat.enemies (corrupt save serialize)', () => {
+        // A corrupt combat.enemies array can contain a literal null entry.
+        // getGameState() must skip it instead of crashing on null.getState().
+        const enemy = {
+            id: 'e1', type: 'orc', name: 'Orc', getState: () => ({ id: 'e1', type: 'orc', name: 'Orc' }),
+        };
+        game.combat = { enemies: [enemy, null], phase: 'attack', round: 3 };
+        let state;
+        expect(() => { state = mgr.getGameState(); }).not.toThrow();
+        expect(state.combat.enemies).toHaveLength(1);
+        expect(state.combat.enemies[0].type).toBe('orc');
+    });
 });
 
 describe('GameStateManager - loadGameState', () => {

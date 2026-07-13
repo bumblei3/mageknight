@@ -56,4 +56,30 @@ describe('TimeManager', () => {
             timeOfDay: TIME_OF_DAY.NIGHT
         });
     });
+
+    describe('loadState — round integrity', () => {
+        it('coerces a string round to the 1-based default (no NaN leak)', () => {
+            // Rounds are 1-based; a corrupt string must not survive as a raw
+            // string (which would make round++ produce NaN downstream).
+            timeManager.loadState({ round: 'abc', timeOfDay: TIME_OF_DAY.DAY });
+            expect(typeof timeManager.getState().round).toBe('number');
+            expect(Number.isFinite(timeManager.getState().round)).toBe(true);
+            expect(timeManager.getState().round).toBe(1);
+        });
+
+        it('keeps a valid numeric round >= 1', () => {
+            timeManager.loadState({ round: 7, timeOfDay: TIME_OF_DAY.DAY });
+            expect(timeManager.getState().round).toBe(7);
+        });
+
+        it('falls back to the 1 default for a negative round', () => {
+            timeManager.loadState({ round: -3, timeOfDay: TIME_OF_DAY.DAY });
+            expect(timeManager.getState().round).toBe(1);
+        });
+
+        it('falls back to DAY when timeOfDay is missing', () => {
+            timeManager.loadState({ round: 4 });
+            expect(timeManager.getState().timeOfDay).toBe(TIME_OF_DAY.DAY);
+        });
+    });
 });

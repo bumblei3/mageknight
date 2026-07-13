@@ -69,7 +69,13 @@ export class TimeManager {
     }
 
     public loadState(state: { round: number, timeOfDay: TimeOfDay }): void {
-        this.round = state.round || 1;
+        this.round = (() => {
+            const r = Number(state.round);
+            // Rounds are 1-based; a missing/non-finite/corrupt value (e.g. a
+            // string from a bad save) must not leak as NaN into round++ math,
+            // so fall back to the 1 default instead of clamping to 0.
+            return Number.isFinite(r) && r >= 1 ? r : 1;
+        })();
         this.timeOfDay = state.timeOfDay || TIME_OF_DAY.DAY;
         this.notifyListeners();
     }

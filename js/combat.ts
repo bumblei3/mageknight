@@ -427,7 +427,7 @@ export class Combat {
     getState(): CombatState {
         return {
             phase: this.phase,
-            enemies: this.enemies.map(e => typeof e.getState === 'function' ? e.getState() : { ...e }),
+            enemies: this.enemies.filter(Boolean).map(e => typeof e.getState === 'function' ? e.getState() : { ...e }),
             defeatedEnemies: this.defeatedEnemies,
             blockedEnemies: Array.from(this.blockedEnemies),
             totalDamage: this.totalDamage,

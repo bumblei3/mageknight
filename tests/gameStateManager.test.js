@@ -152,6 +152,17 @@ describe('GameStateManager - getGameState', () => {
         expect(state.combat.enemies).toHaveLength(1);
         expect(state.combat.enemies[0].type).toBe('orc');
     });
+
+    it('skips a null entry inside entityManager.enemies (corrupt save serialize)', () => {
+        // The main enemy list (entityManager.enemies) is serialized at line 118
+        // via .map(e => e.getState()). A null entry must be skipped, not crash.
+        const enemy = { id: 'e1', type: 'orc', getState: () => ({ id: 'e1', type: 'orc' }) };
+        game.entityManager.enemies = [enemy, null];
+        let state;
+        expect(() => { state = mgr.getGameState(); }).not.toThrow();
+        expect(state.enemies).toHaveLength(1);
+        expect(state.enemies[0].type).toBe('orc');
+    });
 });
 
 describe('GameStateManager - loadGameState', () => {

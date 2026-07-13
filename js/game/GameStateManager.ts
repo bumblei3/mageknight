@@ -115,7 +115,7 @@ export class GameStateManager {
          // Build state - ensure all required fields exist matching SaveStateSchema
          const state = {
              hero: this.game.hero ? this.game.hero.getState() : null,
-             enemies: this.game.entityManager ? this.game.entityManager.enemies.map((e: any) => e.getState()) : [],
+             enemies: this.game.entityManager ? this.game.entityManager.enemies.filter(Boolean).map((e: any) => e.getState()) : [],
              combat,
              hexGrid: this.game.hexGrid ? this.game.hexGrid.getState() : null,
              time: this.game.timeManager ? this.game.timeManager.getState() : { round: 1, timeOfDay: 'day' },

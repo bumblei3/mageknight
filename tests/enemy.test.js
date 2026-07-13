@@ -33,6 +33,13 @@ describe('Enemy', () => {
             const e = new Enemy({ type: 'x', armor: 7, lowerArmor: 1 });
             expect(e.lowerArmor).toBe(1);
         });
+
+        it('honors an explicit lowerArmor of 0 (does not derive floor(armor/2))', () => {
+            // lowerArmor: 0 is a valid, deliberate value (armor never drops
+            // below 0). The `||` default would silently reset it to floor(7/2)=3.
+            const e = new Enemy({ type: 'x', armor: 7, lowerArmor: 0 });
+            expect(e.lowerArmor).toBe(0);
+        });
     });
 
     describe('getResistanceMultiplier', () => {

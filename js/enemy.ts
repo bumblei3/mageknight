@@ -119,7 +119,7 @@ export class Enemy {
         this.summoner = data.summoner || false;
         this.summoned = data.summoned || false;
 
-        this.lowerArmor = data.lowerArmor || Math.floor((data.armor || 1) / 2);
+        this.lowerArmor = data.lowerArmor !== undefined ? data.lowerArmor : Math.floor((data.armor || 1) / 2);
         this.armorBonus = 0;
 
         // Resistances

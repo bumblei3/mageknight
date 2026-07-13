@@ -29,7 +29,7 @@ export class ShortcutsModal {
         this.modal.className = 'modal';
         this.modal.innerHTML = `
             <div class="modal-content">
-                <span class="close-btn" id="shortcuts-close">&times;</span>
+                <span class="close-btn" id="shortcuts-close" tabindex="-1" role="button" aria-label="Schließen">&times;</span>
                 <h2>${(t as any)('ui.settings.shortcuts') || 'Tastaturkürzel'}</h2>
                 <div class="shortcuts-list" id="shortcuts-list"></div>
                 <div class="modal-footer">
@@ -41,6 +41,69 @@ export class ShortcutsModal {
 
         this.setupListeners();
     }
+
+    public show(): void {
+        if (!this.modal) return;
+        this.renderList();
+        this.modal.style.display = 'block';
+        this.modal.classList.add('active');
+        this.modal.setAttribute('tabindex', '-1');
+
+        // Accessibility: move focus into the dialog so keyboard users are not
+        // left on the page behind it, and trap Tab within the modal. Defer one
+        // frame so the (newly-shown) element can receive focus reliably.
+        const focusTarget =
+            (this.modal.querySelector('#shortcuts-close') as HTMLElement | null) ||
+            (this.modal.querySelector('button, [href], input, select, textarea') as HTMLElement | null) ||
+            this.modal;
+        requestAnimationFrame(() => focusTarget.focus());
+        document.addEventListener('keydown', this.trapHandler, true);
+    }
+
+    public hide(): void {
+        if (!this.modal) return;
+        this.modal.style.display = 'none';
+        this.modal.classList.remove('active');
+        this.isListening = false;
+        document.removeEventListener('keydown', this.trapHandler, true);
+        // Return focus to the trigger if available (settings shortcuts button)
+        const trigger = document.getElementById('settings-shortcuts-btn');
+        if (trigger) (trigger as HTMLElement).focus();
+    }
+
+    /**
+     * Keep keyboard focus inside the modal: Escape closes it (unless we are
+     * currently capturing a new key), and Tab cycles the focusable elements
+     * instead of escaping to the page behind.
+     */
+    private trapHandler = (e: KeyboardEvent): void => {
+        if (!this.modal) return;
+        if (e.key === 'Escape' && !this.isListening) {
+            e.preventDefault();
+            this.hide();
+            return;
+        }
+        if (e.key !== 'Tab') return;
+
+        const focusables = Array.from(
+            this.modal.querySelectorAll<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            )
+        ).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null);
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+
+        if (e.shiftKey && active === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && active === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    };
 
     private setupListeners(): void {
         if (!this.modal) return;
@@ -55,7 +118,11 @@ export class ShortcutsModal {
             const resetBtn = this.modal.querySelector('#shortcuts-reset');
             if (resetBtn) {
                 resetBtn.addEventListener('click', () => {
-                    if (typeof window !== 'undefined' && window.confirm && window.confirm('Wirklich alle Kürzel zurücksetzen?')) {
+                    if (
+                        typeof window !== 'undefined' &&
+                        window.confirm &&
+                        window.confirm('Wirklich alle Kürzel zurücksetzen?')
+                    ) {
                         this.ui.game.shortcutManager.resetDefaults();
                         this.renderList();
                     }
@@ -76,21 +143,7 @@ export class ShortcutsModal {
         }
     }
 
-    public show(): void {
-        if (!this.modal) return;
-        this.renderList();
-        this.modal.style.display = 'block';
-        this.modal.classList.add('active');
-    }
-
-    public hide(): void {
-        if (!this.modal) return;
-        this.modal.style.display = 'none';
-        this.modal.classList.remove('active');
-        this.isListening = false;
-    }
-
-    private renderList(): void {
+    public renderList(): void {
         if (!this.modal) return;
         const list = this.modal.querySelector('#shortcuts-list');
         if (!list) return;

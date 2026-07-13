@@ -71,7 +71,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => this.game.confirmMovement?.(),
             showCondition: () => this.game.movementMode === true,
-            order: 10,
+            order: 10
         });
 
         this.registerAction({
@@ -82,7 +82,7 @@ export class ActionBarManager {
             danger: true,
             onClick: () => this.game.cancelMovement?.(),
             showCondition: () => this.game.movementMode === true,
-            order: 20,
+            order: 20
         });
 
         // Card Selected Actions (when hovering a card)
@@ -94,7 +94,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => this.playSelectedCard(false),
             showCondition: () => this.hasPlayableCard() && !this.game.combat,
-            order: 10,
+            order: 10
         });
 
         this.registerAction({
@@ -105,7 +105,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => this.playSelectedCard(true),
             showCondition: () => this.hasPlayableCardWithStrong() && !this.game.combat,
-            order: 15,
+            order: 15
         });
 
         this.registerAction({
@@ -115,7 +115,7 @@ export class ActionBarManager {
             shortcut: 'Rechtsklick',
             onClick: () => this.openSidewaysModal(),
             showCondition: () => this.hasPlayableCard() && !this.game.combat,
-            order: 20,
+            order: 20
         });
 
         // Combat Actions
@@ -126,7 +126,7 @@ export class ActionBarManager {
             shortcut: 'Space',
             onClick: () => this.game.combatOrchestrator?.endRangedPhase?.(),
             showCondition: () => this.game.combat && this.game.combat?.phase === 'RANGED',
-            order: 10,
+            order: 10
         });
 
         this.registerAction({
@@ -137,7 +137,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => {}, // Handled by card click
             showCondition: () => this.game.combat && this.game.combat?.phase === 'BLOCK',
-            order: 10,
+            order: 10
         });
 
         this.registerAction({
@@ -148,7 +148,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => this.game.combatOrchestrator?.executeAttack?.(),
             showCondition: () => this.game.combat && this.game.combat?.phase === 'ATTACK',
-            order: 10,
+            order: 10
         });
 
         this.registerAction({
@@ -159,7 +159,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => this.game.combatOrchestrator?.endCombat?.(),
             showCondition: () => this.game.combat && this.game.combat?.phase === 'COMPLETE',
-            order: 10,
+            order: 10
         });
 
         // Exploration Actions
@@ -171,7 +171,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => this.game.actionManager?.explore?.(),
             showCondition: () => !this.game.combat && !this.game.movementMode && this.canExplore(),
-            order: 10,
+            order: 10
         });
 
         this.registerAction({
@@ -182,7 +182,7 @@ export class ActionBarManager {
             primary: true,
             onClick: () => this.game.endTurn?.(),
             showCondition: () => !this.game.combat && !this.game.movementMode && this.game.canEndTurn !== false,
-            order: 100,
+            order: 100
         });
 
         this.registerAction({
@@ -192,7 +192,7 @@ export class ActionBarManager {
             shortcut: 'R',
             onClick: () => this.game.rest?.(),
             showCondition: () => !this.game.combat && !this.game.movementMode && this.game.canRest !== false,
-            order: 110,
+            order: 110
         });
 
         // Mana Actions (subtle hint)
@@ -203,7 +203,7 @@ export class ActionBarManager {
             shortcut: 'Klick Würfel',
             onClick: () => {},
             showCondition: () => !this.game.combat && this.game.manaPool?.length > 0,
-            order: 200,
+            order: 200
         });
     }
 
@@ -233,11 +233,12 @@ export class ActionBarManager {
     hasPlayableCardWithStrong(): boolean {
         if (!this.game.hero?.hand) return false;
         const isNight = this.game.timeManager?.isNight?.() ?? false;
-        return this.game.hero.hand.some((card: any) =>
-            card &&
-            !card.isWound?.() &&
-            Object.keys(card.strongEffect || {}).length > 0 &&
-            this.game.hero.canAffordMana?.(card, isNight)
+        return this.game.hero.hand.some(
+            (card: any) =>
+                card &&
+                !card.isWound?.() &&
+                Object.keys(card.strongEffect || {}).length > 0 &&
+                this.game.hero.canAffordMana?.(card, isNight)
         );
     }
 
@@ -302,15 +303,23 @@ export class ActionBarManager {
 
         // Filter and sort actions
         const visibleActions = Array.from(this.registeredActions.values())
-            .filter(action => !action.showCondition || action.showCondition(this.game))
+            .filter((action) => !action.showCondition || action.showCondition(this.game))
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
         // Render action buttons
-        visibleActions.forEach(action => {
+        visibleActions.forEach((action) => {
             const btn = document.createElement('button');
             btn.className = `action-btn ${action.primary ? 'primary' : ''} ${action.danger ? 'danger' : ''}`;
             btn.disabled = action.disabled ?? false;
             btn.onclick = action.onClick;
+
+            // Accessibility + tooltip: combine label and shortcut into a single
+            // hint so keyboard/screen-reader/touch users get the same context
+            // as the visible label + kbd badge.
+            const tooltipText = action.shortcut ? `${action.label} (${action.shortcut})` : action.label;
+            btn.setAttribute('aria-label', tooltipText);
+            btn.setAttribute('title', tooltipText);
+            btn.setAttribute('data-tooltip', tooltipText);
 
             if (action.icon) {
                 const iconSpan = document.createElement('span');
@@ -344,7 +353,7 @@ export class ActionBarManager {
         if (this.game.movementMode) {
             hints.push({
                 label: t('ui.hints.moveHint'),
-                shortcut: 'Klick Hex + Enter',
+                shortcut: 'Klick Hex + Enter'
             });
         }
 
@@ -373,7 +382,7 @@ export class ActionBarManager {
             hints.push({ label: t('ui.hints.restHint'), shortcut: 'R' });
         }
 
-        hints.forEach(hint => {
+        hints.forEach((hint) => {
             const item = document.createElement('span');
             item.className = 'hint-item';
             if (hint.shortcut) {

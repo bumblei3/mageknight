@@ -13,6 +13,64 @@ export class TooltipManager {
 
     constructor() {
         this.createTooltipElement();
+        this.enableGlobalDataTooltips();
+    }
+
+    /**
+     * Global, delegated tooltip support for any element carrying a
+     * `data-tooltip="..."` attribute. Works for dynamically-rendered controls
+     * (e.g. the action bar) without per-element wiring. Supports hover, keyboard
+     * focus, and a touch (pointerdown) fallback for devices without hover.
+     */
+    private touchHideTimer: number | null = null;
+    private enableGlobalDataTooltips(): void {
+        if (typeof document === 'undefined') return;
+
+        const resolve = (target: EventTarget | null): HTMLElement | null => {
+            if (!(target instanceof HTMLElement)) return null;
+            return target.closest('[data-tooltip]') as HTMLElement | null;
+        };
+
+        const showFor = (el: HTMLElement): void => {
+            const text = el.getAttribute('data-tooltip');
+            if (!text) return;
+            const html = `<div class="tooltip-generic"><div class="tooltip-description">${text}</div></div>`;
+            this.showTooltip(el, html);
+        };
+
+        // Hover (delegated on document, capture avoids per-element listeners)
+        document.addEventListener('mouseover', (e) => {
+            const el = resolve(e.target);
+            if (el) showFor(el);
+        });
+        document.addEventListener('mouseout', (e) => {
+            const el = resolve(e.target);
+            if (el) this.hideTooltip(100);
+        });
+
+        // Keyboard focus / blur (accessibility)
+        document.addEventListener('focusin', (e) => {
+            const el = resolve(e.target);
+            if (el) showFor(el);
+        });
+        document.addEventListener('focusout', (e) => {
+            const el = resolve(e.target);
+            if (el) this.hideTooltip(100);
+        });
+
+        // Touch fallback: no hover on mobile, so surface on tap and auto-hide.
+        document.addEventListener(
+            'pointerdown',
+            (e) => {
+                if ((e as PointerEvent).pointerType !== 'touch') return;
+                const el = resolve(e.target);
+                if (!el) return;
+                showFor(el);
+                if (this.touchHideTimer) window.clearTimeout(this.touchHideTimer);
+                this.touchHideTimer = window.setTimeout(() => this.hideTooltip(), 1600);
+            },
+            { passive: true }
+        );
     }
 
     private createTooltipElement(): void {
@@ -216,21 +274,21 @@ export class TooltipManager {
         }
 
         const icons: Record<string, string> = {
-            'fire': '🔥',
-            'ice': '❄️',
-            'cold_fire': '🔥❄️',
-            'physical': '⚔️',
-            'fortified': '🏰',
-            'swift': '💨',
-            'poison': '🤢',
-            'vampiric': '🧛',
-            'brutal': '👹',
-            'paralyze': '⚡',
-            'cumbersome': '🏋️',
-            'assassin': '🗡️',
-            'boss': '👑',
-            'summoner': '🦇',
-            'elusive': '👤'
+            fire: '🔥',
+            ice: '❄️',
+            cold_fire: '🔥❄️',
+            physical: '⚔️',
+            fortified: '🏰',
+            swift: '💨',
+            poison: '🤢',
+            vampiric: '🧛',
+            brutal: '👹',
+            paralyze: '⚡',
+            cumbersome: '🏋️',
+            assassin: '🗡️',
+            boss: '👑',
+            summoner: '🦇',
+            elusive: '👤'
         };
 
         const icon = icons[abilityKey] || '';
@@ -256,7 +314,7 @@ export class TooltipManager {
         const rect = element.getBoundingClientRect();
         const tooltipRect = this.tooltip.getBoundingClientRect();
 
-        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        let left = rect.left + rect.width / 2 - tooltipRect.width / 2;
         let top = rect.top - tooltipRect.height - 10;
 
         // Prevent overflow on right
@@ -304,11 +362,16 @@ export class TooltipManager {
         `;
 
         // List basic effects
-        if (effects.movement) html += `<div>🌿 ${t('cards.actions.movement')}: <span class="value">+${effects.movement}</span></div>`;
-        if (effects.attack) html += `<div>⚔️ ${t('cards.actions.attack')}: <span class="value">+${effects.attack}</span></div>`;
-        if (effects.block) html += `<div>🛡️ ${t('cards.actions.block')}: <span class="value">+${effects.block}</span></div>`;
-        if (effects.influence) html += `<div>💬 ${t('cards.actions.influence')}: <span class="value">+${effects.influence}</span></div>`;
-        if (effects.healing) html += `<div>❤️ ${t('cards.actions.healing')}: <span class="value">+${effects.healing}</span></div>`;
+        if (effects.movement)
+            html += `<div>🌿 ${t('cards.actions.movement')}: <span class="value">+${effects.movement}</span></div>`;
+        if (effects.attack)
+            html += `<div>⚔️ ${t('cards.actions.attack')}: <span class="value">+${effects.attack}</span></div>`;
+        if (effects.block)
+            html += `<div>🛡️ ${t('cards.actions.block')}: <span class="value">+${effects.block}</span></div>`;
+        if (effects.influence)
+            html += `<div>💬 ${t('cards.actions.influence')}: <span class="value">+${effects.influence}</span></div>`;
+        if (effects.healing)
+            html += `<div>❤️ ${t('cards.actions.healing')}: <span class="value">+${effects.healing}</span></div>`;
 
         html += '</div>';
 
@@ -327,7 +390,7 @@ export class TooltipManager {
             html += `
                 <div class="tooltip-section">
                     <strong>💎 ${t('cards.manaCost')}:</strong>
-                    <div>${(card.manaCost as any[]).map(m => this.getManaHTML(m)).join(' ')}</div>
+                    <div>${(card.manaCost as any[]).map((m) => this.getManaHTML(m)).join(' ')}</div>
                 </div>
             `;
         }
@@ -344,7 +407,15 @@ export class TooltipManager {
      */
     public createTerrainTooltipHTML(terrainType: string, game?: any): string {
         // Icons mapping
-        const icons: Record<string, string> = { 'plains': '🌾', 'forest': '🌲', 'hills': '⛰️', 'mountains': '🏔️', 'desert': '🏜️', 'wasteland': '☠️', 'water': '💧' };
+        const icons: Record<string, string> = {
+            plains: '🌾',
+            forest: '🌲',
+            hills: '⛰️',
+            mountains: '🏔️',
+            desert: '🏜️',
+            wasteland: '☠️',
+            water: '💧'
+        };
 
         // Fetch data from i18n
         const nameKey = `terrain.${terrainType}.name`;
@@ -382,8 +453,8 @@ export class TooltipManager {
         }
 
         // Check if translations were found, otherwise fallback nicely
-        const displayName = (name !== nameKey) ? name : (terrainType.charAt(0).toUpperCase() + terrainType.slice(1));
-        const displayDesc = (desc !== descKey) ? desc : '';
+        const displayName = name !== nameKey ? name : terrainType.charAt(0).toUpperCase() + terrainType.slice(1);
+        const displayDesc = desc !== descKey ? desc : '';
 
         return `
             <div class="tooltip-terrain">
@@ -448,13 +519,15 @@ export class TooltipManager {
      * @returns {string} HTML string
      */
     public createUnitTooltipHTML(unit: any): string {
-        const unitName = typeof unit.getName === 'function' ? unit.getName() : (unit.name || 'Unit');
+        const unitName = typeof unit.getName === 'function' ? unit.getName() : unit.name || 'Unit';
         const unitLevel = unit.level || 1;
         const abilities = typeof unit.getAbilities === 'function' ? unit.getAbilities() : [];
-        const abilityText = (abilities as any[]).map(a => {
-            const elementIcon = this.getElementIcon(a.element);
-            return `<div class="tooltip-ability">${elementIcon} ${a.text || a}</div>`;
-        }).join('');
+        const abilityText = (abilities as any[])
+            .map((a) => {
+                const elementIcon = this.getElementIcon(a.element);
+                return `<div class="tooltip-ability">${elementIcon} ${a.text || a}</div>`;
+            })
+            .join('');
 
         return `
             <div class="tooltip-unit">
@@ -469,11 +542,15 @@ export class TooltipManager {
                         <span class="value">${unit.armor || 0}</span>
                     </div>
                 </div>
-                ${abilityText ? `
+                ${
+                    abilityText
+                        ? `
                 <div class="tooltip-section">
                     <strong>${t('ui.labels.skills')}:</strong>
                     <div style="margin-top: 0.25rem;">${abilityText}</div>
-                </div>` : ''}
+                </div>`
+                        : ''
+                }
             </div>
         `;
     }
@@ -481,16 +558,16 @@ export class TooltipManager {
     // Helper method to get element icon
     private getElementIcon(element?: string): string {
         const icons: Record<string, string> = {
-            'fire': '🔥',
-            'ice': '❄️',
-            'cold_fire': '🔥❄️',
-            'physical': '⚔️',
-            'holy': '✨',
-            'healing': '❤️',
-            'influence': '💬',
-            'movement': '🌿',
-            'ranged': '🏹',
-            'siege': '🎯'
+            fire: '🔥',
+            ice: '❄️',
+            cold_fire: '🔥❄️',
+            physical: '⚔️',
+            holy: '✨',
+            healing: '❤️',
+            influence: '💬',
+            movement: '🌿',
+            ranged: '🏹',
+            siege: '🎯'
         };
         return icons[element || 'physical'] || '⚔️';
     }
@@ -500,11 +577,11 @@ export class TooltipManager {
      */
     public getColorIcon(color: string): string {
         const icons: Record<string, string> = {
-            'green': '🌿',
-            'red': '⚔️',
-            'blue': '🛡️',
-            'white': '💬',
-            'gold': '⭐'
+            green: '🌿',
+            red: '⚔️',
+            blue: '🛡️',
+            white: '💬',
+            gold: '⭐'
         };
         return icons[color] || '❓';
     }
@@ -514,11 +591,11 @@ export class TooltipManager {
      */
     public getManaHTML(color: string): string {
         const colors: Record<string, string> = {
-            'red': '🔥',
-            'blue': '💧',
-            'white': '✨',
-            'green': '🌿',
-            'gold': '💰'
+            red: '🔥',
+            blue: '💧',
+            white: '✨',
+            green: '🌿',
+            gold: '💰'
         };
         return `<span class="mana-icon ${color}">${colors[color] || '💎'}</span>`;
     }
@@ -550,18 +627,20 @@ export class TooltipManager {
      */
     public createSiteTooltipHTML(site: any): string {
         // Handle both Site class instances and plain objects from saved games
-        const getInfo = typeof site.getInfo === 'function' 
-            ? site.getInfo() 
-            : this.getPlainObjectInfo(site);
-            
-        const localizedName = (site.type && t(`sites.${site.type}`) !== `sites.${site.type}`) ? t(`sites.${site.type}`) : getInfo.name;
-        const status = site.conquered ? `<span class="status-conquered">👑 ${t('sites.conquered')}</span>` :
-            site.visited ? `<span class="status-visited">✓ ${t('sites.visited')}</span>` : '';
+        const getInfo = typeof site.getInfo === 'function' ? site.getInfo() : this.getPlainObjectInfo(site);
+
+        const localizedName =
+            site.type && t(`sites.${site.type}`) !== `sites.${site.type}` ? t(`sites.${site.type}`) : getInfo.name;
+        const status = site.conquered
+            ? `<span class="status-conquered">👑 ${t('sites.conquered')}</span>`
+            : site.visited
+              ? `<span class="status-visited">✓ ${t('sites.visited')}</span>`
+              : '';
 
         let actionsHtml = '';
         if (getInfo.actions) {
             actionsHtml = '<div class="tooltip-actions">';
-            (getInfo.actions as string[]).forEach(action => {
+            (getInfo.actions as string[]).forEach((action) => {
                 actionsHtml += `<span class="action-tag">${this.getActionIcon(action)} ${this.getActionName(action)}</span>`;
             });
             actionsHtml += '</div>';
@@ -584,7 +663,13 @@ export class TooltipManager {
     /**
      * Extract info from plain site object (from loaded save games)
      */
-    private getPlainObjectInfo(site: any): { name: string; icon: string; color: string; description: string; actions?: string[] } {
+    private getPlainObjectInfo(site: any): {
+        name: string;
+        icon: string;
+        color: string;
+        description: string;
+        actions?: string[];
+    } {
         // Use SITE_INFO for metadata if available
         const siteInfo = SITE_INFO[site.type] || { name: site.type || 'Unknown', icon: '?', color: '#888' };
         return {
@@ -598,12 +683,12 @@ export class TooltipManager {
 
     public getActionIcon(action: string): string {
         const icons: Record<string, string> = {
-            'heal': '❤️',
-            'recruit': '👥',
-            'attack': '⚔️',
-            'train': '📚',
-            'learn': '✨',
-            'explore': '🔍'
+            heal: '❤️',
+            recruit: '👥',
+            attack: '⚔️',
+            train: '📚',
+            learn: '✨',
+            explore: '🔍'
         };
         return icons[action] || '•';
     }
@@ -622,34 +707,48 @@ export class TooltipManager {
         let processed = text;
 
         const terms = [
-            'Vampirismus', 'Befestigt', 'Lähmung', 'Flink', 'Brutal', 'Gift',
-            'Schwerfällig', 'Attentäter', 'Beschwörer', 'Ausweichend',
-            'Resistenz', 'Block', 'Wunde', 'Rüstung', 'Fernkampf', 'Belagerung',
-            'Tag', 'Nacht'
+            'Vampirismus',
+            'Befestigt',
+            'Lähmung',
+            'Flink',
+            'Brutal',
+            'Gift',
+            'Schwerfällig',
+            'Attentäter',
+            'Beschwörer',
+            'Ausweichend',
+            'Resistenz',
+            'Block',
+            'Wunde',
+            'Rüstung',
+            'Fernkampf',
+            'Belagerung',
+            'Tag',
+            'Nacht'
         ];
 
         const map: Record<string, string> = {
-            'Vampirismus': 'vampirism',
-            'Befestigt': 'fortified',
-            'Lähmung': 'paralyze',
-            'Flink': 'swift',
-            'Brutal': 'brutal',
-            'Gift': 'poison',
-            'Schwerfällig': 'cumbersome',
-            'Attentäter': 'assassin',
-            'Beschwörer': 'summoner',
-            'Ausweichend': 'elusive',
-            'Resistenz': 'resistance',
-            'Block': 'block',
-            'Wunde': 'wound',
-            'Rüstung': 'armor',
-            'Fernkampf': 'ranged',
-            'Belagerung': 'siege',
-            'Tag': 'day',
-            'Nacht': 'night'
+            Vampirismus: 'vampirism',
+            Befestigt: 'fortified',
+            Lähmung: 'paralyze',
+            Flink: 'swift',
+            Brutal: 'brutal',
+            Gift: 'poison',
+            Schwerfällig: 'cumbersome',
+            Attentäter: 'assassin',
+            Beschwörer: 'summoner',
+            Ausweichend: 'elusive',
+            Resistenz: 'resistance',
+            Block: 'block',
+            Wunde: 'wound',
+            Rüstung: 'armor',
+            Fernkampf: 'ranged',
+            Belagerung: 'siege',
+            Tag: 'day',
+            Nacht: 'night'
         };
 
-        terms.forEach(term => {
+        terms.forEach((term) => {
             const regex = new RegExp(`\\b(${term})\\b`, 'gi');
             const key = map[term];
             if (key) {

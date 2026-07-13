@@ -3,6 +3,7 @@ import { MageKnightGame } from './game';
 import i18n from './i18n/index';
 import { ErrorHandler } from './errorHandler';
 import { initErrorBoundary } from './errorBoundary';
+import { showLoadingError } from './loadingError';
 
 /**
  * Handles dynamic import errors (common after new deployments due to hash mismatch)
@@ -10,8 +11,7 @@ import { initErrorBoundary } from './errorBoundary';
 const handleImportError = (error: any) => {
     console.error('Dynamic import failed:', error);
     // If it's a fetch error for a chunk, it might be due to a new deployment
-    if (error.message?.includes('Failed to fetch dynamically imported module') ||
-        error.message?.includes('chunk')) {
+    if (error.message?.includes('Failed to fetch dynamically imported module') || error.message?.includes('chunk')) {
         const lastReload = localStorage.getItem('mk_last_import_reload');
         const now = Date.now();
         // Only auto-reload once every 30 seconds to avoid loops
@@ -95,10 +95,10 @@ const startMageKnight = async (): Promise<void> => {
 
     try {
         updateLoading(20, 'Lade Spielressourcen...');
-        await new Promise(r => setTimeout(r, 100)); // Allow UI update
+        await new Promise((r) => setTimeout(r, 100)); // Allow UI update
 
         updateLoading(40, 'Initialisiere Spielwelt...');
-        await new Promise(r => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 100));
 
         const game = new MageKnightGame();
         (window as any).game = game;
@@ -158,10 +158,10 @@ const startMageKnight = async (): Promise<void> => {
         }
 
         updateLoading(70, 'Lade Karten und Einheiten...');
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise((r) => setTimeout(r, 150));
 
         updateLoading(90, 'Bereite HUD vor...');
-        await new Promise(r => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 100));
 
         console.log('Game initialized successfully!');
 
@@ -175,25 +175,29 @@ const startMageKnight = async (): Promise<void> => {
         (window as any).errorHandler = errorHandler;
 
         updateLoading(100, 'Fertig!');
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise((r) => setTimeout(r, 300));
 
         hideLoadingScreen();
-
     } catch (error) {
         console.error('Failed to initialize game:', error);
         updateLoading(0, 'Fehler beim Laden!');
+        showLoadingError(error);
     }
 };
 
 // Handle both normal loading and deferred/module loading
 if (document.readyState === 'loading') {
-    window.addEventListener('load', () => {
-        if ('requestIdleCallback' in window) {
-            (window as any).requestIdleCallback(() => startMageKnight(), { timeout: 2000 });
-        } else {
-            setTimeout(startMageKnight, 100);
-        }
-    }, { once: true });
+    window.addEventListener(
+        'load',
+        () => {
+            if ('requestIdleCallback' in window) {
+                (window as any).requestIdleCallback(() => startMageKnight(), { timeout: 2000 });
+            } else {
+                setTimeout(startMageKnight, 100);
+            }
+        },
+        { once: true }
+    );
 } else {
     // Use requestIdleCallback to ensure DOM is fully ready and painted if readyState is already 'complete'
     if ('requestIdleCallback' in window) {

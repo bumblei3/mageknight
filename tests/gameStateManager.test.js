@@ -157,6 +157,20 @@ describe('GameStateManager - loadGameState', () => {
         expect(game.hero.loadState).toHaveBeenCalledWith(state.hero);
     });
 
+    it('drops null enemies produced by reconstituteEnemy (corrupt enemy type)', () => {
+        // Simulate a corrupt save: reconstituteEnemy returns null for an unknown type
+        game.enemyAI.reconstituteEnemy = vi.fn((d) => (d.type === 'known' ? { id: d.id } : null));
+        const state = {
+            hero: { name: 'Goldyx' },
+            enemies: [{ id: 'e1', type: 'known' }, { id: 'e2', type: 'BOGUS' }]
+        };
+        const ok = mgr.loadGameState(state);
+        expect(ok).toBe(true);
+        // The null result for the corrupt enemy must NOT end up in the enemies list
+        expect(game.entityManager.enemies).toEqual([{ id: 'e1' }]);
+        expect(game.enemies).toEqual([{ id: 'e1' }]);
+    });
+
     it('restores all subsystems and updates UI', () => {
         const state = {
             hero: { name: 'G' },

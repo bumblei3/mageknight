@@ -158,7 +158,7 @@ export class GameStateManager {
                 this.game.entityManager.enemies = state.enemies.map((eData: any) => {
                     const e = this.game.enemyAI.reconstituteEnemy(eData);
                     return e;
-                });
+                }).filter(Boolean); // Drop nulls from corrupt/unrecognized enemy data
                 this.game.enemies = this.game.entityManager.enemies; // Compatibility
             }
 

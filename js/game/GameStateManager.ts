@@ -155,10 +155,12 @@ export class GameStateManager {
 
             // Restore enemies
             if (state.enemies && this.game.entityManager) {
-                this.game.entityManager.enemies = state.enemies.map((eData: any) => {
-                    const e = this.game.enemyAI.reconstituteEnemy(eData);
-                    return e;
-                }).filter(Boolean); // Drop nulls from corrupt/unrecognized enemy data
+                this.game.entityManager.enemies = state.enemies
+                    .filter(Boolean) // Drop literal nulls (corrupt save array) before reconstitute
+                    .map((eData: any) => {
+                        const e = this.game.enemyAI.reconstituteEnemy(eData);
+                        return e;
+                    }).filter(Boolean); // Drop nulls from corrupt/unrecognized enemy data
                 this.game.enemies = this.game.entityManager.enemies; // Compatibility
             }
 

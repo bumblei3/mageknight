@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GameStateManager } from '../js/game/GameStateManager.js';
 import { SaveManager } from '../js/persistence/SaveManager.js';
+import { EnemyAI } from '../js/enemyAI.js';
 
 /**
  * Focused tests for js/game/GameStateManager.ts (previously ~58% line coverage).
@@ -159,7 +160,7 @@ describe('GameStateManager - loadGameState', () => {
 
     it('drops null enemies produced by reconstituteEnemy (corrupt enemy type)', () => {
         // Simulate a corrupt save: reconstituteEnemy returns null for an unknown type
-        game.enemyAI.reconstituteEnemy = vi.fn((d) => (d.type === 'known' ? { id: d.id } : null));
+        game.enemyAI.reconstituteEnemy = vi.fn((d) => (d && d.type === 'known' ? { id: d.id } : null));
         const state = {
             hero: { name: 'Goldyx' },
             enemies: [{ id: 'e1', type: 'known' }, { id: 'e2', type: 'BOGUS' }]
@@ -169,6 +170,22 @@ describe('GameStateManager - loadGameState', () => {
         // The null result for the corrupt enemy must NOT end up in the enemies list
         expect(game.entityManager.enemies).toEqual([{ id: 'e1' }]);
         expect(game.enemies).toEqual([{ id: 'e1' }]);
+    });
+
+    it('does not crash on a null entry inside enemies (corrupt save array)', () => {
+        // A corrupt save can contain a literal null inside the enemies array.
+        // The REAL EnemyAI.reconstituteEnemy reads eData.isBoss, so a null entry
+        // throws on `null.isBoss` BEFORE .filter(Boolean) can drop it. loadGameState
+        // must tolerate it and drop the bad entry instead of crashing the load.
+        const ai = new EnemyAI({});
+        game.enemyAI = ai;
+        const state = { hero: { name: 'Goldyx' }, enemies: [null, { id: 'e1', type: 'orc' }] };
+        const ok = mgr.loadGameState(state);
+        expect(ok).toBe(true);
+        // Only the single valid enemy survives; the null entry is dropped (no crash)
+        expect(game.entityManager.enemies).toHaveLength(1);
+        expect(game.entityManager.enemies[0]).toBeTruthy();
+        expect(game.enemies).toHaveLength(1);
     });
 
     it('restores all subsystems and updates UI', () => {

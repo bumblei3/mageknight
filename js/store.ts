@@ -170,10 +170,27 @@ class Store {
         switch (action) {
             case ACTIONS.SET_HERO_STATS:
             case ACTIONS.SET_HERO_RESOURCES:
-            case ACTIONS.SET_HERO_INVENTORY:
-                this.state.hero = { ...this.state.hero, ...(payload as Partial<HeroState>) };
+            case ACTIONS.SET_HERO_INVENTORY: {
+                const p = payload as Partial<HeroState>;
+                const coerced: Partial<HeroState> = {};
+                // Coerce known numeric hero fields; clamp non-negative ones to >= 0.
+                // Prevents corrupt dispatch (e.g. string) from poisoning hero state
+                // used in arithmetic downstream (movementPoints - cost, etc.).
+                const numFields: (keyof HeroState)[] = [
+                    'level', 'fame', 'reputation', 'armor', 'handLimit', 'commandLimit',
+                    'movementPoints', 'attackPoints', 'blockPoints', 'influencePoints', 'healingPoints'
+                ];
+                for (const f of numFields) {
+                    if (p[f] !== undefined) coerced[f] = Math.max(0, Number(p[f]) || 0) as any;
+                }
+                // Carry over non-numeric fields (name, crystals, tempMana, arrays) as-is
+                for (const k of Object.keys(p) as (keyof HeroState)[]) {
+                    if (!(k in coerced)) (coerced as any)[k] = (p as any)[k];
+                }
+                this.state.hero = { ...this.state.hero, ...coerced };
                 stateChanged = true;
                 break;
+            }
             case ACTIONS.SET_GAME_PHASE:
                 this.state.game = { ...this.state.game, phase: payload as string };
                 stateChanged = true;

@@ -51,3 +51,45 @@ describe('Store reducer — numeric payload integrity', () => {
         expect(seen).toEqual([]);
     });
 });
+
+describe('Store reducer — hero numeric payload integrity', () => {
+    beforeEach(() => {
+        store.clearListeners();
+        store.reset();
+        vi.spyOn(console, 'warn').mockImplementation(() => { });
+    });
+
+    afterEach(() => {
+        store.clearListeners();
+    });
+
+    it('coerces a string movementPoints to a number (no raw string in hero state)', () => {
+        store.dispatch(ACTIONS.SET_HERO_RESOURCES, { movementPoints: 'abc' });
+        expect(typeof store.getHero().movementPoints).toBe('number');
+        expect(store.getHero().movementPoints).toBe(0);
+    });
+
+    it('keeps a valid numeric movementPoints', () => {
+        store.dispatch(ACTIONS.SET_HERO_RESOURCES, { movementPoints: 2 });
+        expect(store.getHero().movementPoints).toBe(2);
+    });
+
+    it('clamps a negative movementPoints to 0', () => {
+        store.dispatch(ACTIONS.SET_HERO_RESOURCES, { movementPoints: -3 });
+        expect(store.getHero().movementPoints).toBe(0);
+    });
+
+    it('coerces a string armor to a number', () => {
+        store.dispatch(ACTIONS.SET_HERO_STATS, { armor: 'broken' });
+        expect(typeof store.getHero().armor).toBe('number');
+        expect(store.getHero().armor).toBe(0);
+    });
+
+    it('preserves non-numeric fields (name, crystals) passed through untouched', () => {
+        store.dispatch(ACTIONS.SET_HERO_STATS, { name: 'Goldyx', fame: 10 });
+        expect(store.getHero().name).toBe('Goldyx');
+        expect(store.getHero().fame).toBe(10);
+        store.dispatch(ACTIONS.SET_HERO_INVENTORY, { crystals: { red: 3 } });
+        expect(store.getHero().crystals).toEqual({ red: 3 });
+    });
+});

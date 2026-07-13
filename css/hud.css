@@ -60,9 +60,13 @@
     flex-direction: column;
     gap: var(--space-4);
     width: 320px;
-    height: calc(100vh - 100px);
+    /* Leave room for the top bar (64px) and the fixed bottom hand/action dock
+       (320px) so the lower panels (combat enemies, execute button, log) are
+       not hidden behind it. */
+    height: calc(100vh - 64px - 320px - var(--space-6));
     overflow-y: auto;
     padding-right: var(--space-1);
+    padding-bottom: var(--space-4);
     pointer-events: none;
     grid-row: 2;
     animation: sidebarSlide 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -143,6 +147,31 @@
     color: var(--color-gold-400);
     opacity: 0.3;
     transition: var(--transition-base);
+}
+
+/* Combat panel: keep the enemy list scrollable while pinning the execute
+   button to the bottom so it is never clipped by `.panel { overflow: hidden }`
+   or hidden behind the fixed bottom hand/action dock. */
+.combat-panel {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    /* Allow the execute button to stick to the sidebar's scroll viewport
+       instead of being clipped by the default panel overflow. */
+    overflow: visible;
+}
+.combat-panel #combat-info,
+.combat-panel #combat-units {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+.combat-panel #execute-attack-btn {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    flex: 0 0 auto;
+    z-index: 2;
 }
 
 .panel:hover::before,

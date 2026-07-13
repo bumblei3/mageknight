@@ -179,7 +179,7 @@ class Store {
                 stateChanged = true;
                 break;
             case ACTIONS.SET_GAME_ROUND:
-                this.state.game = { ...this.state.game, round: payload as number };
+                this.state.game = { ...this.state.game, round: Math.max(0, Number(payload) || 0) };
                 stateChanged = true;
                 break;
             case ACTIONS.SET_DAY_NIGHT:

@@ -696,15 +696,23 @@ export class Hero {
         this.displayPosition = { ...this.position };
         // Convert string IDs back to Card objects
         const idsToCards = (ids: (string | Card)[]): Card[] => {
-            return ids.map(id => {
-                if (typeof id === 'string') {
-                    const def = CARD_DEFINITIONS[id];
-                    if (def) return new Card(def);
-                    console.warn(`Card definition not found for ID: ${id}`);
-                    return new Card({ id, name: 'Unknown Card', color: null });
-                }
-                return id;
-            });
+            if (!Array.isArray(ids)) return [];
+            return ids
+                .filter(Boolean) // Drop literal null/undefined (corrupt save data)
+                .map(id => {
+                    if (typeof id === 'string') {
+                        const def = CARD_DEFINITIONS[id];
+                        if (def) return new Card(def);
+                        console.warn(`Card definition not found for ID: ${id}`);
+                        return new Card({ id, name: 'Unknown Card', color: null });
+                    }
+                    // Already a Card instance: keep as-is
+                    if (id instanceof Card) return id;
+                    // Foreign/non-Card object: drop it (corrupt save data)
+                    console.warn('Skipping non-Card entry in saved card list');
+                    return null;
+                })
+                .filter(Boolean) as Card[]; // Drop any nulls produced above
         };
         if (state.deck) this.deck = idsToCards(state.deck);
         if (state.hand) this.hand = idsToCards(state.hand);

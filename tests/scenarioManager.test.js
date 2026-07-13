@@ -271,4 +271,23 @@ describe('ScenarioManager', () => {
             expect(mgr.checkVictory()).toBe(false);
         });
     });
+
+    describe('checkVictory - corrupt enemy list resilience', () => {
+        it('does not crash on a null entry in game.enemies (corrupt state)', () => {
+            // A corrupt state can contain a literal null inside game.enemies
+            // (same data-integrity class as the GameStateManager load fix).
+            // checkBossDefeated() iterates game.enemies and reads enemy.type;
+            // a null entry must not crash the victory check.
+            const corruptGame = makeMockGame({ enemies: [null] });
+            const mgr = new ScenarioManager(corruptGame);
+            mgr.loadScenario('volkare_quest');
+
+            let result;
+            expect(() => { result = mgr.checkVictory(); }).not.toThrow();
+            // With no real boss entity present (only a corrupt null entry),
+            // the boss is treated as defeated -> victory, not a crash.
+            expect(result).toBeTruthy();
+            expect(result.victory).toBe(true);
+        });
+    });
 });

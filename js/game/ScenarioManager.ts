@@ -388,6 +388,7 @@ export class ScenarioManager {
         // Also check game's enemy list
         if (this.game.enemies) {
             for (const enemy of this.game.enemies) {
+                if (!enemy) continue; // Skip corrupt null/foreign entries
                 if (enemy.type === bossType && enemy.isBoss) {
                     return false; // Boss still alive
                 }

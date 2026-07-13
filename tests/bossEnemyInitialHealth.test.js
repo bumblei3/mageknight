@@ -29,4 +29,20 @@ describe('BossEnemy initial health', () => {
         });
         expect(boss.currentHealth).toBe(25);
     });
+
+    it('respects an explicit maxHealth of 0 (does not fall back to 30)', () => {
+        // A boss defined with maxHealth: 0 must keep 0; the `|| 30` default
+        // would silently reset it. currentHealth then derives from maxHealth.
+        const boss = new BossEnemy({
+            id: 'zero_hp_boss',
+            name: 'Zero HP Boss',
+            type: 'custom',
+            maxHealth: 0,
+            attack: 5,
+            armor: 3,
+            fame: 10,
+        });
+        expect(boss.maxHealth).toBe(0);
+        expect(boss.currentHealth).toBe(0);
+    });
 });

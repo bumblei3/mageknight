@@ -42,6 +42,19 @@
     gap: var(--space-2);
 }
 
+/* Undo/Redo toolbar injected by UndoManager (self-created fallback) */
+.action-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.action-toolbar .mk-btn-group.undo-redo-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 .hud-sidebar {
     display: flex;
     flex-direction: column;
@@ -423,7 +436,7 @@
     backdrop-filter: blur(var(--space-1));
 }
 
-.panel.collapsed .hero-info>.hero-details,
+.panel.collapsed .hero-info > .hero-details,
 .panel.collapsed .action-grid,
 .panel.collapsed .movement-display,
 .panel.collapsed .units-container,
@@ -591,7 +604,6 @@
 }
 
 @keyframes pulse-glow {
-
     0%,
     100% {
         filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
@@ -1212,7 +1224,9 @@
     color: var(--color-text-primary);
     font-size: 0.9rem;
     line-height: 1.5;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
     transform-origin: bottom center;
 }
 

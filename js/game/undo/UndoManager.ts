@@ -22,7 +22,17 @@ export interface GameStateSnapshot {
         siegeTotal: number;
     };
     // Track what type of action this was for UI context
-    actionType?: 'move' | 'playCard' | 'endTurn' | 'explore' | 'combat' | 'site' | 'recruit' | 'heal' | 'rest' | 'other';
+    actionType?:
+        | 'move'
+        | 'playCard'
+        | 'endTurn'
+        | 'explore'
+        | 'combat'
+        | 'site'
+        | 'recruit'
+        | 'heal'
+        | 'rest'
+        | 'other';
     description?: string;
 }
 
@@ -290,36 +300,66 @@ export class UndoManager {
 
     private createToolbarButtons(): void {
         if (typeof document === 'undefined') return;
-        // Wait for toolbar to exist
         const checkToolbar = () => {
             if (typeof document === 'undefined') return;
-            const toolbar = document.getElementById('action-toolbar') || document.getElementById('toolbar');
+            // If a statically-declared #undo-btn exists, attach redo/state next
+            // to it so the controls stay grouped. Otherwise fall back to a
+            // self-created container anchored in the header.
+            const existingUndo = document.getElementById('undo-btn');
+            const toolbar =
+                document.getElementById('action-toolbar') ||
+                document.getElementById('toolbar') ||
+                (existingUndo ? existingUndo.parentElement : null) ||
+                this.ensureToolbarContainer();
             if (toolbar) {
                 this.injectButtons(toolbar);
-            } else {
-                // Check again shortly if DOM is available
-                if (typeof window !== 'undefined') {
-                    setTimeout(checkToolbar, 100);
-                }
             }
         };
 
-        // Also listen for toolbar creation
-        if (typeof window !== 'undefined') {
-            eventBus.on(GAME_EVENTS.PHASE_CHANGED, checkToolbar);
-        }
         checkToolbar();
+    }
+
+    /**
+     * Create a visible, clickable toolbar container if none exists in the DOM.
+     * The undo/redo buttons must live outside the canvas-only `.bottom-dock`
+     * (which has `pointer-events: none`), so we anchor them in the always-on
+     * `.hud-top-bar` header. Returns the container, or null if even that
+     * anchor is unavailable.
+     */
+    private ensureToolbarContainer(): HTMLElement | null {
+        if (typeof document === 'undefined') return null;
+        let container = document.getElementById('action-toolbar');
+        if (container) return container;
+
+        container = document.createElement('div');
+        container.id = 'action-toolbar';
+        container.className = 'action-toolbar';
+
+        const anchor = document.querySelector('.header-controls') || document.querySelector('.hud-top-bar');
+        if (anchor) {
+            anchor.insertBefore(container, anchor.firstChild);
+        } else {
+            document.body.appendChild(container);
+        }
+        return container;
     }
 
     private injectButtons(toolbar: HTMLElement): void {
         if (this.undoButton || this.redoButton) return; // Already created
 
-        // Create undo button
-        this.undoButton = ButtonPatterns.icon('↩', () => this.undo(), 'Rückgängig (Ctrl+Z)', 'ghost', 'sm');
-        this.undoButton.id = 'undo-btn';
-        this.undoButton.setAttribute('aria-label', 'Rückgängig machen (Ctrl+Z)');
+        // Prefer the statically-declared button in index.html (class "btn-icon",
+        // id "undo-btn") over creating a duplicate. A duplicate would produce
+        // two elements with the same id (invalid DOM) and split the click wiring.
+        const existingUndo = document.getElementById('undo-btn') as HTMLButtonElement | null;
+        if (existingUndo) {
+            this.undoButton = existingUndo;
+        } else {
+            this.undoButton = ButtonPatterns.icon('↩', () => this.undo(), 'Rückgängig (Ctrl+Z)', 'ghost', 'sm');
+            this.undoButton.id = 'undo-btn';
+            this.undoButton.setAttribute('aria-label', 'Rückgängig machen (Ctrl+Z)');
+        }
 
-        // Create redo button
+        // Create redo button (no static declaration exists)
         this.redoButton = ButtonPatterns.icon('↪', () => this.redo(), 'Wiederholen (Ctrl+Y)', 'ghost', 'sm');
         this.redoButton.id = 'redo-btn';
         this.redoButton.setAttribute('aria-label', 'Wiederholen (Ctrl+Y / Ctrl+Shift+Z)');
@@ -426,16 +466,16 @@ export class UndoManager {
     /** Map action type to emoji icon */
     private getActionIcon(actionType?: string): string {
         const icons: Record<string, string> = {
-            'move': '🚶',
-            'playCard': '🃏',
-            'endTurn': '⏭',
-            'explore': '🔍',
-            'combat': '⚔',
-            'site': '🏰',
-            'recruit': '👥',
-            'heal': '💚',
-            'rest': '🛏',
-            'other': '•'
+            move: '🚶',
+            playCard: '🃏',
+            endTurn: '⏭',
+            explore: '🔍',
+            combat: '⚔',
+            site: '🏰',
+            recruit: '👥',
+            heal: '💚',
+            rest: '🛏',
+            other: '•'
         };
         return icons[actionType || 'other'] || '•';
     }
@@ -447,7 +487,7 @@ export class UndoManager {
         if (this.phaseChangeHandler) {
             eventBus.off(GAME_EVENTS.PHASE_CHANGED, this.phaseChangeHandler);
         }
-        
+
         if (this.undoButton?.parentNode) {
             this.undoButton.parentNode.removeChild(this.undoButton);
         }

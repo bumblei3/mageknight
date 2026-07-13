@@ -67,7 +67,7 @@ export class CombatUIManager {
             onPhaseChange: (targetPhase: string) => {
                 const combat = this.ui?.game?.combat;
                 if (!combat) return;
-                
+
                 if (phase === COMBAT_PHASES.RANGED && targetPhase === COMBAT_PHASES.BLOCK) {
                     combat.endRangedPhase();
                 } else if (phase === COMBAT_PHASES.BLOCK && targetPhase === COMBAT_PHASES.DAMAGE) {
@@ -96,7 +96,7 @@ export class CombatUIManager {
         });
 
         // Render enemies
-        enemies.forEach(enemy => {
+        enemies.forEach((enemy) => {
             const enemyDiv = this.renderEnemy(enemy, phase, onEnemyClick);
             info.appendChild(enemyDiv);
         });
@@ -155,30 +155,42 @@ export class CombatUIManager {
             html += `
                 <div class="combat-prediction">
                     <div class="prediction-details">
-                        ${prediction.expectedWounds > 0 ?
-                    `<div class="prediction-danger">
+                        ${
+                            prediction.expectedWounds > 0
+                                ? `<div class="prediction-danger">
                                 💔 <span><strong>${prediction.expectedWounds}</strong> Wunden erwartet</span>
                                 ${prediction.isPoisoned ? '<span class="poison-warning">+ GIFT!</span>' : ''}
-                             </div>` :
-                    '<div class="prediction-safe">✅ Kein Schaden erwartet</div>'
-                }
-                        ${prediction.enemiesDefeated.length > 0 ?
-                    `<div class="prediction-success">
+                             </div>`
+                                : '<div class="prediction-safe">✅ Kein Schaden erwartet</div>'
+                        }
+                        ${
+                            prediction.enemiesDefeated.length > 0
+                                ? `<div class="prediction-success">
                                 ⚔️ <strong>Besiegbar:</strong> ${prediction.enemiesDefeated.join(', ')}
-                             </div>` : ''
-                }
-                        ${prediction.assassinRestriction ?
-                    `<div class="prediction-warning">
+                             </div>`
+                                : ''
+                        }
+                        ${
+                            prediction.assassinRestriction
+                                ? `<div class="prediction-warning">
                                 🗡️ <strong>Attentäter!</strong> Schaden muss vom Helden genommen werden.
-                             </div>` : ''
-                }
-                        ${(prediction.elementalEfficiencyWarnings?.length > 0 || prediction.blockEfficiencyWarnings?.length > 0) ?
-                    (() => {
-                        const elemWarn = (prediction.elementalEfficiencyWarnings || []).map((w: string) => `<span class="efficiency-warning">⚡ ${w}</span>`).join('');
-                        const blockWarn = (prediction.blockEfficiencyWarnings || []).map((w: string) => `<span class="efficiency-warning">🛡️ ${w}</span>`).join('');
-                        return `<div class="prediction-efficiency">${elemWarn}${blockWarn}</div>`;
-                    })() : ''
-                }
+                             </div>`
+                                : ''
+                        }
+                        ${
+                            prediction.elementalEfficiencyWarnings?.length > 0 ||
+                            prediction.blockEfficiencyWarnings?.length > 0
+                                ? (() => {
+                                      const elemWarn = (prediction.elementalEfficiencyWarnings || [])
+                                          .map((w: string) => `<span class="efficiency-warning">⚡ ${w}</span>`)
+                                          .join('');
+                                      const blockWarn = (prediction.blockEfficiencyWarnings || [])
+                                          .map((w: string) => `<span class="efficiency-warning">🛡️ ${w}</span>`)
+                                          .join('');
+                                      return `<div class="prediction-efficiency">${elemWarn}${blockWarn}</div>`;
+                                  })()
+                                : ''
+                        }
                     </div>
                 </div>
             `;
@@ -244,7 +256,8 @@ export class CombatUIManager {
      */
     public getPhaseHint(phase: string): string {
         const hints: Record<string, string> = {
-            [COMBAT_PHASES.RANGED]: 'Besiege Feinde mit Fernkampf- oder Belagerungswerten. Befestigte Feinde (🏰) ignorieren normalen Fernkampf!',
+            [COMBAT_PHASES.RANGED]:
+                'Besiege Feinde mit Fernkampf- oder Belagerungswerten. Befestigte Feinde (🏰) ignorieren normalen Fernkampf!',
             [COMBAT_PHASES.BLOCK]: 'Blocke Feind-Angriffe. Ungeblockte Feinde verursachen Schaden.',
             [COMBAT_PHASES.ATTACK]: 'Besiege verbliebene Feinde mit normalen Angriffswerten.'
         };
@@ -278,8 +291,14 @@ export class CombatUIManager {
             el.style.cursor = 'crosshair';
             el.title = phase === COMBAT_PHASES.RANGED ? 'Klicken für Fernkampf-Angriff' : 'Klicken zum Blocken';
             el.addEventListener('click', () => onClick(enemy));
-            el.addEventListener('mouseenter', () => el.style.boxShadow = phase === COMBAT_PHASES.RANGED ? '0 0 10px red' : '0 0 10px #3b82f6');
-            el.addEventListener('mouseleave', () => el.style.boxShadow = enemy.isBoss ? '0 0 8px rgba(251, 191, 36, 0.5)' : 'none');
+            el.addEventListener(
+                'mouseenter',
+                () => (el.style.boxShadow = phase === COMBAT_PHASES.RANGED ? '0 0 10px red' : '0 0 10px #3b82f6')
+            );
+            el.addEventListener(
+                'mouseleave',
+                () => (el.style.boxShadow = enemy.isBoss ? '0 0 8px rgba(251, 191, 36, 0.5)' : 'none')
+            );
         }
 
         // Get Attack Info
@@ -288,10 +307,10 @@ export class CombatUIManager {
         const blockReq = typeof enemy.getBlockRequirement === 'function' ? enemy.getBlockRequirement() : attackValue;
 
         const typeIcons: Record<string, string> = {
-            'physical': '⚔️',
-            'fire': '🔥',
-            'ice': '❄️',
-            'cold_fire': '🔥❄️'
+            physical: '⚔️',
+            fire: '🔥',
+            ice: '❄️',
+            cold_fire: '🔥❄️'
         };
         const typeIcon = typeIcons[attackType] || '⚔️';
 
@@ -315,8 +334,8 @@ export class CombatUIManager {
             `;
         }
 
-        const blockBadge = (phase === COMBAT_PHASES.BLOCK && !isBlocked) ?
-            `<div class="block-badge">Benötigt: ${blockReq}</div>` : '';
+        const blockBadge =
+            phase === COMBAT_PHASES.BLOCK && !isBlocked ? `<div class="block-badge">Benötigt: ${blockReq}</div>` : '';
 
         // const fortifiedBadge = (phase === COMBAT_PHASES.RANGED && enemy.fortified && !isBlocked) ?
         //     '<div class="fortified-badge">BEFESTIGT</div>' : '';
@@ -357,9 +376,28 @@ export class CombatUIManager {
         // Attach tooltips to ability icons
         if (this.ui && this.ui.tooltipManager) {
             const abilityIcons = el.querySelectorAll('.ability-icon');
-            abilityIcons.forEach(icon => {
+            abilityIcons.forEach((icon) => {
                 this.ui.tooltipManager.attachToElement(icon as HTMLElement);
             });
+
+            // Rich, whole-card enemy tooltip (hover + keyboard focus) so players
+            // can inspect armor/attack/abilities without a separate click.
+            const tm = this.ui.tooltipManager;
+            el.setAttribute('tabindex', '0');
+            const ariaName = enemy.isBoss ? `Boss ${enemy.name}` : enemy.name;
+            el.setAttribute(
+                'aria-label',
+                `${ariaName}, Rüstung ${enemy.armor}, Angriff ${attackValue}` +
+                    (enemy.fortified ? ', befestigt' : '') +
+                    (enemy.poison ? ', Gift' : '')
+            );
+
+            const showCard = () => tm.showEnemyTooltip(el, enemy);
+            const hideCard = () => tm.hideTooltip(100);
+            el.addEventListener('mouseenter', showCard);
+            el.addEventListener('mouseleave', hideCard);
+            el.addEventListener('focus', showCard);
+            el.addEventListener('blur', hideCard);
         }
 
         return el;
@@ -384,14 +422,19 @@ export class CombatUIManager {
 
         // Check for Assassin restriction (used in hint + unit cards)
         const combat = this.ui?.game?.combat;
-        const hasAssassinRestriction = phase === COMBAT_PHASES.DAMAGE && combat && combat.unblockedEnemies && combat.unblockedEnemies.some((e: any) => e.assassin && !e.damageAssigned);
+        const hasAssassinRestriction =
+            phase === COMBAT_PHASES.DAMAGE &&
+            combat &&
+            combat.unblockedEnemies &&
+            combat.unblockedEnemies.some((e: any) => e.assassin && !e.damageAssigned);
 
         // Add Context Hint for Damage Phase
         if (phase === COMBAT_PHASES.DAMAGE) {
             const hint = document.createElement('div');
             hint.className = 'damage-assignment-hint';
             if (hasAssassinRestriction) {
-                hint.innerHTML = '<small>🗡️ <strong>Attentäter im Kampf!</strong> Schaden kann NICHT auf Einheiten zugewiesen werden. Der Held muss den Schaden nehmen.</small>';
+                hint.innerHTML =
+                    '<small>🗡️ <strong>Attentäter im Kampf!</strong> Schaden kann NICHT auf Einheiten zugewiesen werden. Der Held muss den Schaden nehmen.</small>';
                 hint.style.color = '#ef4444';
                 hint.style.fontWeight = 'bold';
             } else {
@@ -405,33 +448,45 @@ export class CombatUIManager {
         const grid = document.createElement('div');
         grid.className = 'combat-units-grid';
 
-        units.forEach(unit => {
+        units.forEach((unit) => {
             const isReady = typeof unit.isReady === 'function' ? unit.isReady() : true;
             let canAct = false;
             let actionText = '';
 
             // Logic for Phase Actions
             if (phase === COMBAT_PHASES.BLOCK) {
-                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter((a: any) => a.type === ACTION_TYPES.BLOCK);
+                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(
+                    (a: any) => a.type === ACTION_TYPES.BLOCK
+                );
                 canAct = isReady && abilities.length > 0;
-                actionText = abilities.map((a: any) => {
-                    const elementIcon = this.getElementIcon(a.element);
-                    return `${elementIcon} ${a.text}`;
-                }).join(', ');
+                actionText = abilities
+                    .map((a: any) => {
+                        const elementIcon = this.getElementIcon(a.element);
+                        return `${elementIcon} ${a.text}`;
+                    })
+                    .join(', ');
             } else if (phase === COMBAT_PHASES.ATTACK) {
-                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter((a: any) => a.type === ACTION_TYPES.ATTACK);
+                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(
+                    (a: any) => a.type === ACTION_TYPES.ATTACK
+                );
                 canAct = isReady && abilities.length > 0;
-                actionText = abilities.map((a: any) => {
-                    const elementIcon = this.getElementIcon(a.element);
-                    return `${elementIcon} ${a.text}`;
-                }).join(', ');
+                actionText = abilities
+                    .map((a: any) => {
+                        const elementIcon = this.getElementIcon(a.element);
+                        return `${elementIcon} ${a.text}`;
+                    })
+                    .join(', ');
             } else if (phase === COMBAT_PHASES.RANGED) {
-                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter((a: any) => a.type === ACTION_TYPES.RANGED || a.type === ACTION_TYPES.SIEGE);
+                const abilities = (typeof unit.getAbilities === 'function' ? unit.getAbilities() : []).filter(
+                    (a: any) => a.type === ACTION_TYPES.RANGED || a.type === ACTION_TYPES.SIEGE
+                );
                 canAct = isReady && abilities.length > 0;
-                actionText = abilities.map((a: any) => {
-                    const elementIcon = this.getElementIcon(a.element);
-                    return `${elementIcon} ${a.text}`;
-                }).join(', ');
+                actionText = abilities
+                    .map((a: any) => {
+                        const elementIcon = this.getElementIcon(a.element);
+                        return `${elementIcon} ${a.text}`;
+                    })
+                    .join(', ');
             } else if (phase === COMBAT_PHASES.DAMAGE) {
                 if (hasAssassinRestriction) {
                     canAct = false;
@@ -444,7 +499,7 @@ export class CombatUIManager {
 
             const unitCard = document.createElement('div');
             // Visual style for damage assignment target: clearer indication
-            const extraClass = (phase === COMBAT_PHASES.DAMAGE && canAct) ? 'damage-target' : '';
+            const extraClass = phase === COMBAT_PHASES.DAMAGE && canAct ? 'damage-target' : '';
             unitCard.className = `unit-combat-card ${canAct ? '' : 'not-ready'} ${extraClass}`;
 
             // Helper to get ability text if not set above (fallback)
@@ -492,8 +547,10 @@ export class CombatUIManager {
                 });
 
                 // Hover Effects
-                const hoverColor = phase === COMBAT_PHASES.DAMAGE ? 'rgba(239, 68, 68, 0.2)' : 'rgba(139, 92, 246, 0.2)';
-                const hoverBorder = phase === COMBAT_PHASES.DAMAGE ? 'rgba(239, 68, 68, 0.6)' : 'rgba(139, 92, 246, 0.6)';
+                const hoverColor =
+                    phase === COMBAT_PHASES.DAMAGE ? 'rgba(239, 68, 68, 0.2)' : 'rgba(139, 92, 246, 0.2)';
+                const hoverBorder =
+                    phase === COMBAT_PHASES.DAMAGE ? 'rgba(239, 68, 68, 0.6)' : 'rgba(139, 92, 246, 0.6)';
 
                 unitCard.addEventListener('mouseenter', () => {
                     unitCard.style.background = hoverColor;
@@ -526,11 +583,11 @@ export class CombatUIManager {
     // Helper method to get element icon
     private getElementIcon(element?: string): string {
         const icons: Record<string, string> = {
-            'fire': '🔥',
-            'ice': '❄️',
-            'cold_fire': '🔥❄️',
-            'physical': '⚔️',
-            'holy': '✨'
+            fire: '🔥',
+            ice: '❄️',
+            cold_fire: '🔥❄️',
+            physical: '⚔️',
+            holy: '✨'
         };
         return icons[element || 'physical'] || '⚔️';
     }

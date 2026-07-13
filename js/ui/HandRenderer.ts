@@ -33,7 +33,11 @@ export class HandRenderer {
         (store as any).subscribe((state: any, action: string) => {
             if (action === (ACTIONS as any).SET_HERO_STATS || action === (ACTIONS as any).SET_LANGUAGE) {
                 if (state.hero.hand && this.callbacks.onCardClick) {
-                    this.renderHandCards(state.hero.hand, this.callbacks.onCardClick, this.callbacks.onCardRightClick || undefined);
+                    this.renderHandCards(
+                        state.hero.hand,
+                        this.callbacks.onCardClick,
+                        this.callbacks.onCardRightClick || undefined
+                    );
                 }
             }
         });
@@ -45,11 +49,15 @@ export class HandRenderer {
      * @param {Function} onCardClick - Callback for card click
      * @param {Function} [onCardRightClick] - Optional callback for right click
      */
-    public renderHandCards(hand: any[], onCardClick: (index: number, card: any) => void, onCardRightClick?: (index: number, card: any) => void): void {
+    public renderHandCards(
+        hand: any[],
+        onCardClick: (index: number, card: any) => void,
+        onCardRightClick?: (index: number, card: any) => void
+    ): void {
         if (!this.elements || !this.elements.handCards) return;
         if (onCardClick) this.callbacks.onCardClick = onCardClick;
         if (onCardRightClick) this.callbacks.onCardRightClick = onCardRightClick;
-        
+
         // Inject styles once
         if (!this.stylesInjected) {
             injectCardPreviewStyles();
@@ -60,7 +68,7 @@ export class HandRenderer {
 
         hand.forEach((card, index) => {
             const isWound = typeof card.isWound === 'function' ? card.isWound() : !!card.isWound;
-            
+
             // Card data for new component
             const cardData = {
                 id: card.id || `card_${index}`,
@@ -71,7 +79,7 @@ export class HandRenderer {
                 strongEffect: card.strongEffect,
                 isWound: () => isWound,
                 canPlaySideways: () => card.canPlaySideways?.() ?? !isWound,
-                getEffect: (strong: boolean) => strong ? card.strongEffect : card.basicEffect
+                getEffect: (strong: boolean) => (strong ? card.strongEffect : card.basicEffect)
             };
 
             const cardEl = createCard({
@@ -145,7 +153,7 @@ export class HandRenderer {
                     this.tooltipManager.hideTooltip();
 
                     // Add subtle scale down during drag
-                    setTimeout(() => cardEl.style.opacity = '0.5', 0);
+                    setTimeout(() => (cardEl.style.opacity = '0.5'), 0);
                 });
 
                 cardEl.addEventListener('dragend', () => {
@@ -154,14 +162,14 @@ export class HandRenderer {
                 });
             }
 
-            // Add tooltip events
+            // Add tooltip events (hover + keyboard focus for a11y parity)
             if (!isWound) {
-                cardEl.addEventListener('mouseenter', () => {
-                    this.tooltipManager.showCardTooltip(cardEl, card);
-                });
-                cardEl.addEventListener('mouseleave', () => {
-                    this.tooltipManager.hideTooltip(100);
-                });
+                const showCard = () => this.tooltipManager.showCardTooltip(cardEl, card);
+                const hideCard = () => this.tooltipManager.hideTooltip(100);
+                cardEl.addEventListener('mouseenter', showCard);
+                cardEl.addEventListener('mouseleave', hideCard);
+                cardEl.addEventListener('focus', showCard);
+                cardEl.addEventListener('blur', hideCard);
             }
 
             this.elements.handCards!.appendChild(cardEl);
@@ -214,8 +222,11 @@ export class HandRenderer {
             </div>
             <div class="card-effects">
                 <div class="card-effect"><strong>${(t as any)('cards.basic')}:</strong> ${basicEffect}</div>
-                ${strongEffect && strongEffect !== (t as any)('cards.none') ?
-                `<div class="card-effect"><strong>${(t as any)('cards.strong')}:</strong> ${strongEffect}</div>` : ''}
+                ${
+                    strongEffect && strongEffect !== (t as any)('cards.none')
+                        ? `<div class="card-effect"><strong>${(t as any)('cards.strong')}:</strong> ${strongEffect}</div>`
+                        : ''
+                }
             </div>
             <div class="card-hint">${(t as any)('cards.sidewaysAction')}</div>
         `;

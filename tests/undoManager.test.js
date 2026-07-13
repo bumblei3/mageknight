@@ -196,6 +196,19 @@ describe('UndoManager - undo / redo core', () => {
         mgr.undo();
         expect(game.actionManager.enterMovementMode).toHaveBeenCalled();
     });
+
+    it('keeps the snapshot and returns false when restore throws (no data loss)', () => {
+        // Simulate a corrupt snapshot whose loadState throws.
+        game.hero.loadState = vi.fn(() => { throw new Error('corrupt snapshot'); });
+        mgr.saveState('move', 'Step');
+        const result = mgr.undo();
+        expect(result).toBe(false);
+        // Snapshot must be restored to undoStack so it can be retried,
+        // and redoStack must stay empty (no silent drop of history).
+        expect(mgr.getState().canUndo).toBe(true);
+        expect(mgr.getState().canRedo).toBe(false);
+        expect(game.showToast).toHaveBeenCalledWith('Fehler beim Wiederherstellen.', 'error');
+    });
 });
 
 describe('UndoManager - state queries & clearing', () => {

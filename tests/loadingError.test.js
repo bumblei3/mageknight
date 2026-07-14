@@ -58,3 +58,48 @@ describe('showLoadingError', () => {
         expect(detail.textContent).toContain('Unbekannter Fehler');
     });
 });
+
+describe('showLoadingError - edge branches', () => {
+    beforeEach(() => {
+        buildLoadingScreen();
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+        delete window.mkErrorBoundary;
+    });
+
+    it('returns silently when #loading-screen is absent (no crash)', () => {
+        document.body.innerHTML = '<div id="other"></div>';
+        expect(() => showLoadingError(new Error('x'))).not.toThrow();
+    });
+
+    it('stringifies a non-Error string error value', () => {
+        showLoadingError('network timeout');
+        const detail = document.querySelector('.loading-error-actions span');
+        expect(detail.textContent).toContain('Details: network timeout');
+    });
+
+    it('stringifies a numeric error value', () => {
+        showLoadingError(500);
+        const detail = document.querySelector('.loading-error-actions span');
+        expect(detail.textContent).toContain('Details: 500');
+    });
+
+    it('reports to the global error boundary when present', () => {
+        const reportError = vi.fn();
+        window.mkErrorBoundary = { reportError };
+        const err = new Error('boom');
+        showLoadingError(err);
+        expect(reportError).toHaveBeenCalledWith(err);
+    });
+
+    it('does not crash if the error boundary itself throws', () => {
+        window.mkErrorBoundary = {
+            reportError: () => {
+                throw new Error('boundary down');
+            },
+        };
+        expect(() => showLoadingError(new Error('boom'))).not.toThrow();
+    });
+});

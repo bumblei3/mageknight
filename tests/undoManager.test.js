@@ -197,6 +197,14 @@ describe('UndoManager - undo / redo core', () => {
         expect(game.actionManager.enterMovementMode).toHaveBeenCalled();
     });
 
+    it('exits movement mode on restore when hero has no movement points', () => {
+        game.hero.movementPoints = 0; // override makeMockGame default of 3
+        mgr.saveState('move', 'Step');
+        mgr.undo();
+        expect(game.actionManager.exitMovementMode).toHaveBeenCalled();
+        expect(game.actionManager.enterMovementMode).not.toHaveBeenCalled();
+    });
+
     it('keeps the snapshot and returns false when restore throws (no data loss)', () => {
         // Simulate a corrupt snapshot whose loadState throws.
         game.hero.loadState = vi.fn(() => { throw new Error('corrupt snapshot'); });
@@ -344,6 +352,15 @@ describe('UndoManager - UI injection & history display', () => {
         expect(redoBtn).not.toBeNull();
         expect(undoBtn.getAttribute('aria-label')).toContain('Rückgängig');
         expect(redoBtn.getAttribute('aria-label')).toContain('Wiederholen');
+    });
+
+    it('does not create duplicate buttons on repeated toolbar injection', () => {
+        // Buttons already injected by the constructor into #action-toolbar.
+        expect(document.querySelectorAll('#undo-btn').length).toBe(1);
+        // Trigger a phase change -> createToolbarButtons -> injectButtons again.
+        eventBus.emit(GAME_EVENTS.PHASE_CHANGED);
+        expect(document.querySelectorAll('#undo-btn').length).toBe(1);
+        expect(document.querySelectorAll('#redo-btn').length).toBe(1);
     });
 
     it('disables undo button when no history', () => {

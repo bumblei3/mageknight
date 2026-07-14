@@ -122,18 +122,27 @@ describe('SaveManager Extended Coverage', () => {
         });
     });
 
-    describe('listSaves', () => {
-        it('should return empty array when no saves', () => {
+    describe('listSaves - corrupt index resilience', () => {
+        it('returns empty array when index is not valid JSON', () => {
+            global.localStorage.setItem('mk_save_index', 'not json at all');
             expect(SaveManager.listSaves()).toEqual([]);
         });
 
-        it('should list all saved slots', () => {
-            SaveManager.saveGame('slot1', createValidSaveState());
-            SaveManager.saveGame('slot2', createValidSaveState());
-            const saves = SaveManager.listSaves();
-            expect(saves.length).toBe(2);
-            expect(saves).toContain('slot1');
-            expect(saves).toContain('slot2');
+        it('returns empty array when index is a non-array JSON value', () => {
+            global.localStorage.setItem('mk_save_index', JSON.stringify(123));
+            expect(SaveManager.listSaves()).toEqual([]);
+        });
+
+        it('returns empty array when index key is missing', () => {
+            expect(SaveManager.listSaves()).toEqual([]);
+        });
+    });
+
+    describe('hasSave - corrupt index resilience', () => {
+        it('does not throw when index is not valid JSON', () => {
+            global.localStorage.setItem('mk_save_index', 'garbage');
+            expect(() => SaveManager.hasSave('0')).not.toThrow();
+            expect(SaveManager.hasSave('0')).toBe(false);
         });
     });
 

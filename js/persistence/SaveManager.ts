@@ -91,15 +91,25 @@ export class SaveManager {
      * List all saves
      */
     static listSaves(): string[] {
-        const indexJson = localStorage.getItem('mk_save_index');
-        return indexJson ? JSON.parse(indexJson) : [];
+        try {
+            const indexJson = localStorage.getItem('mk_save_index');
+            const index = indexJson ? JSON.parse(indexJson) : [];
+            return Array.isArray(index) ? index : [];
+        } catch {
+            // Corrupt index (non-JSON / non-array) must not crash the loader UI.
+            return [];
+        }
     }
 
     /**
      * Checks if a save exists for the given slot
      */
     static hasSave(slotKey: string | number): boolean {
-        const saves = this.listSaves();
-        return saves.includes(String(slotKey));
+        try {
+            const saves = this.listSaves();
+            return saves.includes(String(slotKey));
+        } catch {
+            return false;
+        }
     }
 }

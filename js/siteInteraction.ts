@@ -34,8 +34,9 @@ export class SiteInteractionManager {
     }
 
     private getHandler(siteType: string): BaseSiteHandler | null {
-        // Fallback to ExplorationHandler for unhandled types
-        return this.handlers.get(siteType) || this.handlers.get(SITE_TYPES.DUNGEON) || null;
+        // No fallback to a wrong handler: an unhandled/unknown type yields null
+        // (no misleading Dungeon menu for dead content like magic_glade/den).
+        return this.handlers.get(siteType) || null;
     }
 
     visitSite(hex: any, site: any): any {

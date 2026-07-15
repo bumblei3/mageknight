@@ -75,8 +75,9 @@ describe('Site - Coverage Boost', () => {
             expect(SITE_TYPES.SPAWNING_GROUNDS).toBe('spawning_grounds');
             expect(SITE_TYPES.LABYRINTH).toBe('labyrinth');
             expect(SITE_TYPES.MINE).toBe('mine');
-            expect(SITE_TYPES.MAGIC_GLADE).toBe('magic_glade');
-            expect(SITE_TYPES.DEN).toBe('den');
+            // magic_glade + den were dead content — removed (Gap C fix).
+            expect(SITE_TYPES['magic_glade']).toBeUndefined();
+            expect(SITE_TYPES['den']).toBeUndefined();
             expect(SITE_TYPES.CITY).toBe('city');
         });
     });

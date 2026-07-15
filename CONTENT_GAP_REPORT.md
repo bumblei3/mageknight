@@ -46,10 +46,16 @@ aber KEINE Skill-Gruppe. Das ist ein echter, messbarer Gap — kein Padding.
 15/16 Spells, 18/20 Feinde. Nahe am Ziel, aber nicht „100% Rules".
 → Einen weiteren Spell + 2 Feind-Definitionen (z.B. `oryx`, `werewolf`, `ice_golem`) ergänzen.
 
-### C. Site-Typen ohne Handler (MITTEL)
-`magic_glade` und `den` sind als SITE_TYPES definiert, aber es gibt KEINE Handler-Datei
-(kein MagicGladeHandler, kein DenHandler). Wenn die auf der Karte spawnen, ist das toter Inhalt.
-→ Entweder Handler bauen ODER die Typen aus SITE_TYPES entfernen (radikale Löschung toten Codes).
+### C. Site-Typen ohne Handler (MITTEL) — ERLEDIGT (2026-07-15)
+`magic_glade` und `den` waren als SITE_TYPES definiert, aber es gab KEINE
+Handler-Datei und sie wurden von KEINEM Szenario platziert (0 Referenzen in
+sitePlacements; keine zufällige Site-Generierung). `getHandler()` fiel
+irreführend auf `DUNGEON` zurück → Klick auf Magische Lichtung öffnete
+Dungeon-Menü (toter/falscher Inhalt).
+→ Radikale Löschung (dein Stil): `magic_glade` + `den` aus `SITE_TYPES`
+  + `SITE_INFO` entfernt; `getHandler()`-Fallback `|| DUNGEON` → `|| null`
+  (echter „kein Handler", kein falsches Dungeon). Test `tests/siteInteraction_dead_types.test.js`
+  dokumentiert das Verhalten (RED→GREEN). Committed.
 
 ### D. Test-Entrümpelung (Radikale Löschung, dein Stil)
 210 vitest-Files / 20 e2e-Specs. 0-Assertion-Stubs + redundante `_coverage_boost`-Files

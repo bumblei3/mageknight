@@ -296,13 +296,13 @@ export default class TouchController {
 
         // Enemies are valid drop zones for attack
         if (this.game.enemies) {
-            this.game.enemies.forEach((enemy: any) => {
+            this.game.enemies.forEach((enemy: any, idx: number) => {
                 if (enemy.position && !enemy.isDefeated?.()) {
                     const pixel = this.game.hexGrid.axialToPixel(enemy.position.q, enemy.position.r);
                     const canvas = this.game.canvas;
                     if (!canvas) return;
                     const rect = canvas.getBoundingClientRect();
-                    const dropZone = this.createDropZoneElement(pixel.x + rect.left, pixel.y + rect.top, { type: 'attack', enemy });
+                    const dropZone = this.createDropZoneElement(pixel.x + rect.left, pixel.y + rect.top, { type: 'attack', enemyIndex: idx });
                     this.validDropZones.push(dropZone);
                 }
             });
@@ -382,9 +382,9 @@ export default class TouchController {
             // Move hero to hex
             this.game.hero.movementPoints = this.game.hero.movementPoints || 0;
             this.game.moveHero(dropData.hex.q, dropData.hex.r);
-        } else if (dropData.type === 'attack' && dropData.enemy) {
-            // Start combat with enemy
-            const enemyIndex = this.game.enemies.findIndex((e: any) => e === dropData.enemy);
+        } else if (dropData.type === 'attack' && typeof dropData.enemyIndex === 'number') {
+            // Start combat with enemy (index survives JSON round-trip, unlike a ref)
+            const enemyIndex = dropData.enemyIndex;
             if (enemyIndex >= 0) {
                 this.game.initiateCombat(enemyIndex);
             }

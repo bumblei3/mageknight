@@ -12,6 +12,7 @@ function makeGame(overrides = {}) {
         addLog: vi.fn(),
         updateStats: vi.fn(),
         hero: {
+            id: 'goldyx',
             skills: [],
             levelUp: vi.fn(),
             addSkill: vi.fn(),

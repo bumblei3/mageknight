@@ -34,7 +34,7 @@ export class LevelUpManager {
 
         // 1. Skill Selection
         const currentSkillIds = new Set(this.game.hero.skills.map((s: any) => s.id)) as Set<string>;
-        const skillOffer = getRandomSkills('goldyx', currentSkillIds, 2);
+        const skillOffer = getRandomSkills(this.game.hero.id, currentSkillIds, 2);
 
         // Notify UI/Tests of offer
         this.renderSkills(skillOffer);

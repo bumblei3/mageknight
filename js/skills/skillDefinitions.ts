@@ -95,6 +95,76 @@ export const HERO_SKILLS: HeroSkills = {
                 icon: '👑'
             }
         ]
+    },
+    // Chaos Blood Witch (Arythea) - Aggression, Pain, Risk
+    arythea: {
+        common: [
+            {
+                id: 'blood_rage',
+                name: 'Blutrausch',
+                type: 'active',
+                description: 'Angriff +3 in dieser Kampfphase (verursacht aber 1 eigene Wunde).',
+                icon: '🩸',
+                cooldown: 'round'
+            },
+            {
+                id: 'pain_weave',
+                name: 'Schmerzgewebe',
+                type: 'passive',
+                description: 'Für jede Wunde des Helden +1 Angriff (max +3).',
+                icon: '🕸️'
+            },
+            {
+                id: 'dark_pact',
+                name: 'Dunkler Pakt',
+                type: 'active',
+                description: 'Ziehe 2 Karten, nimm aber 1 Wunde.',
+                icon: '🌑',
+                cooldown: 'round'
+            },
+            {
+                id: 'chaos_embrace',
+                name: 'Umarmung des Chaos',
+                type: 'passive',
+                description: 'Erleidest 1 Wunde weniger pro Kampf (min 0).',
+                icon: '🌀'
+            }
+        ]
+    },
+    // Imperial Tactician (Tovak) - Defense, Block, Tactics
+    tovak: {
+        common: [
+            {
+                id: 'iron_wall',
+                name: 'Eiserne Mauer',
+                type: 'active',
+                description: 'Block +4 in dieser Kampfphase.',
+                icon: '🛡️',
+                cooldown: 'round'
+            },
+            {
+                id: 'tactical_read',
+                name: 'Taktische Lesart',
+                type: 'passive',
+                description: 'Bei Kampfbeginn: sieh die Gegner-Werte voraus (+1 Info).',
+                icon: '📖'
+            },
+            {
+                id: 'counter_strike',
+                name: 'Konterangriff',
+                type: 'active',
+                description: 'Wenn voll blockt wurde: +2 Angriff als Vergeltung.',
+                icon: '⚔️',
+                cooldown: 'round'
+            },
+            {
+                id: 'bulwark',
+                name: 'Bollwerk',
+                type: 'passive',
+                description: '+1 Rüstung gegen Fernkampf- und Belagerungsangriffe.',
+                icon: '🏰'
+            }
+        ]
     }
 };
 

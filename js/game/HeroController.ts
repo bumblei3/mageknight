@@ -34,7 +34,7 @@ export class HeroController {
      */
     triggerLevelUp(newLevel: number): void {
         const ownedSkillIds = new Set(this.game.hero.skills.map((s: any) => s.id)) as Set<string>;
-        const skills = getRandomSkills('goldyx', ownedSkillIds, 2);
+        const skills = getRandomSkills(this.game.hero.id, ownedSkillIds, 2);
         const cards = createDeck(SAMPLE_ADVANCED_ACTIONS);
 
         if (this.game.ui) {

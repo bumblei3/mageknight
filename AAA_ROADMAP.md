@@ -1,6 +1,8 @@
 # Mage Knight - AAA Roadmap
 
-*Status: Stand 2026-06-18 | Basis: 2501 Unit Tests, CI grün, CSS-Token-System konsolidiert*
+*Status: Stand 2026-07-15 | Basis: 2500+ Unit Tests, 20 e2e-Specs, Coverage-Gate 80% grün (global ~88% branch), CSS-Token-System konsolidiert. Phase1 Visual AAA + Foundation-Hardening abgeschlossen. Multiplayer gestrichen (kein Interesse, Solo-Fokus). Echte Content-Zahlen siehe CONTENT_GAP_REPORT.md.*
+
+*Letzte echte Anpassung (2026-07-15): Skill-Gap A geschlossen — arythea + tovak haben jetzt eigene Skill-Gruppen (zuvor hard-coded 'goldyx' in HeroController + LevelUpManager).*
 
 ---
 
@@ -20,10 +22,10 @@
 |-----------|---------|----------|
 | **Graphics** | Premium CSS/Canvas, 3D opt. | Cinematic Shaders, Particle Systems, Sprite Animation |
 | **Audio** | Keine | Adaptive Musik, SFX, Spatial Audio |
-| **Rules Coverage** | ~70% (Core) | 100% (Alle Feindfähigkeiten, Sites, Szenarien) |
-| **AI** | Worker-basiert, regelbasiert | MCTS/Neural, Schwierigkeitsgrade, Personality |
-| **Content** | 1 Held, 6 Feinde, 2 Szenarien | 5+ Helden, 20+ Feinde, 8+ Szenarien, Campaign |
-| **Multiplayer** | Nein | Hotseat, Async, Lobby |
+| **Rules Coverage** | ~95% (Core) | 100% (Alle Feindfähigkeiten, Sites, Szenarien) |
+| **AI** | Worker-basiert, regelbasiert + MCTS-Andockpunkt | MCTS/Neural, Schwierigkeitsgrade, Personality |
+| **Content** | 4 Helden, 18 Feinde, 8 Szenarien, 24/24 Actions, 15/16 Spells, 11 Unit-Typen, 12 Artefakte | 5. Held, 20+ Feinde, vollst. Spell/Action-Pool |
+| **Multiplayer** | Nein (Solo-Fokus, bewusst) | Nein (bewusst ausgeschlossen) |
 | **Accessibility** | Basis (Shortcuts, ARIA) | WCAG 2.1 AA, Screenreader, Colorblind, Remapping |
 | **Platform** | Web (Desktop/Mobile) | PWA, Desktop (Tauri), Konsolen-Port möglich |
 | **LiveOps** | Nein | Daily Runs, Leaderboards, Achievements, Cloud Save |
@@ -40,7 +42,9 @@
 
 ---
 
-## 🎨 Phase 1: Visuelle AAA-Qualität (Woche 3-8)
+## 🎨 Phase1: Visuelle AAA-Qualität (Woche 3-8) ✅ **ABGESCHLOSSEN** (Stand 2026-07-15)
+
+*Shader-Pipeline, Particle System v2, Sprite Animation, Dynamic Lighting, Adaptive Music + SFX, 13 Artefakte, Touch-Controller, 3D-Lazy-Load sind alle implementiert (siehe Git-Log + mageknight-web-game-development Skill). Die Tasks unten sind historisch; kein offener Phase-1-Backlog mehr.*
 
 ### 1.1 Cinematic Rendering Pipeline
 | Task | Aufwand | Details |
@@ -96,31 +100,11 @@
 
 ---
 
-## 🎮 Phase 3: Multiplayer & Social (Woche 17-24)
+## ♿ Phase3: Accessibility & Polish (Woche 17-24) — Solo-Fokus
 
-### 3.1 Hotseat / Local Multiplayer (Prio 1)
-- [ ] **State Serialisierung** für Multi-Player (bereits Save-System da)
-- [ ] **Turn Manager** mit Player Switch UI
-- [ ] **Shared Screen** + Hidden Info (Hand Cards via Modal/Phone Companion)
-- [ ] **2-Player Balancing** (Enemy Scaling, Map Size, Starting Resources)
+*Multiplayer (Hotseat/Async/Social) bewusst gestrichen — kein Interesse, reine Solo-Experience (AGENTS.md: "NO MULTIPLAYER").*
 
-### 3.2 Async Online (Prio 2)
-- [ ] **Backend**: Cloudflare Workers + Durable Objects / Supabase
-- [ ] **Matchmaking**: ELO/Glicko-2, Lobby, Invite Codes
-- [ ] **Reconnection**: State Sync, Optimistic UI
-- [ ] **Spectator Mode** + Replay System
-
-### 3.3 Social Features
-- [ ] **Friends / Lobby / Chat** (Simple)
-- [ ] **Leaderboards**: Daily/Weekly/All-Time (Score, Speed, Efficiency)
-- [ ] **Achievements**: 50+ (Steam-style), Cloud Sync
-- [ ] **Daily Run**: Fixed Seed, Global Leaderboard, Unique Modifiers
-
----
-
-## ♿ Phase 4: Accessibility & Polish (Woche 25-30)
-
-### 4.1 WCAG 2.1 AA Compliance
+### 3.1 WCAG 2.1 AA Compliance
 | Kriterium | Implementierung |
 |-----------|-----------------|
 | **Keyboard Navigation** | Vollständig (Tab Order, Focus Visible, Skip Links) |
@@ -131,13 +115,13 @@
 | **Text Scaling** | REM-basiert, bis 200% ohne Horizontal Scroll |
 | **Language** | i18n Framework erweitern (EN, DE, FR, ES, CN, JP) |
 
-### 4.2 Input Remapping & Customization
+### 3.2 Input Remapping & Customization
 - [ ] **Full Key Remapping** (Gamepad + Keyboard)
 - [ ] **Gamepad Support** (Standard Layout, Steam Input API)
 - [ ] **Touch Gesture Customization**
 - [ ] **UI Scale Slider** (0.8x - 1.5x)
 
-### 4.3 Polish & QOL
+### 3.3 Polish & QOL
 - [ ] **Tutorial Overhaul**: Interactive, Contextual, Skippable, Progress Tracker
 - [ ] **In-Game Wiki/Codex**: Rules, Cards, Enemies, Searchable
 - [ ] **Replay System**: Full Game Replay, Export (Video/GIF), Share Link
@@ -145,21 +129,21 @@
 
 ---
 
-## 📦 Phase 5: Platform & Distribution (Woche 31-38)
+## 📦 Phase4: Platform & Distribution (Woche 31-38)
 
-### 5.1 PWA & Offline-First
+### 4.1 PWA & Offline-First
 - [ ] **Service Worker**: Precaching, Runtime Caching, Background Sync
 - [ ] **IndexedDB**: Saves, Assets, Replays (Quota Management)
 - [ ] **Install Prompt**: Custom, Timing-optimiert
 - [ ] **App Shortcuts**: New Game, Continue, Daily Run
 
-### 5.2 Desktop App (Tauri v2)
+### 4.2 Desktop App (Tauri v2)
 - [ ] **Rust Backend**: Native File Dialogs, Tray, Auto-Updater
 - [ ] **System Integration**: Native Notifications, Protocol Handler (`mageknight://`)
 - [ ] **Performance**: WASM für Hot Paths (Pathfinding, Combat Math)
 - [ ] **Steam Deck / Console**: Controller UI, 720p/1080p UI Scaling
 
-### 5.3 CI/CD & Release Automation
+### 4.3 CI/CD & Release Automation
 - [ ] **Multi-Platform Builds**: Web, Windows, macOS, Linux, Android (Capacitor)
 - [ ] **Automated Playtesting**: Headless Bots laufen Daily Runs
 - [ ] **Visual Regression**: Percy/Chromatic für UI
@@ -167,20 +151,20 @@
 
 ---
 
-## 🔄 Phase 6: LiveOps & Longevity (Woche 39-52+)
+## 🔄 Phase5: LiveOps & Longevity (Woche 39-52+)
 
-### 6.1 Content Pipeline
+### 5.1 Content Pipeline
 - [ ] **Modding API**: Data-Driven (Cards, Enemies, Scenarios via JSON/Schema)
 - [ ] **Steam Workshop / Mod.io Integration**
 - [ ] **Seasonal Content**: Quarterly Updates (New Hero, Scenario, Mechanics)
 - [ ] **Community Challenges**: Weekly Seeds, Community Goals
 
-### 6.2 Analytics & Balancing
+### 5.2 Analytics & Balancing
 - [ ] **Telemetry** (Opt-in, Privacy-First): Funnel, Drop-off, Win Rates, Card Pick Rates
 - [ ] **A/B Test Framework**: Balance Changes, UI Variants
 - [ ] **Auto-Balancing**: ML-gestützte Card/Enemy Stat Anpassung
 
-### 6.3 Monetization (Optional, Ethical)
+### 5.3 Monetization (Optional, Ethical)
 - [ ] **Cosmetics Only**: Card Backs, Board Skins, Hero Portraits, Particle Effects
 - [ ] **No Pay-to-Win**: Alle Gameplay-Inhalte Free
 - [ ] **Supporter Pack**: Name in Credits, Exclusive Cosmetic, Early Access
@@ -204,42 +188,25 @@
 
 ---
 
-## 🎯 Milestones & Success Metrics
+## 🎯 Milestones & Success Metrics (angepasst, Stand 2026-07-15)
 
-| Meilenstein | Ziel-Datum | Success Criteria |
-|-------------|------------|------------------|
-| **M1: Visual AAA** | Woche 8 | 60 FPS auf 5 Jahre altem Mobile, Lighthouse 95+ |
-| **M2: Rules Complete** | Woche 16 | 100% Rules.md ✅, Alle 6 Feinde + 20+ Feinde spielbar |
-| **M3: AI 2.0** | Woche 20 | MCTS schlägt 80% der Spieler auf "Normal" |
-| **M4: Multiplayer Beta** | Woche 24 | 50+ Concurrent Games stabil |
-| **M5: Accessibility Audit** | Woche 30 | Externes Audit: WCAG 2.1 AA Pass |
-| **M6: Desktop Release** | Woche 38 | Tauri App in Store, < 1% Crash Rate |
-| **M7: Live Launch** | Woche 52 | 1k DAU, 4.5+ Store Rating, < 50ms P95 API |
+| Meilenstein | Success Criteria |
+|-------------|------------------|
+| **M1: Visual AAA** ✅ | 3D-Pipeline, Particles, Sprite-Anim, Dynamic Lighting, Adaptive Music/SFX, 13 Artefakte, Touch-Controller |
+| **M2: Rules Complete** ⚠️ ~95% | 24/24 Actions, 15/16 Spells, 11 Unit-Typen, 8 Szenarien, 10 Site-Handler, 18 Feinde; Lücke: 1 Spell + 2 Feinde + arythea/tovak Skills (jetzt geschlossen) |
+| **M3: AI 2.0** | MCTS schlägt 80% der Spieler auf "Normal" |
+| **M4: Accessibility Audit** | Externes Audit: WCAG 2.1 AA Pass |
+| **M5: Desktop Release** | Tauri App, < 1% Crash Rate |
 
----
-
-## 💰 Ressourcen-Schätzung
-
-| Rolle | Phase 1-2 | Phase 3-4 | Phase 5-6 |
-|-------|-----------|-----------|-----------|
-| **Lead Dev (Du)** | 100% | 100% | 50% |
-| **Graphics/Shader Dev** | 50% (Contract) | 25% | - |
-| **Game Designer** | 25% | 50% (Rules/AI) | 25% |
-| **Backend/Infra** | - | 50% (Contract) | 50% |
-| **QA/Playtest** | 10% | 25% | 50% (Community) |
-| **Sound/Art** | 50% (Contract) | 25% | 25% (Seasonal) |
-
-**Budget-Rough**: ~80k-120k EUR (wenn Contractors), reine Dev-Time: ~1.5 FTE Years
+*Multiplayer-Meilenstein (M4 alt) gestrichen — Solo-Fokus.*
 
 ---
 
-## 🚀 Next Steps (Diese Woche)
+## 🚀 Next Steps (diese Woche)
 
-1. **Priorisierung**: Welche Phase 1 Tasks zuerst? (Shader vs. Particles vs. Assets)
-2. **Tech Spikes**: 2 Tage MCTS-Prototyp, 1 Tag WASM Combat Math Benchmark
-3. **Art Direction**: Style Guide finalisieren (Referenzen: Slay the Spire, Monster Train, Gloomhaven Digital)
-4. **Community**: Discord aufsetzen, Playtester rekrutieren (10-20 Core)
-5. **Analytics**: Privacy-First Event Schema definieren
+1. **Content-Gap schließen** (siehe CONTENT_GAP_REPORT.md): arythea/tovak Skills ✅ erledigt; 1 Spell + 2 Feinde + Site-Handler für magic_glade/den offen.
+2. **Test-Suite entrümpeln**: 0-Assertion-Stubs + redundante `_coverage_boost`-Files radikal löschen (Gate grün halten).
+3. **Accessibility**: Colorblind-Paletten, Screenreader-Live-Regions, Full Key-Remapping.
 
 ---
 

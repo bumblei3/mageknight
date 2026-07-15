@@ -42,6 +42,22 @@
     gap: var(--space-2);
 }
 
+/* Group related top-bar controls so the icon row reads in clusters
+   instead of a single undifferentiated "wall of icons". */
+.header-controls-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.header-controls-sep {
+    width: 1px;
+    align-self: stretch;
+    margin: 0 var(--space-2);
+    background: var(--color-border-default);
+    opacity: 0.6;
+}
+
 /* Undo/Redo toolbar injected by UndoManager (self-created fallback) */
 .action-toolbar {
     display: flex;

@@ -59,6 +59,11 @@ describe('PhaseManager Overlay', () => {
     });
 
     it('should show overlay and update text when switching to day', () => {
+        // Simulate a real flip: start at night, then switch to day.
+        // (The overlay only shows on an actual day<->night transition, not on
+        // a repeated notify of the same time of day — see feafb29.)
+        mockTimeManager.getState = () => ({ timeOfDay: 'night', round: 1 });
+        phaseManager = new PhaseManager(mockGame);
         phaseManager.setupTimeListener();
 
         // Trigger listener with Day state

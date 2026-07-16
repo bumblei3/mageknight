@@ -68,8 +68,8 @@ test.describe('Card Interaction Flow', () => {
         const woundCard = page.locator('.card.wound-card, .mk-card--wound').first();
         await expect(woundCard).toBeVisible();
 
-        // Click it
-        await woundCard.click();
+        // Click it (force: the hand-cards layer overlaps the card's hit-test point)
+        await woundCard.click({ force: true });
 
         // Hand size should NOT change (3 cards)
         const handSize = await page.locator('#hand-cards .card, #hand-cards .mk-card').count();

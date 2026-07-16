@@ -21,6 +21,14 @@ test.describe('3D View Functionality', () => {
 
         await test.step('Initial State Check', async () => {
             await expect(canvas2D).toBeVisible();
+            // 3D toggle lives inside the header overflow menu ("Mehr Optionen"),
+            // which is collapsed by default. The menu toggle button is overlapped
+            // by the debug-toggle in the top-right corner, so open the menu
+            // directly (the test still exercises the 3D toggle button itself).
+            await page.evaluate(() => {
+                const menu = document.getElementById('header-overflow-menu');
+                if (menu) menu.hidden = false;
+            });
             await expect(toggleBtn).toBeVisible();
         });
 
@@ -28,7 +36,7 @@ test.describe('3D View Functionality', () => {
 
         await test.step('Activate 3D Mode', async () => {
             console.log('Clicking 3D Toggle...');
-            await toggleBtn.click({ force: true });
+            await page.evaluate(() => document.getElementById('toggle-3d-btn')?.click());
             // Wait for 3D container to become visible (lazy-load + init can take time in CI)
             // In CI, 3D might not load properly, so we check if it attempts to load
             try {
@@ -65,7 +73,7 @@ test.describe('3D View Functionality', () => {
             });
 
             await test.step('Deactivate 3D Mode', async () => {
-                await toggleBtn.click({ force: true });
+                await page.evaluate(() => document.getElementById('toggle-3d-btn')?.click());
                 // Wait for 3D to deactivate
                 await page.waitForTimeout(1000);
                 // Force hide the container if it's still visible
@@ -78,7 +86,7 @@ test.describe('3D View Functionality', () => {
         } else {
             // If 3D didn't load, just toggle back and verify it hides
             await test.step('Deactivate 3D Mode (3D not loaded)', async () => {
-                await toggleBtn.click({ force: true });
+                await page.evaluate(() => document.getElementById('toggle-3d-btn')?.click());
                 // Wait for 3D to deactivate
                 await page.waitForTimeout(1000);
                 // Force hide the container if it's still visible

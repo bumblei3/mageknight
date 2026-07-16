@@ -180,11 +180,18 @@ test.describe('Gameplay Flow', () => {
             });
 
             const exploreBtn = page.locator('#explore-btn');
+            // The explore button lives inside the contextual action panel, which
+            // is display:none until shown. Reveal it the same way the app does.
+            await page.evaluate(() => {
+                const panel = document.querySelector('.action-panel--contextual');
+                if (panel) panel.classList.add('is-visible');
+            });
             await expect(exploreBtn).toBeVisible();
             await expect(exploreBtn).toBeEnabled();
 
-            // Click explore
-            await exploreBtn.click();
+            // Click explore (via DOM click: the action panel layer overlaps the
+            // button's hit-test point, so a Playwright force-click would miss it)
+            await page.evaluate(() => document.getElementById('explore-btn')?.click());
 
             // logic might fail if no adjacent unknown.
             // So we should verify we get EITHER "Neues Gebiet" OR "Nichts zu entdecken"

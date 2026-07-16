@@ -1,5 +1,5 @@
 import { eventBus } from '../eventBus';
-import { GAME_EVENTS } from '../constants';
+import { GAME_EVENTS, TimeOfDay } from '../constants';
 import { store, ACTIONS } from '../store';
 
 /**
@@ -140,8 +140,24 @@ export class PhaseManager {
     setupTimeListener(): void {
         if (!this.game.timeManager) return;
 
+        let prevTimeOfDay: TimeOfDay | null =
+            (this.game.timeManager.getState().timeOfDay as TimeOfDay) ?? null;
+
         this.game.timeManager.addListener((state: any) => {
             const isNight = state.timeOfDay === 'night' || state.timeOfDay === 1; // Assuming 1 is night if numeric
+
+            // Only run the full curtain transition when the time of day actually
+            // flips (day <-> night). loadState() fires notifyListeners() on a fresh
+            // game (day -> day), which would otherwise flash the overlay for ~2.5s
+            // and block all pointer events on every startup. Seed prevTimeOfDay
+            // from current state so the initial loadState does not count as a flip.
+            const changed = prevTimeOfDay === null || prevTimeOfDay !== state.timeOfDay;
+            prevTimeOfDay = state.timeOfDay;
+
+            if (!changed) {
+                this.game.addLog(`Runde ${state.round}: ${isNight ? 'Nacht' : 'Tag'}`, 'info');
+                return;
+            }
 
             // Visual Transition
             const overlay = document.getElementById('day-night-overlay');

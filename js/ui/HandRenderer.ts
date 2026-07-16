@@ -5,12 +5,21 @@ import { UIElements } from '../ui';
 import { TooltipManager } from './TooltipManager';
 import { createCard, showCardPreview, injectCardPreviewStyles } from './components';
 import type { CardData } from './components';
+import { COMBAT_PHASES } from '../constants';
+
+export interface CardPlayContext {
+    disabled: boolean;
+    dimmed: boolean;
+    relevant: boolean;
+    reason?: string;
+}
 
 export class HandRenderer {
     private elements: UIElements;
     private tooltipManager: TooltipManager;
     private ui: any;
-    private callbacks: {
+    /** Public so ActionBarManager can refresh highlights without re-wiring clicks */
+    public callbacks: {
         onCardClick: ((index: number, card: any) => void) | null;
         onCardRightClick: ((index: number, card: any) => void) | null;
     };
@@ -44,6 +53,97 @@ export class HandRenderer {
     }
 
     /**
+     * Assess how a card should look in the current game context
+     * (combat phase guidance + wound handling).
+     */
+    public assessCardContext(card: any, game: any = this.ui?.game): CardPlayContext {
+        const isWound = typeof card?.isWound === 'function' ? card.isWound() : !!card?.isWound;
+        if (isWound) {
+            return {
+                disabled: true,
+                dimmed: false,
+                relevant: false,
+                reason: t('ui.cardReasons.wound') || 'Wunde — blockiert diesen Handslot'
+            };
+        }
+
+        const basic = card?.basicEffect || {};
+        const strong = card?.strongEffect || {};
+        const has = (key: string) => !!(basic[key] || strong[key]);
+        const hasBlock = has('block');
+        const hasAttack = has('attack') || has('ranged') || has('siege');
+        const hasRanged = has('ranged') || has('siege');
+        const hasMove = has('movement');
+
+        const combat = game?.combat;
+        if (combat) {
+            const phase = String(combat.phase || '').toLowerCase();
+            if (phase === COMBAT_PHASES.BLOCK || phase === 'block') {
+                if (hasBlock) {
+                    return {
+                        disabled: false,
+                        dimmed: false,
+                        relevant: true,
+                        reason: t('ui.cardReasons.recommendedBlock') || 'Empfohlen: Block'
+                    };
+                }
+                return {
+                    disabled: false,
+                    dimmed: true,
+                    relevant: false,
+                    reason: t('ui.cardReasons.wrongPhaseBlock') || 'Jetzt Block-Phase — diese Karte blockt nicht'
+                };
+            }
+            if (phase === COMBAT_PHASES.ATTACK || phase === 'attack') {
+                if (hasAttack) {
+                    return {
+                        disabled: false,
+                        dimmed: false,
+                        relevant: true,
+                        reason: t('ui.cardReasons.recommendedAttack') || 'Empfohlen: Angriff'
+                    };
+                }
+                return {
+                    disabled: false,
+                    dimmed: true,
+                    relevant: false,
+                    reason: t('ui.cardReasons.wrongPhaseAttack') || 'Jetzt Angriff-Phase — diese Karte greift nicht an'
+                };
+            }
+            if (phase === COMBAT_PHASES.RANGED || phase === 'ranged') {
+                if (hasRanged) {
+                    return {
+                        disabled: false,
+                        dimmed: false,
+                        relevant: true,
+                        reason: t('ui.cardReasons.recommendedRanged') || 'Empfohlen: Fernkampf'
+                    };
+                }
+                // Allow other cards but dim non-ranged
+                return {
+                    disabled: false,
+                    dimmed: true,
+                    relevant: false,
+                    reason: t('ui.cardReasons.wrongPhaseRanged') || 'Jetzt Fernkampf — keine Fern-/Belagerungskarte'
+                };
+            }
+        } else {
+            // Exploration: highlight movement when no MP left
+            const mp = game?.hero?.movementPoints ?? 0;
+            if (mp <= 0 && hasMove) {
+                return {
+                    disabled: false,
+                    dimmed: false,
+                    relevant: true,
+                    reason: t('ui.cardReasons.recommendedMove') || 'Empfohlen: Bewegung'
+                };
+            }
+        }
+
+        return { disabled: false, dimmed: false, relevant: false };
+    }
+
+    /**
      * Render hand cards
      * @param {any[]} hand - List of card objects
      * @param {Function} onCardClick - Callback for card click
@@ -65,9 +165,11 @@ export class HandRenderer {
         }
 
         this.elements.handCards.innerHTML = '';
+        const game = this.ui?.game;
 
         hand.forEach((card, index) => {
             const isWound = typeof card.isWound === 'function' ? card.isWound() : !!card.isWound;
+            const ctx = this.assessCardContext(card, game);
 
             // Card data for new component
             const cardData = {
@@ -88,10 +190,14 @@ export class HandRenderer {
                 showSideways: true,
                 showManaCost: true,
                 isWound,
-                disabled: false,
+                disabled: ctx.disabled,
+                disabledReason: ctx.reason,
+                dimmed: ctx.dimmed,
+                relevant: ctx.relevant,
                 selected: false,
                 played: false,
                 onClick: (cardData: CardData, useStrong: boolean) => {
+                    if (ctx.disabled) return;
                     if (this.ui && this.ui.game && this.ui.game.sound) {
                         this.ui.game.sound[useStrong ? 'cardPlayStrong' : 'cardPlay']();
                     }

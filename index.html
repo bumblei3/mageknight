@@ -441,6 +441,9 @@
 
                 <!-- Contextual Action Bar - Dynamic hints based on game state -->
                 <div class="action-bar" id="action-bar" role="region" aria-label="Verfügbare Aktionen">
+                    <!-- Single "what now?" coach line (filled by ActionBarManager) -->
+                    <div class="coach-strip" id="coach-strip" role="status" aria-live="polite"></div>
+                    <div class="combat-phase-stepper" id="combat-phase-stepper" hidden aria-hidden="true"></div>
                     <div class="action-bar-content" id="action-bar-content"></div>
                     <div class="action-bar-hint" id="action-bar-hint"></div>
                 </div>

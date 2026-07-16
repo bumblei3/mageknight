@@ -122,6 +122,45 @@
     transform: none !important;
 }
 
+/* Soft dim (wrong phase) — still clickable */
+.mk-card--dimmed {
+    opacity: 0.42;
+    filter: grayscale(0.35);
+}
+
+.mk-card--dimmed:hover {
+    opacity: 0.7;
+    filter: none;
+}
+
+/* Recommended for current phase */
+.mk-card--relevant {
+    box-shadow:
+        0 0 0 2px var(--color-gold-400, #fbbf24),
+        0 0 16px rgba(251, 191, 36, 0.45);
+    border-color: var(--color-gold-400, #fbbf24);
+    z-index: 5;
+}
+
+.mk-card--relevant::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.35);
+}
+
+.mk-card__icons {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    font-size: 0.75rem;
+    line-height: 1;
+    margin-bottom: 2px;
+    opacity: 0.95;
+}
+
 /* ========================================
    CARD INTERNALS
    ======================================== */

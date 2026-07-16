@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Coach-Strip** über der Action-Bar: eine priorisierte „Was jetzt?“-Zeile
+  (Bewegung / Karten spielen / Site / Heilung / Kampfphasen / Zugende)
+- **Kampfphasen-Stepper** (Fern → Block → Angriff → Ende) unter dem Coach
+- **Karten-Kontext:** empfohlene Karten leuchten (Block/Angriff/Fern/Bewegung),
+  unpassende Phasen-Karten werden gedimmt mit Tooltip-Grund; Wunden disabled
+- **Effekt-Icons** auf Handkarten (👣⚔️🛡️💬💚) für schnelles Scannen
+- i18n-Keys `ui.coach.*` und `ui.cardReasons.*` (de/en)
+
+### Fixed
+- Action-Bar Kampf-Aktionen erkannten Phasen in falscher Großschreibung
+  (`BLOCK` vs `block`) — normalisiert auf lowercase Constants
+
 ## [1.1.0] - 2026-07-12
 
 ### Added

@@ -1,9 +1,10 @@
 /**
- * Contextual Action Bar - Dynamic action hints based on game state
- * Shows available actions with keyboard shortcuts
+ * Contextual Action Bar + Coach Strip
+ * One prioritized "what now?" message, combat phase stepper, action buttons.
  */
 import { t } from '../i18n/index.js';
 import { eventBus } from '../eventBus.js';
+import { COMBAT_PHASES, GAME_EVENTS } from '../constants.js';
 
 interface ActionButton {
     id: string;
@@ -18,16 +19,18 @@ interface ActionButton {
     order?: number;
 }
 
-interface HintItem {
-    label: string;
-    shortcut?: string;
-    condition?: (game: any) => boolean;
+interface CoachMessage {
+    text: string;
+    icon?: string;
+    tone?: 'info' | 'combat' | 'warn' | 'success';
 }
 
 export class ActionBarManager {
     private game: any;
     private container: HTMLElement | null = null;
     private hintContainer: HTMLElement | null = null;
+    private coachStrip: HTMLElement | null = null;
+    private phaseStepper: HTMLElement | null = null;
     private registeredActions: Map<string, ActionButton> = new Map();
     private firstTimeHints: Map<string, boolean> = new Map();
     private currentPhase: string = 'exploration';
@@ -38,31 +41,72 @@ export class ActionBarManager {
         this.registerDefaultActions();
         this.registerDefaultHints();
         this.bindEvents();
+        // Initial paint once DOM is ready
+        queueMicrotask(() => this.render());
     }
 
     private init(): void {
         this.container = document.getElementById('action-bar-content');
         this.hintContainer = document.getElementById('action-bar-hint');
+        this.coachStrip = document.getElementById('coach-strip');
+        this.phaseStepper = document.getElementById('combat-phase-stepper');
         if (!this.container || !this.hintContainer) {
             console.warn('[ActionBar] Container elements not found');
         }
     }
 
     private bindEvents(): void {
-        // Re-render on game state changes
-        eventBus.on('game:stateChanged', () => this.render());
+        const refresh = () => {
+            this.render();
+            this.refreshHandHighlights();
+        };
+        eventBus.on('game:stateChanged', refresh);
         eventBus.on('game:phaseChanged', (data: unknown) => {
             this.currentPhase = data as string;
-            this.render();
+            refresh();
         });
-        eventBus.on('hero:statsChanged', () => this.render());
-        eventBus.on('combat:phaseChanged', () => this.render());
-        eventBus.on('movement:modeChanged', () => this.render());
-        eventBus.on('card:selected', () => this.render());
+        eventBus.on(GAME_EVENTS.PHASE_CHANGED, refresh);
+        eventBus.on('hero:statsChanged', refresh);
+        eventBus.on('combat:phaseChanged', refresh);
+        eventBus.on('movement:modeChanged', refresh);
+        eventBus.on('card:selected', refresh);
+        eventBus.on(GAME_EVENTS.CARD_PLAYED, refresh);
+        eventBus.on(GAME_EVENTS.COMBAT_STARTED, refresh);
+        eventBus.on(GAME_EVENTS.COMBAT_ENDED, refresh);
+        eventBus.on(GAME_EVENTS.TURN_ENDED, refresh);
+        eventBus.on(GAME_EVENTS.HERO_MOVED, refresh);
+    }
+
+    /** Re-paint hand so dim/relevant classes match combat phase */
+    private refreshHandHighlights(): void {
+        const ui = this.game?.ui;
+        const hand = this.game?.hero?.hand;
+        if (!ui?.handRenderer || !hand || !ui.handRenderer.callbacks?.onCardClick) return;
+        try {
+            ui.handRenderer.renderHandCards(
+                hand,
+                ui.handRenderer.callbacks.onCardClick,
+                ui.handRenderer.callbacks.onCardRightClick || undefined
+            );
+        } catch {
+            /* ignore mid-teardown */
+        }
+    }
+
+    /** Normalize combat phase to lowercase constant values */
+    combatPhase(): string {
+        const p = this.game.combat?.phase;
+        if (!p) return '';
+        return String(p).toLowerCase();
+    }
+
+    private isCombatPhase(...phases: string[]): boolean {
+        if (!this.game.combat) return false;
+        const current = this.combatPhase();
+        return phases.some((ph) => current === String(ph).toLowerCase());
     }
 
     private registerDefaultActions(): void {
-        // Movement Mode Actions
         this.registerAction({
             id: 'move-confirm',
             label: t('ui.actions.confirmMove'),
@@ -85,59 +129,27 @@ export class ActionBarManager {
             order: 20
         });
 
-        // Card Selected Actions (when hovering a card)
-        this.registerAction({
-            id: 'play-basic',
-            label: t('ui.actions.playBasic'),
-            icon: '▶',
-            shortcut: 'Klick / Enter',
-            primary: true,
-            onClick: () => this.playSelectedCard(false),
-            showCondition: () => this.hasPlayableCard() && !this.game.combat,
-            order: 10
-        });
-
-        this.registerAction({
-            id: 'play-strong',
-            label: t('ui.actions.playStrong'),
-            icon: '⚡',
-            shortcut: 'Shift+Klick',
-            primary: true,
-            onClick: () => this.playSelectedCard(true),
-            showCondition: () => this.hasPlayableCardWithStrong() && !this.game.combat,
-            order: 15
-        });
-
-        this.registerAction({
-            id: 'play-sideways',
-            label: t('ui.actions.playSideways'),
-            icon: '↔',
-            shortcut: 'Rechtsklick',
-            onClick: () => this.openSidewaysModal(),
-            showCondition: () => this.hasPlayableCard() && !this.game.combat,
-            order: 20
-        });
-
-        // Combat Actions
         this.registerAction({
             id: 'combat-ranged',
             label: t('ui.actions.skipRanged'),
             icon: '🏹',
             shortcut: 'Space',
-            onClick: () => this.game.combatOrchestrator?.endRangedPhase?.(),
-            showCondition: () => this.game.combat && this.game.combat?.phase === 'RANGED',
+            onClick: () =>
+                this.game.combatOrchestrator?.endRangedPhase?.() ||
+                this.game.combat?.endRangedPhase?.(),
+            showCondition: () => this.isCombatPhase(COMBAT_PHASES.RANGED, 'ranged', 'RANGED'),
             order: 10
         });
 
         this.registerAction({
-            id: 'combat-block',
-            label: t('ui.actions.block'),
+            id: 'combat-block-done',
+            label: t('ui.actions.skipBlock') || 'Block beenden',
             icon: '🛡️',
-            shortcut: 'Klick Karte',
-            primary: true,
-            onClick: () => {}, // Handled by card click
-            showCondition: () => this.game.combat && this.game.combat?.phase === 'BLOCK',
-            order: 10
+            shortcut: 'Space',
+            onClick: () =>
+                this.game.combatOrchestrator?.endBlockPhase?.() || this.game.combat?.endBlockPhase?.(),
+            showCondition: () => this.isCombatPhase(COMBAT_PHASES.BLOCK, 'block', 'BLOCK'),
+            order: 20
         });
 
         this.registerAction({
@@ -146,8 +158,10 @@ export class ActionBarManager {
             icon: '⚔️',
             shortcut: 'Space',
             primary: true,
-            onClick: () => this.game.combatOrchestrator?.executeAttack?.(),
-            showCondition: () => this.game.combat && this.game.combat?.phase === 'ATTACK',
+            onClick: () =>
+                this.game.combatOrchestrator?.executeAttackAction?.() ||
+                this.game.combatOrchestrator?.executeAttack?.(),
+            showCondition: () => this.isCombatPhase(COMBAT_PHASES.ATTACK, 'attack', 'ATTACK'),
             order: 10
         });
 
@@ -157,12 +171,12 @@ export class ActionBarManager {
             icon: '✓',
             shortcut: 'Space',
             primary: true,
-            onClick: () => this.game.combatOrchestrator?.endCombat?.(),
-            showCondition: () => this.game.combat && this.game.combat?.phase === 'COMPLETE',
+            onClick: () =>
+                this.game.combatOrchestrator?.endCombat?.() || this.game.combat?.endCombat?.(),
+            showCondition: () => this.isCombatPhase(COMBAT_PHASES.COMPLETE, 'complete', 'COMPLETE'),
             order: 10
         });
 
-        // Exploration Actions
         this.registerAction({
             id: 'explore-site',
             label: t('ui.actions.explore'),
@@ -174,28 +188,6 @@ export class ActionBarManager {
             order: 10
         });
 
-        this.registerAction({
-            id: 'end-turn',
-            label: t('ui.buttons.endTurn'),
-            icon: '⏭️',
-            shortcut: 'Space',
-            primary: true,
-            onClick: () => this.game.endTurn?.(),
-            showCondition: () => !this.game.combat && !this.game.movementMode && this.game.canEndTurn !== false,
-            order: 100
-        });
-
-        this.registerAction({
-            id: 'rest',
-            label: t('ui.buttons.rest'),
-            icon: '🏕️',
-            shortcut: 'R',
-            onClick: () => this.game.rest?.(),
-            showCondition: () => !this.game.combat && !this.game.movementMode && this.game.canRest !== false,
-            order: 110
-        });
-
-        // Contextual site / heal (formerly left action-panel only)
         this.registerAction({
             id: 'heal',
             label: t('ui.buttons.heal') || 'Heilen',
@@ -220,15 +212,27 @@ export class ActionBarManager {
             order: 8
         });
 
-        // Mana Actions (subtle hint)
         this.registerAction({
-            id: 'take-mana',
-            label: t('ui.actions.takeMana'),
-            icon: '💎',
-            shortcut: 'Klick Würfel',
-            onClick: () => {},
-            showCondition: () => !this.game.combat && this.game.manaPool?.length > 0,
-            order: 200
+            id: 'end-turn',
+            label: t('ui.buttons.endTurn'),
+            icon: '⏭️',
+            shortcut: 'Space',
+            primary: true,
+            onClick: () => this.game.endTurn?.(),
+            showCondition: () =>
+                !this.game.combat && !this.game.movementMode && this.game.canEndTurn !== false,
+            order: 100
+        });
+
+        this.registerAction({
+            id: 'rest',
+            label: t('ui.buttons.rest'),
+            icon: '🏕️',
+            shortcut: 'R',
+            onClick: () => this.game.rest?.(),
+            showCondition: () =>
+                !this.game.combat && !this.game.movementMode && this.game.canRest !== false,
+            order: 110
         });
     }
 
@@ -275,16 +279,129 @@ export class ActionBarManager {
     canVisit(): boolean {
         if (this.game.combat || this.game.movementMode || !this.game.hero?.position) return false;
         const hex = this.game.hexGrid?.getHex(this.game.hero.position.q, this.game.hero.position.r);
-        return !!(hex?.site);
+        return !!hex?.site;
     }
 
-    private playSelectedCard(strong: boolean): void {
-        // This would be triggered by the card click handler
-        // The action bar just shows the hint
+    private handHasEffect(key: string): boolean {
+        const hand = this.game.hero?.hand || [];
+        return hand.some((c: any) => {
+            if (!c || c.isWound?.()) return false;
+            const b = c.basicEffect || {};
+            const s = c.strongEffect || {};
+            return !!(b[key] || s[key]);
+        });
     }
 
-    private openSidewaysModal(): void {
-        // Triggered by right-click on card
+    /**
+     * Single prioritized coach message — the core "what now?" answer.
+     */
+    getCoachMessage(): CoachMessage {
+        if (this.game.movementMode) {
+            const mp = this.game.hero?.movementPoints ?? 0;
+            return {
+                icon: '👣',
+                text: t('ui.coach.movement', { points: mp }) || `Bewegung: klicke ein erreichbares Hex (${mp} MP)`,
+                tone: 'info'
+            };
+        }
+
+        if (this.game.combat) {
+            const phase = this.combatPhase();
+            if (phase === COMBAT_PHASES.RANGED || phase === 'ranged') {
+                return {
+                    icon: '🏹',
+                    text:
+                        t('ui.coach.ranged') ||
+                        'Fernkampf: Belagerungs-/Fernkarten spielen oder Phase überspringen',
+                    tone: 'combat'
+                };
+            }
+            if (phase === COMBAT_PHASES.BLOCK || phase === 'block') {
+                return {
+                    icon: '🛡️',
+                    text:
+                        t('ui.coach.block') ||
+                        'Block-Phase: spiele blaue/Block-Karten, dann Block beenden',
+                    tone: 'combat'
+                };
+            }
+            if (phase === COMBAT_PHASES.DAMAGE || phase === 'damage') {
+                return {
+                    icon: '💔',
+                    text: t('ui.coach.damage') || 'Schaden wird verrechnet…',
+                    tone: 'warn'
+                };
+            }
+            if (phase === COMBAT_PHASES.ATTACK || phase === 'attack') {
+                return {
+                    icon: '⚔️',
+                    text:
+                        t('ui.coach.attack') ||
+                        'Angriff: spiele rote/Angriffskarten, dann Angriff ausführen',
+                    tone: 'combat'
+                };
+            }
+            if (phase === COMBAT_PHASES.COMPLETE || phase === 'complete') {
+                return {
+                    icon: '✓',
+                    text: t('ui.coach.combatEnd') || 'Kampf vorbei — beenden',
+                    tone: 'success'
+                };
+            }
+            return { icon: '⚔️', text: t('ui.coach.combat') || 'Kampf läuft', tone: 'combat' };
+        }
+
+        // Healing available
+        if ((this.game.hero?.wounds || 0) > 0 && (this.game.hero?.healingPoints || 0) > 0) {
+            return {
+                icon: '💚',
+                text: t('ui.coach.heal') || 'Du hast Heilung — nutze „Heilen“',
+                tone: 'success'
+            };
+        }
+
+        if (this.canVisit() || this.canExplore()) {
+            return {
+                icon: '🏛️',
+                text: t('ui.coach.site') || 'Du stehst an einem Ort — besuchen/erkunden',
+                tone: 'info'
+            };
+        }
+
+        const mp = this.game.hero?.movementPoints ?? 0;
+        if (mp > 0) {
+            return {
+                icon: '👣',
+                text:
+                    t('ui.coach.hasMp', { points: mp }) ||
+                    `${mp} Bewegungspunkte — klicke ein erreichbares Hex`,
+                tone: 'info'
+            };
+        }
+
+        if (this.handHasEffect('movement') || this.handHasEffect('attack') || this.hasPlayableCard()) {
+            return {
+                icon: '🎴',
+                text:
+                    t('ui.coach.playCards') ||
+                    'Spiele Karten: 🟢 Bewegung · 🔴 Angriff · 🔵 Block · Rechtsklick = seitlich',
+                tone: 'info'
+            };
+        }
+
+        if ((this.game.hero?.wounds || 0) > 0) {
+            return {
+                icon: '🏕️',
+                text: t('ui.coach.rest') || 'Wunden? Rasten heilt und erneuert die Hand',
+                tone: 'warn'
+            };
+        }
+
+        return {
+            icon: '⏭️',
+            text: t('ui.coach.endTurn') || 'Keine weiteren Züge? Zug beenden für neue Karten',
+            tone: 'info'
+        };
     }
 
     // First-time hint system
@@ -301,7 +418,6 @@ export class ActionBarManager {
 
         requestAnimationFrame(() => tooltip.classList.add('visible'));
 
-        // Auto-hide after 8 seconds or on interaction
         const hide = () => {
             tooltip.classList.remove('visible');
             setTimeout(() => tooltip.remove(), 300);
@@ -326,30 +442,36 @@ export class ActionBarManager {
     }
 
     render(): void {
-        if (!this.container || !this.hintContainer) return;
+        if (!this.container) return;
 
-        // Clear containers
         this.container.innerHTML = '';
-        this.hintContainer.innerHTML = '';
+        if (this.hintContainer) this.hintContainer.innerHTML = '';
 
-        // Filter and sort actions
+        this.renderCoach();
+        this.renderPhaseStepper();
+
         const visibleActions = Array.from(this.registeredActions.values())
             .filter((action) => !action.showCondition || action.showCondition(this.game))
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-        // Render action buttons
-        visibleActions.forEach((action) => {
+        // Prefer one primary + up to 2 secondary buttons (less noise)
+        let primarySeen = 0;
+        const limited = visibleActions.filter((a) => {
+            if (a.primary) {
+                primarySeen++;
+                return primarySeen <= 2;
+            }
+            return true;
+        }).slice(0, 5);
+
+        limited.forEach((action) => {
             const btn = document.createElement('button');
             btn.className = `action-btn ${action.primary ? 'primary' : ''} ${action.danger ? 'danger' : ''}`;
             btn.dataset.actionId = action.id;
-            // Stable id for tutorial / e2e that target the primary end-turn control
             if (action.id === 'end-turn') btn.id = 'action-bar-end-turn';
             btn.disabled = action.disabled ?? false;
             btn.onclick = action.onClick;
 
-            // Accessibility + tooltip: combine label and shortcut into a single
-            // hint so keyboard/screen-reader/touch users get the same context
-            // as the visible label + kbd badge.
             const tooltipText = action.shortcut ? `${action.label} (${action.shortcut})` : action.label;
             btn.setAttribute('aria-label', tooltipText);
             btn.setAttribute('title', tooltipText);
@@ -375,59 +497,99 @@ export class ActionBarManager {
             this.container!.appendChild(btn);
         });
 
-        // Render contextual hints (subtle, non-interactive)
-        this.renderHints();
+        this.renderSecondaryHint();
     }
 
-    private renderHints(): void {
+    private renderCoach(): void {
+        if (!this.coachStrip) return;
+        const msg = this.getCoachMessage();
+        this.coachStrip.className = `coach-strip coach-strip--${msg.tone || 'info'}`;
+        this.coachStrip.innerHTML = '';
+
+        if (msg.icon) {
+            const icon = document.createElement('span');
+            icon.className = 'coach-strip-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = msg.icon;
+            this.coachStrip.appendChild(icon);
+        }
+
+        const text = document.createElement('span');
+        text.className = 'coach-strip-text';
+        text.textContent = msg.text;
+        this.coachStrip.appendChild(text);
+    }
+
+    private renderPhaseStepper(): void {
+        if (!this.phaseStepper) return;
+
+        if (!this.game.combat) {
+            this.phaseStepper.hidden = true;
+            this.phaseStepper.setAttribute('aria-hidden', 'true');
+            this.phaseStepper.innerHTML = '';
+            return;
+        }
+
+        this.phaseStepper.hidden = false;
+        this.phaseStepper.setAttribute('aria-hidden', 'false');
+        this.phaseStepper.setAttribute('role', 'list');
+        this.phaseStepper.setAttribute('aria-label', 'Kampfphasen');
+
+        const current = this.combatPhase();
+        const steps = [
+            { id: COMBAT_PHASES.RANGED, label: t('ui.phases.ranged') || 'Fern', icon: '🏹' },
+            { id: COMBAT_PHASES.BLOCK, label: t('ui.phases.block') || 'Block', icon: '🛡️' },
+            { id: COMBAT_PHASES.ATTACK, label: t('ui.phases.attack') || 'Angriff', icon: '⚔️' },
+            { id: COMBAT_PHASES.COMPLETE, label: 'Ende', icon: '✓' }
+        ];
+
+        // Map damage into block→attack progression visually
+        const order = [COMBAT_PHASES.RANGED, COMBAT_PHASES.BLOCK, COMBAT_PHASES.DAMAGE, COMBAT_PHASES.ATTACK, COMBAT_PHASES.COMPLETE];
+        const currentIdx = Math.max(0, order.indexOf(current as any));
+
+        this.phaseStepper.innerHTML = steps
+            .map((step, i) => {
+                // Map visual index: 0 ranged, 1 block, 2 attack, 3 end
+                const visualOrder = [0, 1, 3, 4]; // indices in `order`
+                const stepOrderIdx = visualOrder[i];
+                let state = 'upcoming';
+                if (stepOrderIdx < currentIdx) state = 'done';
+                if (step.id === current || (current === COMBAT_PHASES.DAMAGE && step.id === COMBAT_PHASES.BLOCK)) {
+                    state = 'current';
+                }
+                if (current === COMBAT_PHASES.DAMAGE && step.id === COMBAT_PHASES.ATTACK) {
+                    state = 'upcoming';
+                }
+                return `<div class="combat-step combat-step--${state}" role="listitem" data-phase="${step.id}">
+                    <span class="combat-step-icon" aria-hidden="true">${step.icon}</span>
+                    <span class="combat-step-label">${step.label}</span>
+                </div>`;
+            })
+            .join('<span class="combat-step-arrow" aria-hidden="true">→</span>');
+    }
+
+    private renderSecondaryHint(): void {
         if (!this.hintContainer) return;
 
-        const hints: HintItem[] = [];
-
-        if (this.game.movementMode) {
-            hints.push({
-                label: t('ui.hints.moveHint'),
-                shortcut: 'Klick Hex + Enter'
-            });
-        }
-
+        // Only one short secondary line — avoid stacking
+        let hint = '';
         if (this.game.combat) {
-            const phase = this.game.combat.phase;
-            if (phase === 'RANGED') {
-                hints.push({ label: t('ui.hints.rangedHint'), shortcut: 'Space = Überspringen' });
-            } else if (phase === 'BLOCK') {
-                hints.push({ label: t('ui.hints.blockHint'), shortcut: 'Klick Karte = Blocken' });
-            } else if (phase === 'ATTACK') {
-                hints.push({ label: t('ui.hints.attackHint'), shortcut: 'Space = Angreifen' });
+            const phase = this.combatPhase();
+            if (phase === COMBAT_PHASES.BLOCK || phase === 'block') {
+                hint = t('ui.hints.blockHint') || 'Blockkarten sind hervorgehoben';
+            } else if (phase === COMBAT_PHASES.ATTACK || phase === 'attack') {
+                hint = t('ui.hints.attackHint') || 'Angriffskarten sind hervorgehoben';
+            } else if (phase === COMBAT_PHASES.RANGED || phase === 'ranged') {
+                hint = t('ui.hints.rangedHint') || 'Space = Phase überspringen';
             }
-        } else {
-            if (this.hasPlayableCard() && !this.firstTimeHints.get('card-play')) {
-                hints.push({ label: t('ui.hints.cardPlayHint'), shortcut: 'Klick = Basic, Shift+Klick = Strong' });
-            }
-            if (this.canExplore()) {
-                hints.push({ label: t('ui.hints.exploreHint'), shortcut: 'E' });
-            }
-            if (this.game.manaPool?.length > 0) {
-                hints.push({ label: t('ui.hints.manaHint'), shortcut: 'Klick Würfel' });
-            }
+        } else if ((this.game.hero?.movementPoints ?? 0) === 0 && this.handHasEffect('movement')) {
+            hint = t('ui.hints.cardPlayHint') || 'Grün = Bewegung · Shift+Klick = Stark';
         }
 
-        if (this.game.hero?.wounds > 0 && this.game.canRest) {
-            hints.push({ label: t('ui.hints.restHint'), shortcut: 'R' });
-        }
-
-        hints.forEach((hint) => {
-            const item = document.createElement('span');
-            item.className = 'hint-item';
-            if (hint.shortcut) {
-                const kbd = document.createElement('kbd');
-                kbd.textContent = hint.shortcut;
-                item.appendChild(kbd);
-            }
-            const label = document.createElement('span');
-            label.textContent = hint.label;
-            item.appendChild(label);
-            this.hintContainer!.appendChild(item);
-        });
+        if (!hint) return;
+        const item = document.createElement('span');
+        item.className = 'hint-item';
+        item.textContent = hint;
+        this.hintContainer.appendChild(item);
     }
 }

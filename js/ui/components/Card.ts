@@ -43,6 +43,12 @@ export interface CardProps {
     id?: string;
     /** Disabled state */
     disabled?: boolean;
+    /** Why the card is disabled / dimmed (title + aria) */
+    disabledReason?: string;
+    /** Soft-dim without blocking clicks (wrong combat phase) */
+    dimmed?: boolean;
+    /** Highlight as recommended for current phase */
+    relevant?: boolean;
     /** Selected state */
     selected?: boolean;
     /** Show as played (in combat) */
@@ -63,6 +69,9 @@ export function createCard(props: CardProps): HTMLElement {
         className = '',
         id,
         disabled = false,
+        disabledReason,
+        dimmed = false,
+        relevant = false,
         selected = false,
         played = false
     } = props;
@@ -88,12 +97,22 @@ export function createCard(props: CardProps): HTMLElement {
         played ? 'mk-card--played' : '',
         selected ? 'mk-card--selected' : '',
         disabled ? 'mk-card--disabled' : '',
+        dimmed && !disabled ? 'mk-card--dimmed' : '',
+        relevant && !disabled ? 'mk-card--relevant' : '',
         className
     ].filter(Boolean).join(' ');
     wrapper.className = classes;
     wrapper.setAttribute('role', 'button');
     wrapper.setAttribute('tabindex', disabled ? '-1' : '0');
-    wrapper.setAttribute('aria-label', `${name}${wound ? ', Wunde' : ''}, ${type}${color ? `, ${color}` : ''}`);
+    const reasonSuffix = disabledReason ? `. ${disabledReason}` : '';
+    wrapper.setAttribute(
+        'aria-label',
+        `${name}${wound ? ', Wunde' : ''}, ${type}${color ? `, ${color}` : ''}${reasonSuffix}`
+    );
+    if (disabledReason) {
+        wrapper.setAttribute('title', disabledReason);
+        wrapper.dataset.reason = disabledReason;
+    }
     if (selected) wrapper.setAttribute('aria-pressed', 'true');
 
     // Build card content
@@ -240,6 +259,18 @@ function buildCardHTML(params: {
     // Effects (compact)
     if (effects.length > 0) {
         html += `<div class="mk-card__effects">${effects.slice(0, 2).map(e => `<span class="mk-card__effect">${escapeHtml(e)}</span>`).join('')}</div>`;
+    }
+
+    // Compact effect icons strip (always scannable)
+    const iconBits: string[] = [];
+    if (basicEffect.movement || strongEffect?.movement) iconBits.push('👣');
+    if (basicEffect.attack || strongEffect?.attack || basicEffect.ranged || strongEffect?.ranged || basicEffect.siege || strongEffect?.siege)
+        iconBits.push('⚔️');
+    if (basicEffect.block || strongEffect?.block) iconBits.push('🛡️');
+    if (basicEffect.influence || strongEffect?.influence) iconBits.push('💬');
+    if (basicEffect.healing || strongEffect?.healing) iconBits.push('💚');
+    if (iconBits.length > 0) {
+        html += `<div class="mk-card__icons" aria-hidden="true">${iconBits.join('')}</div>`;
     }
 
     // Sideways indicator

@@ -195,6 +195,31 @@ export class ActionBarManager {
             order: 110
         });
 
+        // Contextual site / heal (formerly left action-panel only)
+        this.registerAction({
+            id: 'heal',
+            label: t('ui.buttons.heal') || 'Heilen',
+            icon: '💚',
+            primary: true,
+            onClick: () => this.game.applyHealing?.(),
+            showCondition: () => {
+                const hero = this.game.hero;
+                if (!hero || this.game.combat) return false;
+                return (hero.wounds || 0) > 0 && (hero.healingPoints || 0) > 0;
+            },
+            order: 5
+        });
+
+        this.registerAction({
+            id: 'visit',
+            label: t('ui.actions.visit') || 'Besuchen',
+            icon: '🏛️',
+            primary: true,
+            onClick: () => this.game.actionManager?.visitSite?.(),
+            showCondition: () => this.canVisit(),
+            order: 8
+        });
+
         // Mana Actions (subtle hint)
         this.registerAction({
             id: 'take-mana',
@@ -245,6 +270,12 @@ export class ActionBarManager {
     canExplore(): boolean {
         const hex = this.game.hexGrid?.getHex(this.game.hero.position.q, this.game.hero.position.r);
         return !!hex?.site && !hex.site.conquered;
+    }
+
+    canVisit(): boolean {
+        if (this.game.combat || this.game.movementMode || !this.game.hero?.position) return false;
+        const hex = this.game.hexGrid?.getHex(this.game.hero.position.q, this.game.hero.position.r);
+        return !!(hex?.site);
     }
 
     private playSelectedCard(strong: boolean): void {
@@ -310,6 +341,9 @@ export class ActionBarManager {
         visibleActions.forEach((action) => {
             const btn = document.createElement('button');
             btn.className = `action-btn ${action.primary ? 'primary' : ''} ${action.danger ? 'danger' : ''}`;
+            btn.dataset.actionId = action.id;
+            // Stable id for tutorial / e2e that target the primary end-turn control
+            if (action.id === 'end-turn') btn.id = 'action-bar-end-turn';
             btn.disabled = action.disabled ?? false;
             btn.onclick = action.onClick;
 

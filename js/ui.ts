@@ -139,6 +139,7 @@ export class UI {
         this.setupPanelToggles();
         this.setupGlobalListeners();
         this.setupStoreSubscriptions();
+        this.setupHudChrome();
     }
 
     private setupStoreSubscriptions(): void {
@@ -378,6 +379,84 @@ export class UI {
                 if (this.game && this.game.sound) this.game.sound.click();
             });
         }
+    }
+
+    /**
+     * Header overflow menu + on-demand shortcuts bar.
+     * Keeps the permanent HUD chrome small and progressive.
+     */
+    private setupHudChrome(): void {
+        const moreBtn = document.getElementById('header-more-btn');
+        const menu = document.getElementById('header-overflow-menu');
+        const shortcutsBar = document.getElementById('shortcuts-bar');
+        const shortcutsToggle = document.getElementById('shortcuts-toggle-btn');
+        const shortcutsClose = document.getElementById('shortcuts-bar-close');
+
+        const setMenuOpen = (open: boolean) => {
+            if (!menu || !moreBtn) return;
+            if (open) {
+                menu.hidden = false;
+                moreBtn.setAttribute('aria-expanded', 'true');
+            } else {
+                menu.hidden = true;
+                moreBtn.setAttribute('aria-expanded', 'false');
+            }
+        };
+
+        const setShortcutsVisible = (visible: boolean) => {
+            if (!shortcutsBar) return;
+            shortcutsBar.hidden = !visible;
+            shortcutsBar.classList.toggle('is-hidden', !visible);
+            shortcutsBar.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        };
+
+        moreBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = moreBtn.getAttribute('aria-expanded') === 'true';
+            setMenuOpen(!isOpen);
+            if (this.game?.sound) this.game.sound.click();
+        });
+
+        // Close overflow when choosing an item (keep menu usable for multi-actions via re-open)
+        menu?.addEventListener('click', (e) => {
+            const item = (e.target as HTMLElement)?.closest?.('.header-menu-item');
+            if (item) setMenuOpen(false);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menu || menu.hidden) return;
+            const target = e.target as Node;
+            if (menu.contains(target) || moreBtn?.contains(target)) return;
+            setMenuOpen(false);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                setMenuOpen(false);
+                setShortcutsVisible(false);
+                return;
+            }
+            const target = e.target as HTMLElement;
+            if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
+            // ? toggles shortcuts; Shift+/ is the usual physical mapping
+            if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
+                e.preventDefault();
+                const visible = shortcutsBar && !shortcutsBar.hidden && !shortcutsBar.classList.contains('is-hidden');
+                setShortcutsVisible(!visible);
+            }
+        });
+
+        shortcutsToggle?.addEventListener('click', () => {
+            const visible = shortcutsBar && !shortcutsBar.hidden && !shortcutsBar.classList.contains('is-hidden');
+            setShortcutsVisible(!visible);
+            setMenuOpen(false);
+        });
+
+        shortcutsClose?.addEventListener('click', () => setShortcutsVisible(false));
+
+        // Ensure initial hidden state
+        setMenuOpen(false);
+        setShortcutsVisible(false);
     }
 
     public toggleLanguage(): void {

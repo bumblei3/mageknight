@@ -170,7 +170,7 @@ export class RenderController {
             this.game.ui.elements.exploreBtn.title = this._getExploreTitle(canExplore, hasPoints);
         }
 
-        // Update Visit Button
+        // Update Visit Button (contextual left panel + action-bar both reflect this)
         const currentHex = this.game.hexGrid.getHex(this.game.hero.position.q, this.game.hero.position.r);
         const visitBtn = document.getElementById('visit-btn');
         if (visitBtn) {
@@ -182,6 +182,13 @@ export class RenderController {
             } else {
                 visitBtn.style.display = 'none';
             }
+        }
+        const actionPanel = document.getElementById('action-panel');
+        if (actionPanel) {
+            const healBtn = document.getElementById('heal-btn');
+            const healVisible = !!healBtn && healBtn.style.display === 'block';
+            const visitVisible = !!visitBtn && visitBtn.style.display !== 'none';
+            actionPanel.classList.toggle('is-visible', healVisible || visitVisible);
         }
     }
 

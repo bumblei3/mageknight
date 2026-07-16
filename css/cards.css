@@ -1,6 +1,6 @@
 #hand-cards {
-    height: 320px;
-    /* Matched with bottom-dock */
+    height: 220px;
+    /* Matched with slimmer bottom-dock */
     contain: strict;
     /* Isolate layout from shifts within cards */
     width: 100%;
@@ -20,9 +20,8 @@
     grid-template-columns: 1fr auto;
     gap: var(--space-6);
     align-items: flex-start;
-    min-height: 320px;
-    /* Increased and fixed height to prevent CLS */
-    padding-top: var(--space-10);
+    min-height: 220px;
+    padding-top: var(--space-4);
     perspective: 1000px;
 }
 
@@ -51,9 +50,9 @@
 
 /* Card Styles - Fantasy Ornate */
 .card {
-    min-width: 140px;
-    width: 140px;
-    height: 220px;
+    min-width: 130px;
+    width: 130px;
+    height: 190px;
     background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -509,25 +508,20 @@
 .hand-cards-container {
     display: flex;
     gap: var(--space-2);
-    padding: var(--space-4) var(--space-6);
-    background: rgba(15, 23, 42, 0.85);
-    /* Dark semi-transparent rail */
+    padding: var(--space-2) var(--space-4);
+    background: rgba(15, 23, 42, 0.9);
     backdrop-filter: blur(var(--space-3));
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    box-shadow: 0 -var(--space-1) 30px rgba(0, 0, 0, 0.5);
-    height: 260px;
-    /* Fixed height to strictly prevent CLS */
-    /* Reserved space for 220px cards + padding to prevent CLS */
+    box-shadow: 0 -var(--space-1) 20px rgba(0, 0, 0, 0.45);
+    height: 220px;
     align-items: center;
     pointer-events: auto;
-    /* Rail captures clicks */
-    transition: transform var(--transition-base);
+    transition: background var(--transition-base);
 }
 
 .hand-cards-container:hover {
-    transform: translateY(-5px);
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(15, 23, 42, 0.96);
 }
 
 /* Play Area (Joined with Dock) */
@@ -555,15 +549,13 @@
 .action-bar {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
-    padding: var(--space-2) var(--space-6);
+    gap: 2px;
+    padding: 6px var(--space-4);
     background: rgba(5, 5, 16, 0.95);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
     border-top: 1px solid var(--color-border-default);
     border-bottom: 1px solid var(--color-border-default);
     pointer-events: auto;
-    min-height: 56px;
+    min-height: 44px;
     transition: var(--transition-base);
 }
 

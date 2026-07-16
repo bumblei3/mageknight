@@ -313,6 +313,7 @@ export class InputController {
                     this.game.actionManager.undoLastAction();
                 }
             }
+            // Shortcuts overlay is handled in UI.setupHudChrome (? key)
         }, { signal });
     }
 

@@ -145,11 +145,12 @@ export class StatsRenderer {
             }
         }
 
-        // Update healing button visibility
+        // Update healing button visibility (left panel is contextual; primary UX is action-bar)
         if (this.elements.healBtn) {
             const hasWounds = (stats.wounds || 0) > 0;
             const hasHealing = (hero.healingPoints || 0) > 0;
-            this.elements.healBtn.style.display = (hasWounds && hasHealing) ? 'block' : 'none';
+            const showHeal = hasWounds && hasHealing;
+            this.elements.healBtn.style.display = showHeal ? 'block' : 'none';
             this.elements.healBtn.textContent = `Heilen (${hero.healingPoints || 0})`;
 
             // Add click sound if not already added
@@ -162,6 +163,19 @@ export class StatsRenderer {
                 (this.elements.healBtn as any)._soundAdded = true;
             }
         }
+        this.syncContextualActionPanel();
+    }
+
+    /** Show left action panel only when heal/visit are relevant */
+    private syncContextualActionPanel(): void {
+        const panel = document.getElementById('action-panel');
+        if (!panel) return;
+        const healVisible = this.elements.healBtn?.style.display === 'block';
+        const visitBtn = document.getElementById('visit-btn');
+        // Prefer inline style (set by RenderController); avoid getComputedStyle for jsdom safety
+        const visitDisplay = visitBtn?.style?.display || 'none';
+        const visitShown = !!visitBtn && visitDisplay !== 'none';
+        panel.classList.toggle('is-visible', healVisible || visitShown);
     }
 
     /**

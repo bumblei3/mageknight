@@ -22,7 +22,12 @@
 .header-right {
     display: flex;
     align-items: center;
-    gap: var(--space-6);
+    gap: var(--space-4);
+    flex-shrink: 0;
+}
+
+.header-right {
+    gap: var(--space-3);
 }
 
 .game-logo {
@@ -74,15 +79,14 @@
 .hud-sidebar {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
-    width: 320px;
+    gap: var(--space-2);
+    width: 240px;
     /* Leave room for the top bar (64px) and the fixed bottom hand/action dock
-       (320px) so the lower panels (combat enemies, execute button, log) are
-       not hidden behind it. */
-    height: calc(100vh - 64px - 320px - var(--space-6));
+       so combat/log panels stay visible above the hand. */
+    height: calc(100vh - 64px - 260px - var(--space-6));
     overflow-y: auto;
     padding-right: var(--space-1);
-    padding-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
     pointer-events: none;
     grid-row: 2;
     animation: sidebarSlide 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -123,19 +127,18 @@
     border-radius: var(--space-1);
 }
 
-/* Panel Override for Fantasy Parchment Look */
+/* Panel Override for Cleaner Look */
 .panel,
 .debug-panel {
-    background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    background: rgba(15, 23, 42, 0.75); /* Sleeker, more transparent background */
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     box-shadow:
-        0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255, 220, 150, 0.1),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-    border: 2px solid rgba(148, 163, 184, 0.3);
-    border-radius: var(--radius-sm);
-    padding: var(--space-4);
+        0 var(--space-2) var(--space-4) rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(148, 163, 184, 0.15); /* Thinner, subtler border */
+    border-radius: var(--radius-md);
+    padding: var(--space-3); /* Reduced padding */
     margin-bottom: 0;
     pointer-events: auto;
     overflow: hidden;
@@ -143,27 +146,7 @@
     transition: var(--transition-base);
 }
 
-.panel::before {
-    content: '✦';
-    position: absolute;
-    top: 6px;
-    left: 10px;
-    font-size: 0.9rem;
-    color: var(--color-gold-400);
-    opacity: 0.3;
-    transition: var(--transition-base);
-}
-
-.panel::after {
-    content: '✦';
-    position: absolute;
-    top: 6px;
-    right: 10px;
-    font-size: 0.9rem;
-    color: var(--color-gold-400);
-    opacity: 0.3;
-    transition: var(--transition-base);
-}
+/* Removed the decorative stars (✦) to reduce visual noise and improve clarity */
 
 /* Combat panel: keep the enemy list scrollable while pinning the execute
    button to the bottom so it is never clipped by `.panel { overflow: hidden }`
@@ -196,25 +179,22 @@
     filter: drop-shadow(0 0 5px var(--color-gold-400));
 }
 
+/* Subtle hover only — avoid lift/glow on every panel (visual noise) */
 .panel:hover,
 .debug-panel:hover {
     border-color: var(--color-border-hover);
-    background: var(--glass-bg-hover);
-    transform: translateY(-2px);
-    box-shadow:
-        0 15px 40px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(255, 220, 150, 0.15),
-        0 0 var(--space-5) rgba(218, 165, 32, 0.1);
+    background: rgba(15, 23, 42, 0.85);
 }
 
 .panel h2,
 .debug-panel h3 {
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Slightly smaller for compactness */
     font-weight: 600;
     color: var(--color-text-primary);
     margin: 0 0 var(--space-2) 0;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    opacity: 0.9;
 }
 
 .panel h3,
@@ -409,12 +389,242 @@
     border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* Action Panel */
+/* Action Panel — primary actions moved to bottom action-bar.
+   Legacy end/rest/explore stay in DOM for wiring but are hidden.
+   Panel only appears when contextual heal/visit is available. */
+.action-panel--contextual {
+    display: none;
+    padding: var(--space-2);
+}
+
+.action-panel--contextual.is-visible {
+    display: block;
+}
+
+.action-panel--contextual .action-btn-legacy {
+    /* Keep for InputController / tutorial IDs; not shown in left rail */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .action-grid {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: var(--space-2);
-    /* Increased gap */
+}
+
+.action-grid .btn {
+    flex: 1 1 calc(50% - var(--space-2));
+    min-width: 100px;
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+}
+
+.movement-panel--compact {
+    padding: var(--space-2) var(--space-3);
+}
+
+.movement-panel--compact .movement-display {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.movement-panel--compact .movement-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+}
+
+.mana-panel--compact h2 {
+    margin-bottom: var(--space-1);
+}
+
+/* Header: phase as single focus + overflow menu */
+.header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    flex: 1;
+    pointer-events: auto;
+}
+
+.phase-indicator--header {
+    max-width: min(420px, 46vw);
+    padding: 4px 14px !important;
+    border-width: 1px !important;
+    border-radius: var(--radius-md) !important;
+    background: rgba(15, 23, 42, 0.88) !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+.phase-indicator--header::before {
+    display: none;
+}
+
+.phase-indicator--header .phase-text {
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+}
+
+.phase-indicator--header .phase-hint {
+    margin-top: 1px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.header-overflow {
+    position: relative;
+}
+
+.header-overflow-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    padding: var(--space-2);
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 50;
+}
+
+.header-overflow-menu[hidden] {
+    display: none !important;
+}
+
+.header-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    width: 100%;
+    padding: 8px 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.header-menu-item:hover,
+.header-menu-item:focus-visible {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--color-border-default);
+    outline: none;
+}
+
+.header-menu-item kbd {
+    font-size: 0.7rem;
+    color: var(--color-gold-400);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    padding: 1px 5px;
+}
+
+.header-menu-sep {
+    height: 1px;
+    margin: 4px 2px;
+    background: var(--color-border-default);
+    opacity: 0.7;
+}
+
+/* Shortcuts bar: on-demand overlay (not a permanent chrome strip) */
+.shortcuts-bar {
+    position: fixed;
+    bottom: 280px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: min(920px, 92vw);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(5, 5, 16, 0.95);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 120;
+    pointer-events: auto;
+}
+
+.shortcuts-bar.is-hidden,
+.shortcuts-bar[hidden] {
+    display: none !important;
+}
+
+.shortcuts-bar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin-bottom: 2px;
+}
+
+.shortcuts-bar-close {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.shortcuts-bar-close:hover {
+    color: var(--color-text-primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.shortcut-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.shortcut-item kbd {
+    font-size: 0.7rem;
+    color: var(--color-gold-400);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    padding: 1px 5px;
 }
 
 /* Debug Panel Specifics */

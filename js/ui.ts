@@ -77,6 +77,16 @@ export interface UIElements {
     eventTitle: HTMLElement | null;
     eventDescription: HTMLElement | null;
     eventOptions: HTMLElement | null;
+    gameOverDefeatModal: HTMLElement | null;
+    gameOverDefeatMessage: HTMLElement | null;
+    gameOverDefeatStats: HTMLElement | null;
+    gameOverDefeatRestartBtn: HTMLElement | null;
+    gameOverDefeatMenuBtn: HTMLElement | null;
+    gameOverVictoryModal: HTMLElement | null;
+    gameOverVictoryMessage: HTMLElement | null;
+    gameOverVictoryStats: HTMLElement | null;
+    gameOverVictoryNextBtn: HTMLElement | null;
+    gameOverVictoryMenuBtn: HTMLElement | null;
 }
 
 /**
@@ -342,7 +352,17 @@ export class UI {
             eventClose: document.getElementById('event-close'),
             eventTitle: document.getElementById('event-title'),
             eventDescription: document.getElementById('event-description'),
-            eventOptions: document.getElementById('event-options')
+            eventOptions: document.getElementById('event-options'),
+            gameOverDefeatModal: document.getElementById('game-over-defeat-modal'),
+            gameOverDefeatMessage: document.getElementById('game-over-defeat-message'),
+            gameOverDefeatStats: document.getElementById('game-over-defeat-stats'),
+            gameOverDefeatRestartBtn: document.getElementById('game-over-restart-btn'),
+            gameOverDefeatMenuBtn: document.getElementById('game-over-menu-btn'),
+            gameOverVictoryModal: document.getElementById('game-over-victory-modal'),
+            gameOverVictoryMessage: document.getElementById('game-over-victory-message'),
+            gameOverVictoryStats: document.getElementById('game-over-victory-stats'),
+            gameOverVictoryNextBtn: document.getElementById('game-over-next-btn'),
+            gameOverVictoryMenuBtn: document.getElementById('game-over-menu-btn-victory')
         };
     }
 
@@ -377,6 +397,38 @@ export class UI {
             this.elements.settingsBtn.addEventListener('click', async () => {
                 await this.showSettings();
                 if (this.game && this.game.sound) this.game.sound.click();
+            });
+        }
+        // Game-over defeat overlay buttons
+        if (this.elements.gameOverDefeatRestartBtn) {
+            this.elements.gameOverDefeatRestartBtn.addEventListener('click', () => {
+                if (this.game && this.game.sound) this.game.sound.click();
+                this.modals.hideGameOverOverlays();
+                this.game.ui?.hideCombatPanel();
+                this.game.restartScenario?.();
+            });
+        }
+        if (this.elements.gameOverDefeatMenuBtn) {
+            this.elements.gameOverDefeatMenuBtn.addEventListener('click', () => {
+                if (this.game && this.game.sound) this.game.sound.click();
+                this.modals.hideGameOverOverlays();
+                this.game.ui?.hideCombatPanel();
+                this.game.stopGame?.();
+            });
+        }
+        // Game-over victory overlay buttons
+        if (this.elements.gameOverVictoryNextBtn) {
+            this.elements.gameOverVictoryNextBtn.addEventListener('click', () => {
+                if (this.game && this.game.sound) this.game.sound.click();
+                this.modals.hideGameOverOverlays();
+            });
+        }
+        if (this.elements.gameOverVictoryMenuBtn) {
+            this.elements.gameOverVictoryMenuBtn.addEventListener('click', () => {
+                if (this.game && this.game.sound) this.game.sound.click();
+                this.modals.hideGameOverOverlays();
+                this.game.ui?.hideCombatPanel();
+                this.game.stopGame?.();
             });
         }
     }
@@ -517,6 +569,14 @@ export class UI {
 
     public showToast(message: string, type: string = 'info'): void {
         this.notifications.showToast(message, type);
+    }
+
+    public showGameOverDefeat(enemyName: string, message: string): void {
+        this.modals.showDefeatOverlay(enemyName, message);
+    }
+
+    public showGameOverVictory(message: string, stats?: { totalEnemies?: number; totalSites?: number }): void {
+        this.modals.showVictoryOverlay(message, stats);
     }
 
     public showCombatPanel(enemies: any[], phase: string, onEnemyClick: (enemy: any) => void): void {

@@ -1052,5 +1052,33 @@
                 </div>
             </div>
         </div>
+
+        <!-- Game Over: Defeat Overlay -->
+        <div class="modal" id="game-over-defeat-modal">
+            <div class="modal-content game-over-content game-over-defeat">
+                <div class="game-over-icon">💀</div>
+                <h2 class="game-over-title" data-i18n="ui.gameOver">Held besiegt</h2>
+                <p class="game-over-message" id="game-over-defeat-message"></p>
+                <div class="game-over-stats" id="game-over-defeat-stats"></div>
+                <div class="modal-actions game-over-actions">
+                    <button class="btn btn-primary" id="game-over-restart-btn" data-i18n="ui.restart">Nochmal spielen</button>
+                    <button class="btn btn-secondary" id="game-over-menu-btn" data-i18n="ui.mainMenu">Hauptmenü</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over: Victory Overlay -->
+        <div class="modal" id="game-over-victory-modal">
+            <div class="modal-content game-over-content game-over-victory">
+                <div class="game-over-icon">🏆</div>
+                <h2 class="game-over-title" data-i18n="ui.victory">Sieg!</h2>
+                <p class="game-over-message" id="game-over-victory-message"></p>
+                <div class="game-over-stats" id="game-over-victory-stats"></div>
+                <div class="modal-actions game-over-actions">
+                    <button class="btn btn-primary" id="game-over-next-btn" data-i18n="ui.nextScenario">Nächstes Szenario</button>
+                    <button class="btn btn-secondary" id="game-over-menu-btn-victory" data-i18n="ui.mainMenu">Hauptmenü</button>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

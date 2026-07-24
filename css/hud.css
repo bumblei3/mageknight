@@ -325,6 +325,68 @@
     animation: fadeIn 0.3s ease-out;
 }
 
+/* Site modal — primary CTA + “more” */
+.site-options--intuition {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.site-option-primary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-md, 8px);
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+.site-option-primary-hint {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gold-400, #fbbf24);
+}
+
+.site-primary-btn {
+    width: 100%;
+    font-size: 1.05rem;
+    padding: 0.65rem 1rem;
+}
+
+.site-options-more {
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    padding-top: 0.5rem;
+}
+
+.site-options-more-summary {
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #cbd5e1);
+    list-style: none;
+    user-select: none;
+}
+
+.site-options-more-summary::-webkit-details-marker {
+    display: none;
+}
+
+.site-options-more-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.shop-item--disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+}
+
 .preview-label {
     color: var(--color-text-secondary);
 }

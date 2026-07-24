@@ -167,6 +167,20 @@
     z-index: 2;
 }
 
+/* Strong mana affordability cue */
+.mk-card--strong-ok .mk-card__mana-cost {
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.75);
+}
+
+.mk-card--strong-no .mk-card__mana-cost {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.55);
+    opacity: 0.85;
+}
+
+.mk-card--strong-ok .mk-card__effect {
+    /* last effect often strong/mana line */
+}
+
 @keyframes mk-card-coach-pulse {
     0%,
     100% {

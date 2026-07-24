@@ -107,6 +107,15 @@ const de = {
             playCards: 'Spiele Karten: 🟢 Bewegung · 🔴 Angriff · 🔵 Block · Rechtsklick = seitlich',
             rest: 'Wunden? Rasten heilt und erneuert die Hand',
             endTurn: 'Keine Züge mehr? Zug beenden für neue Karten',
+            clickHint: 'Klicken zum Hervorheben / Ausführen',
+        },
+        endTurn: {
+            confirmTitle: 'Zug beenden?',
+            confirmFooter: 'Trotzdem beenden?',
+            mpLeft: 'Noch {points} Bewegungspunkte übrig',
+            healAvailable: 'Heilung verfügbar — Wunden könnten geheilt werden',
+            siteHere: 'Du stehst an einem Ort — noch besuchen?',
+            moveCards: 'Bewegungskarten noch auf der Hand',
         },
         cardReasons: {
             wound: 'Wunde — blockiert diesen Handslot',

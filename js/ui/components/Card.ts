@@ -229,14 +229,8 @@ function buildCardHTML(params: {
     };
     const typeLabel = typeLabels[type] || type;
 
-    // Effect summary for compact view
-    const effects = [];
-    if (basicEffect.movement) effects.push(`⬆${basicEffect.movement}${strongEffect?.movement ? `+${strongEffect.movement}` : ''} Bewegung`);
-    if (basicEffect.attack) effects.push(`⚔${basicEffect.attack}${strongEffect?.attack ? `+${strongEffect.attack}` : ''} Angriff`);
-    if (basicEffect.block) effects.push(`🛡${basicEffect.block}${strongEffect?.block ? `+${strongEffect.block}` : ''} Block`);
-    if (basicEffect.influence) effects.push(`💬${basicEffect.influence}${strongEffect?.influence ? `+${strongEffect.influence}` : ''} Einfluss`);
-    if (basicEffect.healing) effects.push(`❤${basicEffect.healing}${strongEffect?.healing ? `+${strongEffect.healing}` : ''} Heilung`);
-    if (basicEffect.mana) effects.push(`💎 Mana`);
+    // One-line play preview: always scannable before click
+    const effects = buildPlayPreviewLines(basicEffect, strongEffect, color);
 
     let html = '';
 
@@ -256,16 +250,19 @@ function buildCardHTML(params: {
     // Type
     html += `<div class="mk-card__type">${typeLabel}</div>`;
 
-    // Effects (compact)
+    // Effects (compact play-preview)
     if (effects.length > 0) {
-        html += `<div class="mk-card__effects">${effects.slice(0, 2).map(e => `<span class="mk-card__effect">${escapeHtml(e)}</span>`).join('')}</div>`;
+        html += `<div class="mk-card__effects" title="${escapeHtml(effects.join(' · '))}">${effects
+            .slice(0, 3)
+            .map((e) => `<span class="mk-card__effect">${escapeHtml(e)}</span>`)
+            .join('')}</div>`;
     }
 
     // Compact effect icons strip (always scannable)
     const iconBits: string[] = [];
     if (basicEffect.movement || strongEffect?.movement) iconBits.push('👣');
-    if (basicEffect.attack || strongEffect?.attack || basicEffect.ranged || strongEffect?.ranged || basicEffect.siege || strongEffect?.siege)
-        iconBits.push('⚔️');
+    if (basicEffect.attack || strongEffect?.attack) iconBits.push('⚔️');
+    if (basicEffect.ranged || strongEffect?.ranged || basicEffect.siege || strongEffect?.siege) iconBits.push('🏹');
     if (basicEffect.block || strongEffect?.block) iconBits.push('🛡️');
     if (basicEffect.influence || strongEffect?.influence) iconBits.push('💬');
     if (basicEffect.healing || strongEffect?.healing) iconBits.push('💚');
@@ -291,13 +288,57 @@ function buildCardHTML(params: {
     return html;
 }
 
+/** Compact one-line previews: "+2 🛡 · Stark +4 🛡" + optional mana cue */
+function buildPlayPreviewLines(basic: any, strong: any, color: string | null): string[] {
+    const lines: string[] = [];
+    const pairs: Array<[string, string]> = [
+        ['movement', '👣'],
+        ['attack', '⚔️'],
+        ['ranged', '🏹'],
+        ['siege', '🏰'],
+        ['block', '🛡️'],
+        ['influence', '💬'],
+        ['healing', '💚']
+    ];
+    let hasStrong = false;
+    for (const [key, icon] of pairs) {
+        const b = basic?.[key];
+        const s = strong?.[key];
+        if (!b && !s) continue;
+        if (b && s && s !== b) {
+            lines.push(`+${b}${icon} · Stark +${s}${icon}`);
+            hasStrong = true;
+        } else if (b) {
+            lines.push(`+${b}${icon}`);
+            if (s) hasStrong = true;
+        } else if (s) {
+            lines.push(`Stark +${s}${icon}`);
+            hasStrong = true;
+        }
+    }
+    if (basic?.mana || strong?.mana) lines.push('💎 Mana');
+    if (hasStrong && color && color !== 'gold') {
+        const manaSym: Record<string, string> = {
+            red: '🔴',
+            blue: '🔵',
+            green: '🟢',
+            white: '⚪',
+            black: '⚫'
+        };
+        lines.push(`${manaSym[color] || '💎'} stark`);
+    }
+    return [...new Set(lines)].slice(0, 3);
+}
+
 const _effectIcons: Record<string, string> = {
     movement: '⬆',
     attack: '⚔',
     block: '🛡',
     influence: '💬',
     healing: '❤',
-    mana: '💎'
+    mana: '💎',
+    ranged: '🏹',
+    siege: '🏰'
 };
 
 const _effectNames: Record<string, string> = {

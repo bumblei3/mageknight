@@ -107,6 +107,15 @@ const en = {
             playCards: 'Play cards: 🟢 move · 🔴 attack · 🔵 block · right-click = sideways',
             rest: 'Wounds? Rest heals and refreshes your hand',
             endTurn: 'Nothing left? End turn for new cards',
+            clickHint: 'Click to highlight / execute',
+        },
+        endTurn: {
+            confirmTitle: 'End turn?',
+            confirmFooter: 'End turn anyway?',
+            mpLeft: '{points} movement points left',
+            healAvailable: 'Healing ready — wounds could be healed',
+            siteHere: 'You are on a site — visit first?',
+            moveCards: 'Movement cards still in hand',
         },
         cardReasons: {
             wound: 'Wound — occupies this hand slot',

@@ -1199,9 +1199,75 @@
 }
 
 .combat-prediction {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(251, 191, 36, 0.25);
     border-radius: var(--radius-sm);
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+}
+
+.prediction-heading {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gold-400, #fbbf24);
+    margin-bottom: 0.4rem;
+}
+
+.total-need {
+    font-size: 0.7em;
+    opacity: 0.75;
+    font-weight: 600;
+}
+
+.total-stat--ok .total-value {
+    color: var(--color-green-500, #10b981);
+}
+
+.prediction-warning {
+    color: var(--color-amber-400, #fbbf24);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.95rem;
+}
+
+.prediction-efficiency {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary, #cbd5e1);
+}
+
+.efficiency-warning {
+    display: block;
+}
+
+.trait-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary, #cbd5e1);
+    cursor: help;
+}
+
+.trait-chip--active {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.55);
+    color: var(--color-gold-300, #fcd34d);
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.25);
+}
+
+.trait-chip-label {
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .enemy-card {

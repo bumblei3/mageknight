@@ -104,7 +104,7 @@ export class HexGrid {
         if (this.renderer) this.renderer.render(hero, enemies);
     }
 
-    highlightHexes(hexes: { q: number, r: number }[]) {
+    highlightHexes(hexes: Array<{ q: number; r: number; cost?: number; danger?: boolean }>) {
         if (this.renderer) this.renderer.highlightHexes(hexes);
     }
 

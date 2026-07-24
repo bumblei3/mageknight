@@ -298,30 +298,80 @@ export class ActionBarManager {
     getCoachMessage(): CoachMessage {
         if (this.game.movementMode) {
             const mp = this.game.hero?.movementPoints ?? 0;
+            const dangerHex = (this.game.reachableHexes || []).find((h: any) => h?.danger);
+            if (dangerHex) {
+                return {
+                    icon: '⚔️',
+                    text:
+                        t('ui.coach.movementCombat', {
+                            points: mp,
+                            enemy: dangerHex.enemyName || t('ui.coach.enemyFallback') || 'Feind'
+                        }) ||
+                        `Bewegung (${mp} MP) — rote Hexes starten Kampf`,
+                    tone: 'warn'
+                };
+            }
             return {
                 icon: '👣',
-                text: t('ui.coach.movement', { points: mp }) || `Bewegung: klicke ein erreichbares Hex (${mp} MP)`,
+                text:
+                    t('ui.coach.movement', { points: mp }) ||
+                    `Bewegung: klicke ein erreichbares Hex (${mp} MP) · Zahl = Kosten`,
                 tone: 'info'
             };
         }
 
         if (this.game.combat) {
             const phase = this.combatPhase();
+            const orch = this.game.combatOrchestrator;
+            const combat = this.game.combat;
+
             if (phase === COMBAT_PHASES.RANGED || phase === 'ranged') {
+                const fortified = (combat.enemies || []).some((e: any) => e.fortified);
                 return {
                     icon: '🏹',
-                    text:
-                        t('ui.coach.ranged') ||
-                        'Fernkampf: Belagerungs-/Fernkarten spielen oder Phase überspringen',
+                    text: fortified
+                        ? t('ui.coach.rangedFortified') ||
+                          'Fernkampf: 🏰 Befestigt braucht Belagerung — sonst Phase überspringen'
+                        : t('ui.coach.ranged') ||
+                          'Fernkampf: Fern-/Belagerungskarten oder Phase überspringen',
                     tone: 'combat'
                 };
             }
             if (phase === COMBAT_PHASES.BLOCK || phase === 'block') {
+                const blockHave = orch?.combatBlockTotal ?? 0;
+                let blockNeed = 0;
+                let swift = false;
+                (combat.enemies || []).forEach((e: any) => {
+                    if (combat.blockedEnemies?.has(e.id)) return;
+                    blockNeed +=
+                        typeof e.getBlockRequirement === 'function' ? e.getBlockRequirement() : e.attack || 0;
+                    if (e.swift) swift = true;
+                });
+                const prediction = combat.getPredictedOutcome?.(orch?.combatAttackTotal ?? 0, blockHave);
+                const wounds = prediction?.expectedWounds ?? 0;
+                if (blockNeed > 0) {
+                    const outcome =
+                        wounds > 0
+                            ? t('ui.coach.blockWounds', { wounds }) || ` · sonst ${wounds} Wunden`
+                            : t('ui.coach.blockSafe') || ' · sicher';
+                    return {
+                        icon: '🛡️',
+                        text:
+                            t('ui.coach.blockProgress', {
+                                have: blockHave,
+                                need: blockNeed,
+                                swift: swift ? t('ui.coach.swiftNote') || ' · 💨 2× Block' : '',
+                                outcome
+                            }) ||
+                            `Block ${blockHave}/${blockNeed}${swift ? ' · 💨 2×' : ''}${outcome}`,
+                        tone: blockHave >= blockNeed ? 'success' : 'combat'
+                    };
+                }
                 return {
                     icon: '🛡️',
                     text:
                         t('ui.coach.block') ||
-                        'Block-Phase: spiele blaue/Block-Karten, dann Block beenden',
+                        'Block-Phase: spiele Block-Karten, dann Block beenden',
                     tone: 'combat'
                 };
             }
@@ -333,11 +383,25 @@ export class ActionBarManager {
                 };
             }
             if (phase === COMBAT_PHASES.ATTACK || phase === 'attack') {
+                const attackHave = orch?.combatAttackTotal ?? 0;
+                const prediction = combat.getPredictedOutcome?.(attackHave, 0);
+                const defeated = prediction?.enemiesDefeated || [];
+                if (defeated.length > 0) {
+                    return {
+                        icon: '⚔️',
+                        text:
+                            t('ui.coach.attackCanDefeat', {
+                                attack: attackHave,
+                                names: defeated.join(', ')
+                            }) || `Angriff ${attackHave} — besiegbar: ${defeated.join(', ')}`,
+                        tone: 'success'
+                    };
+                }
                 return {
                     icon: '⚔️',
                     text:
-                        t('ui.coach.attack') ||
-                        'Angriff: spiele rote/Angriffskarten, dann Angriff ausführen',
+                        t('ui.coach.attackProgress', { attack: attackHave }) ||
+                        `Angriff ${attackHave} — spiele Angriffskarten, dann ausführen`,
                     tone: 'combat'
                 };
             }

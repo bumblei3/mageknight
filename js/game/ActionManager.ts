@@ -5,6 +5,7 @@
 import { eventBus } from '../eventBus';
 import { GAME_EVENTS } from '../constants';
 import { logger } from '../logger';
+import { t } from '../i18n/index';
 
 export interface Checkpoint {
     hero: any;
@@ -174,7 +175,8 @@ export class ActionManager {
     }
 
     /**
-     * Calculates which hexes the hero can reach
+     * Calculates which hexes the hero can reach.
+     * Annotates path cost and combat-danger (enemy on hex) for map UI.
      */
     calculateReachableHexes(): void {
         if (!this.game.hero || !this.game.hexGrid) return;
@@ -186,8 +188,27 @@ export class ActionManager {
             this.game.hero.hasSkill('flight')
         );
 
-        this.game.reachableHexes = reachable;
-        this.game.hexGrid.highlightHexes(reachable);
+        const enemies = this.game.enemies || [];
+        const annotated = reachable.map((hex: { q: number; r: number; cost?: number }) => {
+            const enemy = enemies.find(
+                (e: any) =>
+                    e &&
+                    !e.isDefeated?.() &&
+                    e.position &&
+                    e.position.q === hex.q &&
+                    e.position.r === hex.r
+            );
+            return {
+                q: hex.q,
+                r: hex.r,
+                cost: hex.cost,
+                danger: !!enemy,
+                enemyName: enemy?.name
+            };
+        });
+
+        this.game.reachableHexes = annotated;
+        this.game.hexGrid.highlightHexes(annotated);
     }
 
     /**
@@ -262,6 +283,12 @@ export class ActionManager {
         const enemy = this.game.enemies.find((e: any) => !e.isDefeated() && e.position.q === q && e.position.r === r);
         if (enemy) {
             this.clearHistory(); // Combat started, cannot undo movement
+            if (typeof this.game.showToast === 'function') {
+                this.game.showToast(
+                    t('ui.coach.combatStarts', { enemy: enemy.name }) || `Kampf gegen ${enemy.name}!`,
+                    'warning'
+                );
+            }
             this.game.combatOrchestrator.initiateCombat(enemy);
             this.exitMovementMode();
             this.game.render();

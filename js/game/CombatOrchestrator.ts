@@ -346,6 +346,26 @@ export class CombatOrchestrator {
 
         this.combatAttackTotal = 0;
         this.combatBlockTotal = 0;
+        this.combatRangedTotal = 0;
+        this.combatSiegeTotal = 0;
+        this.activeBlocks = [];
+
+        // Skip empty ranged phase when player has no ranged/siege options
+        if (this.shouldAutoSkipRangedPhase()) {
+            const skipMsg = t('combat.autoSkipRanged') || 'Keine Fernkampf-Karten — Phase übersprungen';
+            this.game.addLog(skipMsg, 'info');
+            if (typeof this.game.showToast === 'function') {
+                this.game.showToast(skipMsg, 'info');
+            }
+            const skipResult = this.game.combat.endRangedPhase();
+            if (skipResult?.victory) {
+                if (this.game.ui) {
+                    this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e: Enemy) => this.handleEnemyClick(e));
+                }
+                this.onCombatEnd({ victory: true, enemy: this.game.combat.enemy });
+                return;
+            }
+        }
 
         if (this.game.ui) {
             this.game.ui.showCombatPanel(enemies, this.game.combat.phase, (e: Enemy) => this.handleEnemyClick(e));
@@ -354,6 +374,31 @@ export class CombatOrchestrator {
         this.game.updatePhaseIndicator();
 
         eventBus.emit(GAME_EVENTS.COMBAT_STARTED, { enemies: enemies });
+    }
+
+    /**
+     * True when the player has no ranged/siege card in hand and no unit ranged source.
+     * Used to auto-skip the ranged phase so combat starts where action is possible.
+     */
+    shouldAutoSkipRangedPhase(): boolean {
+        const hand = this.game.hero?.hand || [];
+        const hasRangedCard = hand.some((c: any) => {
+            if (!c || (typeof c.isWound === 'function' ? c.isWound() : c.isWound)) return false;
+            const b = c.basicEffect || {};
+            const s = c.strongEffect || {};
+            return !!(b.ranged || s.ranged || b.siege || s.siege);
+        });
+        if (hasRangedCard) return false;
+
+        const units = this.game.hero?.units || [];
+        const hasUnitRanged = units.some((u: any) => {
+            if (!u || u.isWounded?.() || u.exhausted) return false;
+            const abilities = typeof u.getAbilities === 'function' ? u.getAbilities() : u.abilities || [];
+            return (abilities as any[]).some(
+                (a: any) => a && (a.type === 'ranged' || a.type === 'siege' || a.ranged || a.siege)
+            );
+        });
+        return !hasUnitRanged;
     }
 
     handleEnemyClick(enemy: Enemy): void {

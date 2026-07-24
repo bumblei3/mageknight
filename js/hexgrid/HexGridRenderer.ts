@@ -13,6 +13,8 @@ interface HexDrawOptions {
     highlight?: boolean;
     revealed?: boolean;
     terrain?: string;
+    /** Enemy on hex — combat if you move here */
+    danger?: boolean;
 }
 
 export class HexGridRenderer {
@@ -22,6 +24,10 @@ export class HexGridRenderer {
     public hexSize: number;
     public selectedHex: { q: number; r: number } | null;
     public highlightedHexes: Set<string>;
+    /** Path cost for highlighted reachable hexes (key → cost) */
+    public hexCosts: Map<string, number>;
+    /** Hexes that start combat if entered (enemy present) */
+    public dangerHexes: Set<string>;
     public animationFrame: number;
     public ambientLight: number;
     public heroPosition: { q: number; r: number } | null;
@@ -37,6 +43,8 @@ export class HexGridRenderer {
         this.hexSize = logic.hexSize;
         this.selectedHex = null;
         this.highlightedHexes = new Set();
+        this.hexCosts = new Map();
+        this.dangerHexes = new Set();
         this.animationFrame = 0;
         this.ambientLight = 1.0;
         this.heroPosition = null;
@@ -71,15 +79,26 @@ export class HexGridRenderer {
         this.ambientLight = isNight ? 0.6 : 1.0;
     }
 
-    highlightHexes(hexList: { q: number; r: number }[]) {
+    highlightHexes(hexList: Array<{ q: number; r: number; cost?: number; danger?: boolean }>) {
         this.highlightedHexes.clear();
+        this.hexCosts.clear();
+        this.dangerHexes.clear();
         hexList.forEach(hex => {
-            this.highlightedHexes.add(this.logic.getHexKey(hex.q, hex.r));
+            const key = this.logic.getHexKey(hex.q, hex.r);
+            this.highlightedHexes.add(key);
+            if (typeof hex.cost === 'number') {
+                this.hexCosts.set(key, hex.cost);
+            }
+            if (hex.danger) {
+                this.dangerHexes.add(key);
+            }
         });
     }
 
     clearHighlights() {
         this.highlightedHexes.clear();
+        this.hexCosts.clear();
+        this.dangerHexes.clear();
     }
 
     selectHex(q: number, r: number) {
@@ -107,6 +126,7 @@ export class HexGridRenderer {
         // Draw all hexes
         for (const [key, hexData] of this.logic.hexes) {
             const isHighlighted = this.highlightedHexes.has(key);
+            const isDanger = this.dangerHexes.has(key);
             const isSelected = this.selectedHex &&
                 this.selectedHex.q === hexData.q &&
                 this.selectedHex.r === hexData.r;
@@ -117,7 +137,8 @@ export class HexGridRenderer {
                 fillColor,
                 highlight: isHighlighted || (isSelected || false),
                 revealed: hexData.revealed,
-                terrain: hexData.terrain
+                terrain: hexData.terrain,
+                danger: isDanger
             });
 
             if (!hexData.revealed) continue;
@@ -131,6 +152,12 @@ export class HexGridRenderer {
                 } else {
                     this.drawHexIcon(hexData.q, hexData.r, this.getTerrainIcon(hexData.terrain), -10);
                 }
+            }
+
+            // Movement cost on reachable hexes (bottom of hex)
+            if (isHighlighted && this.hexCosts.has(key)) {
+                const cost = this.hexCosts.get(key)!;
+                this.drawMovementCost(hexData.q, hexData.r, cost, isDanger);
             }
 
             if (this.debugMode) {
@@ -157,9 +184,54 @@ export class HexGridRenderer {
 
     // ========== Hex Drawing ==========
 
+    drawMovementCost(q: number, r: number, cost: number, danger: boolean = false) {
+        const pos = this.axialToPixel(q, r);
+        const y = pos.y + this.hexSize * 0.45;
+        const label = String(cost);
+        const padX = 6;
+        const padY = 3;
+
+        this.ctx.save();
+        this.ctx.font = `bold ${Math.max(11, Math.floor(this.hexSize * 0.28))}px sans-serif`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        const metrics = this.ctx.measureText(label);
+        const w = metrics.width + padX * 2;
+        const h = Math.max(14, this.hexSize * 0.32);
+
+        // Pill background
+        this.ctx.fillStyle = danger ? 'rgba(185, 28, 28, 0.92)' : 'rgba(15, 23, 42, 0.88)';
+        this.ctx.strokeStyle = danger ? 'rgba(252, 165, 165, 0.9)' : 'rgba(167, 139, 250, 0.85)';
+        this.ctx.lineWidth = 1.5;
+        const rx = pos.x - w / 2;
+        const ry = y - h / 2;
+        const radius = 6;
+        this.ctx.beginPath();
+        this.ctx.moveTo(rx + radius, ry);
+        this.ctx.arcTo(rx + w, ry, rx + w, ry + h, radius);
+        this.ctx.arcTo(rx + w, ry + h, rx, ry + h, radius);
+        this.ctx.arcTo(rx, ry + h, rx, ry, radius);
+        this.ctx.arcTo(rx, ry, rx + w, ry, radius);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        this.ctx.fillStyle = danger ? '#fecaca' : '#e9d5ff';
+        this.ctx.fillText(label, pos.x, y);
+        this.ctx.restore();
+    }
+
     drawHex(q: number, r: number, options: HexDrawOptions = {}) {
         const pos = this.axialToPixel(q, r);
-        const { fillColor = '#1a1a2e', strokeColor = '#374151', lineWidth = 2, highlight = false, revealed = true, terrain = null } = options;
+        const {
+            fillColor = '#1a1a2e',
+            strokeColor = '#374151',
+            lineWidth = 2,
+            highlight = false,
+            revealed = true,
+            terrain = null,
+            danger = false
+        } = options;
 
         // Draw hex path
         this.ctx.beginPath();
@@ -236,19 +308,31 @@ export class HexGridRenderer {
         this.ctx.lineWidth = lineWidth;
         this.ctx.stroke();
 
-        // Highlight
+        // Highlight (purple) or combat-danger (red)
         if (highlight) {
             this.ctx.save();
-            this.ctx.shadowColor = '#8b5cf6';
-            this.ctx.shadowBlur = 15;
-            this.ctx.strokeStyle = '#8b5cf6';
-            this.ctx.lineWidth = 3;
-            this.ctx.stroke();
+            if (danger) {
+                this.ctx.shadowColor = '#ef4444';
+                this.ctx.shadowBlur = 16;
+                this.ctx.strokeStyle = '#ef4444';
+                this.ctx.lineWidth = 3.5;
+                this.ctx.stroke();
+                this.ctx.globalAlpha = 0.35;
+                this.ctx.strokeStyle = '#fca5a5';
+                this.ctx.lineWidth = 6;
+                this.ctx.stroke();
+            } else {
+                this.ctx.shadowColor = '#8b5cf6';
+                this.ctx.shadowBlur = 15;
+                this.ctx.strokeStyle = '#8b5cf6';
+                this.ctx.lineWidth = 3;
+                this.ctx.stroke();
+                this.ctx.globalAlpha = 0.3;
+                this.ctx.strokeStyle = '#ec4899';
+                this.ctx.lineWidth = 5;
+                this.ctx.stroke();
+            }
             this.ctx.restore();
-            this.ctx.globalAlpha = 0.3;
-            this.ctx.strokeStyle = '#ec4899';
-            this.ctx.lineWidth = 5;
-            this.ctx.stroke();
             this.ctx.globalAlpha = 1.0;
         }
     }

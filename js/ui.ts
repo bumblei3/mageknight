@@ -332,7 +332,7 @@ export class UI {
             siteModalTitle: document.getElementById('site-modal-title'),
             siteModalDescription: document.getElementById('site-modal-description'),
             siteOptions: document.getElementById('site-options'),
-            siteCloseBtn: document.getElementById('site-close-btn'),
+            siteCloseBtn: document.getElementById('site-close'),
             levelUpModal: document.getElementById('level-up-modal'),
             newLevelDisplay: document.getElementById('new-level-display'),
             skillChoices: document.getElementById('skill-choices'),

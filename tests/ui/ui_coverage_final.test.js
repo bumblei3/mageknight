@@ -203,8 +203,10 @@ describe('UI Coverage Final', () => {
             const options = [{ label: 'Action', enabled: true, action: successAction }];
             ui.renderSiteOptions(options);
 
-            const btn = document.querySelector('.btn-secondary');
-            if (btn) btn.click();
+            // A single direct-action option becomes the primary CTA (btn btn-primary)
+            const btn = document.querySelector('.btn-primary');
+            expect(btn).not.toBeNull();
+            btn.click();
             expect(successAction.called).toBe(true);
             expect(ui.elements.siteModal.classList.contains('active')).toBe(false);
         });
@@ -214,8 +216,10 @@ describe('UI Coverage Final', () => {
             const options = [{ label: 'Action', enabled: true, action: failAction }];
             ui.renderSiteOptions(options);
 
-            const btn = document.querySelector('.btn-secondary');
-            if (btn) btn.click();
+            // A single direct-action option becomes the primary CTA (btn btn-primary)
+            const btn = document.querySelector('.btn-primary');
+            expect(btn).not.toBeNull();
+            btn.click();
             expect(failAction.called).toBe(true);
             expect(ui.notifications.toastContainer.children.length).toBeGreaterThan(0);
         });

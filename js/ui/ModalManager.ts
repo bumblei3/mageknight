@@ -318,4 +318,67 @@ export class ModalManager {
 
         el.eventModal!.classList.add('active');
     }
+
+    /**
+     * Show game-over defeat overlay.
+     */
+    public showDefeatOverlay(enemyName: string, message?: string): void {
+        const el = this.elements;
+        if (!el.gameOverDefeatModal) return;
+
+        const msgEl = el.gameOverDefeatMessage;
+        if (msgEl) {
+            msgEl.textContent = message || `Dein Held wurde von ${enemyName} besiegt.`;
+        }
+
+        const statsEl = el.gameOverDefeatStats;
+        if (statsEl && this.ui.game) {
+            const h = this.ui.game.hero;
+            const stats = [
+                `Stufe: ${h?.level ?? '?'}`,
+                `HP: ${h?.currentHealth ?? h?.maxHealth ?? '?'} / ${h?.maxHealth ?? '?'}`,
+                `Rüstung: ${h?.armor ?? '?'}`,
+            ].filter(Boolean).join(' · ');
+            statsEl.textContent = stats;
+        }
+
+        el.gameOverDefeatModal.classList.add('active');
+    }
+
+    /**
+     * Show victory overlay after scenario completion.
+     */
+    public showVictoryOverlay(message = '', stats?: { totalEnemies?: number; totalSites?: number }): void {
+        const el = this.elements;
+        if (!el.gameOverVictoryModal) return;
+
+        const msgEl = el.gameOverVictoryMessage;
+        if (msgEl) {
+            msgEl.textContent = message;
+        }
+
+        const statsEl = el.gameOverVictoryStats;
+        if (statsEl && this.ui.game && stats) {
+            const h = this.ui.game.hero;
+            const parts = [
+                `Stufe: ${h?.level ?? '?'}`,
+                `HP: ${h?.currentHealth ?? h?.maxHealth ?? '?'} / ${h?.maxHealth ?? '?'}`,
+                `Rüstung: ${h?.armor ?? '?'}`,
+            ];
+            if (stats.totalEnemies !== undefined) parts.push(`Feinde besiegt: ${stats.totalEnemies}`);
+            if (stats.totalSites !== undefined) parts.push(`Orte erobert: ${stats.totalSites}`);
+            statsEl.textContent = parts.join(' · ');
+        }
+
+        el.gameOverVictoryModal.classList.add('active');
+    }
+
+    /**
+     * Hide both game-over overlays.
+     */
+    public hideGameOverOverlays(): void {
+        const el = this.elements;
+        el.gameOverDefeatModal?.classList.remove('active');
+        el.gameOverVictoryModal?.classList.remove('active');
+    }
 }

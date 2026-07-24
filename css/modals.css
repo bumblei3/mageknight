@@ -1144,3 +1144,104 @@ input:checked+.slider:before {
     display: flex;
     justify-content: center;
 }
+
+/* ========================================
+   GAME-OVER OVERLAYS
+   ======================================== */
+
+#game-over-defeat-modal,
+#game-over-victory-modal {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.game-over-content {
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    padding: 2.5rem 2rem;
+    border-radius: var(--radius-lg, 12px);
+    animation: game-over-slide-in 0.5s ease-out;
+}
+
+@keyframes game-over-slide-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.game-over-defeat .game-over-content {
+    background: linear-gradient(135deg, rgba(30, 10, 10, 0.98), rgba(20, 5, 5, 0.98));
+    border: 2px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.15);
+}
+
+.game-over-victory .game-over-content {
+    background: linear-gradient(135deg, rgba(10, 20, 10, 0.98), rgba(5, 15, 10, 0.98));
+    border: 2px solid rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 40px rgba(251, 191, 36, 0.15);
+}
+
+.game-over-icon {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    animation: game-over-icon-bounce 0.6s ease-out;
+}
+
+@keyframes game-over-icon-bounce {
+    0% {
+        transform: scale(0) rotate(-20deg);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.2) rotate(5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+.game-over-title {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0.5rem 0 1rem;
+    color: var(--color-text-primary);
+}
+
+.game-over-defeat .game-over-title {
+    color: #ef4444;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.game-over-victory .game-over-title {
+    color: #fbbf24;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+.game-over-message {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.game-over-stats {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+}
+
+.game-over-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}

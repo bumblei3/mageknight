@@ -205,7 +205,11 @@ export function createMockUI() {
             showTooltip: createSpy(),
             showCardTooltip: createSpy(),
             showSiteTooltip: createSpy(),
-            showStatTooltip: createSpy()
+            showStatTooltip: createSpy(),
+            showGameOverDefeat: createSpy(),
+            showGameOverVictory: createSpy(),
+            restartScenario: vi.fn(() => Promise.resolve()),
+            stopGame: vi.fn(() => Promise.resolve())
         }
     };
 }

@@ -163,6 +163,8 @@ describe('CombatOrchestrator - Coverage Boost', () => {
         mockUI.elements.playedCards = { getBoundingClientRect: () => ({ top: 0, left: 0, right: 100, bottom: 100 }) };
         mockUI.showCombatPanel = vi.fn();
         mockUI.hideCombatPanel = vi.fn();
+        mockUI.showGameOverDefeat = vi.fn();
+        mockUI.showGameOverVictory = vi.fn();
         mockUI.updateCombatInfo = vi.fn();
         mockUI.updateCombatTotals = vi.fn();
         mockUI.renderUnitsInCombat = vi.fn();
@@ -916,6 +918,7 @@ describe('CombatOrchestrator - Coverage Boost', () => {
             
             expect(mockGame.addLog).toHaveBeenCalledWith(expect.stringContaining('Niederlage'), 'error');
             expect(mockUI.hideCombatPanel).toHaveBeenCalled();
+            expect(mockUI.showGameOverDefeat).toHaveBeenCalledWith('Boss', expect.stringContaining('Boss'));
         });
 
         it('handles retreat (no victory, no defeat)', () => {

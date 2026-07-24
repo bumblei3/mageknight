@@ -119,16 +119,27 @@ export class CombatUIManager {
             info.insertBefore(totalsDiv, info.firstChild);
         }
 
+        const combat = this.ui?.game?.combat;
+        let blockNeeded = 0;
+        if (combat && phase === COMBAT_PHASES.BLOCK) {
+            (combat.enemies || []).forEach((e: any) => {
+                if (combat.blockedEnemies?.has(e.id)) return;
+                blockNeeded +=
+                    typeof e.getBlockRequirement === 'function' ? e.getBlockRequirement() : e.attack || 0;
+            });
+        }
+
         let html = '<div class="combat-totals-row">';
 
         if (phase === COMBAT_PHASES.BLOCK) {
-            html += `<div class="total-stat block-stat">
-                <div class="total-label">Total Block</div>
-                <div class="total-value">${blockTotal}</div>
+            const enough = blockNeeded > 0 && blockTotal >= blockNeeded;
+            html += `<div class="total-stat block-stat ${enough ? 'total-stat--ok' : ''}">
+                <div class="total-label">${t('combat.ui.totalBlock') || 'Block'}</div>
+                <div class="total-value">${blockTotal}${blockNeeded > 0 ? `<span class="total-need">/${blockNeeded}</span>` : ''}</div>
             </div>`;
         } else if (phase === COMBAT_PHASES.ATTACK) {
             html += `<div class="total-stat attack-stat">
-                <div class="total-label">Total Attack</div>
+                <div class="total-label">${t('combat.ui.totalAttack') || 'Angriff'}</div>
                 <div class="total-value">${attackTotal}</div>
             </div>`;
         } else if (phase === COMBAT_PHASES.RANGED) {
@@ -137,11 +148,11 @@ export class CombatUIManager {
             const siegeTotal = orchestrator?.combatSiegeTotal ?? 0;
             html += `
                 <div class="total-stat ranged-stat">
-                    <div class="total-label">Fernkampf</div>
+                    <div class="total-label">${t('combat.ui.ranged') || 'Fernkampf'}</div>
                     <div class="total-value">${rangedTotal}</div>
                 </div>
                 <div class="total-stat siege-stat">
-                    <div class="total-label">Belagerung</div>
+                    <div class="total-label">${t('combat.ui.siege') || 'Belagerung'}</div>
                     <div class="total-value">${siegeTotal}</div>
                 </div>
             `;
@@ -149,51 +160,70 @@ export class CombatUIManager {
 
         html += '</div>';
 
-        // --- ADDTION: Prediction Summary ---
-        const prediction = this.ui?.game?.combat?.getPredictedOutcome(attackTotal, blockTotal);
+        // Live outcome predictor — answer "what happens if I end this phase?"
+        const prediction = combat?.getPredictedOutcome?.(attackTotal, blockTotal);
         if (prediction) {
-            html += `
-                <div class="combat-prediction">
+            const woundsLine =
+                prediction.expectedWounds > 0
+                    ? `<div class="prediction-danger">
+                        💔 <span><strong>${prediction.expectedWounds}</strong> ${
+                          t('combat.ui.woundsExpected') || 'Wunden erwartet'
+                      }</span>
+                        ${
+                            prediction.isPoisoned
+                                ? `<span class="poison-warning">${t('combat.ui.poison') || '+ GIFT!'}</span>`
+                                : ''
+                        }
+                     </div>`
+                    : // Show "safe" whenever no wounds are predicted (any phase)
+                      `<div class="prediction-safe">✅ ${t('combat.ui.noDamage') || 'Kein Schaden erwartet'}</div>`;
+
+            const defeatLine =
+                prediction.enemiesDefeated?.length > 0
+                    ? `<div class="prediction-success">
+                        ⚔️ <strong>${t('combat.ui.defeatable') || 'Besiegbar'}:</strong> ${prediction.enemiesDefeated.join(', ')}
+                     </div>`
+                    : phase === COMBAT_PHASES.ATTACK && attackTotal > 0
+                      ? `<div class="prediction-warning">⚠️ ${
+                            t('combat.ui.notEnoughAttack') || 'Noch nicht genug Angriff für einen Kill'
+                        }</div>`
+                      : '';
+
+            const assassinLine = prediction.assassinRestriction
+                ? `<div class="prediction-warning">
+                    🗡️ <strong>${t('combat.ui.assassin') || 'Attentäter!'}</strong> ${
+                      t('combat.ui.assassinHint') || 'Schaden muss der Held nehmen.'
+                  }
+                 </div>`
+                : '';
+
+            const efficiencyLine =
+                prediction.elementalEfficiencyWarnings?.length > 0 ||
+                prediction.blockEfficiencyWarnings?.length > 0
+                    ? (() => {
+                          const elemWarn = (prediction.elementalEfficiencyWarnings || [])
+                              .map((w: string) => `<span class="efficiency-warning">⚡ ${w}</span>`)
+                              .join('');
+                          const blockWarn = (prediction.blockEfficiencyWarnings || [])
+                              .map((w: string) => `<span class="efficiency-warning">🛡️ ${w}</span>`)
+                              .join('');
+                          return `<div class="prediction-efficiency">${elemWarn}${blockWarn}</div>`;
+                      })()
+                    : '';
+
+            if (woundsLine || defeatLine || assassinLine || efficiencyLine) {
+                html += `
+                <div class="combat-prediction" role="status" aria-live="polite">
+                    <div class="prediction-heading">${t('combat.ui.prediction') || 'Vorschau'}</div>
                     <div class="prediction-details">
-                        ${
-                            prediction.expectedWounds > 0
-                                ? `<div class="prediction-danger">
-                                💔 <span><strong>${prediction.expectedWounds}</strong> Wunden erwartet</span>
-                                ${prediction.isPoisoned ? '<span class="poison-warning">+ GIFT!</span>' : ''}
-                             </div>`
-                                : '<div class="prediction-safe">✅ Kein Schaden erwartet</div>'
-                        }
-                        ${
-                            prediction.enemiesDefeated.length > 0
-                                ? `<div class="prediction-success">
-                                ⚔️ <strong>Besiegbar:</strong> ${prediction.enemiesDefeated.join(', ')}
-                             </div>`
-                                : ''
-                        }
-                        ${
-                            prediction.assassinRestriction
-                                ? `<div class="prediction-warning">
-                                🗡️ <strong>Attentäter!</strong> Schaden muss vom Helden genommen werden.
-                             </div>`
-                                : ''
-                        }
-                        ${
-                            prediction.elementalEfficiencyWarnings?.length > 0 ||
-                            prediction.blockEfficiencyWarnings?.length > 0
-                                ? (() => {
-                                      const elemWarn = (prediction.elementalEfficiencyWarnings || [])
-                                          .map((w: string) => `<span class="efficiency-warning">⚡ ${w}</span>`)
-                                          .join('');
-                                      const blockWarn = (prediction.blockEfficiencyWarnings || [])
-                                          .map((w: string) => `<span class="efficiency-warning">🛡️ ${w}</span>`)
-                                          .join('');
-                                      return `<div class="prediction-efficiency">${elemWarn}${blockWarn}</div>`;
-                                  })()
-                                : ''
-                        }
+                        ${woundsLine}
+                        ${defeatLine}
+                        ${assassinLine}
+                        ${efficiencyLine}
                     </div>
                 </div>
             `;
+            }
         }
 
         totalsDiv!.innerHTML = html;
@@ -230,6 +260,24 @@ export class CombatUIManager {
                 executeAttackBtn.setAttribute('aria-label', text);
             }
         }
+    }
+
+    /** Whether a trait should be highlighted as "matters now" in the current phase */
+    private isTraitRelevantInPhase(traitKey: string, phase: string): boolean {
+        const p = String(phase || '').toLowerCase();
+        const map: Record<string, string[]> = {
+            fortified: [COMBAT_PHASES.RANGED, 'ranged'],
+            swift: [COMBAT_PHASES.BLOCK, 'block'],
+            brutal: [COMBAT_PHASES.BLOCK, COMBAT_PHASES.DAMAGE, 'block', 'damage'],
+            poison: [COMBAT_PHASES.BLOCK, COMBAT_PHASES.DAMAGE, 'block', 'damage'],
+            assassin: [COMBAT_PHASES.DAMAGE, 'damage'],
+            cumbersome: [COMBAT_PHASES.BLOCK, 'block'],
+            paralyze: [COMBAT_PHASES.DAMAGE, 'damage'],
+            vampiric: [COMBAT_PHASES.DAMAGE, 'damage'],
+            elusive: [COMBAT_PHASES.ATTACK, COMBAT_PHASES.BLOCK, 'attack', 'block'],
+            summoner: [COMBAT_PHASES.RANGED, COMBAT_PHASES.BLOCK, 'ranged', 'block']
+        };
+        return (map[traitKey] || []).includes(p);
     }
 
     /**
@@ -335,10 +383,19 @@ export class CombatUIManager {
         }
 
         const blockBadge =
-            phase === COMBAT_PHASES.BLOCK && !isBlocked ? `<div class="block-badge">Benötigt: ${blockReq}</div>` : '';
+            phase === COMBAT_PHASES.BLOCK && !isBlocked
+                ? `<div class="block-badge">${t('combat.ui.needsBlock') || 'Benötigt'}: ${blockReq}</div>`
+                : '';
 
-        // const fortifiedBadge = (phase === COMBAT_PHASES.RANGED && enemy.fortified && !isBlocked) ?
-        //     '<div class="fortified-badge">BEFESTIGT</div>' : '';
+        const phaseNorm = String(phase || '').toLowerCase();
+        const traitChip = (key: string, icon: string, active: boolean, shortLabel: string) => {
+            if (!active) return '';
+            const phaseRelevant = this.isTraitRelevantInPhase(key, phaseNorm);
+            return `<span class="trait-chip${phaseRelevant ? ' trait-chip--active' : ''}" data-tooltip-type="ability" data-tooltip-key="${key}" title="">
+                <span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="${key}">${icon}</span>
+                <span class="trait-chip-label">${shortLabel}</span>
+            </span>`;
+        };
 
         el.innerHTML = `
             <div class="enemy-icon" style="color: ${enemy.color}">
@@ -346,28 +403,28 @@ export class CombatUIManager {
             </div>
             <div class="enemy-details">
                 <div class="enemy-name">
-                    ${isBlocked ? '<span class="blocked-label">[GEBLOCKT]</span><br>' : ''}
+                    ${isBlocked ? `<span class="blocked-label">[${t('combat.ui.blocked') || 'GEBLOCKT'}]</span><br>` : ''}
                     ${enemy.name}
                 </div>
                 <div class="enemy-stats">
-                    <div class="stat" title="Rüstung">🛡️ ${enemy.armor}</div>
-                    <div class="stat" title="Angriff">
+                    <div class="stat" title="${t('ui.labels.armor') || 'Rüstung'}">🛡️ ${enemy.armor}</div>
+                    <div class="stat" title="${t('combat.ui.attack') || 'Angriff'}">
                         <span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="${attackType}">${typeIcon}</span> <span>${attackValue}</span>
                     </div>
                 </div>
                 ${bossHealthHTML}
                 <div class="enemy-traits">
-                    ${enemy.fortified ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="fortified">🏰</span>' : ''}
-                    ${enemy.swift ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="swift">💨</span>' : ''}
-                    ${enemy.poison ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="poison">🤢</span>' : ''}
-                    ${enemy.vampiric ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="vampiric">🧛</span>' : ''}
-                    ${enemy.brutal ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="brutal">👹</span>' : ''}
-                    ${enemy.paralyze ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="paralyze">⚡</span>' : ''}
-                    ${enemy.cumbersome ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="cumbersome">🏋️</span>' : ''}
-                    ${enemy.assassin ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="assassin">🗡️</span>' : ''}
-                    ${enemy.summoner ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="summoner">🦇</span>' : ''}
-                    ${enemy.elusive ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="elusive">👤</span>' : ''}
-                    ${enemy.isBoss ? '<span class="ability-icon" data-tooltip-type="ability" data-tooltip-key="boss">👑</span>' : ''}
+                    ${traitChip('fortified', '🏰', !!enemy.fortified, t('combat.traits.fortifiedShort') || 'nur Belagerung')}
+                    ${traitChip('swift', '💨', !!enemy.swift, t('combat.traits.swiftShort') || '2× Block')}
+                    ${traitChip('poison', '🤢', !!enemy.poison, t('combat.traits.poisonShort') || 'Gift-Wunden')}
+                    ${traitChip('vampiric', '🧛', !!enemy.vampiric, t('combat.traits.vampiricShort') || '+Rüstung')}
+                    ${traitChip('brutal', '👹', !!enemy.brutal, t('combat.traits.brutalShort') || '2× Schaden')}
+                    ${traitChip('paralyze', '⚡', !!enemy.paralyze, t('combat.traits.paralyzeShort') || 'Lähmung')}
+                    ${traitChip('cumbersome', '🏋️', !!enemy.cumbersome, t('combat.traits.cumbersomeShort') || 'MP senkt Block')}
+                    ${traitChip('assassin', '🗡️', !!enemy.assassin, t('combat.traits.assassinShort') || 'nur Held')}
+                    ${traitChip('summoner', '🦇', !!enemy.summoner, t('combat.traits.summonerShort') || 'ruft herbei')}
+                    ${traitChip('elusive', '👤', !!enemy.elusive, t('combat.traits.elusiveShort') || 'hohe Rüstung')}
+                    ${traitChip('boss', '👑', !!enemy.isBoss, t('combat.traits.bossShort') || 'Boss')}
                 </div>
             </div>
             ${blockBadge}

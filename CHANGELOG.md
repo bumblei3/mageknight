@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unpassende Phasen-Karten werden gedimmt mit Tooltip-Grund; Wunden disabled
 - **Effekt-Icons** auf Handkarten (👣⚔️🛡️💬💚) für schnelles Scannen
 - i18n-Keys `ui.coach.*` und `ui.cardReasons.*` (de/en)
+- **Intuition-P0:** Live-Kampfvorschau (Block have/need, Wunden, Besiegbar)
+- **Trait-Chips** mit Kurztext + Phasen-Highlight (z. B. 💨 2× Block in Block-Phase)
+- **Hex-Bewegungskosten** auf erreichbaren Feldern; **rote Hexes** = Kampf startet
+- **Auto-Skip leerer Fernkampf-Phase** wenn keine Fern-/Belagerungskarten
+- Coach nutzt Live-Zahlen: `Block 3/8 · sonst 2 Wunden`, `Angriff 5 — besiegbar: …`
+- **Intuition-P1:** Coach klickbar (highlightet Karten/Buttons oder führt Phase fort)
+- **Card-Play-Preview:** eine Zeile Effekt + Stark/Mana auf der Handkarte
+- **Smart End Turn:** Warnungen bei restlichen MP, Heilung, Site, Move-Karten
 
 ### Fixed
 - Action-Bar Kampf-Aktionen erkannten Phasen in falscher Großschreibung

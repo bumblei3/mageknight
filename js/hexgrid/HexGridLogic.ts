@@ -146,10 +146,19 @@ export class HexGridLogic {
         return cost;
     }
 
-    getReachableHexes(startPos: HexUtils.HexCoord, movementPoints: number, isDay: boolean, hasFlight: boolean = false): HexUtils.HexCoord[] {
+    /**
+     * Reachable hexes from start within movementPoints.
+     * Each result includes path `cost` so the UI can show movement cost on the map.
+     */
+    getReachableHexes(
+        startPos: HexUtils.HexCoord,
+        movementPoints: number,
+        isDay: boolean,
+        hasFlight: boolean = false
+    ): Array<HexUtils.HexCoord & { cost: number }> {
         if (!startPos) return [];
 
-        const reachable: HexUtils.HexCoord[] = [];
+        const reachable: Array<HexUtils.HexCoord & { cost: number }> = [];
         const queue = [{ q: startPos.q, r: startPos.r, cost: 0 }];
         const visited = new Map<string, number>();
         visited.set(this.getHexKey(startPos.q, startPos.r), 0);
@@ -158,7 +167,7 @@ export class HexGridLogic {
             const current = queue.shift()!;
 
             if (current.q !== startPos.q || current.r !== startPos.r) {
-                reachable.push({ q: current.q, r: current.r });
+                reachable.push({ q: current.q, r: current.r, cost: current.cost });
             }
 
             for (const neighbor of this.getNeighbors(current.q, current.r)) {

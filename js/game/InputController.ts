@@ -1,6 +1,8 @@
 /**
  * Handles user input (keyboard, mouse, UI buttons)
  */
+import { confirmEndTurnIfNeeded } from '../ui/endTurnGuard.js';
+
 export class InputController {
     private game: any;
     private canvas: HTMLCanvasElement;
@@ -19,9 +21,7 @@ export class InputController {
         if (this.game.ui.elements.endTurnBtn) {
             this.game.ui.elements.endTurnBtn.addEventListener('click', () => {
                 if (this.isUIBlocked()) return;
-                if (this.game.hero.movementPoints > 0 || this.game.hero.hand.length > 0) {
-                    if (!confirm('Zug beenden? Du hast noch verfügbare Aktionen.')) return;
-                }
+                if (!confirmEndTurnIfNeeded(this.game)) return;
                 this.game.turnManager.endTurn();
             }, { signal });
         }
@@ -258,9 +258,7 @@ export class InputController {
 
                 switch (action) {
                     case 'END_TURN':
-                        if (this.game.hero.movementPoints > 0 || this.game.hero.hand.length > 0) {
-                            if (!confirm('Zug beenden? Du hast noch verfügbare Aktionen.')) return;
-                        }
+                        if (!confirmEndTurnIfNeeded(this.game)) return;
                         this.game.turnManager.endTurn();
                         e.preventDefault();
                         break;

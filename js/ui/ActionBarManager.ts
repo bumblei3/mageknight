@@ -1,10 +1,12 @@
 /**
  * Contextual Action Bar + Coach Strip
  * One prioritized "what now?" message, combat phase stepper, action buttons.
+ * Coach is clickable: highlights the suggested target (cards / buttons / board).
  */
 import { t } from '../i18n/index.js';
 import { eventBus } from '../eventBus.js';
 import { COMBAT_PHASES, GAME_EVENTS } from '../constants.js';
+import { confirmEndTurnIfNeeded } from './endTurnGuard.js';
 
 interface ActionButton {
     id: string;
@@ -19,10 +21,27 @@ interface ActionButton {
     order?: number;
 }
 
+/** What happens when the player clicks the coach strip */
+export type CoachAction =
+    | 'highlight-cards-block'
+    | 'highlight-cards-attack'
+    | 'highlight-cards-ranged'
+    | 'highlight-cards-move'
+    | 'highlight-end-turn'
+    | 'highlight-heal'
+    | 'highlight-rest'
+    | 'highlight-visit'
+    | 'highlight-board'
+    | 'advance-ranged'
+    | 'advance-block'
+    | 'execute-attack'
+    | 'none';
+
 interface CoachMessage {
     text: string;
     icon?: string;
     tone?: 'info' | 'combat' | 'warn' | 'success';
+    action?: CoachAction;
 }
 
 export class ActionBarManager {
@@ -34,6 +53,8 @@ export class ActionBarManager {
     private registeredActions: Map<string, ActionButton> = new Map();
     private firstTimeHints: Map<string, boolean> = new Map();
     private currentPhase: string = 'exploration';
+    private lastCoachAction: CoachAction = 'none';
+    private coachClickBound = false;
 
     constructor(game: any) {
         this.game = game;
@@ -218,7 +239,10 @@ export class ActionBarManager {
             icon: '⏭️',
             shortcut: 'Space',
             primary: true,
-            onClick: () => this.game.endTurn?.(),
+            onClick: () => {
+                if (!confirmEndTurnIfNeeded(this.game)) return;
+                this.game.endTurn?.();
+            },
             showCondition: () =>
                 !this.game.combat && !this.game.movementMode && this.game.canEndTurn !== false,
             order: 100
@@ -298,57 +322,137 @@ export class ActionBarManager {
     getCoachMessage(): CoachMessage {
         if (this.game.movementMode) {
             const mp = this.game.hero?.movementPoints ?? 0;
+            const dangerHex = (this.game.reachableHexes || []).find((h: any) => h?.danger);
+            if (dangerHex) {
+                return {
+                    icon: '⚔️',
+                    text:
+                        t('ui.coach.movementCombat', {
+                            points: mp,
+                            enemy: dangerHex.enemyName || t('ui.coach.enemyFallback') || 'Feind'
+                        }) ||
+                        `Bewegung (${mp} MP) — rote Hexes starten Kampf`,
+                    tone: 'warn',
+                    action: 'highlight-board'
+                };
+            }
             return {
                 icon: '👣',
-                text: t('ui.coach.movement', { points: mp }) || `Bewegung: klicke ein erreichbares Hex (${mp} MP)`,
-                tone: 'info'
+                text:
+                    t('ui.coach.movement', { points: mp }) ||
+                    `Bewegung: klicke ein erreichbares Hex (${mp} MP) · Zahl = Kosten`,
+                tone: 'info',
+                action: 'highlight-board'
             };
         }
 
         if (this.game.combat) {
             const phase = this.combatPhase();
+            const orch = this.game.combatOrchestrator;
+            const combat = this.game.combat;
+
             if (phase === COMBAT_PHASES.RANGED || phase === 'ranged') {
+                const fortified = (combat.enemies || []).some((e: any) => e.fortified);
+                const hasRanged = this.handHasRanged();
                 return {
                     icon: '🏹',
-                    text:
-                        t('ui.coach.ranged') ||
-                        'Fernkampf: Belagerungs-/Fernkarten spielen oder Phase überspringen',
-                    tone: 'combat'
+                    text: fortified
+                        ? t('ui.coach.rangedFortified') ||
+                          'Fernkampf: 🏰 Befestigt braucht Belagerung — sonst Phase überspringen'
+                        : t('ui.coach.ranged') ||
+                          'Fernkampf: Fern-/Belagerungskarten oder Phase überspringen',
+                    tone: 'combat',
+                    action: hasRanged ? 'highlight-cards-ranged' : 'advance-ranged'
                 };
             }
             if (phase === COMBAT_PHASES.BLOCK || phase === 'block') {
+                const blockHave = orch?.combatBlockTotal ?? 0;
+                let blockNeed = 0;
+                let swift = false;
+                (combat.enemies || []).forEach((e: any) => {
+                    if (combat.blockedEnemies?.has(e.id)) return;
+                    blockNeed +=
+                        typeof e.getBlockRequirement === 'function' ? e.getBlockRequirement() : e.attack || 0;
+                    if (e.swift) swift = true;
+                });
+                const prediction = combat.getPredictedOutcome?.(orch?.combatAttackTotal ?? 0, blockHave);
+                const wounds = prediction?.expectedWounds ?? 0;
+                if (blockNeed > 0) {
+                    const outcome =
+                        wounds > 0
+                            ? t('ui.coach.blockWounds', { wounds }) || ` · sonst ${wounds} Wunden`
+                            : t('ui.coach.blockSafe') || ' · sicher';
+                    const enough = blockHave >= blockNeed;
+                    return {
+                        icon: '🛡️',
+                        text:
+                            t('ui.coach.blockProgress', {
+                                have: blockHave,
+                                need: blockNeed,
+                                swift: swift ? t('ui.coach.swiftNote') || ' · 💨 2× Block' : '',
+                                outcome
+                            }) ||
+                            `Block ${blockHave}/${blockNeed}${swift ? ' · 💨 2×' : ''}${outcome}`,
+                        tone: enough ? 'success' : 'combat',
+                        action: enough ? 'advance-block' : 'highlight-cards-block'
+                    };
+                }
                 return {
                     icon: '🛡️',
                     text:
                         t('ui.coach.block') ||
-                        'Block-Phase: spiele blaue/Block-Karten, dann Block beenden',
-                    tone: 'combat'
+                        'Block-Phase: spiele Block-Karten, dann Block beenden',
+                    tone: 'combat',
+                    action: 'highlight-cards-block'
                 };
             }
             if (phase === COMBAT_PHASES.DAMAGE || phase === 'damage') {
                 return {
                     icon: '💔',
                     text: t('ui.coach.damage') || 'Schaden wird verrechnet…',
-                    tone: 'warn'
+                    tone: 'warn',
+                    action: 'none'
                 };
             }
             if (phase === COMBAT_PHASES.ATTACK || phase === 'attack') {
+                const attackHave = orch?.combatAttackTotal ?? 0;
+                const prediction = combat.getPredictedOutcome?.(attackHave, 0);
+                const defeated = prediction?.enemiesDefeated || [];
+                if (defeated.length > 0) {
+                    return {
+                        icon: '⚔️',
+                        text:
+                            t('ui.coach.attackCanDefeat', {
+                                attack: attackHave,
+                                names: defeated.join(', ')
+                            }) || `Angriff ${attackHave} — besiegbar: ${defeated.join(', ')}`,
+                        tone: 'success',
+                        action: 'execute-attack'
+                    };
+                }
                 return {
                     icon: '⚔️',
                     text:
-                        t('ui.coach.attack') ||
-                        'Angriff: spiele rote/Angriffskarten, dann Angriff ausführen',
-                    tone: 'combat'
+                        t('ui.coach.attackProgress', { attack: attackHave }) ||
+                        `Angriff ${attackHave} — spiele Angriffskarten, dann ausführen`,
+                    tone: 'combat',
+                    action: this.handHasEffect('attack') ? 'highlight-cards-attack' : 'execute-attack'
                 };
             }
             if (phase === COMBAT_PHASES.COMPLETE || phase === 'complete') {
                 return {
                     icon: '✓',
                     text: t('ui.coach.combatEnd') || 'Kampf vorbei — beenden',
-                    tone: 'success'
+                    tone: 'success',
+                    action: 'execute-attack'
                 };
             }
-            return { icon: '⚔️', text: t('ui.coach.combat') || 'Kampf läuft', tone: 'combat' };
+            return {
+                icon: '⚔️',
+                text: t('ui.coach.combat') || 'Kampf läuft',
+                tone: 'combat',
+                action: 'none'
+            };
         }
 
         // Healing available
@@ -356,7 +460,8 @@ export class ActionBarManager {
             return {
                 icon: '💚',
                 text: t('ui.coach.heal') || 'Du hast Heilung — nutze „Heilen“',
-                tone: 'success'
+                tone: 'success',
+                action: 'highlight-heal'
             };
         }
 
@@ -364,7 +469,8 @@ export class ActionBarManager {
             return {
                 icon: '🏛️',
                 text: t('ui.coach.site') || 'Du stehst an einem Ort — besuchen/erkunden',
-                tone: 'info'
+                tone: 'info',
+                action: 'highlight-visit'
             };
         }
 
@@ -375,17 +481,30 @@ export class ActionBarManager {
                 text:
                     t('ui.coach.hasMp', { points: mp }) ||
                     `${mp} Bewegungspunkte — klicke ein erreichbares Hex`,
-                tone: 'info'
+                tone: 'info',
+                action: 'highlight-board'
             };
         }
 
-        if (this.handHasEffect('movement') || this.handHasEffect('attack') || this.hasPlayableCard()) {
+        if (this.handHasEffect('movement')) {
             return {
                 icon: '🎴',
                 text:
                     t('ui.coach.playCards') ||
                     'Spiele Karten: 🟢 Bewegung · 🔴 Angriff · 🔵 Block · Rechtsklick = seitlich',
-                tone: 'info'
+                tone: 'info',
+                action: 'highlight-cards-move'
+            };
+        }
+
+        if (this.handHasEffect('attack') || this.hasPlayableCard()) {
+            return {
+                icon: '🎴',
+                text:
+                    t('ui.coach.playCards') ||
+                    'Spiele Karten: 🟢 Bewegung · 🔴 Angriff · 🔵 Block · Rechtsklick = seitlich',
+                tone: 'info',
+                action: 'highlight-cards-attack'
             };
         }
 
@@ -393,15 +512,125 @@ export class ActionBarManager {
             return {
                 icon: '🏕️',
                 text: t('ui.coach.rest') || 'Wunden? Rasten heilt und erneuert die Hand',
-                tone: 'warn'
+                tone: 'warn',
+                action: 'highlight-rest'
             };
         }
 
         return {
             icon: '⏭️',
             text: t('ui.coach.endTurn') || 'Keine weiteren Züge? Zug beenden für neue Karten',
-            tone: 'info'
+            tone: 'info',
+            action: 'highlight-end-turn'
         };
+    }
+
+    private handHasRanged(): boolean {
+        const hand = this.game.hero?.hand || [];
+        return hand.some((c: any) => {
+            if (!c || c.isWound?.()) return false;
+            const b = c.basicEffect || {};
+            const s = c.strongEffect || {};
+            return !!(b.ranged || s.ranged || b.siege || s.siege);
+        });
+    }
+
+    /**
+     * Coach click → focus the recommended UI (or advance phase if already ready).
+     */
+    handleCoachClick(): void {
+        const action = this.lastCoachAction || this.getCoachMessage().action || 'none';
+        switch (action) {
+            case 'highlight-cards-block':
+                this.pulseRelevantCards('block');
+                break;
+            case 'highlight-cards-attack':
+                this.pulseRelevantCards('attack');
+                break;
+            case 'highlight-cards-ranged':
+                this.pulseRelevantCards('ranged');
+                break;
+            case 'highlight-cards-move':
+                this.pulseRelevantCards('move');
+                break;
+            case 'highlight-end-turn':
+                this.pulseElement(
+                    document.getElementById('action-bar-end-turn') ||
+                        document.querySelector('[data-action-id="end-turn"]')
+                );
+                break;
+            case 'highlight-heal':
+                this.pulseElement(
+                    document.getElementById('action-bar-heal') ||
+                        document.querySelector('[data-action-id="heal"]') ||
+                        this.game.ui?.elements?.healBtn
+                );
+                break;
+            case 'highlight-rest':
+                this.pulseElement(
+                    document.querySelector('[data-action-id="rest"]') || this.game.ui?.elements?.restBtn
+                );
+                break;
+            case 'highlight-visit':
+                this.pulseElement(
+                    document.querySelector('[data-action-id="visit"]') ||
+                        document.getElementById('visit-btn')
+                );
+                break;
+            case 'highlight-board':
+                this.pulseElement(document.getElementById('game-board') || this.game.canvas);
+                if (!this.game.movementMode && (this.game.hero?.movementPoints ?? 0) > 0) {
+                    this.game.actionManager?.enterMovementMode?.();
+                }
+                break;
+            case 'advance-ranged':
+                this.game.combatOrchestrator?.endRangedPhase?.();
+                break;
+            case 'advance-block':
+                this.game.combatOrchestrator?.endBlockPhase?.();
+                break;
+            case 'execute-attack':
+                this.game.combatOrchestrator?.executeAttackAction?.();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private pulseRelevantCards(kind: 'block' | 'attack' | 'ranged' | 'move'): void {
+        const handRoot = document.getElementById('hand-cards');
+        if (!handRoot) return;
+        const cards = handRoot.querySelectorAll('.mk-card');
+        const hand = this.game.hero?.hand || [];
+        cards.forEach((el, index) => {
+            const card = hand[index];
+            if (!card || card.isWound?.()) return;
+            const b = card.basicEffect || {};
+            const s = card.strongEffect || {};
+            let match = false;
+            if (kind === 'block') match = !!(b.block || s.block);
+            if (kind === 'attack')
+                match = !!(b.attack || s.attack || b.ranged || s.ranged || b.siege || s.siege);
+            if (kind === 'ranged') match = !!(b.ranged || s.ranged || b.siege || s.siege);
+            if (kind === 'move') match = !!(b.movement || s.movement);
+            if (match) {
+                el.classList.add('mk-card--coach-pulse');
+                setTimeout(() => el.classList.remove('mk-card--coach-pulse'), 1600);
+            }
+        });
+        // Scroll first relevant into view
+        const first = handRoot.querySelector('.mk-card--coach-pulse, .mk-card--relevant');
+        if (first && 'scrollIntoView' in first) {
+            (first as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    private pulseElement(el: Element | null | undefined): void {
+        if (!el) return;
+        const htmlEl = el as HTMLElement;
+        htmlEl.classList.add('coach-target-pulse');
+        htmlEl.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => htmlEl.classList.remove('coach-target-pulse'), 1600);
     }
 
     // First-time hint system
@@ -503,8 +732,23 @@ export class ActionBarManager {
     private renderCoach(): void {
         if (!this.coachStrip) return;
         const msg = this.getCoachMessage();
-        this.coachStrip.className = `coach-strip coach-strip--${msg.tone || 'info'}`;
+        this.lastCoachAction = msg.action || 'none';
+        const clickable = this.lastCoachAction !== 'none';
+
+        this.coachStrip.className = `coach-strip coach-strip--${msg.tone || 'info'}${
+            clickable ? ' coach-strip--clickable' : ''
+        }`;
         this.coachStrip.innerHTML = '';
+        this.coachStrip.setAttribute('role', clickable ? 'button' : 'status');
+        this.coachStrip.setAttribute('tabindex', clickable ? '0' : '-1');
+        const hint = clickable
+            ? t('ui.coach.clickHint') || 'Klicken zum Hervorheben / Ausführen'
+            : '';
+        this.coachStrip.setAttribute(
+            'aria-label',
+            hint ? `${msg.text}. ${hint}` : msg.text
+        );
+        this.coachStrip.title = hint || msg.text;
 
         if (msg.icon) {
             const icon = document.createElement('span');
@@ -518,6 +762,25 @@ export class ActionBarManager {
         text.className = 'coach-strip-text';
         text.textContent = msg.text;
         this.coachStrip.appendChild(text);
+
+        if (clickable) {
+            const cue = document.createElement('span');
+            cue.className = 'coach-strip-cue';
+            cue.setAttribute('aria-hidden', 'true');
+            cue.textContent = '↵';
+            this.coachStrip.appendChild(cue);
+        }
+
+        if (!this.coachClickBound) {
+            this.coachClickBound = true;
+            this.coachStrip.addEventListener('click', () => this.handleCoachClick());
+            this.coachStrip.addEventListener('keydown', (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.handleCoachClick();
+                }
+            });
+        }
     }
 
     private renderPhaseStepper(): void {

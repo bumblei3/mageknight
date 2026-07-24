@@ -76,8 +76,26 @@ export class HexGrid {
         return this.logic.getReachableHexes(startPos, movementPoints, isDay, hasFlight);
     }
 
+    getPathWithinMovement(
+        startPos: HexUtils.HexCoord,
+        endPos: HexUtils.HexCoord,
+        movementPoints: number,
+        isDay: boolean,
+        hasFlight: boolean = false
+    ) {
+        return this.logic.getPathWithinMovement(startPos, endPos, movementPoints, isDay, hasFlight);
+    }
+
     findPath(start: HexUtils.HexCoord, end: HexUtils.HexCoord, isFlight: boolean = false) {
         return this.logic.findPath(start, end, isFlight);
+    }
+
+    setPathPreview(path: Array<{ q: number; r: number }>, totalCost?: number) {
+        if (this.renderer) this.renderer.setPathPreview(path, totalCost);
+    }
+
+    clearPathPreview() {
+        if (this.renderer) this.renderer.clearPathPreview();
     }
 
     getState() { return this.logic.getState(); }

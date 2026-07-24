@@ -147,6 +147,50 @@ export class HexGridLogic {
     }
 
     /**
+     * Dijkstra within movement budget.
+     * Returns reachable hexes (+cost) and cameFrom for path reconstruction.
+     */
+    private exploreMovement(
+        startPos: HexUtils.HexCoord,
+        movementPoints: number,
+        isDay: boolean,
+        hasFlight: boolean = false
+    ): {
+        costs: Map<string, number>;
+        cameFrom: Map<string, HexUtils.HexCoord>;
+    } {
+        const costs = new Map<string, number>();
+        const cameFrom = new Map<string, HexUtils.HexCoord>();
+        if (!startPos) return { costs, cameFrom };
+
+        const startKey = this.getHexKey(startPos.q, startPos.r);
+        costs.set(startKey, 0);
+        const queue = [{ q: startPos.q, r: startPos.r, cost: 0 }];
+
+        while (queue.length > 0) {
+            const current = queue.shift()!;
+
+            for (const neighbor of this.getNeighbors(current.q, current.r)) {
+                if (!this.hasHex(neighbor.q, neighbor.r)) continue;
+
+                const moveCost = this.getMovementCost(neighbor.q, neighbor.r, !isDay, hasFlight);
+                const totalCost = current.cost + moveCost;
+
+                if (totalCost <= movementPoints) {
+                    const key = this.getHexKey(neighbor.q, neighbor.r);
+                    if (!costs.has(key) || costs.get(key)! > totalCost) {
+                        costs.set(key, totalCost);
+                        cameFrom.set(key, { q: current.q, r: current.r });
+                        queue.push({ ...neighbor, cost: totalCost });
+                    }
+                }
+            }
+        }
+
+        return { costs, cameFrom };
+    }
+
+    /**
      * Reachable hexes from start within movementPoints.
      * Each result includes path `cost` so the UI can show movement cost on the map.
      */
@@ -158,35 +202,49 @@ export class HexGridLogic {
     ): Array<HexUtils.HexCoord & { cost: number }> {
         if (!startPos) return [];
 
+        const { costs } = this.exploreMovement(startPos, movementPoints, isDay, hasFlight);
         const reachable: Array<HexUtils.HexCoord & { cost: number }> = [];
-        const queue = [{ q: startPos.q, r: startPos.r, cost: 0 }];
-        const visited = new Map<string, number>();
-        visited.set(this.getHexKey(startPos.q, startPos.r), 0);
+        const startKey = this.getHexKey(startPos.q, startPos.r);
 
-        while (queue.length > 0) {
-            const current = queue.shift()!;
-
-            if (current.q !== startPos.q || current.r !== startPos.r) {
-                reachable.push({ q: current.q, r: current.r, cost: current.cost });
-            }
-
-            for (const neighbor of this.getNeighbors(current.q, current.r)) {
-                if (!this.hasHex(neighbor.q, neighbor.r)) continue;
-
-                const moveCost = this.getMovementCost(neighbor.q, neighbor.r, !isDay, hasFlight);
-                const totalCost = current.cost + moveCost;
-
-                if (totalCost <= movementPoints) {
-                    const key = this.getHexKey(neighbor.q, neighbor.r);
-                    if (!visited.has(key) || visited.get(key)! > totalCost) {
-                        visited.set(key, totalCost);
-                        queue.push({ ...neighbor, cost: totalCost });
-                    }
-                }
-            }
+        for (const [key, cost] of costs) {
+            if (key === startKey) continue;
+            const [q, r] = key.split(',').map(Number);
+            reachable.push({ q, r, cost });
         }
 
         return reachable;
+    }
+
+    /**
+     * Cheapest path to end within movement budget (same rules as getReachableHexes).
+     * Returns empty path if unreachable within budget.
+     */
+    getPathWithinMovement(
+        startPos: HexUtils.HexCoord,
+        endPos: HexUtils.HexCoord,
+        movementPoints: number,
+        isDay: boolean,
+        hasFlight: boolean = false
+    ): { path: HexUtils.HexCoord[]; cost: number } | null {
+        if (!startPos || !endPos) return null;
+        if (startPos.q === endPos.q && startPos.r === endPos.r) {
+            return { path: [], cost: 0 };
+        }
+
+        const { costs, cameFrom } = this.exploreMovement(startPos, movementPoints, isDay, hasFlight);
+        const endKey = this.getHexKey(endPos.q, endPos.r);
+        if (!costs.has(endKey)) return null;
+
+        const path: HexUtils.HexCoord[] = [];
+        let curKey: string | null = endKey;
+        while (curKey && curKey !== this.getHexKey(startPos.q, startPos.r)) {
+            const [q, r] = curKey.split(',').map(Number);
+            path.unshift({ q, r });
+            const parent = cameFrom.get(curKey);
+            curKey = parent ? this.getHexKey(parent.q, parent.r) : null;
+        }
+
+        return { path, cost: costs.get(endKey)! };
     }
 
     findPath(start: HexUtils.HexCoord, end: HexUtils.HexCoord, isFlight: boolean = false): HexUtils.HexCoord[] {

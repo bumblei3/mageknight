@@ -53,6 +53,8 @@ export interface CardProps {
     selected?: boolean;
     /** Show as played (in combat) */
     played?: boolean;
+    /** Can pay mana for strong effect right now (null = unknown / no strong) */
+    strongAffordable?: boolean | null;
 }
 
 /** Creates a card element */
@@ -73,7 +75,8 @@ export function createCard(props: CardProps): HTMLElement {
         dimmed = false,
         relevant = false,
         selected = false,
-        played = false
+        played = false,
+        strongAffordable = null
     } = props;
 
     // Extract card data
@@ -126,8 +129,14 @@ export function createCard(props: CardProps): HTMLElement {
         canPlaySideways,
         showSideways: compact && showSideways && canPlaySideways && !(wound ?? false),
         showManaCost: compact && showManaCost && !(wound ?? false),
-        played
+        played,
+        strongAffordable
     });
+
+    if (strongAffordable === true) wrapper.classList.add('mk-card--strong-ok');
+    if (strongAffordable === false && strongEffect && Object.keys(strongEffect).length > 0) {
+        wrapper.classList.add('mk-card--strong-no');
+    }
 
     // Event handlers
     if (!disabled) {
@@ -207,8 +216,21 @@ function buildCardHTML(params: {
     showSideways: boolean;
     showManaCost: boolean;
     played: boolean;
+    strongAffordable?: boolean | null;
 }): string {
-    const { name, color, type, basicEffect, strongEffect, wound, canPlaySideways, showSideways, showManaCost, played } = params;
+    const {
+        name,
+        color,
+        type,
+        basicEffect,
+        strongEffect,
+        wound,
+        canPlaySideways,
+        showSideways,
+        showManaCost,
+        played,
+        strongAffordable = null
+    } = params;
 
     if (wound) {
         return `
@@ -230,7 +252,11 @@ function buildCardHTML(params: {
     const typeLabel = typeLabels[type] || type;
 
     // One-line play preview: always scannable before click
-    const effects = buildPlayPreviewLines(basicEffect, strongEffect, color);
+    const effects = appendStrongAffordHint(
+        buildPlayPreviewLines(basicEffect, strongEffect, color),
+        strongAffordable,
+        color
+    );
 
     let html = '';
 
@@ -328,6 +354,22 @@ function buildPlayPreviewLines(basic: any, strong: any, color: string | null): s
         lines.push(`${manaSym[color] || '💎'} stark`);
     }
     return [...new Set(lines)].slice(0, 3);
+}
+
+function appendStrongAffordHint(
+    lines: string[],
+    strongAffordable: boolean | null | undefined,
+    color: string | null
+): string[] {
+    if (strongAffordable === null || strongAffordable === undefined) return lines;
+    if (!lines.some((l) => l.includes('Stark') || l.includes('stark'))) return lines;
+    const mark = strongAffordable ? '✓' : '✗';
+    return lines.map((l) => {
+        if (l.includes('stark') || l.includes('Stark')) {
+            return `${l} ${mark}`;
+        }
+        return l;
+    });
 }
 
 const _effectIcons: Record<string, string> = {

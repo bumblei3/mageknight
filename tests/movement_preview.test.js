@@ -18,7 +18,11 @@ describe('Movement Preview Logic', () => {
             pixelToAxial: vi.fn(),
             getHex: vi.fn(),
             hasHex: vi.fn(),
-            axialToPixel: vi.fn(() => ({ x: 0, y: 0 }))
+            axialToPixel: vi.fn(() => ({ x: 0, y: 0 })),
+            // Movement preview hooks — InteractionController calls these
+            getPathWithinMovement: vi.fn(() => null),
+            setPathPreview: vi.fn(),
+            clearPathPreview: vi.fn()
         };
 
         gameMock = {
@@ -31,6 +35,7 @@ describe('Movement Preview Logic', () => {
             timeManager: {
                 isNight: vi.fn().mockReturnValue(false)
             },
+            reachableHexes: [],
             ui: {
                 tooltipManager: {
                     hideTooltip: vi.fn(),
@@ -67,12 +72,14 @@ describe('Movement Preview Logic', () => {
         document.body.innerHTML = '';
     });
 
-    it('should show movement cost when hovering valid neighbor', () => {
-        // Setup simple returns for spies
+    it('should show movement cost when hovering a reachable hex', () => {
+        // Setup a reachable hex — the preview logic checks reachableHexes first
         hexGridMock.pixelToAxial = () => ({ q: 1, r: -1 });
         hexGridMock.getHex = () => ({ revealed: true, terrain: TERRAIN_TYPES.PLAINS });
-        hexGridMock.distance = () => 1; // Adjacent
-        hexGridMock.getMovementCost = () => 2;
+
+        // InteractionController.updateMovementPathPreview checks reachableHexes first;
+        // when there a hit with cost info, it uses that instead of getPathWithinMovement.
+        gameMock.reachableHexes = [{ q: 1, r: -1, cost: 2 }];
 
         // Simulate Mouse Move
         const event = { clientX: 100, clientY: 100 };
@@ -84,33 +91,20 @@ describe('Movement Preview Logic', () => {
 
         expect(previewEl.style.display).toBe('flex');
         expect(valueEl.textContent).toBe('2');
-        // JSDOM might not reflect var() in .style.color, limiting validation here.
-        // Code path is verified by textContent and display checks.
     });
 
     it('should show warning color if insufficient movement points', () => {
-        // Hills cost 3, have 2
+        // Hills cost 3, have 2 — reachableHexes supplies cost
         hexGridMock.pixelToAxial = () => ({ q: 1, r: -1 });
         hexGridMock.getHex = () => ({ revealed: true, terrain: TERRAIN_TYPES.HILLS });
-        hexGridMock.distance = () => 1;
-        hexGridMock.getMovementCost = () => 3;
+        gameMock.reachableHexes = [{ q: 1, r: -1, cost: 3 }];
 
         interactionController.handleCanvasMouseMove({});
 
         const valueEl = document.getElementById('movement-preview-value');
         expect(valueEl.textContent).toBe('3');
-        expect(valueEl.style.color).toBe('rgb(239, 68, 68)'); // Hex normalized to rgb
-    });
-
-    it('should hide preview if distance is not 1 (not adjacent)', () => {
-        hexGridMock.pixelToAxial = () => ({ q: 2, r: 0 }); // Far away
-        hexGridMock.getHex = () => ({ revealed: true });
-        hexGridMock.distance = () => 2;
-
-        interactionController.handleCanvasMouseMove({});
-
-        const previewEl = document.getElementById('movement-preview');
-        expect(previewEl.style.display).toBe('none');
+        // JSDOM normalizes hex colors to rgb — #ef4444 → rgb(239, 68, 68)
+        expect(valueEl.style.color).toBe('rgb(239, 68, 68)');
     });
 
     it('should hide preview if not in movement mode', () => {

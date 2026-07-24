@@ -28,6 +28,9 @@ export class HexGridRenderer {
     public hexCosts: Map<string, number>;
     /** Hexes that start combat if entered (enemy present) */
     public dangerHexes: Set<string>;
+    /** Hover path preview (ordered hexes from first step to target) */
+    public pathPreview: Array<{ q: number; r: number }>;
+    public pathPreviewCost: number | null;
     public animationFrame: number;
     public ambientLight: number;
     public heroPosition: { q: number; r: number } | null;
@@ -45,6 +48,8 @@ export class HexGridRenderer {
         this.highlightedHexes = new Set();
         this.hexCosts = new Map();
         this.dangerHexes = new Set();
+        this.pathPreview = [];
+        this.pathPreviewCost = null;
         this.animationFrame = 0;
         this.ambientLight = 1.0;
         this.heroPosition = null;
@@ -99,6 +104,17 @@ export class HexGridRenderer {
         this.highlightedHexes.clear();
         this.hexCosts.clear();
         this.dangerHexes.clear();
+        this.clearPathPreview();
+    }
+
+    setPathPreview(path: Array<{ q: number; r: number }>, totalCost?: number) {
+        this.pathPreview = path ? [...path] : [];
+        this.pathPreviewCost = typeof totalCost === 'number' ? totalCost : null;
+    }
+
+    clearPathPreview() {
+        this.pathPreview = [];
+        this.pathPreviewCost = null;
     }
 
     selectHex(q: number, r: number) {
@@ -165,6 +181,11 @@ export class HexGridRenderer {
             }
         }
 
+        // Draw path preview under entities
+        if (this.pathPreview.length > 0 && this.heroPosition) {
+            this.drawPathPreview(this.heroPosition, this.pathPreview);
+        }
+
         // Draw enemies
         enemies.forEach(enemy => {
             if (enemy.position) {
@@ -180,6 +201,64 @@ export class HexGridRenderer {
                 this.drawHeroAt(pixel.x, pixel.y);
             }
         }
+    }
+
+    /**
+     * Dashed route from hero through path hexes (hover movement preview).
+     */
+    drawPathPreview(start: { q: number; r: number }, path: Array<{ q: number; r: number }>) {
+        if (!path.length) return;
+        const points = [start, ...path].map((h) => this.axialToPixel(h.q, h.r));
+        if (points.length < 2) return;
+
+        this.ctx.save();
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.strokeStyle = 'rgba(251, 191, 36, 0.95)';
+        this.ctx.lineWidth = 3.5;
+        if (typeof this.ctx.setLineDash === 'function') {
+            this.ctx.setLineDash([8, 6]);
+        }
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+            this.ctx.lineTo(points[i].x, points[i].y);
+        }
+        this.ctx.stroke();
+        if (typeof this.ctx.setLineDash === 'function') {
+            this.ctx.setLineDash([]);
+        }
+
+        // Target marker
+        const end = points[points.length - 1];
+        this.ctx.fillStyle = 'rgba(251, 191, 36, 0.85)';
+        this.ctx.beginPath();
+        this.ctx.arc(end.x, end.y, 6, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = 'rgba(15, 23, 42, 0.9)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.stroke();
+
+        // Total cost bubble near target
+        if (this.pathPreviewCost != null) {
+            const label = String(this.pathPreviewCost);
+            this.ctx.font = 'bold 12px sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            const tw =
+                typeof this.ctx.measureText === 'function'
+                    ? this.ctx.measureText(label).width + 10
+                    : label.length * 8 + 10;
+            const bx = end.x;
+            const by = end.y - this.hexSize * 0.55;
+            this.ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+            this.ctx.fillRect(bx - tw / 2, by - 9, tw, 18);
+            this.ctx.strokeStyle = 'rgba(251, 191, 36, 0.9)';
+            this.ctx.strokeRect(bx - tw / 2, by - 9, tw, 18);
+            this.ctx.fillStyle = '#fde68a';
+            this.ctx.fillText(label, bx, by);
+        }
+        this.ctx.restore();
     }
 
     // ========== Hex Drawing ==========

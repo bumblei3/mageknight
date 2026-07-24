@@ -151,36 +151,81 @@ export class InteractionController {
             this.game.ui.tooltipManager.hideTooltip();
         }
 
-        // --- NEW: Movement Preview Logic ---
+        // --- Movement path preview (route + total cost) ---
+        this.updateMovementPathPreview(axial, hex);
+    }
+
+    /**
+     * Dashed path + cost HUD when hovering a reachable hex in movement mode.
+     */
+    updateMovementPathPreview(axial: { q: number; r: number } | null, hex: any): void {
         const previewEl = document.getElementById('movement-preview');
         const previewValueEl = document.getElementById('movement-preview-value');
+        const clearPreview = () => {
+            if (previewEl) previewEl.style.display = 'none';
+            this.game.hexGrid?.clearPathPreview?.();
+        };
 
-        if (this.game.movementMode && hex && hex.revealed) {
-            const distance = this.game.hexGrid.distance(
-                this.game.hero.position.q,
-                this.game.hero.position.r,
-                axial.q, axial.r
-            );
+        if (!this.game.movementMode || !axial || !hex?.revealed || !this.game.hero) {
+            clearPreview();
+            return;
+        }
 
-            if (distance === 1) {
-                const isNight = this.game.timeManager.isNight();
-                const cost = this.game.hexGrid.getMovementCost(axial.q, axial.r, isNight, this.game.hero.hasSkill('flight'));
+        const heroPos = this.game.hero.position;
+        const mp = this.game.hero.movementPoints ?? 0;
+        const isDay = this.game.timeManager?.isDay?.() ?? true;
+        const hasFlight = !!this.game.hero.hasSkill?.('flight');
 
-                if (previewEl && previewValueEl) {
-                    previewValueEl.textContent = cost.toString();
-                    previewEl.style.display = 'flex';
+        // Prefer annotated reachable list (includes danger), fallback to path search
+        type ReachHex = { q: number; r: number; cost?: number; danger?: boolean };
+        const reachable = (this.game.reachableHexes || []) as ReachHex[];
+        const hit: ReachHex | undefined = reachable.find((h) => h.q === axial.q && h.r === axial.r);
 
-                    if (this.game.hero.movementPoints < cost) {
-                        previewValueEl.style.color = '#ef4444';
-                    } else {
-                        previewValueEl.style.color = 'var(--color-accent-secondary)';
-                    }
-                }
-            } else if (previewEl) {
-                previewEl.style.display = 'none';
-            }
-        } else if (previewEl) {
-            previewEl.style.display = 'none';
+        const pathResult =
+            this.game.hexGrid.getPathWithinMovement?.(heroPos, axial, mp, isDay, hasFlight) || null;
+
+        if (!pathResult && !hit) {
+            clearPreview();
+            return;
+        }
+
+        const path = pathResult?.path || (hit ? [axial] : []);
+        const cost: number =
+            pathResult?.cost ??
+            (typeof hit?.cost === 'number'
+                ? hit.cost
+                : this.game.hexGrid.getMovementCost(axial.q, axial.r, !isDay, hasFlight));
+
+        this.game.hexGrid.setPathPreview?.(path, cost);
+
+        if (previewEl && previewValueEl) {
+            const danger = !!hit?.danger;
+            const steps = path.length;
+            const label =
+                steps > 1
+                    ? `${cost} (${steps})`
+                    : String(cost);
+            previewValueEl.textContent = danger ? `${label} ⚔️` : label;
+            previewEl.style.display = 'flex';
+            previewValueEl.style.color =
+                mp < cost ? '#ef4444' : danger ? '#fca5a5' : 'var(--color-accent-secondary, #fbbf24)';
+            previewEl.title = danger
+                ? `Pfad-Kosten ${cost} · Kampf startet hier`
+                : `Pfad-Kosten ${cost}${steps > 1 ? ` · ${steps} Schritte (je angrenzend klicken)` : ''}`;
+        }
+
+        // Soft re-render so path shows without full game tick
+        if (typeof this.game.render === 'function') {
+            this.game.render();
+        }
+    }
+
+    handleMouseLeave(): void {
+        this.game.hexGrid?.clearPathPreview?.();
+        const previewEl = document.getElementById('movement-preview');
+        if (previewEl) previewEl.style.display = 'none';
+        if (this.game.movementMode && typeof this.game.render === 'function') {
+            this.game.render();
         }
     }
 

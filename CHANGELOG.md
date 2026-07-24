@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Intuition-P2:** Pfad-Hover (gestrichelte Route + Kosten) in Bewegung
+- **Site-Modal:** empfohlene Primäraktion groß, Rest unter „Weitere Aktionen“
+- **Stark-Mana-Cue** auf Handkarten (✓/✗ + grüner/roter Mana-Ring)
 - **Coach-Strip** über der Action-Bar: eine priorisierte „Was jetzt?“-Zeile
   (Bewegung / Karten spielen / Site / Heilung / Kampfphasen / Zugende)
 - **Kampfphasen-Stepper** (Fern → Block → Angriff → Ende) unter dem Coach

@@ -351,7 +351,8 @@ describe('CombatUIManager - Coverage Boost', () => {
             combatUIManager.updateCombatTotals(4, 2, COMBAT_PHASES.ATTACK);
 
             expect(totalsDiv.innerHTML).toContain('prediction-warning');
-            expect(totalsDiv.innerHTML).toContain('Attentäter');
+            // DE Attentäter / EN Assassin
+            expect(totalsDiv.innerHTML).toMatch(/Attentäter|Assassin/i);
         });
 
         it('should render prediction with poison warning in totalsDiv', () => {
@@ -370,7 +371,8 @@ describe('CombatUIManager - Coverage Boost', () => {
             combatUIManager.updateCombatTotals(4, 2, COMBAT_PHASES.ATTACK);
 
             expect(totalsDiv.innerHTML).toContain('poison-warning');
-            expect(totalsDiv.innerHTML).toContain('GIFT');
+            // DE GIFT / EN POISON
+            expect(totalsDiv.innerHTML).toMatch(/GIFT|POISON/i);
         });
 
         it('should render safe prediction when no wounds expected', () => {
@@ -389,7 +391,8 @@ describe('CombatUIManager - Coverage Boost', () => {
             combatUIManager.updateCombatTotals(5, 5, COMBAT_PHASES.ATTACK);
 
             expect(totalsDiv.innerHTML).toContain('prediction-safe');
-            expect(totalsDiv.innerHTML).toContain('Kein Schaden erwartet');
+            // DE / EN
+            expect(totalsDiv.innerHTML).toMatch(/Kein Schaden erwartet|No damage expected/i);
         });
 
         it('should render defeated enemies list', () => {
@@ -414,13 +417,15 @@ describe('CombatUIManager - Coverage Boost', () => {
 
         it('should render block totals in BLOCK phase', () => {
             combatUIManager.updateCombatTotals(0, 5, COMBAT_PHASES.BLOCK);
-            expect(totalsDiv.innerHTML).toContain('Total Block');
+            expect(totalsDiv.innerHTML).toContain('block-stat');
+            expect(totalsDiv.innerHTML).toMatch(/Block|Total Block/);
             expect(totalsDiv.innerHTML).toContain('5');
         });
 
         it('should render attack totals in ATTACK phase', () => {
             combatUIManager.updateCombatTotals(7, 0, COMBAT_PHASES.ATTACK);
-            expect(totalsDiv.innerHTML).toContain('Total Attack');
+            expect(totalsDiv.innerHTML).toContain('attack-stat');
+            expect(totalsDiv.innerHTML).toMatch(/Attack|Angriff|Total Attack/);
             expect(totalsDiv.innerHTML).toContain('7');
         });
 
@@ -430,8 +435,10 @@ describe('CombatUIManager - Coverage Boost', () => {
                 combatSiegeTotal: 2
             };
             combatUIManager.updateCombatTotals(3, 0, COMBAT_PHASES.RANGED);
-            expect(totalsDiv.innerHTML).toContain('Fernkampf');
-            expect(totalsDiv.innerHTML).toContain('Belagerung');
+            expect(totalsDiv.innerHTML).toContain('ranged-stat');
+            expect(totalsDiv.innerHTML).toContain('siege-stat');
+            expect(totalsDiv.innerHTML).toMatch(/Fernkampf|Ranged/);
+            expect(totalsDiv.innerHTML).toMatch(/Belagerung|Siege/);
         });
     });
 
@@ -521,7 +528,8 @@ describe('CombatUIManager - Coverage Boost', () => {
             const el = combatUIManager.renderEnemy(enemy, 'block', null);
             
             expect(el.classList.contains('blocked-enemy')).toBe(true);
-            expect(el.innerHTML).toContain('[GEBLOCKT]');
+            // i18n: DE "[GEBLOCKT]" / EN "[BLOCKED]"
+            expect(el.querySelector('.blocked-label')?.textContent).toMatch(/\[(GEBLOCKT|BLOCKED)\]/);
         });
 
         it('should render boss enemy with health bar', () => {

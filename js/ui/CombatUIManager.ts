@@ -175,9 +175,8 @@ export class CombatUIManager {
                                 : ''
                         }
                      </div>`
-                    : phase === COMBAT_PHASES.BLOCK || phase === COMBAT_PHASES.RANGED
-                      ? `<div class="prediction-safe">✅ ${t('combat.ui.noDamage') || 'Kein Schaden erwartet'}</div>`
-                      : '';
+                    : // Show "safe" whenever no wounds are predicted (any phase)
+                      `<div class="prediction-safe">✅ ${t('combat.ui.noDamage') || 'Kein Schaden erwartet'}</div>`;
 
             const defeatLine =
                 prediction.enemiesDefeated?.length > 0

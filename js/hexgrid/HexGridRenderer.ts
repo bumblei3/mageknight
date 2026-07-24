@@ -189,17 +189,19 @@ export class HexGridRenderer {
         const y = pos.y + this.hexSize * 0.45;
         const label = String(cost);
         const padX = 6;
-        const padY = 3;
 
         this.ctx.save();
         this.ctx.font = `bold ${Math.max(11, Math.floor(this.hexSize * 0.28))}px sans-serif`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        const metrics = this.ctx.measureText(label);
-        const w = metrics.width + padX * 2;
+        const metrics =
+            typeof this.ctx.measureText === 'function'
+                ? this.ctx.measureText(label)
+                : { width: label.length * 7 };
+        const w = (metrics.width || label.length * 7) + padX * 2;
         const h = Math.max(14, this.hexSize * 0.32);
 
-        // Pill background
+        // Pill background (rounded if arcTo exists; plain rect in test mocks / old ctx)
         this.ctx.fillStyle = danger ? 'rgba(185, 28, 28, 0.92)' : 'rgba(15, 23, 42, 0.88)';
         this.ctx.strokeStyle = danger ? 'rgba(252, 165, 165, 0.9)' : 'rgba(167, 139, 250, 0.85)';
         this.ctx.lineWidth = 1.5;
@@ -207,12 +209,18 @@ export class HexGridRenderer {
         const ry = y - h / 2;
         const radius = 6;
         this.ctx.beginPath();
-        this.ctx.moveTo(rx + radius, ry);
-        this.ctx.arcTo(rx + w, ry, rx + w, ry + h, radius);
-        this.ctx.arcTo(rx + w, ry + h, rx, ry + h, radius);
-        this.ctx.arcTo(rx, ry + h, rx, ry, radius);
-        this.ctx.arcTo(rx, ry, rx + w, ry, radius);
-        this.ctx.closePath();
+        if (typeof this.ctx.arcTo === 'function') {
+            this.ctx.moveTo(rx + radius, ry);
+            this.ctx.arcTo(rx + w, ry, rx + w, ry + h, radius);
+            this.ctx.arcTo(rx + w, ry + h, rx, ry + h, radius);
+            this.ctx.arcTo(rx, ry + h, rx, ry, radius);
+            this.ctx.arcTo(rx, ry, rx + w, ry, radius);
+            this.ctx.closePath();
+        } else if (typeof this.ctx.roundRect === 'function') {
+            this.ctx.roundRect(rx, ry, w, h, radius);
+        } else {
+            this.ctx.rect(rx, ry, w, h);
+        }
         this.ctx.fill();
         this.ctx.stroke();
 

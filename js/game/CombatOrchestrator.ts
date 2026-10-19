@@ -528,6 +528,9 @@ export class CombatOrchestrator {
                             setTimeout(() => {
                                 this.game.showNotification('🎉 ' + win.message, 'success');
                                 this.game.addLog(win.message, 'success');
+                                const totalEnemies = this.game.statisticsManager?.getStat?.('enemiesDefeated') ?? 0;
+                                const totalSites = this.game.statisticsManager?.getStat?.('sitesConquered') ?? 0;
+                                this.game.ui?.showGameOverVictory(win.message, { totalEnemies, totalSites });
                             }, 1000);
                         }
                     }
@@ -535,6 +538,11 @@ export class CombatOrchestrator {
             }
         } else if (result.defeat && enemy) {
             this.game.addLog(t('combat.defeatAgainst', { enemy: enemy.name }), 'error');
+            // Show defeat overlay with combat summary
+            const currentSite = this.game.siteManager?.currentSite;
+            const siteName = currentSite?.getName?.() ?? 'Unbekannt';
+            const defeatMsg = `${t('combat.defeatAgainst', { enemy: enemy.name })} — Dein Held fiel auf ${siteName}.`;
+            this.game.ui?.showGameOverDefeat(enemy.name, defeatMsg);
         } else if (enemy) {
             this.game.addLog(t('combat.retreatFrom', { enemy: enemy.name }), 'info');
         }

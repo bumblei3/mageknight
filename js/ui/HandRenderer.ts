@@ -184,6 +184,21 @@ export class HandRenderer {
                 getEffect: (strong: boolean) => (strong ? card.strongEffect : card.basicEffect)
             };
 
+            // Strong affordability: only when card has strong effect + color
+            let strongAffordable: boolean | null = null;
+            const hasStrong =
+                card.strongEffect &&
+                typeof card.strongEffect === 'object' &&
+                Object.keys(card.strongEffect).length > 0;
+            if (hasStrong && card.color && !isWound && game?.hero) {
+                const isNight = game.timeManager?.isNight?.() ?? false;
+                if (typeof game.hero.canAffordMana === 'function') {
+                    strongAffordable = !!game.hero.canAffordMana(card, isNight);
+                } else if (typeof game.hero.hasMana === 'function') {
+                    strongAffordable = !!game.hero.hasMana(card.color, isNight);
+                }
+            }
+
             const cardEl = createCard({
                 card: cardData,
                 compact: true,
@@ -194,6 +209,7 @@ export class HandRenderer {
                 disabledReason: ctx.reason,
                 dimmed: ctx.dimmed,
                 relevant: ctx.relevant,
+                strongAffordable,
                 selected: false,
                 played: false,
                 onClick: (cardData: CardData, useStrong: boolean) => {

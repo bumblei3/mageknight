@@ -17,7 +17,9 @@ export const SITE_TYPES = {
     SPAWNING_GROUNDS: 'spawning_grounds',
     LABYRINTH: 'labyrinth',
     MINE: 'mine',
-    CITY: 'city'
+    CITY: 'city',
+    MAGIC_GLADE: 'magic_glade',
+    DEN: 'den'
 };
 
 export const SITE_INFO: Record<string, { name: string, icon: string, color: string }> = {
@@ -34,7 +36,9 @@ export const SITE_INFO: Record<string, { name: string, icon: string, color: stri
     [SITE_TYPES.TOMB]: { name: 'Grabmal', icon: 'tomb', color: '#4b5563' },
     [SITE_TYPES.SPAWNING_GROUNDS]: { name: 'Brutstätte', icon: 'skull', color: '#7f1d1d' },
     [SITE_TYPES.LABYRINTH]: { name: 'Labyrinth', icon: 'maze', color: '#059669' },
-    [SITE_TYPES.MINE]: { name: 'Mine', icon: 'mining', color: '#d97706' }
+    [SITE_TYPES.MINE]: { name: 'Mine', icon: 'mining', color: '#d97706' },
+    [SITE_TYPES.MAGIC_GLADE]: { name: 'Magischer Hain', icon: '🌿', color: '#34d399' },
+    [SITE_TYPES.DEN]: { name: 'Hort', icon: '🕳️', color: '#78716c' }
 };
 
 export class Site {

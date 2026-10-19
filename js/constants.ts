@@ -210,6 +210,8 @@ export const ENEMY_DEFINITIONS: Record<string, EnemyDefinition> = {
     deep_orc: { name: 'Deep Orc', attack: 4, armor: 4, fame: 4, fortified: true, icon: '👺', color: '#115e59' },
     crystal_golem: { name: 'Crystal Golem', attack: 6, armor: 6, fame: 6, physicalResist: true, icon: '💎', color: '#22d3ee' },
     [ENEMY_TYPES.ELEMENTAL]: { name: 'Feuer-Elementar', armor: 6, attack: 5, fame: 6, fireResist: true, attackType: 'fire', icon: '🔥', color: '#f97316', arcaneImmune: true },
+    ice_elemental: { name: 'Eis-Elementar', armor: 6, attack: 5, fame: 6, iceResist: true, attackType: 'ice', icon: '❄️', color: '#67e8f9', arcaneImmune: true },
+    orc_elite: { name: 'Ork-Elite', armor: 5, attack: 4, fame: 5, fortified: true, brutal: true, icon: '⚔️', color: '#166534' },
     [ENEMY_TYPES.BOSS]: { name: 'Dunkler Lord', armor: 10, attack: 8, fame: 20, fortified: true, brutal: true, fireResist: true, iceResist: true, physicalResist: true, icon: '👿', color: '#000000' }
 };
 

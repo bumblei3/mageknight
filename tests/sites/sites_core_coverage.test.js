@@ -14,10 +14,9 @@ describe('sites.ts - Coverage Boost', () => {
             expect(SITE_TYPES.MAGE_TOWER).toBe('mage_tower');
             expect(SITE_TYPES.SPAWNING_GROUNDS).toBe('spawning_grounds');
             expect(SITE_TYPES.LABYRINTH).toBe('labyrinth');
-            // magic_glade + den were dead content (no handler, never placed) — removed.
-            expect(SITE_TYPES['magic_glade']).toBeUndefined();
-            expect(SITE_TYPES['den']).toBeUndefined();
-            expect(Object.keys(SITE_TYPES).length).toBe(15);
+            expect(SITE_TYPES.MAGIC_GLADE).toBe('magic_glade');
+            expect(SITE_TYPES.DEN).toBe('den');
+            expect(Object.keys(SITE_TYPES).length).toBe(17);
         });
 
         it('has metadata for every site type that has an info entry', () => {

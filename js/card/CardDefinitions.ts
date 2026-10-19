@@ -357,6 +357,16 @@ export const SAMPLE_SPELLS: any[] = [
         image: 'meteor_storm.png'
     },
     {
+        id: 'cure',
+        name: 'Cure',
+        type: CARD_TYPES.SPELL,
+        color: CARD_COLORS.WHITE,
+        cost: 1,
+        basicEffect: { type: 'heal', value: 3, cleanse: true },
+        advancedEffect: { type: 'heal', value: 6, cleanse: true },
+        image: 'cure.png'
+    },
+    {
         id: 'refresh',
         name: 'Refresh',
         type: CARD_TYPES.ACTION,

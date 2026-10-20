@@ -70,6 +70,15 @@ export const HERO_SKILLS: HeroSkills = {
                 description: '+1 Rüstung.',
                 icon: '🛡️',
                 value: 1
+            },
+            {
+                id: 'freezing_breath',
+                name: 'Eis-Atem',
+                type: 'active',
+                description: 'Gefriert Feinde: -3 Rüstung, 0 Angriff.',
+                icon: '❄️',
+                value: 3,
+                cooldown: 'round'
             }
         ]
     },

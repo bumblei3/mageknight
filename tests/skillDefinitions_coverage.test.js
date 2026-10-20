@@ -46,9 +46,9 @@ describe('skillDefinitions - Branch Coverage', () => {
         });
 
         it('should return up to count skills when fewer available', () => {
-            const ownedSkillIds = new Set(['flight', 'crystal_mastery', 'fire_breath']);
+            const ownedSkillIds = new Set(['flight', 'crystal_mastery', 'fire_breath', 'dragon_scales']);
             const skills = getRandomSkills('goldyx', ownedSkillIds, 5);
-            // Only 1 skill left (dragon_scales)
+            // Only 1 skill left (freezing_breath)
             expect(skills.length).toBeLessThanOrEqual(1);
         });
 

@@ -29,7 +29,7 @@ describe('Hero Skills — hero.id-driven skill offers (Gap A fix)', () => {
   it('SKILLS uppercase mirror includes the new heroes', () => {
     expect(SKILLS.ARYTHEA.length).toBe(4);
     expect(SKILLS.TOVAK.length).toBe(4);
-    expect(SKILLS.GOLDYX.length).toBe(4);
+    expect(SKILLS.GOLDYX.length).toBe(5);
     expect(SKILLS.NOROWAS.length).toBe(5);
   });
 

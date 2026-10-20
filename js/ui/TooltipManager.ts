@@ -88,6 +88,19 @@ export class TooltipManager {
     }
 
     /**
+     * Defer a callback to the next animation frame when available.
+     * Falls back to setTimeout so the class never throws in environments
+     * (e.g. jsdom test runners) that lack requestAnimationFrame.
+     */
+    private schedule(callback: () => void): void {
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(callback);
+        } else {
+            setTimeout(callback, 16);
+        }
+    }
+
+    /**
      * Show tooltip for a card
      * @param {HTMLElement} element - Element to attach tooltip to
      * @param {any} card - Card object
@@ -156,7 +169,7 @@ export class TooltipManager {
         this.tooltip.style.display = 'block';
 
         // Defer positioning to next frame to avoid forced reflow (layout thrashing)
-        requestAnimationFrame(() => {
+        this.schedule(() => {
             if (!this.currentTarget || !this.tooltip) return; // Mouse left before frame
 
             this.positionTooltip(element);
@@ -164,7 +177,7 @@ export class TooltipManager {
 
             // Add fade-in animation
             this.tooltip.style.opacity = '0';
-            requestAnimationFrame(() => {
+            this.schedule(() => {
                 if (this.tooltip) this.tooltip.style.opacity = '1';
             });
         });

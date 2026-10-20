@@ -52,10 +52,19 @@ export class Game3D {
     private hoveredHex: THREE.Object3D | null = null;
     private hoveredTerrain: string | null = null;
 
+    // Reusable vectors to avoid per-frame allocations
+    private cameraPos: THREE.Vector3 = new THREE.Vector3();
+    private boundAnimate: () => void;
+    private boundOnMouseMove: (e: MouseEvent) => void;
+    private boundOnClick: (e: MouseEvent) => void;
+
     constructor(game: any) {
         this.game = game;
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
+        this.boundAnimate = this.animate.bind(this);
+        this.boundOnMouseMove = this.onMouseMove.bind(this);
+        this.boundOnClick = this.onClick.bind(this);
     }
 
     init(containerId: string): void {
@@ -109,8 +118,8 @@ export class Game3D {
         this.dynamicLighting = new DynamicLightingManager(this.renderer, this.scene!, this.camera!);
 
         // Interaction Listeners
-        this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.renderer.domElement.addEventListener('click', this.onClick.bind(this));
+        this.renderer.domElement.addEventListener('mousemove', this.boundOnMouseMove);
+        this.renderer.domElement.addEventListener('click', this.boundOnClick);
 
         // 5. Controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -215,8 +224,8 @@ export class Game3D {
             eventBus.off(GAME_EVENTS.MANA_SOURCE_UPDATED, onManaSourceUpdated);
 
             if (this.renderer) {
-                this.renderer.domElement.removeEventListener('mousemove', this.onMouseMove.bind(this));
-                this.renderer.domElement.removeEventListener('click', this.onClick.bind(this));
+                this.renderer.domElement.removeEventListener('mousemove', this.boundOnMouseMove);
+                this.renderer.domElement.removeEventListener('click', this.boundOnClick);
             }
         });
 
@@ -245,6 +254,8 @@ export class Game3D {
         }
     }
 
+    private mouseMoved: boolean = false;
+
     // Interaction Handlers
     onMouseMove(event: MouseEvent): void {
         if (!this.renderer) return;
@@ -253,6 +264,7 @@ export class Game3D {
         const rect = this.renderer.domElement.getBoundingClientRect();
         this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        this.mouseMoved = true;
     }
 
     onClick(event: MouseEvent): void {
@@ -276,6 +288,8 @@ export class Game3D {
 
     handleHoverInteraction(): void {
         if (!this.camera || !this.scene) return;
+        if (!this.mouseMoved) return;
+        this.mouseMoved = false;
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
@@ -867,7 +881,7 @@ export class Game3D {
     animate(): void {
         if (!this.enabled) return;
 
-        this.animationId = requestAnimationFrame(this.animate.bind(this));
+        this.animationId = requestAnimationFrame(this.boundAnimate);
 
         const delta = this.clock.getDelta();
         const elapsed = this.clock.getElapsedTime();
@@ -885,20 +899,19 @@ export class Game3D {
         this.handleHoverInteraction(); // Update hover effects
 
         // Update particle system
-        const cameraPos = new THREE.Vector3();
-        this.camera!.getWorldPosition(cameraPos);
+        this.camera!.getWorldPosition(this.cameraPos);
         if (this.particleSystem) {
-            this.particleSystem.update(this.clock.getDelta(), cameraPos);
+            this.particleSystem.update(delta, this.cameraPos);
         }
 
         // Update sprite animation system
         if (this.spriteAnimation) {
-            this.spriteAnimation.update(this.clock.getDelta());
+            this.spriteAnimation.update(delta);
         }
 
         // Update dynamic lighting system
         if (this.dynamicLighting) {
-            this.dynamicLighting.update(this.clock.getDelta());
+            this.dynamicLighting.update(delta);
         }
 
         // Render via Post-Processing or directly

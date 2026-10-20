@@ -160,7 +160,7 @@ Das Spiel ist modular aufgebaut:
 
 ## 🧪 Testing
 
-Das Projekt verfügt über eine hochmoderne Test-Suite mit **3462 Tests** (234 Test-Dateien, Vitest + V8-Coverage mit 80%-Gate; inkl. headless jsdom-UI-Tests für Modal-/Accessibility-Manager).
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **3462 Tests** (237 Test-Dateien, Vitest + V8-Coverage mit 80%-Gate; inkl. headless jsdom-UI-Tests für Modal-/Accessibility-Manager).
 
 ```bash
 # Alle Tests ausführen

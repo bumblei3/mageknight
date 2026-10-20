@@ -461,6 +461,16 @@
     color: var(--color-text-muted);
 }
 
+.skill-magnitude {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: var(--space-1);
+    background: rgba(168, 85, 247, 0.25);
+    color: var(--color-accent-primary);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
 .skill-item:not(.used) .skill-status {
     color: var(--color-mana-green);
     border: 1px solid rgba(16, 185, 129, 0.3);

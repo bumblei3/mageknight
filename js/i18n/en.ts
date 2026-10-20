@@ -409,7 +409,8 @@ const en = {
         avenging_spirit: { name: 'Avenging Spirit', desc: '+2 Attack' },
         header: 'Skills',
         ready: 'Ready',
-        used: 'Used'
+        used: 'Used',
+        nextRound: 'Next round'
     },
 
     // Mana

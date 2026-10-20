@@ -52,7 +52,7 @@ export class SkillRenderer {
                 <span class="skill-icon">${skill.icon}</span>
                 <span class="skill-name">${skill.name}</span>
                 ${typeof skill.value === 'number' ? `<span class="skill-magnitude">+${skill.value}</span>` : ''}
-                ${isActive ? `<span class="skill-status">${isUsed ? t('skills.used') : t('skills.ready')}</span>` : ''}
+                ${isActive ? `<span class="skill-status">${isUsed ? (skill.cooldown === 'round' ? t('skills.nextRound') : t('skills.used')) : t('skills.ready')}</span>` : ''}
             `;
 
             // Tooltip data

@@ -414,7 +414,8 @@ const de = {
         avenging_spirit: { name: 'Rächender Geist', desc: '+2 Angriff' },
         header: 'Skills',
         ready: 'Bereit',
-        used: 'Benutzt'
+        used: 'Benutzt',
+        nextRound: 'Nächste Runde'
     },
 
     // Mana

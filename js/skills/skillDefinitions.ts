@@ -10,6 +10,14 @@ export interface Skill {
     description: string;
     icon: string;
     cooldown?: 'round';
+    /**
+     * Magnitude of the rule, so the data declares what the engine applies
+     * (like a card's `value`). Passive: the bonus amount. Active: the effect
+     * size (attack/block/draw/...).
+     */
+    value?: number;
+    /** Wounds the hero takes as the cost of using the skill. */
+    selfWound?: number;
 }
 
 export const SKILL_TYPES = {
@@ -35,6 +43,7 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Bewege dich 2 Felder weit und ignoriere Geländekosten.', // Move 2 spaces, ignore terrain
                 icon: '🦅',
+                value: 2,
                 cooldown: 'round'
             },
             {
@@ -42,7 +51,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Kristall-Meisterschaft',
                 type: 'passive',
                 description: 'Erhalte zu Beginn jeder Runde 1 Grünen Kristall.', // Gain 1 Green Crystal per round
-                icon: '💎'
+                icon: '💎',
+                value: 1
             },
             {
                 id: 'fire_breath',
@@ -50,6 +60,7 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Fernkampf-Feuer-Angriff 3.',
                 icon: '🔥',
+                value: 3,
                 cooldown: 'round'
             },
             {
@@ -57,7 +68,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Drachenschuppen',
                 type: 'passive',
                 description: '+1 Rüstung.',
-                icon: '🛡️'
+                icon: '🛡️',
+                value: 1
             }
         ]
     },
@@ -77,7 +89,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Vorwärts Marsch',
                 type: 'passive',
                 description: 'Bewegungskosten -1 für alle Felder (min 1).',
-                icon: '🥾'
+                icon: '🥾',
+                value: 1
             },
             {
                 id: 'healing_touch',
@@ -85,6 +98,7 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Heile 2 Schaden (von Held oder Einheit).',
                 icon: '✨',
+                value: 2,
                 cooldown: 'round'
             },
             {
@@ -92,7 +106,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Edle Manieren',
                 type: 'passive',
                 description: '+2 Einfluss in Dörfern und Klöstern.',
-                icon: '👑'
+                icon: '👑',
+                value: 2
             }
         ]
     },
@@ -105,6 +120,8 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Angriff +3 in dieser Kampfphase (verursacht aber 1 eigene Wunde).',
                 icon: '🩸',
+                value: 3,
+                selfWound: 1,
                 cooldown: 'round'
             },
             {
@@ -112,7 +129,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Schmerzgewebe',
                 type: 'passive',
                 description: 'Für jede Wunde des Helden +1 Angriff (max +3).',
-                icon: '🕸️'
+                icon: '🕸️',
+                value: 3
             },
             {
                 id: 'dark_pact',
@@ -120,6 +138,8 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Ziehe 2 Karten, nimm aber 1 Wunde.',
                 icon: '🌑',
+                value: 2,
+                selfWound: 1,
                 cooldown: 'round'
             },
             {
@@ -127,7 +147,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Umarmung des Chaos',
                 type: 'passive',
                 description: 'Erleidest 1 Wunde weniger pro Kampf (min 0).',
-                icon: '🌀'
+                icon: '🌀',
+                value: 1
             }
         ]
     },
@@ -140,6 +161,7 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Block +4 in dieser Kampfphase.',
                 icon: '🛡️',
+                value: 4,
                 cooldown: 'round'
             },
             {
@@ -147,7 +169,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Taktische Lesart',
                 type: 'passive',
                 description: 'Bei Kampfbeginn: sieh die Gegner-Werte voraus (+1 Info).',
-                icon: '📖'
+                icon: '📖',
+                value: 1
             },
             {
                 id: 'counter_strike',
@@ -155,6 +178,7 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Wenn voll blockt wurde: +2 Angriff als Vergeltung.',
                 icon: '⚔️',
+                value: 2,
                 cooldown: 'round'
             },
             {
@@ -162,7 +186,8 @@ export const HERO_SKILLS: HeroSkills = {
                 name: 'Bollwerk',
                 type: 'passive',
                 description: '+1 Rüstung gegen Fernkampf- und Belagerungsangriffe.',
-                icon: '🏰'
+                icon: '🏰',
+                value: 1
             }
         ]
     }

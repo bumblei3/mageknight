@@ -49,6 +49,10 @@ export interface Skill {
     name: string;
     type: 'active' | 'passive';
     description?: string;
+    /** Effect magnitude declared by `js/skills/skillDefinitions.ts`. */
+    value?: number;
+    /** Wounds the hero takes as the cost of using the skill. */
+    selfWound?: number;
 }
 
 export interface Unit {
@@ -783,8 +787,14 @@ export class Hero {
             return true;
         }
 
+        // The wound list is authoritative: a save or a test may carry wounds
+        // whose card is not in hand. Drop the entry rather than refusing.
+        this.wounds.pop();
+        if (useHealingPoints) {
+            this.healingPoints--;
+        }
         this.syncStore();
-        return false;
+        return true;
     }
 
     /**
@@ -912,6 +922,9 @@ export class Hero {
             this.addCrystal(randomColor);
         }
 
+        // Crystal Mastery (Goldyx): 1 green crystal every round.
+        this.applyCrystalMastery();
+
         this.usedSkills.clear();
     }
 
@@ -1037,6 +1050,51 @@ export class Hero {
             commandLimit: this.commandLimit,
             skills: this.skills
         };
+    }
+
+    /**
+     * Pain Weave (Arythea): +1 attack per wound the hero carries, capped at
+     * `value` (3). Wounds change mid-turn (blood_rage, dark_pact, damage), so
+     * this is a getter the combat engine asks for at resolution time — never a
+     * value armed once per turn.
+     */
+    getPainWeaveBonus(): number {
+        if (!this.hasSkill('pain_weave')) return 0;
+        const skill = this.skills.find((s: Skill) => s.id === 'pain_weave');
+        const cap = skill?.value ?? 3;
+        return Math.min(this.wounds.length, cap);
+    }
+
+    /**
+     * Bulwark (Tovak): +1 armor against ranged and siege attacks. The engine
+     * has no ranged attack *against* the hero, so the rule is read as "armor
+     * against non-physical attackers" — a ranged/elemental enemy attack.
+     */
+    getArmorAgainst(attackType: string): number {
+        let armor = this.armor;
+        if (attackType !== 'physical' && this.hasSkill('bulwark')) {
+            const skill = this.skills.find((s: Skill) => s.id === 'bulwark');
+            armor += skill?.value ?? 1;
+        }
+        return armor;
+    }
+
+    /**
+     * Crystal Mastery (Goldyx): 1 green crystal at the start of every round.
+     */
+    applyCrystalMastery(): void {
+        if (!this.hasSkill('crystal_mastery')) return;
+        const skill = this.skills.find((s: Skill) => s.id === 'crystal_mastery');
+        this.gainCrystals('green', skill?.value ?? 1);
+    }
+
+    /**
+     * Chaos Embrace (Arythea): the hero suffers one fewer wound per combat.
+     */
+    getChaosEmbraceReduction(): number {
+        if (!this.hasSkill('chaos_embrace')) return 0;
+        const skill = this.skills.find((s: Skill) => s.id === 'chaos_embrace');
+        return skill?.value ?? 1;
     }
 
     addUnit(unit: Unit): boolean {

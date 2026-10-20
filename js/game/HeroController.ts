@@ -52,7 +52,7 @@ export class HeroController {
 
         if (selection.skill) {
             this.game.hero.addSkill(selection.skill);
-            this.game.addLog(`Fertigkeit gelernt: ${selection.skill.name}`, 'success');
+            this.game.addLog(`Fähigkeit gelernt: ${selection.skill.name}`, 'success');
         }
 
         if (selection.card) {
@@ -135,7 +135,7 @@ export class HeroController {
         if (!this.game.hero) return { success: false, message: 'Kein Held aktiv.' };
 
         if (!this.game.hero.canUseSkill(skillId)) {
-            return { success: false, message: 'Fertigkeit bereits benutzt oder nicht verfügbar.' };
+            return { success: false, message: 'Fähigkeit bereits benutzt oder nicht verfügbar.' };
         }
 
         switch (skillId) {
@@ -151,8 +151,11 @@ export class HeroController {
             case 'healing_touch': {
                 let woundsHealed = 0;
                 while (woundsHealed < 2 && this.game.hero.wounds.length > 0) {
-                    this.game.hero.wounds.pop();
-                    woundsHealed++;
+                    // healWound() removes the wound card from hand *and* the
+                    // wounds list; popping the list alone left an orphaned
+                    // wound card blocking a hand slot.
+                    if (this.game.hero.healWound(false)) woundsHealed++;
+                    else break;
                 }
 
                 if (woundsHealed > 0) {
@@ -218,6 +221,93 @@ export class HeroController {
                     this.game.updateCombatUI();
                 }
                 return { success: true, message: 'Eis-Atem aktiviert!' };
+            }
+
+            // --- Goldyx: fire_breath ---
+            case 'fire_breath': {
+                if (!this.game.combat) {
+                    return { success: false, message: 'Feueratem kann nur im Kampf eingesetzt werden.' };
+                }
+                const value = 3;
+                this.game.combatOrchestrator.combatRangedTotal += value;
+                this.game.combatOrchestrator.combatRangedElements.fire =
+                    (this.game.combatOrchestrator.combatRangedElements.fire || 0) + value;
+                this.game.hero.useSkill(skillId);
+                this.game.addLog(`Fähigkeit "Feueratem" genutzt: Fernkampf-Feuer-Angriff +${value}.`, 'success');
+                this.game.combatOrchestrator.updateCombatTotals();
+                this.game.updateStats();
+                return { success: true, message: `Feueratem: +${value} Fernkampf-Feuer!` };
+            }
+
+            // --- Arythea: blood_rage (+3 attack this combat phase, 1 self wound) ---
+            case 'blood_rage': {
+                if (!this.game.combat) {
+                    return { success: false, message: 'Blutrausch kann nur im Kampf eingesetzt werden.' };
+                }
+                const value = 3;
+                this.game.combatOrchestrator.combatAttackTotal += value;
+                this.game.combatOrchestrator.combatAttackElements.physical =
+                    (this.game.combatOrchestrator.combatAttackElements.physical || 0) + value;
+                this.game.hero.takeWound();
+                this.game.hero.useSkill(skillId);
+                this.game.addLog(`Fähigkeit "Blutrausch" genutzt: +${value} Angriff, 1 eigene Wunde.`, 'warning');
+                this.game.combatOrchestrator.updateCombatTotals();
+                this.game.updateStats();
+                return { success: true, message: `Blutrausch: +${value} Angriff (1 Wunde)!` };
+            }
+
+            // --- Arythea: dark_pact (draw 2 cards, take 1 wound) ---
+            case 'dark_pact': {
+                const value = 2;
+                const drawn = this.game.hero.drawCards(value);
+                this.game.hero.takeWound();
+                this.game.hero.useSkill(skillId);
+                this.game.addLog(`Fähigkeit "Dunkler Pakt" genutzt: ${drawn.length} Karten gezogen, 1 Wunde.`, 'warning');
+                this.game.renderHand();
+                this.game.updateStats();
+                return { success: true, message: `Dunkler Pakt: ${drawn.length} Karten, 1 Wunde.` };
+            }
+
+            // --- Tovak: iron_wall (+4 block this combat phase) ---
+            case 'iron_wall': {
+                if (!this.game.combat) {
+                    return { success: false, message: 'Eiserne Mauer kann nur im Kampf eingesetzt werden.' };
+                }
+                const value = 4;
+                this.game.combatOrchestrator.combatBlockTotal += value;
+                this.game.combatOrchestrator.activeBlocks.push({
+                    value,
+                    element: 'physical'
+                });
+                this.game.hero.useSkill(skillId);
+                this.game.addLog(`Fähigkeit "Eiserne Mauer" genutzt: +${value} Block.`, 'success');
+                this.game.combatOrchestrator.updateCombatTotals();
+                this.game.updateStats();
+                return { success: true, message: `Eiserne Mauer: +${value} Block!` };
+            }
+
+            // --- Tovak: counter_strike (+2 attack as retaliation when fully blocked) ---
+            case 'counter_strike': {
+                if (!this.game.combat) {
+                    return { success: false, message: 'Konterangriff kann nur im Kampf eingesetzt werden.' };
+                }
+                const combat = this.game.combat;
+                const allBlocked = combat.enemies.length > 0 &&
+                    combat.enemies.every((enemy: any) => combat.blockedEnemies.has(enemy.id));
+
+                if (!allBlocked) {
+                    return { success: false, message: 'Konterangriff braucht einen vollständig geblockten Kampf.' };
+                }
+
+                const value = 2;
+                this.game.combatOrchestrator.combatAttackTotal += value;
+                this.game.combatOrchestrator.combatAttackElements.physical =
+                    (this.game.combatOrchestrator.combatAttackElements.physical || 0) + value;
+                this.game.hero.useSkill(skillId);
+                this.game.addLog(`Fähigkeit "Konterangriff" genutzt: +${value} Angriff als Vergeltung.`, 'success');
+                this.game.combatOrchestrator.updateCombatTotals();
+                this.game.updateStats();
+                return { success: true, message: `Konterangriff: +${value} Angriff!` };
             }
 
             default:

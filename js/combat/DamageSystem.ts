@@ -38,11 +38,24 @@ export class DamageSystem {
             totalDamage += enemy.getEffectiveAttack();
         });
 
-        const effectiveArmor = Math.max(1, hero.armor || 1);
+        // Bulwark (Tovak): +1 armor against ranged/siege attackers. The engine
+        // has no ranged attack *against* the hero, so the rule reads as armor
+        // against non-physical attackers.
+        const worstAttackType = unblockedEnemies.reduce(
+            (worst: string, enemy: any) => {
+                const type = enemy.attackType || 'physical';
+                if (worst === 'physical' && type !== 'physical') return type;
+                return worst;
+            },
+            'physical'
+        );
+        const effectiveArmor = Math.max(1, hero.getArmorAgainst
+            ? hero.getArmorAgainst(worstAttackType)
+            : (hero.armor || 1));
         let baseWounds = Math.ceil(totalDamage / effectiveArmor);
         if (isNaN(baseWounds)) baseWounds = 0;
 
-        logger.info(`Damage phase: Total damage ${totalDamage} vs Armor ${effectiveArmor} = ${baseWounds} wounds`);
+        logger.info(`Damage phase: Total damage ${totalDamage} vs Armor ${effectiveArmor} (${worstAttackType}) = ${baseWounds} wounds`);
 
         // Check for poison enemies
         const isPoison = unblockedEnemies.some(e => e.poison || (e.abilities && e.abilities.includes('poison')));

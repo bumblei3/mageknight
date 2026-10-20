@@ -331,6 +331,18 @@ export class CombatOrchestrator {
             }
         }
 
+        // Chaos Embrace (Arythea): the hero suffers one fewer wound per combat.
+        // `combat.woundsReceived` is authoritative; the result object only
+        // carries it on the damage-resolution path.
+        const woundsThisFight = this.game.combat?.woundsReceived ?? result.woundsReceived ?? 0;
+        const chaosReduction = this.game.hero.getChaosEmbraceReduction();
+        if (chaosReduction > 0 && woundsThisFight > 0) {
+            const healed = this.game.hero.vampiricHeal(chaosReduction);
+            if (healed > 0) {
+                this.game.addLog(t('combat.chaosEmbrace', { amount: healed }), 'success');
+            }
+        }
+
         this.game.addLog(result.message, 'combat');
     }
 
@@ -362,15 +374,23 @@ export class CombatOrchestrator {
 
         const attackElement = this.getDominantAttackElement();
 
+        // Pain Weave (Arythea): +1 attack per wound, read at resolution time
+        // because wounds can change during the fight (blood_rage, dark_pact).
+        const painWeaveBonus = this.game.hero.getPainWeaveBonus();
+        if (painWeaveBonus > 0) {
+            this.game.addLog(t('combat.painWeave', { amount: painWeaveBonus }), 'combat');
+        }
+        const totalAttack = this.combatAttackTotal + painWeaveBonus;
+
         if (this.game.hexGrid && this.game.particleSystem) {
             const pixelPos = this.game.hexGrid.axialToPixel(this.game.combat.enemy.position.q, this.game.combat.enemy.position.r);
             this.game.particleSystem.combatClashEffect(pixelPos.x, pixelPos.y, attackElement);
 
-            if (this.combatAttackTotal > 0) {
-                this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal, this.combatAttackTotal >= 5);
+            if (totalAttack > 0) {
+                this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, totalAttack, totalAttack >= 5);
 
-                if (this.combatAttackTotal >= 4) {
-                    this.game.particleSystem.triggerShake(Math.min(10, this.combatAttackTotal), 0.3);
+                if (totalAttack >= 4) {
+                    this.game.particleSystem.triggerShake(Math.min(10, totalAttack), 0.3);
                     this.game.particleSystem.freeze(0.05);
                 }
             }
@@ -396,12 +416,12 @@ export class CombatOrchestrator {
         });
         this.combatAreaStrikes = [];
 
-        const attackResult = this.game.combat.attackEnemies(this.combatAttackTotal, attackElement);
+        const attackResult = this.game.combat.attackEnemies(totalAttack, attackElement);
 
-        if (this.combatAttackTotal > 0) {
+        if (totalAttack > 0) {
             eventBus.emit(GAME_EVENTS.COMBAT_DAMAGE, {
                 targetPos: this.game.combat.enemy.position,
-                amount: this.combatAttackTotal,
+                amount: totalAttack,
                 targetType: 'enemy'
             });
         }
@@ -510,6 +530,21 @@ export class CombatOrchestrator {
         const names = enemies.map((e: any) => e.name).join(' & ');
 
         this.game.addLog(t('combat.fightAgainst', { enemy: names }), 'combat');
+
+        // Tactical Read (Tovak): the hero sees the enemy values at combat start.
+        if (typeof this.game.hero.hasSkill === 'function' && this.game.hero.hasSkill('tactical_read')) {
+            const info = enemies
+                .map((e: any) => {
+                    const armor = typeof e.getCurrentArmor === 'function' ? e.getCurrentArmor() : e.armor;
+                    const attack = typeof e.getEffectiveAttack === 'function' ? e.getEffectiveAttack() : e.attack;
+                    return `${e.name} (Rüstung ${armor}, Angriff ${attack}, Ruhm ${e.fame ?? 0})`;
+                })
+                .join(' · ');
+            this.game.addLog(
+                t('combat.tacticalRead', { info }) || `Taktische Lesart: ${info}`,
+                'info'
+            );
+        }
 
         this.game.combat = new Combat(this.game.hero, enemies, (result: any) => this.onCombatEnd(result, onEndCallback));
         this.game.combat.start();

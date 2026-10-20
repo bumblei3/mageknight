@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/bumblei3/mageknight/ci.yml?branch=master&label=build&logo=github)](https://github.com/bumblei3/mageknight/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/bumblei3/mageknight?logo=codecov)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 3439 passing](https://img.shields.io/badge/tests-3439%20passing-brightgreen)
+![Tests: 3449 passing](https://img.shields.io/badge/tests-3449%20passing-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -160,7 +160,7 @@ Das Spiel ist modular aufgebaut:
 
 ## 🧪 Testing
 
-Das Projekt verfügt über eine hochmoderne Test-Suite mit **3439 Tests** (234 Test-Dateien, Vitest + V8-Coverage mit 80%-Gate; inkl. headless jsdom-UI-Tests für Modal-/Accessibility-Manager).
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **3449 Tests** (234 Test-Dateien, Vitest + V8-Coverage mit 80%-Gate; inkl. headless jsdom-UI-Tests für Modal-/Accessibility-Manager).
 
 ```bash
 # Alle Tests ausführen

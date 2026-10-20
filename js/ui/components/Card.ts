@@ -425,7 +425,12 @@ function effectRowsHTML(effect: any, strongEffect?: any, showStrongDelta = false
         const value = effect[flag.key];
         if (!value) continue;
         if (flag.matches && !flag.matches(value)) continue;
-        const shown = flag.key === 'element' ? flagValueLabel(value) : '✓';
+        const shown =
+            flag.key === 'element'
+                ? flagValueLabel(value)
+                : typeof value === 'number' && flag.valueUnit
+                    ? `${value} ${flag.valueUnit}`
+                    : '✓';
         html += `<div class="effect-row">
                     <span class="effect-label">${flag.icon} ${flag.label}</span>
                     <span class="effect-value">${shown}</span>

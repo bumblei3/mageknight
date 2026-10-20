@@ -127,8 +127,8 @@ export const CARD_DEFINITIONS: Record<string, any> = {
         type: CARD_TYPES.ACTION,
         color: CARD_COLORS.WHITE,
         cost: 0,
-        basicEffect: { type: 'influence', value: 2 },
-        advancedEffect: { type: 'influence', value: 5, unitRecruitment: true },
+        basicEffect: { type: 'influence', value: 2, unitRecruitment: 1 },
+        advancedEffect: { type: 'influence', value: 5, unitRecruitment: 2 },
         image: 'call_to_arms.png'
     },
     'atk_cha': {

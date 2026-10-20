@@ -256,9 +256,12 @@ describe('CombatOrchestrator - Coverage Boost', () => {
             orchestrator.playCardInCombat(0, blockCard);
             
             expect(orchestrator.combatBlockTotal).toBe(4);
+            // iceBlock is now always carried on a block source: the engine needs
+            // it to know whether a block counts as cold fire (Cold Toughness).
             expect(orchestrator.activeBlocks).toContainEqual({
                 value: 4,
-                element: 'physical'
+                element: 'physical',
+                iceBlock: false
             });
         });
 

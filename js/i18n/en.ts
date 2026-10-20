@@ -228,6 +228,7 @@ const en = {
         unitAlreadyActivated: 'Unit already activated',
         unitActivated: '{unit} activated: {applied}',
         enemiesDefeated: '{count} enemies defeated!',
+        vampiricHeal: '🩸 Vampirism: healed {amount} wound(s)!',
         enemiesDestroyed: '{count} enemy(ies) destroyed!',
         destroyBossImmune: '{enemy} is a boss and cannot be destroyed — the card is wasted.',
         attackWeak: 'Attack too weak for normal enemies ({attack} vs {armor})',

@@ -149,6 +149,14 @@ export class Hero {
     nextCardBonus: number;
     /** Extra turns granted by Time Walk; TurnManager spends them. */
     extraTurns: number;
+    /** Soul Stealer: heals the hero for each enemy the artifact attack defeats. */
+    vampirism: number;
+    /**
+     * Cards drawn by Concentration's "keep" rule. They stay in the hand when
+     * the turn ends instead of going to the discard pile, and are dropped from
+     * the set at that moment (so they are discarded on the following turn).
+     */
+    keptCardIds: Set<string>;
     tempMana: ManaColor[];
 
     deck: Card[];
@@ -208,6 +216,8 @@ export class Hero {
         this.healingPoints = 0;
         this.nextCardBonus = 0;
         this.extraTurns = 0;
+        this.vampirism = 0;
+        this.keptCardIds = new Set();
 
         this.initializeDeck();
         this.syncStore();
@@ -338,7 +348,12 @@ export class Hero {
 
         // Effects that need a side channel (deck, inventory, limits) — these
         // keys are lifted from the card data by Card.normalizeEffect().
-        if (effect.draw) this.drawCards(effect.draw as number);
+        const drawn = effect.draw ? this.drawCards(effect.draw as number) : [];
+        // Concentration strong: the card drawn by this play is kept in hand
+        // when the turn ends (it does not go to the discard pile).
+        if (effect.keep) {
+            drawn.forEach((kept) => this.keptCardIds.add(kept.id));
+        }
         if (effect.mana) this.gainManaTokens(card.color, effect.mana as number);
         if (effect.crystal) this.gainCrystals(card.color, effect.crystal as number);
         if (effect.handLimitBonus) this.handLimit += effect.handLimitBonus as number;
@@ -348,9 +363,58 @@ export class Hero {
             this.changeReputation(REPUTATION_LOSS_PER_PLAY);
         }
 
+        // Keyword rules that ride along on a primary effect rather than
+        // standing alone: the influence spent recruits units (Call to Arms),
+        // and the heal cleanses a wound (Cure).
+        if (effect.unitRecruitment) {
+            this.recruitUnits(Number(effect.unitRecruitment) || 0);
+        }
+        if (effect.cleanse) {
+            this.cleanseWound();
+        }
+
         this.discard.push(card);
         this.syncStore();
         return { card, effect, usedStrong: useStrong };
+    }
+
+    /**
+     * Spend influence to recruit a unit (Call to Arms). The command limit
+     * applies, so a recruit that no longer fits is refused. Returns how many
+     * units joined and why the rest did not.
+     */
+    recruitUnits(count: number): { recruited: number; refused: number; units: Unit[] } {
+        const joined: Unit[] = [];
+        let refused = 0;
+        const wanted = Math.max(0, Math.floor(count) || 0);
+        const types = Object.keys(UNIT_INFO);
+
+        for (let i = 0; i < wanted; i++) {
+            const type = types[Math.floor(Math.random() * types.length)];
+            const unit = createUnit(type);
+            if (!unit || !this.addUnit(unit)) {
+                refused++;
+                continue;
+            }
+            joined.push(unit);
+        }
+
+        if (joined.length > 0) this.syncStore();
+        return { recruited: joined.length, refused, units: joined };
+    }
+
+    /**
+     * Vampirism (Soul Stealer artifact): heal the hero for the wounds the
+     * enemy dealt. Artifacts are passive, so this is called from the damage
+     * resolution, not from playing a card.
+     */
+    vampiricHeal(amount: number): number {
+        const wanted = Math.max(0, Math.floor(amount) || 0);
+        if (wanted === 0) return 0;
+
+        let healed = 0;
+        while (healed < wanted && this.healWound(false)) healed++;
+        return healed;
     }
 
     /**
@@ -586,7 +650,9 @@ export class Hero {
         if (effect.influence) this.influencePoints += effect.influence;
         if (effect.command) this.commandLimit += effect.command;
 
-        // Special effects: vampirism, mana_token, etc. would need game integration
+        // Soul Stealer: the attack it adds heals the hero for each enemy it
+        // defeats. Counted per equipped artifact, removed on unequip.
+        if (effect.vampirism) this.vampirism += 1;
     }
 
     /** Remove artifact passive effects */
@@ -598,6 +664,7 @@ export class Hero {
         if (effect.movement) this.movementPoints = Math.max(0, this.movementPoints - effect.movement);
         if (effect.influence) this.influencePoints = Math.max(0, this.influencePoints - effect.influence);
         if (effect.command) this.commandLimit = Math.max(1, this.commandLimit - effect.command);
+        if (effect.vampirism) this.vampirism = Math.max(0, this.vampirism - 1);
     }
 
     /** Get equipped artifact */
@@ -644,8 +711,15 @@ export class Hero {
     }
 
     endTurn(): void {
-        this.discard.push(...this.hand);
-        this.hand = [];
+        // Concentration's "keep" rule: kept cards stay in the hand, everything
+        // else goes to the discard pile. The set is dropped here, so a kept
+        // card is discarded on the following turn.
+        const kept = this.hand.filter((card) => this.keptCardIds.has(card.id));
+        const dropped = this.hand.filter((card) => !this.keptCardIds.has(card.id));
+
+        this.discard.push(...dropped);
+        this.hand = kept;
+        this.keptCardIds.clear();
 
         this.movementPoints = 0;
         this.attackPoints = 0;
@@ -685,9 +759,22 @@ export class Hero {
             return false;
         }
 
-        const woundIndex = this.hand.findIndex(card => card.isWound());
-        if (woundIndex !== -1) {
-            this.hand.splice(woundIndex, 1);
+        // A wound in the hand is the one that blocks a card slot; a wound already
+        // on the discard pile (poison) is healed the same way.
+        const handIndex = this.hand.findIndex(card => card.isWound());
+        if (handIndex !== -1) {
+            this.hand.splice(handIndex, 1);
+            this.wounds.pop();
+            if (useHealingPoints) {
+                this.healingPoints--;
+            }
+            this.syncStore();
+            return true;
+        }
+
+        const discardIndex = this.discard.findIndex(card => card.isWound());
+        if (discardIndex !== -1) {
+            this.discard.splice(discardIndex, 1);
             this.wounds.pop();
             if (useHealingPoints) {
                 this.healingPoints--;
@@ -698,6 +785,14 @@ export class Hero {
 
         this.syncStore();
         return false;
+    }
+
+    /**
+     * Cleanse (Cure): the heal additionally removes one wound from the hero,
+     * independent of healing points. Returns true when a wound was removed.
+     */
+    cleanseWound(): boolean {
+        return this.healWound(false);
     }
 
     moveTo(q: number, r: number, cost = 0): boolean {
@@ -795,6 +890,8 @@ export class Hero {
         this.crystals = {} as Record<string, number>;
         this.nextCardBonus = 0;
         this.extraTurns = 0;
+        this.vampirism = 0;
+        this.keptCardIds = new Set();
 
         this.initializeDeck();
         this.drawCards();

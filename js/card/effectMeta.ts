@@ -83,6 +83,17 @@ export interface EffectFlag {
     label: string;
     /** Only render when the value matches. */
     matches?: (value: unknown) => boolean;
+    /**
+     * Filled in when a numeric flag needs a unit: the value is not the block
+     * itself (Burning Shield strong: 4 block *and* a 2-point fire attack).
+     */
+    valueUnit?: string;
+    /**
+     * Tooltip for a flag that is declared in the data but has no engine
+     * handler yet. Missing means "the engine applies this" — the gap is shown
+     * only where one really exists.
+     */
+    unhandled?: string;
 }
 
 export const EFFECT_FLAGS: EffectFlag[] = [
@@ -93,6 +104,58 @@ export const EFFECT_FLAGS: EffectFlag[] = [
         icon: '🔮',
         label: 'Element',
         matches: (value) => typeof value === 'string' && value !== 'physical'
+    },
+    {
+        // Burning Shield: the block is the elementally weak part, so the card
+        // adds a fire attack of its own. Applied by CombatOrchestrator.
+        key: 'fireAttack',
+        icon: '🔥',
+        label: 'Feuer-Angriff',
+        matches: (value) => typeof value === 'number' && value > 0,
+        valueUnit: 'Angriff'
+    },
+    {
+        // Cold Toughness: elemental block counts as cold fire, i.e. full
+        // efficiency against any attack element. Applied by BlockingEngine.
+        key: 'iceBlock',
+        icon: '❄️',
+        label: 'Eis-Block (Schneidezorn)',
+        matches: (value) => value === true
+    },
+    {
+        // Soul Stealer is an artifact, so the flag rides along on the artifact
+        // effect. Applied by Hero.applyArtifactEffects + CombatOrchestrator.
+        key: 'vampirism',
+        icon: '🩸',
+        label: 'Vampirismus',
+        matches: (value) => value === true,
+        valueUnit: 'Heilung'
+    },
+    {
+        // Call to Arms: the influence spent also recruits units. The number is
+        // the count, so the data declares how many join.
+        key: 'unitRecruitment',
+        icon: '👥',
+        label: 'Einheitenwerb',
+        matches: (value) => typeof value === 'number' && value > 0,
+        valueUnit: 'Einheiten'
+    },
+    {
+        // Cure: the heal additionally removes a wound from the hero, whatever
+        // the healing points say. Applied by Hero.playCard → cleanseWounds().
+        key: 'cleanse',
+        icon: '✨',
+        label: 'Befreiung',
+        matches: (value) => value === true,
+        valueUnit: 'Wunde'
+    },
+    {
+        // Concentration strong: the drawn card stays in hand at end of turn.
+        // Applied by Hero.playCard (keptCardIds) and Hero.endTurn().
+        key: 'keep',
+        icon: '🤲',
+        label: 'Behalten',
+        matches: (value) => value === true
     }
 ];
 
@@ -145,6 +208,67 @@ export function isKnownEffectType(type: string | undefined): boolean {
         EFFECT_TYPES_HANDLED_ELSEWHERE.includes(type) ||
         UNHANDLED_EFFECT_TYPES.includes(type)
     );
+}
+
+/**
+ * Every key the card data may declare on an effect. `EFFECT_TYPE_TO_KEY`,
+ * `EFFECT_FLAGS`, `CHOICE_EFFECT_KEYS` and the explicit extras below cover the
+ * whole surface a definition can use — anything else is either a typo or a
+ * rule the engine silently ignores.
+ */
+export const KNOWN_EFFECT_KEYS: string[] = [
+    ...Object.keys(EFFECT_TYPE_TO_KEY),
+    ...EFFECT_FLAGS.map((flag) => flag.key),
+    ...CHOICE_EFFECT_KEYS,
+    // Bookkeeping: the declared effect type itself and the values that ride
+    // along on it. `type` is what EFFECT_TYPE_TO_KEY maps, not a rule.
+    'type',
+    'value',
+    'type2',
+    'value2',
+    'move',
+    'condition',
+    'enhancedBy'
+];
+
+/**
+ * The keys the engine applies (or hands to a controller that applies them).
+ * Used by the card-effect guard so a declared key can never be silently dead.
+ */
+export function isAppliedEffectKey(key: string): boolean {
+    return (
+        key in EFFECT_TYPE_TO_KEY ||
+        EFFECT_FLAGS.some((flag) => flag.key === key && !flag.unhandled) ||
+        CHOICE_EFFECT_KEYS.includes(key)
+    );
+}
+
+/**
+ * Collect every key declared on any effect object across the card data.
+ * Guard input: a key here that is neither applied nor explicitly flagged as
+ * unhandled means the engine drops it.
+ */
+export function collectEffectKeys(...collections: unknown[][]): string[] {
+    const keys = new Set<string>();
+
+    const walk = (node: unknown) => {
+        if (!node || typeof node !== 'object') return;
+        if (Array.isArray(node)) {
+            node.forEach(walk);
+            return;
+        }
+
+        for (const [key, value] of Object.entries(node)) {
+            if (key === 'basicEffect' || key === 'strongEffect' || key === 'advancedEffect') {
+                if (value && typeof value === 'object') {
+                    Object.keys(value as Record<string, unknown>).forEach((effectKey) => keys.add(effectKey));
+                }
+            }
+        }
+    };
+
+    collections.forEach((collection) => walk(collection));
+    return [...keys].sort();
 }
 
 /**

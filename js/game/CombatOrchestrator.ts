@@ -10,6 +10,8 @@ import { Unit } from '../unit';
 export interface BlockSource {
     value: number;
     element: string;
+    /** Ice Block (Cold Toughness): counts as cold fire, full efficiency on any element. */
+    iceBlock?: boolean;
 }
 
 interface CombatResult {
@@ -58,6 +60,8 @@ export class CombatOrchestrator {
     public combatRangedElements: Record<string, number>;
     /** Enemies to destroy outright at attack resolution (Disintegrate). */
     public pendingDestroyEnemies: number;
+    /** Burning Shield fire attacks, resolved as their own attack pass. */
+    public pendingFireAttacks: number[];
     /** Site under the hero when this fight started. Null when the hex has nothing to conquer. */
     private combatSite: any = null;
     /** True after initiateCombat looked at the hero hex, so a stale currentSite is ignored. */
@@ -74,6 +78,7 @@ export class CombatOrchestrator {
         this.combatAreaStrikes = [];
         this.combatRangedElements = {};
         this.pendingDestroyEnemies = 0;
+        this.pendingFireAttacks = [];
     }
 
     /**
@@ -116,6 +121,7 @@ export class CombatOrchestrator {
         this.combatAreaStrikes = [];
         this.combatRangedElements = {};
         this.pendingDestroyEnemies = 0;
+        this.pendingFireAttacks = [];
         this.activeBlocks = [];
     }
 
@@ -141,7 +147,9 @@ export class CombatOrchestrator {
             this.combatBlockTotal += result.effect.block;
             this.activeBlocks.push({
                 value: result.effect.block,
-                element: result.effect.element || 'physical'
+                element: result.effect.element || 'physical',
+                // Cold Toughness: the block counts as cold fire (full efficiency).
+                iceBlock: !!result.effect.iceBlock
             });
         } else if (phase === COMBAT_PHASES.RANGED) {
             const element = (result.effect.element as string) || 'physical';
@@ -162,6 +170,15 @@ export class CombatOrchestrator {
                 this.combatAttackTotal += result.effect.attack;
             }
             this.combatAttackElements[element] = (this.combatAttackElements[element] || 0) + result.effect.attack;
+        }
+
+        // Burning Shield: a fire attack that rides along on the block, not on
+        // the attack pool. Resolved in its own attack pass, after the main one.
+        if (result.effect.fireAttack) {
+            const fireValue = Number(result.effect.fireAttack) || 0;
+            if (fireValue > 0 && (phase === COMBAT_PHASES.BLOCK || phase === COMBAT_PHASES.ATTACK)) {
+                this.pendingFireAttacks.push(fireValue);
+            }
         }
 
         if (
@@ -390,6 +407,37 @@ export class CombatOrchestrator {
         }
 
         this.game.addLog(attackResult.message, attackResult.success ? 'success' : 'warning');
+
+        // Burning Shield: the fire attack rides along on the block, so it hits
+        // after the main attack pass and before combat ends.
+        const fireAttacks = this.pendingFireAttacks;
+        this.pendingFireAttacks = [];
+
+        // Soul Stealer: a vampiric artifact heals the hero for each enemy the
+        // attack pass defeated.
+        if (this.game.hero.vampirism > 0 && this.game.combat) {
+            const defeated = this.game.combat.defeatedEnemies.length;
+            if (defeated > 0) {
+                const healed = this.game.hero.vampiricHeal(defeated);
+                if (healed > 0) {
+                    this.game.addLog(t('combat.vampiricHeal', { amount: healed }), 'success');
+                }
+            }
+        }
+
+        if (fireAttacks.length > 0 && this.game.combat && this.game.combat.phase === COMBAT_PHASES.ATTACK) {
+            fireAttacks.forEach((value) => {
+                const fireResult = this.game.combat.attackEnemies(value, 'fire');
+                if (fireResult && fireResult.message) {
+                    this.game.addLog(fireResult.message, fireResult.success ? 'success' : 'warning');
+                }
+            });
+            // A fire attack alone can end the fight
+            if (this.game.combat.enemies.length === 0) {
+                this.onCombatEnd({ victory: true, enemy: this.game.combat.enemy });
+                return;
+            }
+        }
 
         this.onCombatEnd({ victory: attackResult.success, enemy: this.game.combat.enemy });
     }

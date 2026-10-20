@@ -5,6 +5,8 @@ import { t } from '../i18n/index';
 export interface BlockSource {
     value: number;
     element: string;
+    /** Ice Block (Cold Toughness): counts as cold fire, full efficiency on any element. */
+    iceBlock?: boolean;
 }
 
 export interface BlockResult {
@@ -14,6 +16,8 @@ export interface BlockResult {
     consumedPoints: number;
     unitPointsConsumed: number;
     isInefficient: boolean;
+    /** True when an elemental block acted as cold fire (full efficiency, any element). */
+    elementalWildcard?: boolean;
     message: string;
 }
 
@@ -56,6 +60,7 @@ export class BlockingEngine {
         let totalEffectiveBlock = 0;
         let totalInputBlock = 0;
         let isInefficient = false;
+        let elementalWildcard = false;
         const inefficiencyReasons = new Set<string>();
 
         cardBlocks.forEach(block => {
@@ -63,6 +68,7 @@ export class BlockingEngine {
             const el = block.element || ATTACK_ELEMENTS.PHYSICAL;
             totalInputBlock += val;
             let efficiency = 1.0;
+            let blockInefficient = false;
 
             // Cold Fire blocks act as WILDCARD - full efficiency against ANY attack element
             if (el === ATTACK_ELEMENTS.COLD_FIRE) {
@@ -70,14 +76,14 @@ export class BlockingEngine {
             } else if (enemyElement === ATTACK_ELEMENTS.FIRE) {
                 if (el !== ATTACK_ELEMENTS.ICE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
-                    isInefficient = true;
+                    blockInefficient = true;
                     if (el === ATTACK_ELEMENTS.FIRE) inefficiencyReasons.add('fire_vs_fire');
                     else inefficiencyReasons.add('physical_vs_fire');
                 }
             } else if (enemyElement === ATTACK_ELEMENTS.ICE) {
                 if (el !== ATTACK_ELEMENTS.FIRE && el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
-                    isInefficient = true;
+                    blockInefficient = true;
                     if (el === ATTACK_ELEMENTS.ICE) inefficiencyReasons.add('ice_vs_ice');
                     else inefficiencyReasons.add('physical_vs_ice');
                 }
@@ -86,12 +92,22 @@ export class BlockingEngine {
                 // (Handled above by the el === COLD_FIRE check)
                 if (el !== ATTACK_ELEMENTS.COLD_FIRE) {
                     efficiency = 0.5;
-                    isInefficient = true;
+                    blockInefficient = true;
                     if (el === ATTACK_ELEMENTS.FIRE) inefficiencyReasons.add('fire_vs_cold_fire');
                     else if (el === ATTACK_ELEMENTS.ICE) inefficiencyReasons.add('ice_vs_cold_fire');
                     else inefficiencyReasons.add('physical_vs_cold_fire');
                 }
             }
+
+            // Ice Block (Cold Toughness): the block acts as cold fire, i.e. it
+            // keeps full efficiency whatever element the enemy attacks with.
+            if (block.iceBlock) {
+                efficiency = 1.0;
+                blockInefficient = false;
+                elementalWildcard = true;
+            }
+
+            if (blockInefficient) isInefficient = true;
 
             totalEffectiveBlock += Math.floor(val * efficiency);
         });
@@ -175,6 +191,7 @@ export class BlockingEngine {
                 consumedPoints: totalInputBlock,
                 unitPointsConsumed: unitPointsUsed,
                 isInefficient: isInefficient,
+                elementalWildcard,
                 message: t('combat.blockSuccess', { enemy: enemy.name, note: limitNote })
             };
         }
@@ -186,6 +203,7 @@ export class BlockingEngine {
             consumedPoints: totalInputBlock,
             unitPointsConsumed: 0,
             isInefficient: isInefficient,
+            elementalWildcard,
             message: t('combat.blockWeak', { attack: totalEffectiveBlock, armor: blockRequired, note: limitNote })
         };
     }

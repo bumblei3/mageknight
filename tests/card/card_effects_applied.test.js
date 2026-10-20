@@ -18,7 +18,14 @@ import {
     SAMPLE_SPELLS,
     SAMPLE_ADVANCED_ACTIONS
 } from '../../js/card/CardDefinitions';
-import { isKnownEffectType, EFFECT_TYPE_TO_KEY } from '../../js/card/effectMeta';
+import {
+    isKnownEffectType,
+    isAppliedEffectKey,
+    collectEffectKeys,
+    KNOWN_EFFECT_KEYS,
+    EFFECT_FLAGS,
+    EFFECT_TYPE_TO_KEY
+} from '../../js/card/effectMeta';
 import { HeroBuilder } from '../test-helpers.js';
 
 /**
@@ -171,6 +178,59 @@ describe('Hero.playCard — declared effects change hero state', () => {
         hero.playCard(0, false);
 
         expect(hero.reputation).toBe(0);
+    });
+});
+
+describe('effect key coverage — no declared key is silently dead', () => {
+    it('every key declared on an effect is applied or explicitly flagged unhandled', () => {
+        const declared = collectEffectKeys(
+            CARD_DEFINITIONS,
+            SAMPLE_ARTIFACTS,
+            SAMPLE_SPELLS,
+            SAMPLE_ADVANCED_ACTIONS
+        );
+
+        const silent = declared.filter(
+            (key) =>
+                !isAppliedEffectKey(key) &&
+                !KNOWN_EFFECT_KEYS.includes(key) &&
+                !EFFECT_FLAGS.some((flag) => flag.key === key && flag.unhandled)
+        );
+
+        expect(silent).toEqual([]);
+    });
+
+    it('the keyword rules that used to be declared and dropped are now applied', () => {
+        // Before this suite grew, these keys sat in CardDefinitions with no
+        // reader anywhere in js/: the cards played, the values did nothing.
+        // soul_stealer exists in both the starter dict and SAMPLE_ARTIFACTS,
+        // so the lookup takes the first match rather than definitionById().
+        const expected = {
+            cleanse: 'cure',
+            vampirism: 'soul_stealer',
+            fireAttack: 'chaos_1', // Burning Shield
+            iceBlock: 'tac_1', // Cold Toughness
+            unitRecruitment: 'unit_1', // Call to Arms
+            keep: 'concentration'
+        };
+
+        const all = [
+            ...Object.values(CARD_DEFINITIONS),
+            ...SAMPLE_ARTIFACTS,
+            ...SAMPLE_SPELLS,
+            ...SAMPLE_ADVANCED_ACTIONS
+        ].filter(Boolean);
+
+        for (const key of Object.keys(expected)) {
+            const cardId = expected[key];
+            const def = all.find((entry) => entry && entry.id === cardId);
+            expect(def, `definition for ${cardId}`).toBeTruthy();
+
+            const effects = [def.basicEffect, def.advancedEffect, def.strongEffect]
+                .filter(Boolean);
+            expect(effects.some((effect) => effect[key] !== undefined)).toBe(true);
+            expect(isAppliedEffectKey(key)).toBe(true);
+        }
     });
 });
 

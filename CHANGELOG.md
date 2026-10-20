@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Map tiles:** Exploring spends 2 movement and lays the next 7-hex scenario tile on the open edge (terrain, one site, that site's enemies). The deck is built from `mapConfig.deck` or `deckDistribution` plus the scenario's site list, then shuffled with a seed from the scenario id. The start tile is left in place.
 
 ### Changed
+- **CI-Pipeline:** `cancel-in-progress` für PR-Pushes (überholte Läufe werden abgebrochen statt doppelt bezahlt), E2E-Tests blockieren wieder (waren durch `continue-on-error` + Summary-Logik unsichtbar, obwohl seit 9 Läufen rot), Deploy lädt das getestete `dist`-Artefakt statt erneut `npm ci && npm run build` auszuführen, `permissions: contents: read` als Default, Timeout für den Lint-Job, No-op-Schritt „Check coverage thresholds" entfernt (vitest erzwingt die Schwellen selbst).
+- **Playwright in CI:** 2 Worker statt 1 — der E2E-Job war mit 9,7 min der Flaschenhals des 12,7-min-Pipelines.
 - **Kartentooltip/Preview:** rendert nur noch echte Effektzeilen. Vorher leckten die internen Schlüssel `type`, `value`, `condition` als „• type influence (+influence)" in die UI.
 - **Handkarten-Log** (`formatEffect`) nennt die neuen Effekte (🎴 Ziehen, 💎 Mana, 💠 Kristall, 🖐️ Handkarten-Limit, ⚖️ Ansehen).
 - **`HeroInventory.addCrystal`:** legt fehlende Farb-Slots (Gold/Schwarz) an, damit Karten wie Crystal Magic nicht ins Leere laufen; Deckel von 3 pro Farbe bleibt.
@@ -45,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Smart End Turn:** Warnungen bei restlichen MP, Heilung, Site, Move-Karten
 
 ### Fixed
+- **Tooltip-Race:** Ein bereits gestarteter Ausblend-Vorgang versteckte einen danach neu angezeigten Tooltip 200 ms später zwangsweise — beim schnellen Hover von Ziel zu Ziel blieb der Tooltip unsichtbar. Der 200-ms-Tail ist jetzt abbrechbar (`hideFinishTimeout`); Regressionstest in `tests/ui/tooltipLifecycle.test.js`.
 - Winning a fight on a mine, keep, mage tower, dungeon, ruin, tomb, labyrinth, spawning ground, den, or magic glade marks that site conquered. The site is the one under the hero when the fight starts. Defeat and retreat leave it alone, and the next fight does not clear an older site. Village, monastery, and city are unchanged.
 - Site fights that passed a plain enemy object into combat now build an `Enemy` inside `initiateCombat`, so block and damage can call `getBlockRequirement` and `getEffectiveAttack`. An enemy that already has those methods is left unchanged. Summoners still summon.
 - In the damage phase, clicking a unit assigns that enemy's damage to the unit. Block, attack, and ranged clicks still activate the unit. An assassin still forces the wounds onto the hero.

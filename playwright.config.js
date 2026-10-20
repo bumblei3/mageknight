@@ -11,7 +11,10 @@ export default defineConfig({
     fullyParallel: false,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 1 : 0,
-    workers: 1,
+    // 49 spec files at ~9.7 min serial was the CI long pole; two workers halve
+    // it. Keep it at 2 so the shared Vite dev server and the runner CPU stay
+    // comfortable (flaky timing assertions are worse than a slow job).
+    workers: process.env.CI ? 2 : 1,
     reporter: 'html',
     use: {
         actionTimeout: 30000,

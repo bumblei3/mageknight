@@ -10,6 +10,8 @@ export class TooltipManager {
     private tooltip: HTMLElement | null = null;
     private currentTarget: HTMLElement | null = null;
     private hideTimeout: NodeJS.Timeout | number | null = null;
+    /** Tail of hideTooltip() (fade out → display:none) — must be cancellable. */
+    private hideFinishTimeout: NodeJS.Timeout | number | null = null;
 
     constructor() {
         this.createTooltipElement();
@@ -160,6 +162,10 @@ export class TooltipManager {
     public showTooltip(element: HTMLElement, htmlContent: string): void {
         if (!this.tooltip) return;
         if (this.hideTimeout) clearTimeout(this.hideTimeout as any);
+        // A hide that already started fading must not finish after we re-show,
+        // otherwise the fresh tooltip is force-hidden 200 ms later.
+        if (this.hideFinishTimeout) clearTimeout(this.hideFinishTimeout as any);
+        this.hideFinishTimeout = null;
 
         this.currentTarget = element;
         this.tooltip.innerHTML = htmlContent;
@@ -194,7 +200,9 @@ export class TooltipManager {
         const hide = () => {
             if (!this.tooltip) return;
             this.tooltip.style.opacity = '0';
-            setTimeout(() => {
+            if (this.hideFinishTimeout) clearTimeout(this.hideFinishTimeout as any);
+            this.hideFinishTimeout = setTimeout(() => {
+                this.hideFinishTimeout = null;
                 if (this.tooltip) this.tooltip.style.display = 'none';
                 this.currentTarget = null;
             }, 200);

@@ -127,6 +127,7 @@ Kartendaten deklarieren Effekte als `{ type, value, … }`. `Card.normalizeEffec
 | `condition: 'reputation_loss'` | Ansehen −1 beim Ausspielen (Threaten, Banner of Fear) |
 | `type: 'enhance_next'` + `value` | Bonus für die nächste Karte des Zuges (Concentrate: +2 / +5 auf den ersten Effekt der nächsten Karte, verfällt am Zugende) |
 | `type: 'summon_unit'` + `value` | beschwört `value` Einheiten aus `UNIT_INFO`; das Kommandolimit begrenzt (Summon) |
+| `type: 'extra_turn'` + `value` | gewährt `value` zusätzliche Züge (Time Walk). Ein zusätzlicher Zug füllt Hand und Mana-Quelle auf, zählt aber **nicht** als Runde — der Tag/Nacht-Rhythmus (alle 6 Züge) wartet |
 | `type: 'wish'` + `value` | Wunsch: der Spieler wählt pro Wert eine Option — 5 Wunden heilen, +5 Angriff oder ein Artefakt (Wish) |
 | `type: 'copy_card'` + `value` | holt `value` gewählte Karten aus dem Ablagestapel zurück auf die Hand (Improvisation) |
 | `type: 'destroy_enemy'` + `value` | vernichtet beim Angriff bis zu `value` Feinde ohne Rüstungsrechnung (Disintegrate). Bosse sind immun — die Karte verpufft dann |
@@ -134,9 +135,9 @@ Kartendaten deklarieren Effekte als `{ type, value, … }`. `Card.normalizeEffec
 | `area: true` bzw. `target: 'all'` | Angriff trifft jeden Feind einzeln statt gepoolt (Flame Wave, Meteor Storm, Fireball) |
 
 Noch ohne Engine-Wirkung (im Tooltip als „noch nicht implementiert" markiert):
-`spell_effect`, `extra_turn`. Ebenfalls noch nicht simuliert: die
-Schlüsselwörter `vampirism`, `cleanse`, `keep`, `iceBlock`, `fireAttack`,
-`unitRecruitment`.
+nur noch `spell_effect` (Spell Mastery — beliebigen Zauber wirken). Ebenfalls
+noch nicht simuliert: die Schlüsselwörter `vampirism`, `cleanse`, `keep`,
+`iceBlock`, `fireAttack`, `unitRecruitment`.
 
 ### Auswahl-Effekte (Wish, Improvisation)
 

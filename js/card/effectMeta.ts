@@ -42,7 +42,8 @@ export const EFFECT_TYPE_TO_KEY: Record<string, string> = {
     summon_unit: 'summonUnit',
     destroy_enemy: 'destroyEnemy',
     wish: 'wish',
-    copy_card: 'copyCard'
+    copy_card: 'copyCard',
+    extra_turn: 'extraTurn'
 };
 
 /**
@@ -63,8 +64,7 @@ export const EFFECT_TYPES_HANDLED_ELSEWHERE: string[] = [
  * is visible in the UI and testable instead of silent.
  */
 export const UNHANDLED_EFFECT_LABELS: Record<string, string> = {
-    spell_effect: 'Beliebigen Zauber wirken',
-    extra_turn: 'Zusätzlicher Zug'
+    spell_effect: 'Beliebigen Zauber wirken'
 };
 
 /**
@@ -118,7 +118,8 @@ export const EFFECT_FIELDS: EffectField[] = [
     { key: 'summonUnit', icon: '👻', label: 'Einheiten beschwören' },
     { key: 'destroyEnemy', icon: '✨', label: 'Feind vernichten' },
     { key: 'wish', icon: '🪄', label: 'Wunsch (Auswahl)' },
-    { key: 'copyCard', icon: '📋', label: 'Karte aus der Ablage' }
+    { key: 'copyCard', icon: '📋', label: 'Karte aus der Ablage' },
+    { key: 'extraTurn', icon: '⏳', label: 'Zusätzliche Züge' }
 ];
 
 /**

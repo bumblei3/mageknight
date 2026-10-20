@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Time Walk** (`extra_turn`, Basis 1 / stark 2): gewährt echte zusätzliche Züge. Ein zusätzlicher Zug füllt Hand und Mana-Quelle wie ein normaler Zugwechsel auf, zählt aber nicht als Runde — der Tag/Nacht-Wechsel (alle 6 Züge) wartet (`Hero.consumeExtraTurn`, aufgerufen aus `TurnManager.endTurn`). Der Zustand übersteht Speichern/Laden.
+
+### Fixed
+- **Speichern mit negativem Ansehen wurde stillschweigend verworfen:** `HeroStateSchema.reputation` war `min(0)`, während die Engine auf [−7, 7] klemmt und Karten wie Threaten 1 Ansehen kosten. `SaveManager.saveGame` schreibt bei fehlgeschlagener Validierung nur `console.error` und gibt `false` zurück — der Spielstand war weg. Schema jetzt `min(-7).max(7)`, plus Regressionstests in `tests/persistence/reputationSave.test.js`.
+- **18 fehlende Übersetzungsschlüssel:** `t()` gibt bei fehlendem Schlüssel den Schlüssel selbst zurück, dadurch standen Rohpfade in der Oberfläche — u. a. `game.turnEnded`, `game.cardsDrawn`, `game.manaRecharged`, `game.nextTurn`, `game.timeAdvanced`, `combat.attackSuccess`, `combat.damageAssignedTo`, `combat.paralyzeDiscard`, `combat.cumbersomeUsed`, `ui.phases.damage`, `ui.hints.attack/block`, `ui.labels.empty` sowie die Trait-Labels `mana.assassin/boss/cumbersome/elusive/paralyze/summoner/vampiric`. Alle in de/en ergänzt, dazu drei in EN fehlende Site-Meldungen. Neuer Guard-Test `tests/i18n/missingKeys.test.js` prüft, dass jeder literale `t('…')`-Schlüssel in beiden Sprachen existiert.
 - **Wish und Improvisation fragen jetzt nach:** die letzten beiden Karten, die sichtbar nichts taten.
   - **Wish** (`wish`, Basis 1 / stark 2): Auswahl-Modal mit drei Optionen — 5 Wunden heilen, +5 Angriff oder ein Artefakt (`hero.resolveWish`). Der Wert der Karte ist die Zahl der Wünsche, das Modal öffnet sich entsprechend mehrfach.
   - **Improvisation** (`copy_card`, Basis 1 / stark 2): Auswahl-Modal listet den Ablagestapel, gewählte Karten kommen zurück auf die Hand (`hero.copyCardsFromDiscard`).

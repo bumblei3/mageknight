@@ -588,7 +588,7 @@ describe('CombatOrchestrator - Coverage Boost', () => {
             
             orchestrator.handleDamageResults(result);
             
-            expect(mockGame.addLog).toHaveBeenCalledWith(expect.stringContaining('paralyzeDiscard'), 'warning');
+            expect(mockGame.addLog).toHaveBeenCalledWith(expect.stringContaining('Versteinerung'), 'warning');
             expect(mockParticleSystem.createFloatingText).toHaveBeenCalled();
         });
     });

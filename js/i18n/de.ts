@@ -14,7 +14,13 @@ const de = {
         victory: 'Sieg!',
         defeat: 'Niederlage!',
         gameOver: 'Spiel beendet',
-        endTurnCombatBlocked: 'Beende erst den Kampf, bevor du den Zug beenden kannst!'
+        endTurnCombatBlocked: 'Beende erst den Kampf, bevor du den Zug beenden kannst!',
+        turnEnded: 'Zug {number} beendet',
+        cardsDrawn: '{count} Karte(n) gezogen',
+        manaRecharged: 'Mana-Quelle aufgefrischt',
+        timeAdvanced: 'Tageszeit wechselt zu {time}',
+        nextTurn: 'Nächster Zug!',
+        extraTurn: 'Zeitreise: zusätzlicher Zug (noch {left} übrig)'
     },
 
     // UI Elements
@@ -36,6 +42,7 @@ const de = {
             explore: 'Erkunden'
         },
         labels: {
+            empty: '—',
             fame: 'Ruhm',
             reputation: 'Ansehen',
             armor: 'Rüstung',
@@ -142,6 +149,9 @@ const de = {
             manaHint: 'Klicke Mana-Würfel zum Aufnehmen',
             restHint: 'Rasten heilt Wunden & resetet Karten',
             shortcut: 'Tastenkürzel',
+            damage: 'Ziehe Schaden auf Einheiten oder nimm Wunden',
+            attack: 'Angriffskarten sind hervorgehoben · Space = ausführen',
+            block: 'Blockkarten sind hervorgehoben · dann „Block beenden“',
         },
         phases: {
             exploration: 'Erkundung',
@@ -149,9 +159,11 @@ const de = {
             ranged: 'Fernkampf',
             block: 'Block-Phase',
             attack: 'Angriff-Phase',
+            damage: 'Schadensphase',
             phase1: 'Phase 1',
             phase2: 'Phase 2',
             phase3: 'Phase 3',
+            phase4: 'Phase 4',
             enraged: 'Wütend'
         },
         tooltips: {
@@ -227,6 +239,14 @@ const de = {
         paralyzeEffect: 'Versteinerung! Der Held muss alle Nicht-Wunden-Karten abwerfen.',
         assassinateRestriction: '{enemy} ist ein Attentäter! Schaden kann nicht auf Einheiten zugewiesen werden.',
         phaseDamageOnly: 'Schadenszuweisung ist nur in der Schadensphase möglich.',
+        assignDamage: 'Weise den Schaden des Feindes einer Einheit oder dem Helden zu.',
+        noEnemyToAssign: 'Kein Feind, dem Schaden zugewiesen werden kann.',
+        alreadyAssigned: 'Diesem Feind wurde der Schaden bereits zugewiesen.',
+        damageSkipped: 'Kein Schaden zuzuweisen.',
+        damageAssignedTo: '{unit} übernimmt den Schaden von {enemy}.',
+        attackSuccess: 'Angriff erfolgreich!',
+        paralyzeDiscard: '{count} Karten durch Versteinerung abgeworfen.',
+        cumbersomeUsed: '{enemy} musste {amount} Angriff für Schwerfälligkeit abgeben.',
         cardPlayed: 'Karte gespielt: {card}',
         message: 'Kampf gegen {count} Feinde!',
         combatEnded: 'Kampf beendet',
@@ -402,6 +422,13 @@ const de = {
         brutal: 'Brutal',
         swift: 'Schnell',
         poison: 'Gift',
+        vampiric: 'Vampirismus',
+        paralyze: 'Lähmung',
+        cumbersome: 'Schwerfällig',
+        assassin: 'Attentäter',
+        summoner: 'Beschwörer',
+        elusive: 'Ausweichend',
+        boss: 'Boss',
         fireResist: 'Feuer-Resistenz',
         iceResist: 'Eis-Resistenz',
         physicalResist: 'Physische Resistenz',

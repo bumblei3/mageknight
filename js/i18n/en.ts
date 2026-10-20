@@ -14,7 +14,13 @@ const en = {
         victory: 'Victory!',
         defeat: 'Defeat!',
         gameOver: 'Game Over',
-        endTurnCombatBlocked: 'Finish the combat first before ending your turn!'
+        endTurnCombatBlocked: 'Finish the combat before ending your turn!',
+        turnEnded: 'Turn {number} ended',
+        cardsDrawn: 'Drew {count} card(s)',
+        manaRecharged: 'Mana source recharged',
+        timeAdvanced: 'Time of day changes to {time}',
+        nextTurn: 'Next turn!',
+        extraTurn: 'Time Walk: extra turn ({left} left)'
     },
 
     // UI Elements
@@ -36,6 +42,7 @@ const en = {
             explore: 'Explore'
         },
         labels: {
+            empty: '—',
             fame: 'Fame',
             reputation: 'Reputation',
             armor: 'Armor',
@@ -142,6 +149,9 @@ const en = {
             manaHint: 'Click mana die to collect',
             restHint: 'Rest heals wounds & resets cards',
             shortcut: 'Shortcut',
+            damage: 'Assign damage to units or take wounds',
+            attack: 'Attack cards are highlighted · Space = execute',
+            block: 'Block cards are highlighted · then "End Block"',
         },
         phases: {
             exploration: 'Exploration',
@@ -149,9 +159,11 @@ const en = {
             ranged: 'Ranged',
             block: 'Block-Phase',
             attack: 'Attack-Phase',
+            damage: 'Damage Phase',
             phase1: 'Phase 1',
             phase2: 'Phase 2',
             phase3: 'Phase 3',
+            phase4: 'Phase 4',
             enraged: 'Enraged'
         },
         tooltips: {
@@ -227,6 +239,17 @@ const en = {
         paralyzeEffect: 'Paralyze! Hero must discard all non-wound cards.',
         assassinateRestriction: '{enemy} is an assassin! Damage cannot be assigned to units.',
         phaseDamageOnly: 'Damage assignment is only possible in the damage phase.',
+        assignDamage: 'Assign the enemy damage to a unit or the hero.',
+        noEnemyToAssign: 'No enemy to assign damage to.',
+        alreadyAssigned: 'Damage was already assigned to this enemy.',
+        damageSkipped: 'No damage to assign.',
+        damageAssignedTo: '{unit} takes the damage from {enemy}.',
+        attackSuccess: 'Attack successful!',
+        labyrinthCleared: 'The labyrinth is cleared!',
+        spawningCleared: 'The spawning ground is cleared!',
+        tombCleared: 'The tomb is cleared!',
+        paralyzeDiscard: '{count} cards discarded to paralyze.',
+        cumbersomeUsed: '{enemy} had to give up {amount} attack for being cumbersome.',
         cardPlayed: 'Card played: {card}',
         message: 'Combat against {count} enemies!',
         combatEnded: 'Combat ended',
@@ -394,6 +417,13 @@ const en = {
         brutal: 'Brutal',
         swift: 'Swift',
         poison: 'Poison',
+        vampiric: 'Vampirism',
+        paralyze: 'Paralyze',
+        cumbersome: 'Cumbersome',
+        assassin: 'Assassin',
+        summoner: 'Summoner',
+        elusive: 'Elusive',
+        boss: 'Boss',
         fireResist: 'Fire Resistance',
         iceResist: 'Ice Resistance',
         physicalResist: 'Physical Resistance',

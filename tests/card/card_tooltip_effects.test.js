@@ -64,9 +64,9 @@ describe('card tooltip — effect rows', () => {
     });
 
     it('marks effect types without an engine handler as not implemented', () => {
-        const text = tooltipTextOf('time_walk'); // extra_turn
+        const text = tooltipTextOf('spell_mastery'); // spell_effect
 
-        expect(text).toContain('Zusätzlicher Zug');
+        expect(text).toContain('Beliebigen Zauber wirken');
         expect(text).toContain('noch nicht implementiert');
     });
 

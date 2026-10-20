@@ -329,8 +329,10 @@ describe('TooltipManager - Coverage Boost', () => {
         it('should show vampiric trait when present', () => {
             const enemy = createMockEnemy({ vampiric: true });
             const html = tooltipManager.createEnemyTooltipHTML(enemy);
-            
-            expect(html.toLowerCase()).toContain('vampiric');
+
+            // Dictionary label (de 'Vampirismus' / en 'Vampirism') — used to fall
+            // through as the raw key 'mana.vampiric'
+            expect(html).toMatch(/Vampiri(smus|sm)/);
         });
 
         it('should show brutal trait when present', () => {

@@ -30,7 +30,9 @@ const HeroStateSchema = z.object({
   name: z.string(),
   level: z.number().int().min(1).max(10),
   fame: z.number().int().min(0),
-  reputation: z.number().int().min(0).default(0),
+  // Engine range is [-7, 7] (Hero.changeReputation); a min(0) here silently
+  // dropped every save made after a card cost reputation.
+  reputation: z.number().int().min(-7).max(7).default(0),
   armor: z.number().int().min(0).default(0),
   movementPoints: z.number().int().min(0).default(0),
   attackPoints: z.number().int().min(0).default(0),
@@ -48,6 +50,8 @@ const HeroStateSchema = z.object({
   skills: z.array(HeroSkillSchema).default([]),
   tempMana: z.array(z.string()).default([]),
   units: z.array(z.any()).default([]), // Unit state validated separately
+  /** Pending extra turns from the Time Walk spell. */
+  extraTurns: z.number().int().min(0).default(0),
 });
 
 export type HeroState = z.infer<typeof HeroStateSchema>;

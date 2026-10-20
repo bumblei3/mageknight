@@ -275,8 +275,8 @@ describe('BossEnemy', () => {
             b.currentHealth = 35;
             expect(b.getPhaseName()).toContain('Phase 3');
             b.currentHealth = 20;
-            // volkare has a 4th phase; German i18n lacks the 'phase4' key, so raw key is returned
-            expect(b.getPhaseName()).toContain('phase4');
+            // volkare has a 4th phase; the German dictionary now has it
+            expect(b.getPhaseName()).toBe('Phase 4');
             b.currentHealth = 5;
             expect(b.getPhaseName()).toContain('Enraged');
         });

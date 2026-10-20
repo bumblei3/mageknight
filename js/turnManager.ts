@@ -44,12 +44,22 @@ export class TurnManager {
         this.game.addLog(t('game.manaRecharged'), 'info');
 
         // 4. Update Game State / Turn Number
-        this.turnNumber++;
-        this.game.addLog(t('game.turnEnded', { number: this.turnNumber }), 'info');
+        // Time Walk grants extra turns: the player gets a fresh hand and mana
+        // source, but the round counter (and with it the day/night cycle) waits.
+        const extraTurn = typeof this.game.hero.consumeExtraTurn === 'function'
+            ? this.game.hero.consumeExtraTurn()
+            : false;
+
+        if (extraTurn) {
+            this.game.addLog(t('game.extraTurn', { left: this.game.hero.extraTurns }), 'warning');
+        } else {
+            this.turnNumber++;
+            this.game.addLog(t('game.turnEnded', { number: this.turnNumber }), 'info');
+        }
 
         // 5. Check if Round ends (e.g. after X turns or manual call)
         // Simple logic: every 6 turns a day/night cycle
-        if (this.turnNumber % 6 === 0) {
+        if (!extraTurn && this.turnNumber % 6 === 0) {
             this.game.timeManager.advanceTime();
             this.game.addLog(t('game.timeAdvanced', { time: this.game.timeManager.getTimeOfDay() }), 'warning');
 

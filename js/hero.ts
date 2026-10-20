@@ -112,6 +112,8 @@ export interface HeroState {
     healingPoints: number;
     handLimit: number;
     commandLimit: number;
+    /** Pending extra turns granted by Time Walk. */
+    extraTurns?: number;
     position: Position;
     deck: string[];
     hand: string[];
@@ -145,6 +147,8 @@ export class Hero {
     crystals: Record<string, number>;
     /** Armed by Concentrate; spent on the next card's primary effect this turn. */
     nextCardBonus: number;
+    /** Extra turns granted by Time Walk; TurnManager spends them. */
+    extraTurns: number;
     tempMana: ManaColor[];
 
     deck: Card[];
@@ -203,6 +207,7 @@ export class Hero {
         this.influencePoints = 0;
         this.healingPoints = 0;
         this.nextCardBonus = 0;
+        this.extraTurns = 0;
 
         this.initializeDeck();
         this.syncStore();
@@ -338,6 +343,7 @@ export class Hero {
         if (effect.crystal) this.gainCrystals(card.color, effect.crystal as number);
         if (effect.handLimitBonus) this.handLimit += effect.handLimitBonus as number;
         if (effect.summonUnit) this.summonUnits(effect.summonUnit as number);
+        if (effect.extraTurn) this.extraTurns += Number(effect.extraTurn) || 0;
         if (effect.condition === CONDITION_REPUTATION_LOSS) {
             this.changeReputation(REPUTATION_LOSS_PER_PLAY);
         }
@@ -382,6 +388,17 @@ export class Hero {
 
         if (units.length > 0) this.syncStore();
         return units;
+    }
+
+    /**
+     * Spend one pending extra turn (Time Walk). Returns true when the turn that
+     * just ended was the extra one, i.e. the round counter must not advance.
+     */
+    consumeExtraTurn(): boolean {
+        if (this.extraTurns <= 0) return false;
+        this.extraTurns--;
+        this.syncStore();
+        return true;
     }
 
     /**
@@ -777,6 +794,7 @@ export class Hero {
         this.skills = [];
         this.crystals = {} as Record<string, number>;
         this.nextCardBonus = 0;
+        this.extraTurns = 0;
 
         this.initializeDeck();
         this.drawCards();
@@ -824,6 +842,7 @@ export class Hero {
             healingPoints: this.healingPoints,
             handLimit: this.handLimit,
             commandLimit: this.commandLimit,
+            extraTurns: this.extraTurns,
             position: { ...this.position },
             deck: this.deck.map(c => c.id),
             hand: this.hand.map(c => c.id),
@@ -851,6 +870,7 @@ export class Hero {
         if (state.healingPoints !== undefined) this.healingPoints = state.healingPoints;
         if (state.handLimit !== undefined) this.handLimit = state.handLimit;
         if (state.commandLimit !== undefined) this.commandLimit = state.commandLimit;
+        if (state.extraTurns !== undefined) this.extraTurns = state.extraTurns;
         if (state.position) this.position = { ...state.position };
         this.displayPosition = { ...this.position };
         // Convert string IDs back to Card objects

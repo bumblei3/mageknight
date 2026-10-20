@@ -20,7 +20,7 @@ concurrency:
 jobs:
   lint-and-typecheck:
     name: Lint & Typecheck
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -43,7 +43,7 @@ jobs:
 
   test:
     name: Unit & Coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -71,7 +71,7 @@ jobs:
 
   build:
     name: Build Production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [lint-and-typecheck, test]
     steps:
       - name: Checkout
@@ -110,7 +110,7 @@ jobs:
 
   e2e:
     name: E2E Tests (Playwright)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     timeout-minutes: 25
     steps:
@@ -160,7 +160,7 @@ jobs:
 
   summary:
     name: CI Summary
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [lint-and-typecheck, test, build, e2e]
     if: always()
     steps:
@@ -182,7 +182,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [lint-and-typecheck, test, build]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     timeout-minutes: 10

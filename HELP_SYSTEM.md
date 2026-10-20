@@ -114,16 +114,12 @@ Für neue Spieler gibt es ein interaktives Tutorial mit 5 Schritten:
 ## Screenshots
 
 ### Tutorial
-![Tutorial erster Schritt](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/.system_generated/click_feedback/click_feedback_1763914662117.png)
 
 ### Hilfe-Modal - Grundlagen
-![Hilfe Modal Grundlagen](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/help_modal_basics_1763914701871.png)
 
 ### Hilfe-Modal - Kampf
-![Hilfe Modal Kampf](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/help_modal_combat_1763914723448.png)
 
 ### Demo-Video
-![Help System Demo](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/help_system_test_1763914641335.webp)
 
 ## Verbesserungen gegenüber vorher
 

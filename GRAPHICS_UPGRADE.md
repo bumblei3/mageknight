@@ -94,7 +94,6 @@ gradient.addColorStop(1, darkerColor)     // Unten dunkel
 ## 📸 Vorher/Nachher
 
 ### Premium Graphics Overview
-![Premium Graphics](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/premium_graphics_overview_1763915222049.png)
 
 **Sichtbar**:
 - Mehrschichtiger Hintergrund
@@ -104,7 +103,6 @@ gradient.addColorStop(1, darkerColor)     // Unten dunkel
 - Verbesserte Board-Beleuchtung
 
 ### Card Hover Effect
-![Card Hover](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/premium_card_hover_1763915233177.png)
 
 **Sichtbar**:
 - Karte hebt sich stark ab
@@ -114,7 +112,6 @@ gradient.addColorStop(1, darkerColor)     // Unten dunkel
 - Starker Schatten
 
 ### Hex Highlights with Glow
-![Hex Highlights](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/premium_hex_highlights_1763915259978.png)
 
 **Sichtbar**:
 - 3D-Gradient auf Hexen
@@ -124,7 +121,6 @@ gradient.addColorStop(1, darkerColor)     // Unten dunkel
 - Schatten für Tiefe
 
 ### Demo-Video
-![Graphics Demo](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/graphics_improvements_demo_1763915683924.webp)
 
 *Komplette Demo aller grafischen Verbesserungen in Aktion*
 

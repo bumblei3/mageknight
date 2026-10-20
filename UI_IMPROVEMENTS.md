@@ -112,7 +112,6 @@ Angriffs-Phase → "⚔️ Spiele rote Karten zum Angreifen"
 ### UI Initial View
 Die neue Shortcuts-Bar und der Phase-Indikator sind sichtbar:
 
-![UI Demo](file:///home/tobber/.gemini/antigravity/brain/c303dd58-1679-47a8-9ab0-dc6c37d6bdc0/final_ui_test_1763916344271.webp)
 
 *Zeigt: Shortcuts-Leiste (1-5, Space, H, Esc) und Phase-Indikator "Erkundung"*
 

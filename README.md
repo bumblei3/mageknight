@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/bumblei3/mageknight/ci.yml?branch=master&label=build&logo=github)](https://github.com/bumblei3/mageknight/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/bumblei3/mageknight?logo=codecov)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 3462 passing](https://img.shields.io/badge/tests-3462%20passing-brightgreen)
+![Tests: 3490 passing](https://img.shields.io/badge/tests-3490%20passing-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 
@@ -37,7 +37,7 @@ Dies ist eine Basis-Version von Mage Knight, implementiert als Web-Anwendung. Da
 ### Regeln & Entwicklung
 - **[Regeln & Status](rules.md)**: Detaillierte Übersicht der implementierten Regeln, Feindfähigkeiten und fehlenden Features.
 - **[Test Guide](TEST_WRITING_GUIDE.md)**: Anleitung zum Schreiben von Tests für dieses Projekt.
-- **[Hilfe System](HELPSYSTEM.md)**: Dokumentation des Hilfesystems.
+- **[Hilfe System](HELP_SYSTEM.md)**: Dokumentation des Hilfesystems.
 - **[Original-Brettspiel-Regeln (Hintergrund)](anleitungen/Mage-Knight.pdf)**: Das vollständige Regelwerk des *Brettspiels* Mage Knight (Regelheft + Szenarioheft). Hinweis: Dies ist das Original-Brettspiel, **keine** Anleitung für diese Web-App — die Web-Version ist eine vereinfachte Solo-Implementierung (siehe oben). Nützlich als Hintergrund für die Spielmechaniken. [Ultimate-Variante](anleitungen/mageknight_ultimate.pdf) enthält zusätzliche Feindplättchen-Eigenschaften.
 
 ## 📖 Spielanleitung
@@ -160,7 +160,7 @@ Das Spiel ist modular aufgebaut:
 
 ## 🧪 Testing
 
-Das Projekt verfügt über eine hochmoderne Test-Suite mit **3462 Tests** (237 Test-Dateien, Vitest + V8-Coverage mit 80%-Gate; inkl. headless jsdom-UI-Tests für Modal-/Accessibility-Manager).
+Das Projekt verfügt über eine hochmoderne Test-Suite mit **3490 Tests** (239 Test-Dateien, Vitest + V8-Coverage mit 80%-Gate; inkl. headless jsdom-UI-Tests für Modal-/Accessibility-Manager).
 
 ```bash
 # Alle Tests ausführen

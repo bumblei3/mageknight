@@ -844,6 +844,18 @@ export class Hero {
     }
 
     takeManaFromSource(color: ManaColor): boolean {
+        if (!Object.values(MANA_COLORS).includes(color)) {
+            return false;
+        }
+        this.tempMana.push(color);
+        this.syncStore();
+        return true;
+    }
+
+    addMana(color: ManaColor): boolean {
+        if (!Object.values(MANA_COLORS).includes(color)) {
+            return false;
+        }
         this.tempMana.push(color);
         this.syncStore();
         return true;

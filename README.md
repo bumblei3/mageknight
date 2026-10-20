@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/bumblei3/mageknight/ci.yml?branch=master&label=build&logo=github)](https://github.com/bumblei3/mageknight/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/bumblei3/mageknight?logo=codecov)](https://codecov.io/gh/bumblei3/mageknight)
-![Tests: 3317 passing](https://img.shields.io/badge/tests-3317%20passing-brightgreen)
+![Tests: 3321 passing](https://img.shields.io/badge/tests-3321%20passing-brightgreen)
 
 Eine vereinfachte, spielbare Web-Version des Mage Knight Brettspiels.
 

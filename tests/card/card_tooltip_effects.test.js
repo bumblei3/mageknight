@@ -9,10 +9,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createCard } from '../../js/ui/components/Card';
 import { Card as CardClass } from '../../js/card';
-import { CARD_DEFINITIONS } from '../../js/card/CardDefinitions';
+import {
+    CARD_DEFINITIONS,
+    SAMPLE_ADVANCED_ACTIONS,
+    SAMPLE_SPELLS
+} from '../../js/card/CardDefinitions';
 
 function cardFor(id) {
-    return new CardClass(CARD_DEFINITIONS[id]);
+    const def =
+        CARD_DEFINITIONS[id] ||
+        [...SAMPLE_SPELLS, ...SAMPLE_ADVANCED_ACTIONS].find((card) => card && card.id === id);
+    return new CardClass(def);
 }
 
 function tooltipTextOf(id) {
@@ -57,10 +64,24 @@ describe('card tooltip — effect rows', () => {
     });
 
     it('marks effect types without an engine handler as not implemented', () => {
+        const text = tooltipTextOf('improvisation'); // copy_card
+
+        expect(text).toContain('Karte kopieren');
+        expect(text).toContain('noch nicht implementiert');
+    });
+
+    it('describes a next-card bonus instead of calling it unimplemented (Concentrate)', () => {
         const text = tooltipTextOf('concentrate');
 
-        expect(text).toContain('Nächste Karte verstärken');
-        expect(text).toContain('noch nicht implementiert');
+        expect(text).toContain('Bonus auf nächste Karte');
+        expect(text).not.toContain('noch nicht implementiert');
+    });
+
+    it('describes unit summoning (Summon)', () => {
+        const text = tooltipTextOf('summon_spell');
+
+        expect(text).toContain('Einheiten beschwören');
+        expect(text).not.toContain('noch nicht implementiert');
     });
 
     it('renders the strong value next to the basic value', () => {

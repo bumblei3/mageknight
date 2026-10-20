@@ -8,20 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Sonder-Effekte, Runde 2:** `enhance_next` und `summon_unit` wirken jetzt (standen vorher im Tooltip als „noch nicht implementiert"):
+  - `Concentrate` legt einen Bonus von +2 (stark +5) für die **nächste** Karte des Zuges an. Der Bonus landet auf dem ersten Effekt, den die nächste Karte hat (Bewegung, Angriff, Block, Einfluss, Heilung, Ziehen, Mana, Kristall, Handkarten-Limit, Beschwören), gestapelt bei mehrfacher Nutzung, und verfällt am Zugende. Die Karte selbst wird dabei nicht dauerhaft verstärkt (Effekt-Kopie statt Mutation).
+  - `Summon` beschwört `value` Einheiten aus `UNIT_INFO` (stark zwei); das Kommandolimit begrenzt weiterhin, eine nicht passende Beschwörung entfällt.
 - **Karten-Effekte wirken jetzt:** Effekt-Schlüssel, die in den Kartendaten standen, aber nie angewendet wurden, laufen jetzt durch die Engine — betroffen sind 13 Karten-Definitionen (Agility/`blk_tac`, Banner of Fear, Battle Versatility, Concentration, Crystal Magic, Crystal of Insight, Crystallize, Mana Draw, Mana Storm, Mana Surge, Rage, Threaten, Will Focus):
   - `move: N` neben einem anderen Effekt (Battle Versatility, Rage stark) gibt Bewegungspunkte.
   - `type2`/`value2` als zweiter Effekt (Agility stark: Block 3 + Bewegung 2).
   - `type: 'draw'` zieht Karten (Concentration), `type: 'mana_token'` gibt Mana-Token in Kartenfarbe (Mana Storm), `type: 'crystal'` gibt einen Manakristall (Crystallize, max. 3 pro Farbe), `type: 'hand_limit'` erhöht das Handkarten-Limit dauerhaft (Will Focus).
   - `condition: 'reputation_loss'` kostet beim Ausspielen 1 Ansehen (Threaten).
 - **`js/card/effectMeta.ts`:** zentrale Zuordnung Effekt-Typ → Engine-Eigenschaft samt UI-Labels. Effekt-Typen ohne Handler werden dort explizit geführt, statt still zu verschwinden.
-- **Kartentooltip:** zeigt `Karten ziehen`, `Mana-Token`, `Manakristall`, `Handkarten-Limit` und Ansehens-Kosten; Effekt-Typen ohne Handler erscheinen als „noch nicht implementiert".
+- **Kartentooltip:** zeigt `Karten ziehen`, `Mana-Token`, `Manakristall`, `Handkarten-Limit`, `Bonus auf nächste Karte`, `Einheiten beschwören` und Ansehens-Kosten; Effekt-Typen ohne Handler erscheinen als „noch nicht implementiert".
 - **Map tiles:** Exploring spends 2 movement and lays the next 7-hex scenario tile on the open edge (terrain, one site, that site's enemies). The deck is built from `mapConfig.deck` or `deckDistribution` plus the scenario's site list, then shuffled with a seed from the scenario id. The start tile is left in place.
 
 ### Changed
 - **CI-Pipeline:** `cancel-in-progress` für PR-Pushes (überholte Läufe werden abgebrochen statt doppelt bezahlt), E2E-Tests blockieren wieder (waren durch `continue-on-error` + Summary-Logik unsichtbar, obwohl seit 9 Läufen rot), Deploy lädt das getestete `dist`-Artefakt statt erneut `npm ci && npm run build` auszuführen, `permissions: contents: read` als Default, Timeout für den Lint-Job, No-op-Schritt „Check coverage thresholds" entfernt (vitest erzwingt die Schwellen selbst).
 - **Playwright in CI:** 2 Worker statt 1 — der E2E-Job war mit 9,7 min der Flaschenhals des 12,7-min-Pipelines.
 - **Kartentooltip/Preview:** rendert nur noch echte Effektzeilen. Vorher leckten die internen Schlüssel `type`, `value`, `condition` als „• type influence (+influence)" in die UI.
-- **Handkarten-Log** (`formatEffect`) nennt die neuen Effekte (🎴 Ziehen, 💎 Mana, 💠 Kristall, 🖐️ Handkarten-Limit, ⚖️ Ansehen).
+- **Handkarten-Log** (`formatEffect`) nennt die neuen Effekte (🎴 Ziehen, 💎 Mana, 💠 Kristall, 🖐️ Handkarten-Limit, 🚀 Bonus, 👻 Beschwörung, ⚖️ Ansehen).
 - **`HeroInventory.addCrystal`:** legt fehlende Farb-Slots (Gold/Schwarz) an, damit Karten wie Crystal Magic nicht ins Leere laufen; Deckel von 3 pro Farbe bleibt.
 - Scenario goal sites from `sitePlacements` are no longer dropped onto the start tile. They arrive only when that tile is explored. The start tile keeps its terrain and gains one unguarded village.
 - Reputation changes the influence price of healing, recruiting, and learning cards at sites. The shown price is the base minus `getReputationModifier()`, and it never drops below 0.

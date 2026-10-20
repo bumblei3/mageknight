@@ -27,6 +27,11 @@ export class TurnManager {
         // 1. Reset Move Points
         this.game.hero.movementPoints = 0;
 
+        // 1b. A bonus armed by Concentrate only lasts for the current turn
+        if (typeof this.game.hero.clearTurnBonus === 'function') {
+            this.game.hero.clearTurnBonus();
+        }
+
         // 2. Discard cards (optional in real rules, but here auto-refill)
         // For now, we just draw up to hand limit
         const cardsDrawn = this.game.hero.drawCards();

@@ -37,7 +37,9 @@ export const EFFECT_TYPE_TO_KEY: Record<string, string> = {
     mana_token: 'mana',
     crystal: 'crystal',
     crystal_effect: 'crystal',
-    hand_limit: 'handLimitBonus'
+    hand_limit: 'handLimitBonus',
+    enhance_next: 'enhanceNext',
+    summon_unit: 'summonUnit'
 };
 
 /**
@@ -62,9 +64,7 @@ export const UNHANDLED_EFFECT_LABELS: Record<string, string> = {
     spell_effect: 'Beliebigen Zauber wirken',
     wish: 'Wunsch (freie Wahl)',
     extra_turn: 'Zusätzlicher Zug',
-    destroy_enemy: 'Feind vernichten',
-    summon_unit: 'Einheit beschwören',
-    enhance_next: 'Nächste Karte verstärken'
+    destroy_enemy: 'Feind vernichten'
 };
 
 export const UNHANDLED_EFFECT_TYPES: string[] = [
@@ -84,7 +84,9 @@ export const EFFECT_FIELDS: EffectField[] = [
     { key: 'draw', icon: '🎴', label: 'Karten ziehen' },
     { key: 'mana', icon: '💎', label: 'Mana-Token' },
     { key: 'crystal', icon: '💠', label: 'Manakristall' },
-    { key: 'handLimitBonus', icon: '🖐️', label: 'Handkarten-Limit' }
+    { key: 'handLimitBonus', icon: '🖐️', label: 'Handkarten-Limit' },
+    { key: 'enhanceNext', icon: '🚀', label: 'Bonus auf nächste Karte' },
+    { key: 'summonUnit', icon: '👻', label: 'Einheiten beschwören' }
 ];
 
 /**
@@ -95,6 +97,12 @@ export function secondaryEffectKey(type: string | undefined): string | undefined
     if (!type) return undefined;
     return EFFECT_TYPE_TO_KEY[type];
 }
+
+/**
+ * Order in which a "boost the next card" effect (Concentrate) picks its target:
+ * the first of these that the next card actually carries gets the bonus.
+ */
+export const PRIMARY_EFFECT_ORDER: string[] = EFFECT_FIELDS.map((field) => field.key);
 
 /** True when the data declares an effect type the engine knows about. */
 export function isKnownEffectType(type: string | undefined): boolean {

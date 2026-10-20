@@ -125,10 +125,11 @@ Kartendaten deklarieren Effekte als `{ type, value, … }`. `Card.normalizeEffec
 | `type: 'crystal'` + `value` | Manakristall in Kartenfarbe, max. 3 pro Farbe (Crystallize) |
 | `type: 'hand_limit'` + `value` | Handkarten-Limit dauerhaft +N (Will Focus) |
 | `condition: 'reputation_loss'` | Ansehen −1 beim Ausspielen (Threaten, Banner of Fear) |
+| `type: 'enhance_next'` + `value` | Bonus für die nächste Karte des Zuges (Concentrate: +2 / +5 auf den ersten Effekt der nächsten Karte, verfällt am Zugende) |
+| `type: 'summon_unit'` + `value` | beschwört `value` Einheiten aus `UNIT_INFO`; das Kommandolimit begrenzt (Summon) |
 
 Noch ohne Engine-Wirkung (im Tooltip als „noch nicht implementiert" markiert):
-`copy_card`, `spell_effect`, `wish`, `extra_turn`, `destroy_enemy`, `summon_unit`,
-`enhance_next`. Ebenfalls noch nicht simuliert: die Schlüsselwörter `area`,
+`copy_card`, `spell_effect`, `wish`, `extra_turn`, `destroy_enemy`. Ebenfalls noch nicht simuliert: die Schlüsselwörter `area`,
 `target`, `vampirism`, `cleanse`, `keep`, `iceBlock`, `fireAttack`,
 `unitRecruitment` (nur `element` wird für den Element-Combo-Bonus gelesen).
 

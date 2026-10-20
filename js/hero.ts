@@ -4,7 +4,8 @@ import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_A
 import { CARD_DEFINITIONS } from './card/CardDefinitions';
 import { MANA_COLORS, ManaColor } from './constants';
 import { HeroInventory, Crystals } from './hero/HeroInventory';
-import { CONDITION_REPUTATION_LOSS, REPUTATION_LOSS_PER_PLAY } from './card/effectMeta';
+import { CONDITION_REPUTATION_LOSS, REPUTATION_LOSS_PER_PLAY, PRIMARY_EFFECT_ORDER } from './card/effectMeta';
+import { createUnit, UNIT_INFO } from './unit';
 import { HeroSkills } from './hero/HeroSkills';
 import { store, ACTIONS } from './store';
 
@@ -138,6 +139,8 @@ export class Hero {
     skills: Skill[];
     usedSkills: Set<string>;
     crystals: Record<string, number>;
+    /** Armed by Concentrate; spent on the next card's primary effect this turn. */
+    nextCardBonus: number;
     tempMana: ManaColor[];
 
     deck: Card[];
@@ -195,6 +198,7 @@ export class Hero {
         this.blockPoints = 0;
         this.influencePoints = 0;
         this.healingPoints = 0;
+        this.nextCardBonus = 0;
 
         this.initializeDeck();
         this.syncStore();
@@ -288,7 +292,34 @@ export class Hero {
         }
 
         this.hand.splice(cardIndex, 1);
-        const effect = card.getEffect(useStrong);
+        const declaredEffect = card.getEffect(useStrong);
+
+        // "Boost the next card you play this turn" (Concentrate): arm the bonus
+        // and do nothing else with this card.
+        if (declaredEffect.enhanceNext) {
+            this.nextCardBonus += Number(declaredEffect.enhanceNext) || 0;
+            this.discard.push(card);
+            this.syncStore();
+            return { card, effect: declaredEffect, usedStrong: useStrong };
+        }
+
+        // Apply an armed bonus to this card's primary effect. Copy the effect
+        // first: the Card instance is recycled from the discard pile and must
+        // not stay boosted forever.
+        let effect = declaredEffect;
+        if (this.nextCardBonus > 0) {
+            const target = PRIMARY_EFFECT_ORDER.find(
+                (key) => typeof declaredEffect[key] === 'number' && (declaredEffect[key] as number) > 0
+            );
+            if (target) {
+                effect = {
+                    ...declaredEffect,
+                    [target]: (declaredEffect[target] as number) + this.nextCardBonus,
+                    enhancedBy: this.nextCardBonus
+                };
+                this.nextCardBonus = 0;
+            }
+        }
 
         if (effect.movement) this.movementPoints += effect.movement;
         if (effect.attack) this.attackPoints += effect.attack;
@@ -302,6 +333,7 @@ export class Hero {
         if (effect.mana) this.gainManaTokens(card.color, effect.mana as number);
         if (effect.crystal) this.gainCrystals(card.color, effect.crystal as number);
         if (effect.handLimitBonus) this.handLimit += effect.handLimitBonus as number;
+        if (effect.summonUnit) this.summonUnits(effect.summonUnit as number);
         if (effect.condition === CONDITION_REPUTATION_LOSS) {
             this.changeReputation(REPUTATION_LOSS_PER_PLAY);
         }
@@ -325,6 +357,34 @@ export class Hero {
             if (this.addMana(manaColor)) granted++;
         }
         return granted;
+    }
+
+    /**
+     * Summon units declared by a card (`type: 'summon_unit'`, value = how many).
+     * Each unit is drawn from UNIT_INFO; the command limit still applies, so a
+     * summon that no longer fits is dropped. Returns the units that joined.
+     */
+    summonUnits(count: number): Unit[] {
+        const units: Unit[] = [];
+        const types = Object.keys(UNIT_INFO);
+        const wanted = Math.max(0, Math.floor(count) || 0);
+
+        for (let i = 0; i < wanted; i++) {
+            const type = types[Math.floor(Math.random() * types.length)];
+            const unit = createUnit(type);
+            if (!unit || !this.addUnit(unit)) break;
+            units.push(unit);
+        }
+
+        if (units.length > 0) this.syncStore();
+        return units;
+    }
+
+    /**
+     * Drop a bonus armed by Concentrate (called when the turn ends).
+     */
+    clearTurnBonus(): void {
+        this.nextCardBonus = 0;
     }
 
     /**
@@ -660,6 +720,7 @@ export class Hero {
         this.units = [];
         this.skills = [];
         this.crystals = {} as Record<string, number>;
+        this.nextCardBonus = 0;
 
         this.initializeDeck();
         this.drawCards();

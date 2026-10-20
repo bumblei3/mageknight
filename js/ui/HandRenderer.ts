@@ -402,6 +402,9 @@ export class HandRenderer {
         if (effect.mana) parts.push(`+${effect.mana} 💎`);
         if (effect.crystal) parts.push(`+${effect.crystal} 💠`);
         if (effect.handLimitBonus) parts.push(`+${effect.handLimitBonus} 🖐️`);
+        if (effect.enhanceNext) parts.push(`+${effect.enhanceNext} 🚀 nächste Karte`);
+        if (effect.summonUnit) parts.push(`+${effect.summonUnit} 👻`);
+        if (effect.enhancedBy) parts.push(`+${effect.enhancedBy} 🚀 Bonus`);
         if (effect.condition === CONDITION_REPUTATION_LOSS) {
             parts.push(`${REPUTATION_LOSS_PER_PLAY} ⚖️`);
         }

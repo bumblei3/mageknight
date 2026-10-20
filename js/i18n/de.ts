@@ -303,6 +303,23 @@ const de = {
 
     // Cards
     cards: {
+        wish: {
+            title: 'Wunsch',
+            pick: 'Wähle einen Effekt',
+            remaining: '{count} Wünsche offen',
+            heal: '❤️ {amount} Wunden heilen',
+            attack: '⚔️ +{amount} Angriff',
+            artifact: '💎 Artefakt erhalten'
+        },
+        copy: {
+            title: 'Improvisation',
+            pickOne: 'Wähle eine Karte aus dem Ablagestapel',
+            remaining: '{count} Karten wählen',
+            pick: '📋 {card} zurückholen',
+            copied: '{cards} aus der Ablage geholt',
+            missing: 'Karte nicht gefunden',
+            empty: 'Der Ablagestapel ist leer'
+        },
         basicEffect: 'Basis-Effekt',
         sideways: 'Seitlich spielen',
         sidewaysHint: '+1 Bewegung/Angriff/Block/Einfluss',

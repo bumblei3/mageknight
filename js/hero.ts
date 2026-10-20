@@ -9,6 +9,10 @@ import { createUnit, UNIT_INFO } from './unit';
 import { HeroSkills } from './hero/HeroSkills';
 import { store, ACTIONS } from './store';
 
+/** Wish spell values — see rules.md, section 7. */
+export const WISH_HEAL = 5;
+export const WISH_ATTACK = 5;
+
 // Fame thresholds for levels
 export interface LevelEntry {
     level: number;
@@ -385,6 +389,58 @@ export class Hero {
      */
     clearTurnBonus(): void {
         this.nextCardBonus = 0;
+    }
+
+    /**
+     * Wish (spell): one pick out of three. The card text is
+     * "Heal 5, or +5 Attack, or Gain Artifact".
+     */
+    resolveWish(option: 'heal' | 'attack' | 'artifact'): { success: boolean; message: string } {
+        if (option === 'attack') {
+            this.attackPoints += WISH_ATTACK;
+            this.syncStore();
+            return { success: true, message: `Wunsch: +${WISH_ATTACK} Angriff` };
+        }
+
+        if (option === 'heal') {
+            let healed = 0;
+            while (healed < WISH_HEAL && this.healWound(false)) healed++;
+            this.syncStore();
+            return {
+                success: true,
+                message: `Wunsch: ${healed} Wunde(n) geheilt`
+            };
+        }
+
+        if (option === 'artifact') {
+            this.awardRandomArtifact();
+            this.syncStore();
+            return { success: true, message: 'Wunsch: Artefakt erhalten' };
+        }
+
+        return { success: false, message: 'Unbekannter Wunsch' };
+    }
+
+    /**
+     * Improvisation: copy cards from the discard pile back into the hand.
+     * Unknown ids are skipped, so a stale pick cannot duplicate cards.
+     */
+    copyCardsFromDiscard(cardIds: string[]): Card[] {
+        const copied: Card[] = [];
+        for (const id of cardIds || []) {
+            const index = this.discard.findIndex((card) => card.id === id);
+            if (index === -1) continue;
+            const [card] = this.discard.splice(index, 1);
+            this.hand.push(card);
+            copied.push(card);
+        }
+        if (copied.length > 0) this.syncStore();
+        return copied;
+    }
+
+    /** Cards currently in the discard pile (for the Improvisation picker). */
+    getDiscardCards(): Card[] {
+        return [...this.discard];
     }
 
     /**

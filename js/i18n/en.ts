@@ -300,6 +300,23 @@ const en = {
 
     // Cards
     cards: {
+        wish: {
+            title: 'Wish',
+            pick: 'Choose one effect',
+            remaining: '{count} wishes left',
+            heal: '❤️ Heal {amount} wounds',
+            attack: '⚔️ +{amount} Attack',
+            artifact: '💎 Gain an artifact'
+        },
+        copy: {
+            title: 'Improvisation',
+            pickOne: 'Choose a card from the discard pile',
+            remaining: 'Choose {count} cards',
+            pick: '📋 Bring back {card}',
+            copied: 'Recovered {cards} from the discard pile',
+            missing: 'Card not found',
+            empty: 'The discard pile is empty'
+        },
         basicEffect: 'Basic Effect',
         sideways: 'Play Sideways',
         sidewaysHint: '+1 Movement/Attack/Block/Influence',

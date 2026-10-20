@@ -326,6 +326,21 @@
 }
 
 /* Site modal — primary CTA + “more” */
+/* Card choices (Wish, Improvisation): equal-weight options, no CTA ranking */
+.site-options--choice {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 8px);
+}
+
+.site-choice-option {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    font-size: var(--font-size-base, 1rem);
+}
+
 .site-options--intuition {
     display: flex;
     flex-direction: column;

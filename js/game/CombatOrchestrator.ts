@@ -1,5 +1,6 @@
 import { Combat } from '../combat';
 import { eventBus } from '../eventBus';
+import { resolveCardChoice } from './cardChoiceFlow';
 import { GAME_EVENTS, COMBAT_PHASES } from '../constants';
 import { t } from '../i18n/index';
 import Enemy, { ENEMY_DEFINITIONS } from '../enemy';
@@ -174,6 +175,9 @@ export class CombatOrchestrator {
         if (this.game.ui) {
             this.game.ui.addPlayedCard(result.card, result.effect);
         }
+
+        // Wish / Improvisation ask the player before they resolve
+        resolveCardChoice(this.game, result);
 
         eventBus.emit(GAME_EVENTS.CARD_PLAYED, { combat: true });
 

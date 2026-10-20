@@ -1,4 +1,5 @@
 import { logger } from './logger';
+import { resolveCardChoice } from './game/cardChoiceFlow';
 import { MageKnightGame } from './game';
 import { HexData } from './hexgrid/HexGridLogic';
 import { Card } from './card/CardFactory';
@@ -309,6 +310,9 @@ export class InteractionController {
             this.game.addLog(`${result.card.name} gespielt ${useStrong ? '(Verstärkt)' : ''}: ${this.game.ui.formatEffect(result.effect)}`, 'info');
             this.game.ui.addPlayedCard(result.card, result.effect);
             this.game.ui.showPlayArea();
+
+            // Wish / Improvisation ask the player before they resolve
+            resolveCardChoice(this.game, result);
 
             if (this.game.particleSystem && this.game.ui.elements.playedCards) {
                 const rect = this.game.ui.elements.playedCards.getBoundingClientRect();

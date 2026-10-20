@@ -127,14 +127,26 @@ Kartendaten deklarieren Effekte als `{ type, value, … }`. `Card.normalizeEffec
 | `condition: 'reputation_loss'` | Ansehen −1 beim Ausspielen (Threaten, Banner of Fear) |
 | `type: 'enhance_next'` + `value` | Bonus für die nächste Karte des Zuges (Concentrate: +2 / +5 auf den ersten Effekt der nächsten Karte, verfällt am Zugende) |
 | `type: 'summon_unit'` + `value` | beschwört `value` Einheiten aus `UNIT_INFO`; das Kommandolimit begrenzt (Summon) |
+| `type: 'wish'` + `value` | Wunsch: der Spieler wählt pro Wert eine Option — 5 Wunden heilen, +5 Angriff oder ein Artefakt (Wish) |
+| `type: 'copy_card'` + `value` | holt `value` gewählte Karten aus dem Ablagestapel zurück auf die Hand (Improvisation) |
 | `type: 'destroy_enemy'` + `value` | vernichtet beim Angriff bis zu `value` Feinde ohne Rüstungsrechnung (Disintegrate). Bosse sind immun — die Karte verpufft dann |
 | `element: 'fire' / 'ice' / 'cold_fire'` | Angriff (Nah und Fern) rechnet mit diesem Element: Resistenz-Multiplikatoren der Feinde greifen. Bei mehreren Karten zählt das Element mit dem größten Angriffsanteil |
 | `area: true` bzw. `target: 'all'` | Angriff trifft jeden Feind einzeln statt gepoolt (Flame Wave, Meteor Storm, Fireball) |
 
 Noch ohne Engine-Wirkung (im Tooltip als „noch nicht implementiert" markiert):
-`copy_card`, `spell_effect`, `wish`, `extra_turn`. Ebenfalls noch nicht
-simuliert: die Schlüsselwörter `vampirism`, `cleanse`, `keep`, `iceBlock`,
-`fireAttack`, `unitRecruitment`.
+`spell_effect`, `extra_turn`. Ebenfalls noch nicht simuliert: die
+Schlüsselwörter `vampirism`, `cleanse`, `keep`, `iceBlock`, `fireAttack`,
+`unitRecruitment`.
+
+### Auswahl-Effekte (Wish, Improvisation)
+
+`wish` und `copy_card` brauchen eine Entscheidung. `js/game/cardChoiceFlow.ts`
+öffnet dafür das Auswahl-Modal (`ModalManager.showCardChoice`, flache
+Optionsliste ohne „Empfohlen"-Ranking) — aus dem normalen Spielpfad
+(`interactionController.finishCardPlay`) und aus dem Kampf
+(`CombatOrchestrator.playCardInCombat`). Der Wert der Karte ist die Anzahl der
+Picks (Basis 1, stark 2): nach jedem Pick öffnet sich das Modal erneut. Ohne
+UI (Tests, Bots) greift ein definierter Fallback statt Wirkungslosigkeit.
 
 ---
 

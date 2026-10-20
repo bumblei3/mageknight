@@ -40,7 +40,9 @@ export const EFFECT_TYPE_TO_KEY: Record<string, string> = {
     hand_limit: 'handLimitBonus',
     enhance_next: 'enhanceNext',
     summon_unit: 'summonUnit',
-    destroy_enemy: 'destroyEnemy'
+    destroy_enemy: 'destroyEnemy',
+    wish: 'wish',
+    copy_card: 'copyCard'
 };
 
 /**
@@ -61,11 +63,15 @@ export const EFFECT_TYPES_HANDLED_ELSEWHERE: string[] = [
  * is visible in the UI and testable instead of silent.
  */
 export const UNHANDLED_EFFECT_LABELS: Record<string, string> = {
-    copy_card: 'Karte kopieren',
     spell_effect: 'Beliebigen Zauber wirken',
-    wish: 'Wunsch (freie Wahl)',
     extra_turn: 'Zusätzlicher Zug'
 };
+
+/**
+ * Effects that stop to ask the player (`CardChoiceFlow`): the value is the
+ * number of picks the card grants.
+ */
+export const CHOICE_EFFECT_KEYS: string[] = ['wish', 'copyCard'];
 
 /**
  * Boolean/string flags that modify an effect (no numeric value of their own).
@@ -110,7 +116,9 @@ export const EFFECT_FIELDS: EffectField[] = [
     { key: 'handLimitBonus', icon: '🖐️', label: 'Handkarten-Limit' },
     { key: 'enhanceNext', icon: '🚀', label: 'Bonus auf nächste Karte' },
     { key: 'summonUnit', icon: '👻', label: 'Einheiten beschwören' },
-    { key: 'destroyEnemy', icon: '✨', label: 'Feind vernichten' }
+    { key: 'destroyEnemy', icon: '✨', label: 'Feind vernichten' },
+    { key: 'wish', icon: '🪄', label: 'Wunsch (Auswahl)' },
+    { key: 'copyCard', icon: '📋', label: 'Karte aus der Ablage' }
 ];
 
 /**

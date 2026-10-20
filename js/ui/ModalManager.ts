@@ -6,6 +6,8 @@ import { UIElements } from '../ui';
 export class ModalManager {
     private elements: UIElements;
     private ui: any;
+    /** Card choices render as an equal-weight list, without the site CTA ranking. */
+    private uniformOptionList = false;
 
     constructor(elements: UIElements, ui: any) {
         this.elements = elements;
@@ -37,6 +39,53 @@ export class ModalManager {
     }
 
     /**
+     * Generic player choice (card effects that need a decision, e.g. Wish or
+     * Improvisation). Reuses the site modal markup so the look stays uniform;
+     * each option action may return `{ success, message }` like a site action.
+     */
+    public showCardChoice(config: {
+        icon?: string;
+        title: string;
+        description?: string;
+        options: Array<{ label: string; enabled?: boolean; action: () => unknown }>;
+    }): void {
+        if (!this.elements.siteModal) return;
+
+        this.uniformOptionList = true;
+        try {
+            this.showSiteModal({
+                icon: config.icon || '❔',
+                name: config.title,
+                description: config.description || '',
+                color: 'var(--color-accent-gold)',
+                options: config.options
+            });
+        } finally {
+            this.uniformOptionList = false;
+        }
+    }
+
+    /**
+     * Flat option list for player choices: every option has the same weight
+     * (no "Empfohlen" primary, nothing hidden behind "Weitere Aktionen").
+     */
+    private renderUniformOptions(container: HTMLElement, options: any[]): void {
+        container.innerHTML = '';
+        container.classList.add('site-options--choice');
+
+        (Array.isArray(options) ? options : []).forEach((opt) => {
+            if (!opt) return;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn site-choice-option';
+            btn.textContent = opt.label;
+            btn.disabled = opt.enabled === false;
+            btn.addEventListener('click', () => this.runSiteAction(opt.action));
+            container.appendChild(btn);
+        });
+    }
+
+    /**
      * Hide site interaction modal
      */
     public hideSiteModal(): void {
@@ -52,6 +101,11 @@ export class ModalManager {
     public renderSiteOptions(options: any[]): void {
         const container = this.elements.siteOptions;
         if (!container) return;
+
+        if (this.uniformOptionList) {
+            this.renderUniformOptions(container, options);
+            return;
+        }
 
         container.innerHTML = '';
         container.classList.add('site-options--intuition');

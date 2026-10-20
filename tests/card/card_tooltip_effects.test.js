@@ -64,10 +64,24 @@ describe('card tooltip — effect rows', () => {
     });
 
     it('marks effect types without an engine handler as not implemented', () => {
-        const text = tooltipTextOf('improvisation'); // copy_card
+        const text = tooltipTextOf('time_walk'); // extra_turn
 
-        expect(text).toContain('Karte kopieren');
+        expect(text).toContain('Zusätzlicher Zug');
         expect(text).toContain('noch nicht implementiert');
+    });
+
+    it('describes Wish as a player choice', () => {
+        const text = tooltipTextOf('wish');
+
+        expect(text).toContain('Wunsch (Auswahl)');
+        expect(text).not.toContain('noch nicht implementiert');
+    });
+
+    it('describes Improvisation as fetching a card from the discard pile', () => {
+        const text = tooltipTextOf('improvisation');
+
+        expect(text).toContain('Karte aus der Ablage');
+        expect(text).not.toContain('noch nicht implementiert');
     });
 
     it('describes a next-card bonus instead of calling it unimplemented (Concentrate)', () => {

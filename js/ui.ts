@@ -680,6 +680,10 @@ export class UI {
         this.modals.hideSiteModal();
     }
 
+    public showCardChoice(config: any): void {
+        this.modals.showCardChoice(config);
+    }
+
     public renderSiteOptions(options: any[]): void {
         this.modals.renderSiteOptions(options);
     }

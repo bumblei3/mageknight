@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Wish und Improvisation fragen jetzt nach:** die letzten beiden Karten, die sichtbar nichts taten.
+  - **Wish** (`wish`, Basis 1 / stark 2): Auswahl-Modal mit drei Optionen — 5 Wunden heilen, +5 Angriff oder ein Artefakt (`hero.resolveWish`). Der Wert der Karte ist die Zahl der Wünsche, das Modal öffnet sich entsprechend mehrfach.
+  - **Improvisation** (`copy_card`, Basis 1 / stark 2): Auswahl-Modal listet den Ablagestapel, gewählte Karten kommen zurück auf die Hand (`hero.copyCardsFromDiscard`).
+  - Neues Auswahl-UI `ModalManager.showCardChoice`: flache Optionsliste über das Site-Modal, ohne „Empfohlen"-CTA und ohne „Weitere Aktionen"-Versteck; Verdrahtung in beiden Spielpfaden (`interactionController.finishCardPlay`, `CombatOrchestrator.playCardInCombat`) über `js/game/cardChoiceFlow.ts`. Ohne UI greift ein definierter Fallback statt Wirkungslosigkeit.
 - **Kampf-Regeln, die in den Daten standen, aber nie griffen:**
   - **Element**: Angriffe rechneten immer als „physical", egal was auf der Karte stand. Jetzt sammelt der Kampf das Element der gespielten Karten (Fern und Nah getrennt) und übergibt das Element mit dem größten Angriffsanteil an die Angriffsphase — Feuer-/Eis-Resistenzen der Feinde wirken damit erstmals, ebenso der Treffer-Effekt (`combatClashEffect`).
   - **Flächenangriffe** (`area: true`, `target: 'all'`): der Kartenwert wurde in den einen gepoolten Angriff addiert. Jetzt trifft die Karte jeden Feind einzeln (Flame Wave, Meteor Storm, Fireball, Disintegrate, Dark Ritual, Disenchant).

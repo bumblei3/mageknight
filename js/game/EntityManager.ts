@@ -2,7 +2,7 @@
  * Manages game entities: Hero, Units, and Enemies.
  */
 import { Hero } from '../hero';
-import { Enemy } from '../enemy';
+import { Enemy, createEnemy } from '../enemy';
 
 export interface Position {
     q: number;
@@ -71,6 +71,22 @@ export class EntityManager {
         if (this.game) this.game.enemies = this.enemies; // Compatibility
         console.log(`Spawned ${this.enemies.length} enemies.`);
         return this.enemies;
+    }
+
+    /**
+     * Appends the guards of a newly placed map tile without rebuilding the board.
+     */
+    spawnTileEnemies(list: { type: string; q: number; r: number }[]): Enemy[] {
+        const spawned: Enemy[] = [];
+        list.forEach((entry, index) => {
+            const enemy = createEnemy(entry.type, { q: entry.q, r: entry.r });
+            if (!enemy) return;
+            enemy.id = `tile_${entry.q}_${entry.r}_${index}_${entry.type}`;
+            this.enemies.push(enemy);
+            spawned.push(enemy);
+        });
+        if (this.game) this.game.enemies = this.enemies;
+        return spawned;
     }
 
     getEnemyAt(q: number, r: number): Enemy | undefined {

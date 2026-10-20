@@ -332,7 +332,10 @@ export class ActionManager {
             this.game.hero.movementPoints -= cost;
             const count = (result.success ? 7 : 0) + newHexes.length; // Approx 7 for a new tile
 
-            this.game.addLog('Neues Gebiet entdeckt!', 'discovery');
+            const discovered = result.siteName
+                ? `Neues Gebiet entdeckt: ${result.siteName}!`
+                : 'Neues Gebiet entdeckt!';
+            this.game.addLog(discovered, 'discovery');
             if (this.game.statisticsManager) {
                 this.game.statisticsManager.increment('tilesExplored', count);
             }
@@ -346,7 +349,11 @@ export class ActionManager {
                 if (this.game.haptics) this.game.haptics(30);
             }
 
-            this.game.entityManager.createEnemies();
+            if (Array.isArray(result.enemies)) {
+                this.game.entityManager.spawnTileEnemies(result.enemies);
+            } else {
+                this.game.entityManager.createEnemies();
+            }
 
             // Handle World Event
             if (result.event && this.game.ui) {

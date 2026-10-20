@@ -12,7 +12,7 @@ export class CityHandler extends BaseSiteHandler {
         // Expensive Healing
         options.push({
             id: 'heal',
-            label: 'Heilen (4 Einfluss / Wunde)',
+            label: `Heilen (${this.influenceCost(4)} Einfluss / Wunde)`,
             action: () => this.healWounds(4),
             enabled: this.game.hero.wounds.length > 0
         });
@@ -27,7 +27,7 @@ export class CityHandler extends BaseSiteHandler {
                 label: u.name,
                 type: 'unit' as const,
                 data: u,
-                cost: u.cost,
+                cost: this.influenceCost(u.cost),
                 action: () => this.recruitUnit(u)
             })) : [{ id: 'none', label: 'Keine Einheiten verfügbar', enabled: false }]
         });
@@ -37,13 +37,13 @@ export class CityHandler extends BaseSiteHandler {
         const spells = SAMPLE_SPELLS; // Now objects
         options.push({
             id: 'city_spells',
-            label: 'Zauber im Laden (8 Einfluss + Mana)',
+            label: `Zauber im Laden (${this.influenceCost(8)} Einfluss + Mana)`,
             subItems: spells.map(c => ({
                 id: `spell_${c.id}`,
                 label: c.name,
                 type: 'card' as const,
                 data: c,
-                cost: 8,
+                cost: this.influenceCost(8),
                 action: () => this.buyCard(c, 8)
             }))
         });

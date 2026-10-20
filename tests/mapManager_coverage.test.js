@@ -51,7 +51,9 @@ describe('MapManager - Coverage Boost', () => {
         it('should initialize tilesDeck with 10 tiles', () => {
             expect(mapManager.tilesDeck.length).toBe(10);
             mapManager.tilesDeck.forEach(tile => {
-                expect(tile.length).toBe(7);
+                expect(tile.terrains.length).toBe(7);
+                expect(tile).toHaveProperty('siteType');
+                expect(Array.isArray(tile.enemyTypes)).toBe(true);
             });
         });
 
@@ -138,21 +140,24 @@ describe('MapManager - Coverage Boost', () => {
             expect(mockHexGrid.setHex).toHaveBeenCalledWith(1, 0, { terrain: TERRAIN_TYPES.FOREST }, undefined);
         });
 
-        it('should place scenario sites when sitePlacements provided', () => {
-            const scenarioData = { 
-                mapConfig: { 
+        it('keeps scenario goal sites off the start map', () => {
+            const scenarioData = {
+                mapConfig: {
                     sitePlacements: [
-                        { type: SITE_TYPES.VILLAGE, q: 2, r: 2, count: 1, radius: 2 }
-                    ] 
-                } 
+                        { type: SITE_TYPES.MINE, q: 2, r: 2, count: 2, radius: 2 }
+                    ]
+                }
             };
+            const placeGoals = vi.spyOn(mapManager, 'placeScenarioSites');
             mockHexGrid.hasHex.mockReturnValue(true);
-            mockHexGrid.getHex.mockReturnValue({ site: null });
+            mockHexGrid.getHex.mockReturnValue({ site: null, terrain: TERRAIN_TYPES.PLAINS });
             mockHexGrid.getNeighbors.mockReturnValue([]);
             mockHexGrid.getRing.mockReturnValue([]);
             mockHexGrid.getHexesInRange.mockReturnValue([]);
-            
+
             mapManager.createStartingMap(scenarioData);
+
+            expect(placeGoals).not.toHaveBeenCalled();
         });
     });
 
@@ -233,27 +238,41 @@ describe('MapManager - Coverage Boost', () => {
     });
 
     describe('addMapTile', () => {
-        it('should add tiles to empty hexes', () => {
-            mockHexGrid.getHexesInRange.mockReturnValue([
-                { q: 0, r: 0 }, { q: 1, r: 0 }, { q: 0, r: 1 }
-            ]);
-            mockHexGrid.hasHex
-                .mockReturnValueOnce(false)
-                .mockReturnValueOnce(true)
-                .mockReturnValueOnce(false);
-            
-            mapManager.addMapTile(0, 0, 'countryside');
-            
-            expect(mockHexGrid.setHex).toHaveBeenCalledTimes(2); // Two empty hexes
+        it('should lay a drawn tile onto empty hexes', () => {
+            mockHexGrid.getNeighbors.mockImplementation((q, r) => ([
+                { q: q + 1, r }, { q: q + 1, r: r - 1 }, { q, r: r - 1 },
+                { q: q - 1, r }, { q: q - 1, r: r + 1 }, { q, r: r + 1 }
+            ]));
+            mockHexGrid.hasHex.mockReturnValue(false);
+            mapManager.tilesDeck = [{
+                terrains: Array(7).fill(TERRAIN_TYPES.FOREST),
+                siteType: null,
+                enemyTypes: []
+            }];
+
+            const result = mapManager.addMapTile(0, 0, 'countryside');
+
+            expect(result.success).toBe(true);
+            expect(mockHexGrid.setHex).toHaveBeenCalledTimes(7);
+            expect(mockHexGrid.setHex).toHaveBeenCalledWith(0, 0, expect.objectContaining({
+                terrain: TERRAIN_TYPES.FOREST,
+                revealed: true
+            }));
         });
 
         it('should not overwrite existing hexes', () => {
-            mockHexGrid.getHexesInRange.mockReturnValue([{ q: 0, r: 0 }]);
+            mockHexGrid.getNeighbors.mockReturnValue([
+                { q: 1, r: 0 }, { q: 1, r: -1 }, { q: 0, r: -1 },
+                { q: -1, r: 0 }, { q: -1, r: 1 }, { q: 0, r: 1 }
+            ]);
             mockHexGrid.hasHex.mockReturnValue(true);
-            
-            mapManager.addMapTile(0, 0, 'core');
-            
+            const before = mapManager.tilesDeck.length;
+
+            const result = mapManager.addMapTile(0, 0, 'core');
+
+            expect(result.success).toBe(false);
             expect(mockHexGrid.setHex).not.toHaveBeenCalled();
+            expect(mapManager.tilesDeck.length).toBe(before);
         });
     });
 
@@ -294,76 +313,19 @@ describe('MapManager - Coverage Boost', () => {
     describe('explore', () => {
         it('should return false when cannot explore', () => {
             mapManager.canExplore = vi.fn().mockReturnValue(false);
-            
+
             const result = mapManager.explore(0, 0);
-            
+
             expect(result.success).toBe(false);
         });
 
-        it('should reveal unknown neighbors and return success', () => {
-            mapManager.canExplore = vi.fn().mockReturnValue(true);
-            
-            mockHexGrid.getNeighbors.mockReturnValue([
-                { q: 1, r: 0 }, { q: 0, r: 1 }, { q: -1, r: 1 }
-            ]);
-            mockHexGrid.hasHex
-                .mockReturnValueOnce(true)  // first neighbor known
-                .mockReturnValueOnce(false) // second unknown
-                .mockReturnValueOnce(false); // third unknown
-            
-            mockHexGrid.setHex.mockImplementation(() => {});
-            mockHexGrid.getHex.mockReturnValue({ site: null });
-            
-            // Mock Math.random for event trigger
-            const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.8); // > 0.7 triggers event
-            
-            const result = mapManager.explore(0, 0);
-            
-            expect(result.success).toBe(true);
-            expect(result.event).toBeDefined();
-            expect(mockHexGrid.setHex).toHaveBeenCalledTimes(2); // Only for unknown neighbors
-            expect(mockWorldEventManager.getRandomEvent).toHaveBeenCalled();
-            
-            randomSpy.mockRestore();
-        });
-
-        it('should not trigger event when random <= 0.7', () => {
-            mapManager.canExplore = vi.fn().mockReturnValue(true);
-            
+        it('should return false when the deck is empty', () => {
+            mapManager.tilesDeck = [];
             mockHexGrid.getNeighbors.mockReturnValue([{ q: 1, r: 0 }]);
             mockHexGrid.hasHex.mockReturnValue(false);
-            mockHexGrid.setHex.mockImplementation(() => {});
-            mockHexGrid.getHex.mockReturnValue({ site: null });
-            
-            const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5); // <= 0.7
-            
-            const result = mapManager.explore(0, 0);
-            
-            expect(result.success).toBe(true);
-            expect(mockWorldEventManager.getRandomEvent).not.toHaveBeenCalled();
-            
-            randomSpy.mockRestore();
-        });
 
-        it('should trigger Spawning Grounds auto-spawn on reveal', () => {
-            mapManager.canExplore = vi.fn().mockReturnValue(true);
-            
-            const mockSite = new Site(SITE_TYPES.SPAWNING_GROUNDS);
-            mockHexGrid.getNeighbors.mockReturnValue([{ q: 1, r: 0 }]);
-            mockHexGrid.hasHex.mockReturnValue(false);
-            mockHexGrid.setHex.mockImplementation(() => {});
-            mockHexGrid.getHex.mockReturnValue({ 
-                site: mockSite,
-                revealed: false 
-            });
-            
-            const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.9);
-            
-            mapManager.explore(0, 0);
-            
-            expect(mockWorldEventManager.onTileRevealed).toHaveBeenCalledWith(1, 0, expect.objectContaining({ site: mockSite }));
-            
-            randomSpy.mockRestore();
+            expect(mapManager.canExplore(0, 0)).toBe(false);
+            expect(mapManager.explore(0, 0).success).toBe(false);
         });
     });
 

@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Map tiles:** Exploring spends 2 movement and lays the next 7-hex scenario tile on the open edge (terrain, one site, that site's enemies). The deck is built from `mapConfig.deck` or `deckDistribution` plus the scenario's site list, then shuffled with a seed from the scenario id. The start tile is left in place.
+
+### Changed
+- Scenario goal sites from `sitePlacements` are no longer dropped onto the start tile. They arrive only when that tile is explored. The start tile keeps its terrain and gains one unguarded village.
+- Reputation changes the influence price of healing, recruiting, and learning cards at sites. The shown price is the base minus `getReputationModifier()`, and it never drops below 0.
+- Dungeon, ruin, tomb, and spawning-ground rewards for an artifact, spell, or advanced action place a real card from `SAMPLE_ARTIFACTS`, `SAMPLE_SPELLS`, or `SAMPLE_ADVANCED_ACTIONS` onto the hero discard pile. A reward name that matches a card grants that card.
+- Dungeon, ruin, tomb, and spawning-ground unit rewards place a real unit from `UNIT_INFO` onto the hero via `addUnit`. A reward name that matches a unit grants that unit. A full command limit adds no unit.
 - **Intuition-P2:** Pfad-Hover (gestrichelte Route + Kosten) in Bewegung
 - **Site-Modal:** empfohlene Primäraktion groß, Rest unter „Weitere Aktionen“
 - **Stark-Mana-Cue** auf Handkarten (✓/✗ + grüner/roter Mana-Ring)
@@ -28,6 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Smart End Turn:** Warnungen bei restlichen MP, Heilung, Site, Move-Karten
 
 ### Fixed
+- Winning a fight on a mine, keep, mage tower, dungeon, ruin, tomb, labyrinth, spawning ground, den, or magic glade marks that site conquered. The site is the one under the hero when the fight starts. Defeat and retreat leave it alone, and the next fight does not clear an older site. Village, monastery, and city are unchanged.
+- Site fights that passed a plain enemy object into combat now build an `Enemy` inside `initiateCombat`, so block and damage can call `getBlockRequirement` and `getEffectiveAttack`. An enemy that already has those methods is left unchanged. Summoners still summon.
+- In the damage phase, clicking a unit assigns that enemy's damage to the unit. Block, attack, and ranged clicks still activate the unit. An assassin still forces the wounds onto the hero.
 - Action-Bar Kampf-Aktionen erkannten Phasen in falscher Großschreibung
   (`BLOCK` vs `block`) — normalisiert auf lowercase Constants
 

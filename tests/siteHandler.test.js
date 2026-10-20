@@ -1,5 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { BaseSiteHandler } from '../js/sites/BaseSiteHandler.js';
+import { VillageHandler } from '../js/sites/VillageHandler.js';
+import { CityHandler } from '../js/sites/CityHandler.js';
+import { MonasteryHandler } from '../js/sites/MonasteryHandler.js';
 
 function makeGame(overrides = {}) {
     return {
@@ -158,6 +161,70 @@ describe('BaseSiteHandler', () => {
             const cardData = { name: 'Frost', type: 'spell', color: 'blue' };
             const r = handler.buyCard(cardData, 2);
             expect(r.success).toBe(false);
+        });
+    });
+
+    describe('reputation prices', () => {
+        it('lowers healing, recruitment, and card prices and shows them', () => {
+            game.hero.getReputationModifier = () => 2;
+            game.hero.wounds = ['w1'];
+            game.hero.influencePoints = 1;
+
+            const village = new VillageHandler(game);
+            const heal = village.getOptions({}).find((option) => option.id === 'heal');
+            expect(heal.label).toBe('Heilen (1 Einfluss / Wunde)');
+            const recruit = village.getOptions({}).find((option) => option.id === 'recruit');
+            expect(recruit.subItems[0].cost).toBe(village.influenceCost(recruit.subItems[0].data.cost));
+
+            expect(handler.healWounds(3).success).toBe(true);
+            expect(game.hero.influencePoints).toBe(0);
+
+            game.hero.wounds = ['w1'];
+            game.hero.influencePoints = 2;
+            expect(handler.recruitUnit({ type: 'peasants', cost: 4, name: 'Bauern' }).success).toBe(true);
+            expect(game.hero.influencePoints).toBe(0);
+
+            game.hero.influencePoints = 4;
+            expect(handler.buyCard({ name: 'Strike', type: 'action', color: 'red' }, 6).success).toBe(true);
+            expect(game.hero.influencePoints).toBe(0);
+
+            const city = new CityHandler(game);
+            const spells = city.getOptions({}).find((option) => option.id === 'city_spells');
+            expect(spells.label).toBe('Zauber im Laden (6 Einfluss + Mana)');
+            expect(spells.subItems[0].cost).toBe(6);
+
+            const monastery = new MonasteryHandler(game);
+            const training = monastery.getOptions({}).find((option) => option.id === 'train');
+            expect(training.subItems[0].cost).toBe(4);
+        });
+
+        it('raises the price when reputation is poor', () => {
+            game.hero.getReputationModifier = () => -2;
+            game.hero.wounds = ['w1'];
+            game.hero.influencePoints = 3;
+            expect(handler.healWounds(2).success).toBe(false);
+
+            game.hero.influencePoints = 4;
+            expect(handler.healWounds(2).success).toBe(true);
+            expect(game.hero.influencePoints).toBe(0);
+        });
+
+        it('never charges less than zero', () => {
+            game.hero.getReputationModifier = () => 9;
+            game.hero.wounds = ['w1'];
+            game.hero.influencePoints = 0;
+            expect(handler.influenceCost(2)).toBe(0);
+            expect(handler.healWounds(2).success).toBe(true);
+            expect(game.hero.influencePoints).toBe(0);
+        });
+
+        it('does not spend spell mana when influence is short', () => {
+            game.hero.getReputationModifier = () => -2;
+            game.hero.influencePoints = 2;
+            game.hero.getManaInventory = () => ['blue'];
+            const result = handler.buyCard({ name: 'Frost', type: 'spell', color: 'blue' }, 2);
+            expect(result.success).toBe(false);
+            expect(game.hero.removeMana).not.toHaveBeenCalled();
         });
     });
 });

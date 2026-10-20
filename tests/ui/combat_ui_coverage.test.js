@@ -189,7 +189,10 @@ describe('CombatUIManager - Coverage Boost', () => {
             ];
             
             const unit = new MockUnit({ id: 'unit-1', name: 'Damage Unit', ready: true });
-            combatUIManager.renderUnitsInCombat([unit], COMBAT_PHASES.DAMAGE, () => {});
+            const onUnit = vi.fn();
+            combatUIManager.renderUnitsInCombat([unit], COMBAT_PHASES.DAMAGE, onUnit);
+            container.querySelector('.unit-combat-card').click();
+            expect(onUnit).toHaveBeenCalledWith(unit);
 
             const unitCard = container.querySelector('.unit-combat-card');
             
@@ -204,7 +207,10 @@ describe('CombatUIManager - Coverage Boost', () => {
             ];
             
             const unit = new MockUnit({ id: 'unit-1', name: 'Damage Unit', ready: true });
-            combatUIManager.renderUnitsInCombat([unit], COMBAT_PHASES.DAMAGE, () => {});
+            const onUnit = vi.fn();
+            combatUIManager.renderUnitsInCombat([unit], COMBAT_PHASES.DAMAGE, onUnit);
+            container.querySelector('.unit-combat-card').click();
+            expect(onUnit).not.toHaveBeenCalled();
 
             const unitCard = container.querySelector('.unit-combat-card');
             

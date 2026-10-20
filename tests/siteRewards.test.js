@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Hero } from '../js/hero.js';
+import { SAMPLE_ADVANCED_ACTIONS, SAMPLE_ARTIFACTS, SAMPLE_SPELLS } from '../js/card/CardDefinitions.js';
+import { UNIT_INFO, createUnit } from '../js/unit.js';
 import {
     SiteRewardManager,
     SITE_REWARD_TABLES,
@@ -197,36 +199,66 @@ describe('applyRewards() - branch coverage', () => {
         expect(messages).not.toContain('Healed 1 wounds');
     });
 
-    it('logs artifact rewards without mutating hero', () => {
+    it('puts a real artifact on the discard pile when the reward name is not a card', () => {
+        const before = hero.discard.length;
         const messages = mgr.applyRewards(hero, [
             roll({ type: 'artifact', name: 'Excalibur', icon: '⚔️' }),
         ]);
-        expect(messages).toContain('Artifact: Excalibur');
+        expect(hero.discard.length).toBe(before + 1);
+        const card = hero.discard[hero.discard.length - 1];
+        expect(SAMPLE_ARTIFACTS.some((entry) => entry.name === card.name)).toBe(true);
+        expect(messages).toContain(`Artifact: ${card.name}`);
         expect(hero.units.length).toBe(0);
     });
 
-    it('logs spell rewards', () => {
+    it('puts the named spell on the discard pile when it exists', () => {
         const messages = mgr.applyRewards(hero, [
-            roll({ type: 'spell', name: 'Fireball', icon: '🔥' }),
+            roll({ type: 'spell', name: 'Flame Wave', icon: '🔥' }),
         ]);
-        expect(messages).toContain('Spell: Fireball');
+        const card = hero.discard[hero.discard.length - 1];
+        expect(card.name).toBe('Flame Wave');
+        expect(card.type).toBe(SAMPLE_SPELLS.find((entry) => entry.name === 'Flame Wave').type);
+        expect(messages).toContain('Spell: Flame Wave');
     });
 
-    it('logs advanced_action rewards when a name is present', () => {
+    it('puts a real advanced action on the discard pile', () => {
+        const before = hero.discard.length;
         const messages = mgr.applyRewards(hero, [
             roll({ type: 'advanced_action', name: 'Rage', icon: '💢' }),
         ]);
-        expect(messages).toContain('Advanced Action: Rage');
+        expect(hero.discard.length).toBe(before + 1);
+        const card = hero.discard[hero.discard.length - 1];
+        expect(SAMPLE_ADVANCED_ACTIONS.some((entry) => entry.name === card.name)).toBe(true);
+        expect(messages).toContain(`Advanced Action: ${card.name}`);
     });
 
-    it('recruits a unit onto the hero', () => {
+    it('puts a real unit on the hero when the reward name is not a unit', () => {
         const messages = mgr.applyRewards(hero, [
             roll({ type: 'unit', name: 'Spearman', icon: '🪖', data: { attack: 3 } }),
         ]);
         expect(hero.units.length).toBe(1);
-        expect(hero.units[0].name).toBe('Spearman');
-        expect(hero.units[0].attack).toBe(3);
-        expect(messages).toContain('Unit: Spearman');
+        const unit = hero.units[0];
+        const knownNames = Object.values(UNIT_INFO).map((info) => info.name);
+        expect(knownNames).toContain(unit.getName());
+        expect(unit.isReady()).toBe(true);
+        expect(messages).toContain(`Unit: ${unit.getName()}`);
+    });
+
+    it('puts the named unit on the hero when it exists', () => {
+        const messages = mgr.applyRewards(hero, [
+            roll({ type: 'unit', name: 'Wachen', icon: '🛡️' }),
+        ]);
+        expect(hero.units[0].getName()).toBe('Wachen');
+        expect(hero.units[0].type).toBe('guards');
+        expect(messages).toContain('Unit: Wachen');
+    });
+
+    it('puts the unit whose type id matches the reward name', () => {
+        const messages = mgr.applyRewards(hero, [
+            roll({ type: 'unit', name: 'fire_drakes', icon: '🐲' }),
+        ]);
+        expect(hero.units[0].getName()).toBe('Feuer-Drachen');
+        expect(messages).toContain('Unit: Feuer-Drachen');
     });
 
     it('initializes hero.units if missing before recruiting', () => {
@@ -234,9 +266,22 @@ describe('applyRewards() - branch coverage', () => {
         const messages = mgr.applyRewards(hero, [
             roll({ type: 'unit', name: 'Crossbowman', icon: '🏹', data: {} }),
         ]);
-        expect(hero.units).toBeDefined();
+        expect(Array.isArray(hero.units)).toBe(true);
         expect(hero.units.length).toBe(1);
-        expect(messages).toContain('Unit: Crossbowman');
+        const knownNames = Object.values(UNIT_INFO).map((info) => info.name);
+        expect(knownNames).toContain(hero.units[0].getName());
+        expect(messages).toContain(`Unit: ${hero.units[0].getName()}`);
+    });
+
+    it('does not recruit when the command limit is full', () => {
+        expect(hero.addUnit(createUnit('peasants'))).toBe(true);
+        const before = hero.units.length;
+        const messages = mgr.applyRewards(hero, [
+            roll({ type: 'unit', name: 'Wachen', icon: '🛡️' }),
+        ]);
+        expect(hero.units.length).toBe(before);
+        expect(hero.units[0].getName()).toBe('Bauern');
+        expect(messages).toContain('Befehlslimit voll');
     });
 
     it('converts gold into a random crystal color', () => {

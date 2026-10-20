@@ -26,7 +26,7 @@ export class KeepHandler extends BaseSiteHandler {
                     label: u.name,
                     type: 'unit' as const,
                     data: u,
-                    cost: u.cost,
+                    cost: this.influenceCost(u.cost),
                     action: () => this.recruitUnit(u)
                 }))
             });

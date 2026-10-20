@@ -118,6 +118,9 @@ export class GameStateManager {
              enemies: this.game.entityManager ? this.game.entityManager.enemies.filter(Boolean).map((e: any) => e.getState()) : [],
              combat,
              hexGrid: this.game.hexGrid ? this.game.hexGrid.getState() : null,
+             tilesDeck: this.game.mapManager && typeof this.game.mapManager.getDeckState === 'function'
+                 ? this.game.mapManager.getDeckState()
+                 : [],
              time: this.game.timeManager ? this.game.timeManager.getState() : { round: 1, timeOfDay: 'day' },
              statistics: this.game.statisticsManager ? this.game.statisticsManager.getState() : {},
              achievements: this.game.achievementManager ? this.game.achievementManager.getState() : { unlocked: [] },
@@ -167,6 +170,9 @@ export class GameStateManager {
 
             // Restore other systems
             if (state.hexGrid && this.game.hexGrid) this.game.hexGrid.loadState(state.hexGrid);
+            if (Array.isArray(state.tilesDeck) && this.game.mapManager && typeof this.game.mapManager.loadDeckState === 'function') {
+                this.game.mapManager.loadDeckState(state.tilesDeck);
+            }
             if (state.time && this.game.timeManager) this.game.timeManager.loadState(state.time);
             if (state.statistics && this.game.statisticsManager) this.game.statisticsManager.loadState(state.statistics);
             if (state.achievements && this.game.achievementManager) this.game.achievementManager.loadState(state.achievements);

@@ -9,7 +9,7 @@ export class MonasteryHandler extends BaseSiteHandler {
         // Healing (Cheaper)
         options.push({
             id: 'heal',
-            label: 'Heilen (2 Einfluss / Wunde)',
+            label: `Heilen (${this.influenceCost(2)} Einfluss / Wunde)`,
             action: () => this.healWounds(2),
             enabled: this.game.hero.wounds.length > 0
         });
@@ -24,7 +24,7 @@ export class MonasteryHandler extends BaseSiteHandler {
                 label: c.name,
                 type: 'card',
                 data: c,
-                cost: 6,
+                cost: this.influenceCost(6),
                 action: () => this.buyCard(c, 6)
             }))
         });

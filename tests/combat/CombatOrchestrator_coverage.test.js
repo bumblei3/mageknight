@@ -364,6 +364,31 @@ describe('CombatOrchestrator - Coverage Boost', () => {
                 expect.any(Function)
             );
         });
+
+        it('routes a damage-phase click to assignDamageToUnit', () => {
+            mockGame.combat = mockCombat;
+            mockCombat.phase = COMBAT_PHASES.DAMAGE;
+            mockCombat.assignDamageToUnit.mockReturnValue({ success: true, message: 'assigned', unitDestroyed: false });
+            const unit = { type: 'guard' };
+            mockHero.units = [unit];
+            orchestrator.renderUnitsInCombat();
+            const onClick = mockUI.renderUnitsInCombat.mock.calls[0][2];
+            onClick(unit);
+            expect(mockCombat.assignDamageToUnit).toHaveBeenCalledWith(unit);
+            expect(mockCombat.activateUnit).not.toHaveBeenCalled();
+        });
+
+        it('routes a block-phase click to activateUnit', () => {
+            mockGame.combat = mockCombat;
+            mockCombat.phase = COMBAT_PHASES.BLOCK;
+            const unit = { type: 'guard' };
+            mockHero.units = [unit];
+            orchestrator.renderUnitsInCombat();
+            const onClick = mockUI.renderUnitsInCombat.mock.calls[0][2];
+            onClick(unit);
+            expect(mockCombat.activateUnit).toHaveBeenCalledWith(unit);
+            expect(mockCombat.assignDamageToUnit).not.toHaveBeenCalled();
+        });
     });
 
     describe('activateUnitInCombat', () => {
@@ -746,6 +771,72 @@ describe('CombatOrchestrator - Coverage Boost', () => {
             expect(eventBus.emit).toHaveBeenCalledWith('combat_started', expect.any(Object));
         });
 
+        it('wraps a plain site enemy so block and damage can use it', () => {
+            orchestrator.initiateCombat({
+                name: 'Festungswache',
+                armor: 6,
+                attack: 4,
+                fame: 5,
+                icon: '🛡️',
+                type: 'keep_guard',
+                color: '#9ca3af',
+                fortified: true,
+                swift: true,
+                attackType: 'physical',
+            });
+
+            const enemy = mockGame.combat.enemies[0];
+            expect(enemy.name).toBe('Festungswache');
+            expect(enemy.armor).toBe(6);
+            expect(enemy.attack).toBe(4);
+            expect(enemy.fame).toBe(5);
+            expect(enemy.fortified).toBe(true);
+            expect(enemy.getEffectiveAttack()).toBe(4);
+            expect(enemy.getBlockRequirement()).toBe(8);
+
+            if (mockGame.combat.phase === COMBAT_PHASES.RANGED) {
+                mockGame.combat.endRangedPhase();
+            }
+            const result = mockGame.combat.endBlockPhase();
+            expect(result.waitingForAssignment).toBe(true);
+            expect(result.totalDamage).toBe(4);
+        });
+
+        it('still replaces a plain summoner object', () => {
+            orchestrator.initiateCombat({
+                name: 'Ruinen-Beschwörer',
+                armor: 4,
+                attack: 3,
+                fame: 5,
+                type: 'necromancer',
+                summoner: true,
+            });
+
+            const enemy = mockGame.combat.enemies[0];
+            expect(enemy.name).not.toBe('Ruinen-Beschwörer');
+            expect(typeof enemy.getEffectiveAttack).toBe('function');
+            expect(mockGame.addLog).toHaveBeenCalledWith(expect.stringContaining('Ruinen-Beschwörer'), 'warning');
+        });
+
+        it('leaves an enemy that already has combat methods unchanged', () => {
+            const enemy = createMockEnemy({ id: 'map-orc', name: 'Orc' });
+            orchestrator.initiateCombat(enemy);
+            expect(mockGame.combat.enemies[0]).toBe(enemy);
+        });
+
+        it('gives two plain enemies distinct ids', () => {
+            orchestrator.initiateCombat([
+                { name: 'A', armor: 3, attack: 2, type: 'a' },
+                { name: 'B', armor: 4, attack: 3, type: 'b' },
+            ]);
+            const [first, second] = mockGame.combat.enemies;
+            expect(first.id).not.toBe(second.id);
+            expect(first.name).toBe('A');
+            expect(second.name).toBe('B');
+            expect(first.getBlockRequirement()).toBe(2);
+            expect(second.getEffectiveAttack()).toBe(3);
+        });
+
         it('filters out falsy enemies', () => {
             const enemies = [createMockEnemy(), null, createMockEnemy(), undefined];
             orchestrator.initiateCombat(enemies);
@@ -854,6 +945,71 @@ describe('CombatOrchestrator - Coverage Boost', () => {
             orchestrator.updateCombatTotals();
             
             expect(mockUI.updateCombatTotals).toHaveBeenCalledWith(5, 3, mockCombat.phase);
+        });
+    });
+
+    describe('site conquest from the hero hex', () => {
+        const startFight = (site) => {
+            mockHexGrid.getHex.mockReturnValue(site ? { site } : {});
+            orchestrator.initiateCombat({ name: 'Wächter', armor: 3, attack: 2, fame: 2, type: 'guard' });
+        };
+
+        it('conquers the mine under the hero and ignores a stale currentSite', () => {
+            const mine = { type: 'mine', conquered: false, getName: () => 'Mine' };
+            const stale = { type: 'dungeon', conquered: false, getName: () => 'Dungeon' };
+            mockSiteManager.currentSite = stale;
+            startFight(mine);
+
+            orchestrator.onCombatEnd({ victory: true, enemy: { name: 'Wächter', fame: 2 } });
+
+            expect(mine.conquered).toBe(true);
+            expect(stale.conquered).toBe(false);
+            expect(mockStatisticsManager.increment).toHaveBeenCalledWith('sitesConquered');
+        });
+
+        it('conquers ruins and offers the existing artifact reward', () => {
+            const ruins = { type: 'ruins', conquered: false, getName: () => 'Ruinen' };
+            startFight(ruins);
+
+            orchestrator.onCombatEnd({ victory: true, enemy: { name: 'Räuber', fame: 2 } });
+
+            expect(ruins.conquered).toBe(true);
+            expect(mockRewardManager.showArtifactChoice).toHaveBeenCalled();
+        });
+
+        it('conquers a magic glade without an artifact or spell choice', () => {
+            const glade = { type: 'magic_glade', conquered: false, getName: () => 'Magischer Hain' };
+            startFight(glade);
+
+            orchestrator.onCombatEnd({ victory: true, enemy: { name: 'Hain-Wächter', fame: 2 } });
+
+            expect(glade.conquered).toBe(true);
+            expect(mockRewardManager.showArtifactChoice).not.toHaveBeenCalled();
+            expect(mockRewardManager.showSpellChoice).not.toHaveBeenCalled();
+            expect(mockGame.addLog).toHaveBeenCalledWith(expect.stringContaining('Magischer Hain'), 'success');
+        });
+
+        it('does not conquer a village or a stale site from an earlier visit', () => {
+            const village = { type: 'village', conquered: false, getName: () => 'Dorf' };
+            const stale = { type: 'mine', conquered: false, getName: () => 'Mine' };
+            mockSiteManager.currentSite = stale;
+            startFight(village);
+
+            orchestrator.onCombatEnd({ victory: true, enemy: { name: 'Orc', fame: 1 } });
+
+            expect(village.conquered).toBe(false);
+            expect(stale.conquered).toBe(false);
+        });
+
+        it('leaves a den unconquered after defeat and does not clear it in a later fight', () => {
+            const den = { type: 'den', conquered: false, getName: () => 'Hort' };
+            startFight(den);
+            orchestrator.onCombatEnd({ defeat: true, enemy: { name: 'Wolf', fame: 1 } });
+            expect(den.conquered).toBe(false);
+
+            startFight(null);
+            orchestrator.onCombatEnd({ victory: true, enemy: { name: 'Orc', fame: 1 } });
+            expect(den.conquered).toBe(false);
         });
     });
 

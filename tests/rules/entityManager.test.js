@@ -8,6 +8,28 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { EntityManager } from '../../js/game/EntityManager';
 
+describe('EntityManager — tile enemies', () => {
+    it('appends tile guards and leaves enemies already on the board', () => {
+        const game = { enemies: [] };
+        const em = new EntityManager(game);
+        const existing = { id: 'already', position: { q: 0, r: 0 } };
+        em.enemies.push(existing);
+
+        const spawned = em.spawnTileEnemies([
+            { type: 'orc', q: 2, r: 0 },
+            { type: 'crystal_golem', q: 2, r: 0 },
+            { type: 'not_a_real_enemy', q: 3, r: 0 }
+        ]);
+
+        expect(spawned).toHaveLength(2);
+        expect(em.enemies[0]).toBe(existing);
+        expect(em.enemies).toHaveLength(3);
+        expect(game.enemies).toBe(em.enemies);
+        expect(spawned[0].position).toEqual({ q: 2, r: 0 });
+        expect(spawned[1].type).toBe('crystal_golem');
+    });
+});
+
 describe('EntityManager — enemy spawning', () => {
     let game;
     let em;

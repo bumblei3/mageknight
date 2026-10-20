@@ -5,6 +5,9 @@
  */
 import { Hero } from '../hero';
 import { logger } from '../logger';
+import { createDeck } from '../card/CardFactory';
+import { SAMPLE_ADVANCED_ACTIONS, SAMPLE_ARTIFACTS, SAMPLE_SPELLS } from '../card/CardDefinitions';
+import { UNIT_INFO, createUnit } from '../unit';
 
 export type RewardType = 
     | 'artifact' 
@@ -521,27 +524,19 @@ export class SiteRewardManager {
                     }
                     break;
                 case 'artifact':
-                    // Add artifact to hand (can be equipped later via equipArtifact)
-                    // For now, just log the reward
-                    messages.push(`Artifact: ${r.name}`);
+                    messages.push(`Artifact: ${this.grantPlayableCard(hero, SAMPLE_ARTIFACTS, r.name)}`);
                     break;
                 case 'spell':
-                    // Spells are cards - would need to be added to deck via card system
-                    messages.push(`Spell: ${r.name}`);
+                    messages.push(`Spell: ${this.grantPlayableCard(hero, SAMPLE_SPELLS, r.name)}`);
                     break;
                 case 'advanced_action':
-                    // Learn advanced action as skill
-                    // learnAdvancedAction requires (Card, influenceCost) - skip actual learning for now
-                    if (r.name) {
-                        messages.push(`Advanced Action: ${r.name}`);
-                    }
+                    messages.push(`Advanced Action: ${this.grantPlayableCard(hero, SAMPLE_ADVANCED_ACTIONS, r.name)}`);
                     break;
-                case 'unit':
-                    // Recruit unit
-                    if (!hero.units) hero.units = [];
-                    hero.units.push({ name: r.name, ...r.data });
-                    messages.push(`Unit: ${r.name}`);
+                case 'unit': {
+                    const unitName = this.grantPlayableUnit(hero, r.name);
+                    messages.push(unitName ? `Unit: ${unitName}` : 'Befehlslimit voll');
                     break;
+                }
                 case 'mana':
                     // Mana is handled through crystals
                     break;
@@ -559,6 +554,53 @@ export class SiteRewardManager {
         }
         
         return messages;
+    }
+
+    /**
+     * Puts a real card from the playable list onto the discard pile.
+     * A reward name that matches a card is used as-is. Any other name draws one from the list.
+     */
+    private grantPlayableCard(hero: Hero, pool: Array<{ name?: string }>, rewardName?: string): string {
+        const fallback = rewardName || 'Unbekannt';
+        if (!pool.length) return fallback;
+
+        const wanted = (rewardName || '').trim().toLowerCase();
+        const match = wanted
+            ? pool.find((card) => String(card.name || '').trim().toLowerCase() === wanted)
+            : undefined;
+        const chosen = match || pool[Math.floor(Math.random() * pool.length)];
+        const card = createDeck([chosen])[0];
+        if (!card) return fallback;
+
+        if (!Array.isArray(hero.discard)) hero.discard = [];
+        hero.discard.push(card);
+        return card.name;
+    }
+
+    /**
+     * Puts a real unit from UNIT_INFO onto the hero.
+     * A reward name that matches a unit is used as-is. Any other name draws one from the list.
+     * Returns null when the command limit is already full.
+     */
+    private grantPlayableUnit(hero: Hero, rewardName?: string): string | null {
+        const entries = Object.entries(UNIT_INFO);
+        const fallback = rewardName || 'Unbekannt';
+        if (!entries.length) return fallback;
+
+        const wanted = (rewardName || '').trim().toLowerCase();
+        const match = wanted
+            ? entries.find(([type, info]) => {
+                const name = String(info.name || '').trim().toLowerCase();
+                return name === wanted || type.trim().toLowerCase() === wanted;
+            })
+            : undefined;
+        const chosenType = (match || entries[Math.floor(Math.random() * entries.length)])[0];
+        const unit = createUnit(chosenType);
+        if (!unit) return fallback;
+
+        if (!Array.isArray(hero.units)) hero.units = [];
+        if (!hero.addUnit(unit)) return null;
+        return unit.getName();
     }
     
     /**

@@ -4,6 +4,8 @@ import { TERRAIN_TYPES } from './constants';
 import { logger } from './logger';
 import { SITE_TYPES } from './sites';
 import { Site } from './sites';
+import { HEX_DIRECTIONS } from './utils/hexUtils';
+import { buildScenarioDeck, normalizeTerrains, ScenarioTile } from './map/tileDeck';
 
 export interface MapData {
     hexes: Array<{ q: number; r: number; terrain: TerrainType; site?: any }>;
@@ -17,10 +19,25 @@ export interface SitePlacement {
     radius?: number;
 }
 
+export interface PlacedEnemy {
+    type: string;
+    q: number;
+    r: number;
+}
+
+export interface ExploreResult {
+    success: boolean;
+    event?: any;
+    placed?: Array<{ q: number; r: number }>;
+    enemies?: PlacedEnemy[];
+    siteType?: string | null;
+    siteName?: string | null;
+}
+
 export class MapManager {
     private game: any;
     private hexGrid: HexGridLogic;
-    public tilesDeck: TerrainType[][] = [];
+    public tilesDeck: ScenarioTile[] = [];
 
     constructor(game: any) {
         this.game = game;
@@ -29,15 +46,26 @@ export class MapManager {
     }
 
     initializeDeck() {
-        // Create a dummy deck for testing/placeholder logic
-        // 10 tiles, each with 7 hexes
-        for (let i = 0; i < 10; i++) {
-            const tile = new Array(7).fill(TERRAIN_TYPES.PLAINS);
-            // Vary terrains slightly
-            tile[1] = TERRAIN_TYPES.FOREST;
-            tile[2] = TERRAIN_TYPES.HILLS;
-            this.tilesDeck.push(tile);
-        }
+        this.tilesDeck = buildScenarioDeck({ deckDistribution: 'countryside' }, 'start', 10);
+    }
+
+    getDeckState(): ScenarioTile[] {
+        return this.tilesDeck.map((tile) => ({
+            terrains: [...tile.terrains],
+            siteType: tile.siteType,
+            enemyTypes: [...tile.enemyTypes]
+        }));
+    }
+
+    loadDeckState(deck: ScenarioTile[] | null | undefined): void {
+        if (!Array.isArray(deck)) return;
+        this.tilesDeck = deck
+            .filter((tile) => tile && Array.isArray(tile.terrains))
+            .map((tile) => ({
+                terrains: normalizeTerrains(tile.terrains),
+                siteType: tile.siteType || null,
+                enemyTypes: Array.isArray(tile.enemyTypes) ? [...tile.enemyTypes] : []
+            }));
     }
 
     private getRandomTerrain(): TerrainType {
@@ -61,21 +89,46 @@ export class MapManager {
     createStartingMap(scenarioData: any | null = null): void {
         console.log('Initializing Map...');
 
+        if (scenarioData && scenarioData.mapConfig) {
+            const seed = scenarioData.id || scenarioData.mapConfig.deckDistribution || 'scenario';
+            this.tilesDeck = buildScenarioDeck(scenarioData.mapConfig, seed);
+        }
+
         if (scenarioData && scenarioData.mapConfig && scenarioData.mapConfig.startTile) {
             this.createMapFromStartTile(scenarioData.mapConfig.startTile);
+            this.placeStartingHaven();
         } else if (scenarioData && scenarioData.hexes) {
             this.loadMapFromData(scenarioData);
         } else {
             this.generateDefaultMap();
+            this.placeStartingHaven();
         }
 
-        // Place scenario-specific sites
-        if (scenarioData && scenarioData.mapConfig && scenarioData.mapConfig.sitePlacements) {
-            this.placeScenarioSites(scenarioData.mapConfig.sitePlacements);
-        }
+        // Goal sites stay in the scenario deck and appear when a tile is explored.
 
         // Reveal starting area
         this.revealStartingArea();
+    }
+
+    /**
+     * Puts one unguarded village on the start tile. Scenario goals are not
+     * placed here; they arrive with explored tiles.
+     */
+    private placeStartingHaven(): void {
+        const candidates = [
+            ...this.hexGrid.getNeighbors(0, 0),
+            { q: 0, r: 0 }
+        ];
+        const spot = candidates.find((coord) => {
+            const hex = this.hexGrid.getHex(coord.q, coord.r);
+            return hex && !hex.site && hex.terrain !== TERRAIN_TYPES.WATER;
+        });
+        if (!spot) return;
+
+        const hex = this.hexGrid.getHex(spot.q, spot.r);
+        if (!hex || hex.site) return;
+        hex.site = new Site(SITE_TYPES.VILLAGE);
+        logger.info(`Placed village at (${spot.q}, ${spot.r})`);
     }
 
     private createMapFromStartTile(startTile: TerrainType[]): void {
@@ -143,66 +196,121 @@ export class MapManager {
     }
 
     /**
-     * Adds a new map tile (group of 7 hexes) at the specified coordinate
-     * Logic for map tiles would go here (Core Tiles vs Countryside Tiles)
+     * Draws the next tile and lays its empty hexes around the given center.
+     * Existing hexes stay as they are, so the start tile is never overwritten.
      */
-    addMapTile(centerQ: number, centerR: number, tileType: 'countryside' | 'core'): void {
-        // TODO: Implement actual tile deck logic
-        // For now, just filling hexes
-        const hexes = this.hexGrid.getHexesInRange(centerQ, centerR, 1);
-        hexes.forEach(h => {
-            // If empty, fill
-            if (!this.hexGrid.hasHex(h.q, h.r)) {
-                this.hexGrid.setHex(h.q, h.r, { terrain: TERRAIN_TYPES.PLAINS });
-            }
-        });
+    addMapTile(centerQ: number, centerR: number, tileType: 'countryside' | 'core' = 'countryside'): ExploreResult {
+        const tile = this.tilesDeck.shift();
+        if (!tile) return { success: false };
+        if (tileType === 'core' && !tile.siteType) {
+            tile.siteType = SITE_TYPES.CITY;
+            tile.enemyTypes = ['guard', 'dragon'];
+        }
+        const placed = this.placeTile(centerQ, centerR, tile);
+        if (!placed.success) this.tilesDeck.unshift(tile);
+        return placed;
     }
+
     /**
      * Checks if exploration is possible from the given position
      */
     canExplore(q: number, r: number): boolean {
+        if (this.tilesDeck.length === 0) return false;
         const neighbors = this.hexGrid.getNeighbors(q, r);
         return neighbors.some(n => !this.hexGrid.hasHex(n.q, n.r));
     }
 
     /**
-     * Explores adjacent unknown hexes from specified position
+     * Lays the next 7-hex scenario tile onto the first open edge.
+     * The tile center is that unknown neighbor, so it shares the hero hex
+     * and does not replace any hex that is already on the map.
      */
-    explore(q: number, r: number): { success: boolean; event?: any } {
+    explore(q: number, r: number): ExploreResult {
         logger.debug(`MapManager: Exploring from ${q},${r}`);
         if (!this.canExplore(q, r)) {
             logger.warn('MapManager: canExplore returned false');
             return { success: false };
         }
 
-        const neighbors = this.hexGrid.getNeighbors(q, r);
-        const unknownNeighbors = neighbors.filter(n => !this.hexGrid.hasHex(n.q, n.r));
+        const anchor = this.hexGrid.getNeighbors(q, r).find(n => !this.hexGrid.hasHex(n.q, n.r));
+        const tile = anchor ? this.tilesDeck.shift() : undefined;
+        if (!anchor || !tile) return { success: false };
 
-        if (unknownNeighbors.length > 0) {
-            // Simplistic exploration: reveal all direct neighbors
-            unknownNeighbors.forEach(n => {
-                this.hexGrid.setHex(n.q, n.r, { terrain: this.getRandomTerrain() });
-                const hex = this.hexGrid.getHex(n.q, n.r);
-                if (hex) {
-                    hex.revealed = true;
-
-                    // Check for Spawning Grounds auto-spawn on reveal
-                    if (this.worldEventManager && hex.site && hex.site.type === SITE_TYPES.SPAWNING_GROUNDS) {
-                        this.worldEventManager.onTileRevealed(n.q, n.r, hex);
-                    }
-                }
-            });
-
-            // Randomly trigger a world event if possible
-            let event = null;
-            if (this.worldEventManager && Math.random() > 0.7) {
-                event = this.worldEventManager.getRandomEvent();
-            }
-
-            return { success: true, event };
+        const placed = this.placeTile(anchor.q, anchor.r, tile);
+        if (!placed.success) {
+            this.tilesDeck.unshift(tile);
+            return { success: false };
         }
 
-        return { success: false };
+        let event = null;
+        if (this.worldEventManager && Math.random() > 0.7) {
+            event = this.worldEventManager.getRandomEvent();
+        }
+
+        return { ...placed, event };
+    }
+
+    private placeTile(centerQ: number, centerR: number, tile: ScenarioTile): ExploreResult {
+        const offsets = [{ q: 0, r: 0 }, ...HEX_DIRECTIONS];
+        const placed: Array<{ q: number; r: number }> = [];
+        let siteHex: { q: number; r: number } | null = null;
+        let siteName: string | null = null;
+
+        offsets.forEach((offset, index) => {
+            const q = centerQ + offset.q;
+            const r = centerR + offset.r;
+            if (this.hexGrid.hasHex(q, r)) return;
+
+            const wantsSite = tile.siteType && siteHex === null && index > 0;
+            const site = wantsSite && tile.siteType ? new Site(tile.siteType) : undefined;
+            this.hexGrid.setHex(q, r, {
+                terrain: tile.terrains[index] || TERRAIN_TYPES.PLAINS,
+                revealed: true,
+                site
+            });
+            placed.push({ q, r });
+            if (site) {
+                siteHex = { q, r };
+                siteName = site.getName();
+                this.notifySpawningGrounds(q, r, site.type);
+            }
+        });
+
+        if (placed.length === 0) return { success: false };
+
+        if (tile.siteType && !siteHex) {
+            const fallback = placed[0];
+            const hex = this.hexGrid.getHex(fallback.q, fallback.r);
+            if (hex && !hex.site) {
+                const site = new Site(tile.siteType);
+                hex.site = site;
+                siteHex = fallback;
+                siteName = site.getName();
+                this.notifySpawningGrounds(fallback.q, fallback.r, site.type);
+            }
+        }
+
+        const guard = siteHex || placed[0];
+        const enemies: PlacedEnemy[] = tile.enemyTypes.map((type) => ({
+            type,
+            q: guard.q,
+            r: guard.r
+        }));
+
+        logger.info(`Placed tile at (${centerQ}, ${centerR}) with ${placed.length} new hexes`);
+        return {
+            success: true,
+            placed,
+            enemies,
+            siteType: siteHex ? tile.siteType : null,
+            siteName
+        };
+    }
+
+    private notifySpawningGrounds(q: number, r: number, siteType: string): void {
+        if (!this.worldEventManager || siteType !== SITE_TYPES.SPAWNING_GROUNDS) return;
+        const hex = this.hexGrid.getHex(q, r);
+        this.worldEventManager.onTileRevealed(q, r, hex);
     }
 
     /**

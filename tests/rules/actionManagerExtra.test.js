@@ -199,6 +199,20 @@ describe('ActionManager Extra — explore side-effects', () => {
         expect(game.entityManager.createEnemies).not.toHaveBeenCalled();
     });
 
+    it('explore spawns tile enemies without rebuilding the board', () => {
+        game.entityManager.spawnTileEnemies = vi.fn();
+        game.mapManager.explore = () => ({
+            success: true,
+            siteName: 'Mine',
+            enemies: [{ type: 'orc', q: 2, r: 0 }]
+        });
+        game.hexGrid.exploreAdjacent = () => [];
+        am.explore();
+        expect(game.entityManager.spawnTileEnemies).toHaveBeenCalledWith([{ type: 'orc', q: 2, r: 0 }]);
+        expect(game.entityManager.createEnemies).not.toHaveBeenCalled();
+        expect(game.addLog).toHaveBeenCalledWith('Neues Gebiet entdeckt: Mine!', 'discovery');
+    });
+
     it('explore skips event modal when no event is returned', () => {
         game.mapManager.explore = () => ({ success: true });
         game.hexGrid.exploreAdjacent = () => [];

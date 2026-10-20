@@ -9,7 +9,7 @@ export class VillageHandler extends BaseSiteHandler {
         // Healing
         options.push({
             id: 'heal',
-            label: 'Heilen (3 Einfluss / Wunde)',
+            label: `Heilen (${this.influenceCost(3)} Einfluss / Wunde)`,
             action: () => this.healWounds(3),
             enabled: this.game.hero.wounds.length > 0
         });
@@ -24,7 +24,7 @@ export class VillageHandler extends BaseSiteHandler {
                 label: u.name,
                 type: 'unit',
                 data: u,
-                cost: u.cost,
+                cost: this.influenceCost(u.cost),
                 action: () => this.recruitUnit(u)
             }))
         });

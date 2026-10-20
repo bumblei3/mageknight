@@ -28,6 +28,20 @@ export interface EnemyData {
     [key: string]: unknown;
 }
 
+const CONQUERABLE_SITE_TYPES = new Set([
+    'dungeon',
+    'ruin',
+    'ruins',
+    'tomb',
+    'labyrinth',
+    'spawning_grounds',
+    'keep',
+    'mage_tower',
+    'mine',
+    'den',
+    'magic_glade',
+]);
+
 export class CombatOrchestrator {
     private game: any; // TODO: Replace with proper Game interface
     public combatAttackTotal: number;
@@ -35,6 +49,10 @@ export class CombatOrchestrator {
     public activeBlocks: BlockSource[];
     public combatRangedTotal: number;
     public combatSiegeTotal: number;
+    /** Site under the hero when this fight started. Null when the hex has nothing to conquer. */
+    private combatSite: any = null;
+    /** True after initiateCombat looked at the hero hex, so a stale currentSite is ignored. */
+    private combatSiteKnown = false;
 
     constructor(game: any) {
         this.game = game;
@@ -98,7 +116,10 @@ export class CombatOrchestrator {
     renderUnitsInCombat(): void {
         if (!this.game.combat || !this.game.ui) return;
         const units = this.game.hero.units;
-        this.game.ui.renderUnitsInCombat(units, this.game.combat.phase, (u: any) => this.activateUnitInCombat(u));
+        const onUnitClick = this.game.combat.phase === COMBAT_PHASES.DAMAGE
+            ? (unit: any) => this.assignDamageToUnit(unit)
+            : (unit: any) => this.activateUnitInCombat(unit);
+        this.game.ui.renderUnitsInCombat(units, this.game.combat.phase, onUnitClick);
     }
 
     activateUnitInCombat(unit: Unit): void {
@@ -299,7 +320,10 @@ export class CombatOrchestrator {
 
         if (this.game.gameState !== 'playing' && !this.game.isTestEnvironment) return;
 
-        const processedEnemies = enemies.map((enemy: any) => {
+        this.rememberSiteUnderHero();
+
+        const processedEnemies = enemies.map((raw: any) => {
+            const enemy = this.asCombatEnemy(raw);
             if (enemy.summoner) {
                 let summonKey = 'orc';
                 const candidates = Object.keys(ENEMY_DEFINITIONS).filter((k: string) => {
@@ -331,7 +355,7 @@ export class CombatOrchestrator {
         if (defensiveEnemies.length > 0 && this.game.hexGrid) {
             const additionalEnemies = this.findDefensiveAllies(defensiveEnemies, enemies);
             if (additionalEnemies.length > 0) {
-                enemies.push(...additionalEnemies);
+                enemies.push(...additionalEnemies.map((ally: any) => this.asCombatEnemy(ally)));
                 this.game.addLog(t('combat.defensiveJoin', { count: additionalEnemies.length }), 'warning');
             }
         }
@@ -483,9 +507,9 @@ export class CombatOrchestrator {
                 this.game.levelUpManager.handleLevelUp(levelResult);
             }
 
-            const currentSite = this.game.siteManager ? this.game.siteManager.currentSite : null;
+            const currentSite = this.siteForThisFight();
             if (currentSite && !currentSite.conquered) {
-                if (currentSite.type === 'dungeon' || currentSite.type === 'ruin') {
+                if (currentSite.type === 'dungeon' || currentSite.type === 'ruin' || currentSite.type === 'ruins') {
                     currentSite.conquered = true;
                     const logKey = currentSite.type === 'dungeon' ? 'combat.dungeonCleared' : 'combat.ruinCleared';
                     this.game.addLog(t(logKey), 'success');
@@ -515,6 +539,10 @@ export class CombatOrchestrator {
                         const heroPixel = this.game.hexGrid.axialToPixel(this.game.hero.position.q, this.game.hero.position.r);
                         this.game.particleSystem.buffEffect(heroPixel.x, heroPixel.y, 'green');
                     }
+                } else if (currentSite.type === 'den' || currentSite.type === 'magic_glade') {
+                    currentSite.conquered = true;
+                    const siteName = typeof currentSite.getName === 'function' ? currentSite.getName() : (currentSite.name || currentSite.type);
+                    this.game.addLog(t('combat.siteConquered', { site: siteName }), 'success');
                 } else if (currentSite.type === 'keep' || currentSite.type === 'mage_tower' || currentSite.type === 'mine') {
                     currentSite.conquered = true;
                     this.game.addLog(t('combat.siteConquered', { site: currentSite.getName() }), 'success');
@@ -539,7 +567,7 @@ export class CombatOrchestrator {
         } else if (result.defeat && enemy) {
             this.game.addLog(t('combat.defeatAgainst', { enemy: enemy.name }), 'error');
             // Show defeat overlay with combat summary
-            const currentSite = this.game.siteManager?.currentSite;
+            const currentSite = this.siteForThisFight();
             const siteName = currentSite?.getName?.() ?? 'Unbekannt';
             const defeatMsg = `${t('combat.defeatAgainst', { enemy: enemy.name })} — Dein Held fiel auf ${siteName}.`;
             this.game.ui?.showGameOverDefeat(enemy.name, defeatMsg);
@@ -558,11 +586,36 @@ export class CombatOrchestrator {
         }
 
         eventBus.emit(GAME_EVENTS.COMBAT_ENDED, { victory: result.victory, enemy: enemy });
-        
+
+        this.combatSite = null;
+        this.combatSiteKnown = false;
+
         // Call site-specific callback if provided
         if (siteCallback) {
             siteCallback();
         }
+    }
+
+    /**
+     * Remember the unconquered site on the hero's hex. Village, monastery, and city are ignored.
+     * The snapshot is cleared when the fight ends.
+     */
+    private rememberSiteUnderHero(): void {
+        this.combatSite = null;
+        this.combatSiteKnown = true;
+        const pos = this.game.hero?.position;
+        if (!pos || typeof this.game.hexGrid?.getHex !== 'function') return;
+        const site = this.game.hexGrid.getHex(pos.q, pos.r)?.site;
+        if (!site || site.conquered || !CONQUERABLE_SITE_TYPES.has(site.type)) return;
+        this.combatSite = site;
+    }
+
+    /**
+     * Site captured at fight start. Direct onCombatEnd calls still honor siteManager.currentSite.
+     */
+    private siteForThisFight(): any {
+        if (this.combatSiteKnown) return this.combatSite;
+        return this.game.siteManager ? this.game.siteManager.currentSite : null;
     }
 
     executeRangedAttack(enemy: Enemy): void {
@@ -608,6 +661,25 @@ export class CombatOrchestrator {
         } else {
             this.updateCombatInfo();
         }
+    }
+
+    /**
+     * Site fights pass plain objects. Combat needs getEffectiveAttack and getBlockRequirement.
+     * An enemy that already has both stays as it is, including test doubles.
+     */
+    private asCombatEnemy(enemy: any): Enemy {
+        if (
+            enemy &&
+            typeof enemy.getEffectiveAttack === 'function' &&
+            typeof enemy.getBlockRequirement === 'function'
+        ) {
+            return enemy;
+        }
+        return new Enemy({
+            ...enemy,
+            type: enemy?.type || 'custom',
+            id: enemy?.id || `site_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        });
     }
 
     findDefensiveAllies(defensiveEnemies: EnemyData[], allEnemies: EnemyData[]): EnemyData[] {

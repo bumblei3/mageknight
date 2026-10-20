@@ -18,13 +18,13 @@ export class MageTowerHandler extends BaseSiteHandler {
             const spells = SAMPLE_SPELLS;
             options.push({
                 id: 'spells',
-                label: 'Zauber lernen (7 Einfluss + Mana)',
+                label: `Zauber lernen (${this.influenceCost(7)} Einfluss + Mana)`,
                 subItems: spells.map(c => ({
                     id: `spell_${c.id}`,
                     label: c.name,
                     type: 'card' as const,
                     data: c,
-                    cost: 7,
+                    cost: this.influenceCost(7),
                     action: () => this.buyCard(c, 7)
                 }))
             });

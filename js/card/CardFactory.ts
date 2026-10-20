@@ -2,7 +2,7 @@
  * CardFactory - Card creation functions and Card class
  */
 import { CARD_TYPES } from '../constants';
-import { CARD_DEFINITIONS } from './CardDefinitions';
+import { CARD_DEFINITIONS, findCardDefinition } from './CardDefinitions';
 import { EFFECT_TYPE_TO_KEY, secondaryEffectKey } from './effectMeta';
 
 export interface CardEffect {
@@ -145,7 +145,7 @@ export function createDeck(cardDefinitions: (Partial<CardData> | string)[]): Car
     return cardDefinitions.map((def, index) => {
         let data: Partial<CardData>;
         if (typeof def === 'string') {
-            data = CARD_DEFINITIONS[def];
+            data = findCardDefinition(def)!;
             if (!data) {
                 console.warn(`Card definition not found for ID: ${def}`);
                 data = { id: def, name: 'Unknown Card' };

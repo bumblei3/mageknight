@@ -1,7 +1,7 @@
 // Hero class for Mage Knight
 
 import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_ARTIFACTS, Card, CardData } from './card';
-import { CARD_DEFINITIONS } from './card/CardDefinitions';
+import { CARD_DEFINITIONS, findCardDefinition } from './card/CardDefinitions';
 import { MANA_COLORS, ManaColor } from './constants';
 import { HeroInventory, Crystals } from './hero/HeroInventory';
 import { CONDITION_REPUTATION_LOSS, REPUTATION_LOSS_PER_PLAY, PRIMARY_EFFECT_ORDER } from './card/effectMeta';
@@ -880,7 +880,7 @@ export class Hero {
                 .filter(Boolean) // Drop literal null/undefined (corrupt save data)
                 .map(id => {
                     if (typeof id === 'string') {
-                        const def = CARD_DEFINITIONS[id];
+                        const def = findCardDefinition(id);
                         if (def) return new Card(def);
                         console.warn(`Card definition not found for ID: ${id}`);
                         return new Card({ id, name: 'Unknown Card', color: null });
@@ -903,7 +903,7 @@ export class Hero {
         if (state.units) this.units = state.units as Unit[];
         // Restore equipped artifact
         if (state.equippedArtifact) {
-            const def = CARD_DEFINITIONS[state.equippedArtifact];
+            const def = findCardDefinition(state.equippedArtifact);
             if (def) {
                 this.equippedArtifact = new Card(def);
                 // Apply passive effects on load

@@ -139,6 +139,15 @@ nur noch `spell_effect` (Spell Mastery — beliebigen Zauber wirken). Ebenfalls
 noch nicht simuliert: die Schlüsselwörter `vampirism`, `cleanse`, `keep`,
 `iceBlock`, `fireAttack`, `unitRecruitment`.
 
+### Karten-IDs beim Speichern
+
+Saves speichern nur Karten-**IDs**. Aufgelöst werden sie über
+`findCardDefinition()` (`js/card/CardDefinitions.ts`), das Starter-Deck **und**
+die Pools `SAMPLE_ADVANCED_ACTIONS`, `SAMPLE_SPELLS`, `SAMPLE_ARTIFACTS`
+abdeckt. Eine Auflösung nur über das 18-Einträge-Starter-Dictionary machte jede
+Advanced Action, jeden Zauber und jedes Artefakt nach dem Laden zu einer
+wirkungslosen „Unknown Card".
+
 ### Auswahl-Effekte (Wish, Improvisation)
 
 `wish` und `copy_card` brauchen eine Entscheidung. `js/game/cardChoiceFlow.ts`

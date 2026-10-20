@@ -890,3 +890,25 @@ export const SAMPLE_ADVANCED_ACTIONS: any[] = [
         image: 'horn_of_valor.png'
     }
 ];
+
+/**
+ * Full lookup pool: the starter dictionary plus the advanced-action, spell and
+ * artifact sets.
+ *
+ * Saves store card **ids**, so every id the game can hand out (site rewards,
+ * level-up choices, artifacts) must resolve back to a definition. Resolving
+ * against `CARD_DEFINITIONS` alone turned every advanced action, spell and
+ * artifact into "Unknown Card" after loading a save.
+ */
+export const ALL_CARD_DEFINITIONS: Record<string, any> = (() => {
+    const pool: Record<string, any> = { ...CARD_DEFINITIONS };
+    [...SAMPLE_ADVANCED_ACTIONS, ...SAMPLE_SPELLS, ...SAMPLE_ARTIFACTS].forEach((card) => {
+        if (card && card.id && !pool[card.id]) pool[card.id] = card;
+    });
+    return pool;
+})();
+
+/** Resolve a card id to its definition (starter deck first, then the pools). */
+export function findCardDefinition(id: string): any | undefined {
+    return ALL_CARD_DEFINITIONS[id];
+}

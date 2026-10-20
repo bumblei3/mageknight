@@ -6,6 +6,7 @@ import { TooltipManager } from './TooltipManager';
 import { createCard, showCardPreview, injectCardPreviewStyles } from './components';
 import type { CardData } from './components';
 import { COMBAT_PHASES } from '../constants';
+import { CONDITION_REPUTATION_LOSS, REPUTATION_LOSS_PER_PLAY } from '../card/effectMeta';
 
 export interface CardPlayContext {
     disabled: boolean;
@@ -397,6 +398,13 @@ export class HandRenderer {
         if (effect.block) parts.push(`+${effect.block} 🛡️`);
         if (effect.influence) parts.push(`+${effect.influence} 💬`);
         if (effect.healing) parts.push(`+${effect.healing} ❤️`);
+        if (effect.draw) parts.push(`+${effect.draw} 🎴`);
+        if (effect.mana) parts.push(`+${effect.mana} 💎`);
+        if (effect.crystal) parts.push(`+${effect.crystal} 💠`);
+        if (effect.handLimitBonus) parts.push(`+${effect.handLimitBonus} 🖐️`);
+        if (effect.condition === CONDITION_REPUTATION_LOSS) {
+            parts.push(`${REPUTATION_LOSS_PER_PLAY} ⚖️`);
+        }
         return parts.join(' ') || (t as any)('cards.none');
     }
 

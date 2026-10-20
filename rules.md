@@ -107,4 +107,31 @@ Artefakte sind spezielle Gold-Karten (=Artifacts), die permanent ausgerüstet we
 
 ---
 
-*Last Updated: 2026-06-16*
+## 7. Karten-Effekte (Engine-Abdeckung)
+
+Kartendaten deklarieren Effekte als `{ type, value, … }`. `Card.normalizeEffect()`
+(`js/card/CardFactory.ts`) hebt sie auf die direkten Eigenschaften, die
+`Hero.playCard()` anwendet. Die Zuordnung liegt zentral in `js/card/effectMeta.ts`.
+
+| Deklariert in den Daten | Wirkung beim Ausspielen |
+|-------------------------|--------------------------|
+| `type: 'move'` + `value` | Bewegungspunkte |
+| `move: N` (neben anderem Typ) | Bewegungspunkte (z. B. Battle Versatility, Rage stark) |
+| `type2`/`value2` | zweiter Effekt (z. B. Agility stark: Block 3 + Bewegung 2) |
+| `type: 'attack' / 'block' / 'influence'` | Angriff / Block / Einfluss |
+| `type: 'heal'` + `value` | Heilpunkte |
+| `type: 'draw'` + `value` | Karten ziehen (Concentration) |
+| `type: 'mana_token'` + `value` | Mana-Token in Kartenfarbe (Mana Storm) |
+| `type: 'crystal'` + `value` | Manakristall in Kartenfarbe, max. 3 pro Farbe (Crystallize) |
+| `type: 'hand_limit'` + `value` | Handkarten-Limit dauerhaft +N (Will Focus) |
+| `condition: 'reputation_loss'` | Ansehen −1 beim Ausspielen (Threaten, Banner of Fear) |
+
+Noch ohne Engine-Wirkung (im Tooltip als „noch nicht implementiert" markiert):
+`copy_card`, `spell_effect`, `wish`, `extra_turn`, `destroy_enemy`, `summon_unit`,
+`enhance_next`. Ebenfalls noch nicht simuliert: die Schlüsselwörter `area`,
+`target`, `vampirism`, `cleanse`, `keep`, `iceBlock`, `fireAttack`,
+`unitRecruitment` (nur `element` wird für den Element-Combo-Bonus gelesen).
+
+---
+
+*Last Updated: 2026-10-20*

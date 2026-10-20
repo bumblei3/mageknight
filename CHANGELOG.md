@@ -8,9 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Karten-Effekte wirken jetzt:** Effekt-Schlüssel, die in den Kartendaten standen, aber nie angewendet wurden, laufen jetzt durch die Engine — betroffen sind 13 Karten-Definitionen (Agility/`blk_tac`, Banner of Fear, Battle Versatility, Concentration, Crystal Magic, Crystal of Insight, Crystallize, Mana Draw, Mana Storm, Mana Surge, Rage, Threaten, Will Focus):
+  - `move: N` neben einem anderen Effekt (Battle Versatility, Rage stark) gibt Bewegungspunkte.
+  - `type2`/`value2` als zweiter Effekt (Agility stark: Block 3 + Bewegung 2).
+  - `type: 'draw'` zieht Karten (Concentration), `type: 'mana_token'` gibt Mana-Token in Kartenfarbe (Mana Storm), `type: 'crystal'` gibt einen Manakristall (Crystallize, max. 3 pro Farbe), `type: 'hand_limit'` erhöht das Handkarten-Limit dauerhaft (Will Focus).
+  - `condition: 'reputation_loss'` kostet beim Ausspielen 1 Ansehen (Threaten).
+- **`js/card/effectMeta.ts`:** zentrale Zuordnung Effekt-Typ → Engine-Eigenschaft samt UI-Labels. Effekt-Typen ohne Handler werden dort explizit geführt, statt still zu verschwinden.
+- **Kartentooltip:** zeigt `Karten ziehen`, `Mana-Token`, `Manakristall`, `Handkarten-Limit` und Ansehens-Kosten; Effekt-Typen ohne Handler erscheinen als „noch nicht implementiert".
 - **Map tiles:** Exploring spends 2 movement and lays the next 7-hex scenario tile on the open edge (terrain, one site, that site's enemies). The deck is built from `mapConfig.deck` or `deckDistribution` plus the scenario's site list, then shuffled with a seed from the scenario id. The start tile is left in place.
 
 ### Changed
+- **Kartentooltip/Preview:** rendert nur noch echte Effektzeilen. Vorher leckten die internen Schlüssel `type`, `value`, `condition` als „• type influence (+influence)" in die UI.
+- **Handkarten-Log** (`formatEffect`) nennt die neuen Effekte (🎴 Ziehen, 💎 Mana, 💠 Kristall, 🖐️ Handkarten-Limit, ⚖️ Ansehen).
+- **`HeroInventory.addCrystal`:** legt fehlende Farb-Slots (Gold/Schwarz) an, damit Karten wie Crystal Magic nicht ins Leere laufen; Deckel von 3 pro Farbe bleibt.
 - Scenario goal sites from `sitePlacements` are no longer dropped onto the start tile. They arrive only when that tile is explored. The start tile keeps its terrain and gains one unguarded village.
 - Reputation changes the influence price of healing, recruiting, and learning cards at sites. The shown price is the base minus `getReputationModifier()`, and it never drops below 0.
 - Dungeon, ruin, tomb, and spawning-ground rewards for an artifact, spell, or advanced action place a real card from `SAMPLE_ARTIFACTS`, `SAMPLE_SPELLS`, or `SAMPLE_ADVANCED_ACTIONS` onto the hero discard pile. A reward name that matches a card grants that card.

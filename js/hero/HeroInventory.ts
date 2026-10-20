@@ -28,7 +28,11 @@ export class HeroInventory {
     // ========== Crystal Management (max 3 per color) ==========
 
     public addCrystal(color: keyof Crystals): boolean {
-        if (this.crystals[color] !== undefined && this.crystals[color] < 3) {
+        // Gold/black start out absent from the inventory; materialise the slot
+        // so a card that grants them (e.g. Crystal Magic) is not a no-op.
+        if (!(Object.values(MANA_COLORS) as string[]).includes(color as string)) return false;
+        if (this.crystals[color] === undefined) this.crystals[color] = 0;
+        if (this.crystals[color] < 3) {
             this.crystals[color]++;
             return true;
         }

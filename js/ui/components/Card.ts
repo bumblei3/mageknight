@@ -7,6 +7,12 @@
 import './Card.css';
 import { Card as CardClass } from '../../card';
 import { t } from '../../i18n/index';
+import {
+    EFFECT_FIELDS,
+    UNHANDLED_EFFECT_LABELS,
+    CONDITION_REPUTATION_LOSS,
+    REPUTATION_LOSS_PER_PLAY
+} from '../../card/effectMeta';
 
 export interface CardData {
     id: string;
@@ -372,25 +378,13 @@ function appendStrongAffordHint(
     });
 }
 
-const _effectIcons: Record<string, string> = {
-    movement: '⬆',
-    attack: '⚔',
-    block: '🛡',
-    influence: '💬',
-    healing: '❤',
-    mana: '💎',
-    ranged: '🏹',
-    siege: '🏰'
-};
+const _effectIcons: Record<string, string> = Object.fromEntries(
+    EFFECT_FIELDS.map((f) => [f.key, f.icon])
+);
 
-const _effectNames: Record<string, string> = {
-    movement: 'Bewegung',
-    attack: 'Angriff',
-    block: 'Block',
-    influence: 'Einfluss',
-    healing: 'Heilung',
-    mana: 'Mana'
-};
+const _effectNames: Record<string, string> = Object.fromEntries(
+    EFFECT_FIELDS.map((f) => [f.key, f.label])
+);
 
 const _manaCostColors: Record<string, string> = {
     red: 'var(--color-mana-red)',
@@ -401,6 +395,49 @@ const _manaCostColors: Record<string, string> = {
     black: 'var(--color-mana-black)'
 };
 
+/**
+ * Rows for the effects the engine really applies. Iterating EFFECT_FIELDS
+ * instead of the raw effect object is deliberate: the raw object also carries
+ * bookkeeping keys (`type`, `value`, `type2`, …) that must never reach the UI.
+ */
+function effectRowsHTML(effect: any, strongEffect?: any, showStrongDelta = false): string {
+    if (!effect) return '';
+
+    let html = '';
+    for (const field of EFFECT_FIELDS) {
+        const value = effect[field.key];
+        if (typeof value !== 'number' || value === 0) continue;
+
+        const strongValue = strongEffect?.[field.key];
+        const delta =
+            showStrongDelta && typeof strongValue === 'number' && strongValue !== value
+                ? ` <span style="color:#3b82f6">(+${strongValue})</span>`
+                : '';
+
+        html += `<div class="effect-row">
+                    <span class="effect-label">${field.icon} ${field.label}</span>
+                    <span class="effect-value">${value}${delta}</span>
+                </div>`;
+    }
+
+    if (effect.condition === CONDITION_REPUTATION_LOSS) {
+        html += `<div class="effect-row">
+                    <span class="effect-label">⚖️ Ansehen</span>
+                    <span class="effect-value">${REPUTATION_LOSS_PER_PLAY}</span>
+                </div>`;
+    }
+
+    const todo = effect.type ? UNHANDLED_EFFECT_LABELS[effect.type] : undefined;
+    if (todo) {
+        html += `<div class="effect-row">
+                    <span class="effect-label">🚧 ${todo}</span>
+                    <span class="effect-value">noch nicht implementiert</span>
+                </div>`;
+    }
+
+    return html;
+}
+
 function buildCardTooltip(params: { basicEffect: any; strongEffect?: any; color: string | null }): string {
     const { basicEffect, strongEffect, color } = params;
     if (!basicEffect || Object.keys(basicEffect).length === 0) return '';
@@ -408,30 +445,17 @@ function buildCardTooltip(params: { basicEffect: any; strongEffect?: any; color:
     let tooltip = '<div class="card-tooltip"><div class="card-tooltip-content">';
     tooltip += `<div class="tooltip-title">Kartendetails</div>`;
 
-    if (Object.keys(basicEffect).length > 0) {
+    const basicRows = effectRowsHTML(basicEffect, strongEffect, true);
+    if (basicRows) {
         tooltip += '<div class="tooltip-section"><div class="tooltip-section-title">Basis</div>';
-        Object.entries(basicEffect).forEach(([key, value]) => {
-            if (value) {
-                const strongVal = strongEffect?.[key];
-                tooltip += `<div class="effect-row">
-                    <span class="effect-label">${_effectIcons[key] || '•'} ${_effectNames[key] || key}</span>
-                    <span class="effect-value">${value}${strongVal ? ` <span style="color:#3b82f6">(+${strongVal})</span>` : ''}</span>
-                </div>`;
-            }
-        });
+        tooltip += basicRows;
         tooltip += '</div>';
     }
 
-    if (strongEffect && Object.keys(strongEffect).length > 0) {
+    const strongRows = effectRowsHTML(strongEffect);
+    if (strongRows) {
         tooltip += '<div class="tooltip-section"><div class="tooltip-section-title">Stark (Mana)</div>';
-        Object.entries(strongEffect).forEach(([key, value]) => {
-            if (value) {
-                tooltip += `<div class="effect-row">
-                    <span class="effect-label">${_effectIcons[key] || '•'} ${_effectNames[key] || key}</span>
-                    <span class="effect-value">${value}</span>
-                </div>`;
-            }
-        });
+        tooltip += strongRows;
         if (color) {
             tooltip += `<div class="effect-row">
                 <span class="effect-label">Mana-Kosten</span>
@@ -654,36 +678,7 @@ function buildPreviewHTML(params: {
         html += '<h3 style="margin: 0 0 12px; font-size: 0.9rem; color: #9ca3af; text-transform: uppercase;">Basiseffekt</h3>';
         html += '<div class="mk-card-preview__effect-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px;">';
         
-        const effectIcons: Record<string, string> = {
-            movement: '⬆',
-            attack: '⚔',
-            block: '🛡',
-            influence: '💬',
-            healing: '❤',
-            mana: '💎'
-        };
-
-        const effectNames: Record<string, string> = {
-            movement: 'Bewegung',
-            attack: 'Angriff',
-            block: 'Block',
-            influence: 'Einfluss',
-            healing: 'Heilung',
-            mana: 'Mana'
-        };
-
-        Object.entries(basicEffect).forEach(([key, value]) => {
-            if (value) {
-                const strongVal = strongEffect?.[key];
-                html += `
-                    <div style="background: #374151; border-radius: 8px; padding: 12px; text-align: center;">
-                        <div style="font-size: 1.5rem;">${effectIcons[key] || '•'}</div>
-                        <div style="font-weight: 600; color: white;">${value}${strongVal ? ` <span style="color:#3b82f6">(+${strongVal})</span>` : ''}</div>
-                        <div style="font-size: 0.7rem; color: #9ca3af;">${effectNames[key] || key}</div>
-                    </div>
-                `;
-            }
-        });
+        html += effectTilesHTML(basicEffect, strongEffect);
         html += '</div>';
     }
 
@@ -691,25 +686,7 @@ function buildPreviewHTML(params: {
     if (strongEffect && Object.keys(strongEffect).length > 0) {
         html += '<h3 style="margin: 20px 0 12px; font-size: 0.9rem; color: #9ca3af; text-transform: uppercase;">Starker Effekt (Mana)</h3>';
         html += '<div class="mk-card-preview__effect-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px;">';
-        Object.entries(strongEffect).forEach(([key, value]) => {
-            if (value) {
-                const effectIcons: Record<string, string> = {
-                    movement: '⬆',
-                    attack: '⚔',
-                    block: '🛡',
-                    influence: '💬',
-                    healing: '❤',
-                    mana: '💎'
-                };
-                html += `
-                    <div style="background: #1e3a5f; border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; text-align: center;">
-                        <div style="font-size: 1.5rem;">${effectIcons[key] || '•'}</div>
-                        <div style="font-weight: 600; color: #60a5fa;">${value}</div>
-                        <div style="font-size: 0.7rem; color: #9ca3af;">${key}</div>
-                    </div>
-                `;
-            }
-        });
+        html += effectTilesHTML(strongEffect, undefined, true);
         html += '</div>';
     }
 
@@ -746,6 +723,34 @@ function buildPreviewHTML(params: {
     return html;
 }
 
+function effectTilesHTML(effect: any, strongEffect?: any, strong = false): string {
+    if (!effect) return '';
+
+    let html = '';
+    for (const field of EFFECT_FIELDS) {
+        const value = effect[field.key];
+        if (typeof value !== 'number' || value === 0) continue;
+
+        const strongValue = strong ? undefined : strongEffect?.[field.key];
+        const delta =
+            typeof strongValue === 'number' && strongValue !== value
+                ? ` <span style="color:#3b82f6">(+${strongValue})</span>`
+                : '';
+        const background = strong ? '#1e3a5f' : '#374151';
+        const border = strong ? ' border: 1px solid #3b82f6;' : '';
+        const valueColor = strong ? '#60a5fa' : 'white';
+
+        html += `
+            <div style="background: ${background};${border} border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 1.5rem;">${field.icon}</div>
+                <div style="font-weight: 600; color: ${valueColor};">${value}${delta}</div>
+                <div style="font-size: 0.7rem; color: #9ca3af;">${field.label}</div>
+            </div>
+        `;
+    }
+    return html;
+}
+
 function getColorBorder(color: string | null): string {
     const colors: Record<string, string> = {
         red: '#ef4444',
@@ -759,15 +764,7 @@ function getColorBorder(color: string | null): string {
 }
 
 function getEffectIcon(key: string): string {
-    const icons: Record<string, string> = {
-        movement: '⬆',
-        attack: '⚔',
-        block: '🛡',
-        influence: '💬',
-        healing: '❤',
-        mana: '💎'
-    };
-    return icons[key] || '•';
+    return _effectIcons[key] || '•';
 }
 
 /** Inject preview styles once */

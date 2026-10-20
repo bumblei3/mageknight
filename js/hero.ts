@@ -3,7 +3,8 @@
 import { createDeck, shuffleDeck, createWoundCard, GOLDYX_STARTER_DECK, SAMPLE_ARTIFACTS, Card, CardData } from './card';
 import { CARD_DEFINITIONS } from './card/CardDefinitions';
 import { MANA_COLORS, ManaColor } from './constants';
-import { HeroInventory } from './hero/HeroInventory';
+import { HeroInventory, Crystals } from './hero/HeroInventory';
+import { CONDITION_REPUTATION_LOSS, REPUTATION_LOSS_PER_PLAY } from './card/effectMeta';
 import { HeroSkills } from './hero/HeroSkills';
 import { store, ACTIONS } from './store';
 
@@ -295,9 +296,50 @@ export class Hero {
         if (effect.influence) this.influencePoints += effect.influence;
         if (effect.healing) this.healingPoints += effect.healing;
 
+        // Effects that need a side channel (deck, inventory, limits) — these
+        // keys are lifted from the card data by Card.normalizeEffect().
+        if (effect.draw) this.drawCards(effect.draw as number);
+        if (effect.mana) this.gainManaTokens(card.color, effect.mana as number);
+        if (effect.crystal) this.gainCrystals(card.color, effect.crystal as number);
+        if (effect.handLimitBonus) this.handLimit += effect.handLimitBonus as number;
+        if (effect.condition === CONDITION_REPUTATION_LOSS) {
+            this.changeReputation(REPUTATION_LOSS_PER_PLAY);
+        }
+
         this.discard.push(card);
         this.syncStore();
         return { card, effect, usedStrong: useStrong };
+    }
+
+    /**
+     * Grant mana tokens of the card's color (colorless cards grant gold).
+     * Returns how many tokens were actually gained.
+     */
+    gainManaTokens(color: string | null, count: number): number {
+        const manaColor = (
+            Object.values(MANA_COLORS).includes(color as ManaColor) ? color : MANA_COLORS.GOLD
+        ) as ManaColor;
+
+        let granted = 0;
+        for (let i = 0; i < count; i++) {
+            if (this.addMana(manaColor)) granted++;
+        }
+        return granted;
+    }
+
+    /**
+     * Grant mana crystals of the card's color (colorless cards grant gold).
+     * The inventory caps each color at 3, so this returns what really landed.
+     */
+    gainCrystals(color: string | null, count: number): number {
+        const crystalColor = (color || MANA_COLORS.GOLD) as unknown as keyof Crystals;
+
+        let granted = 0;
+        for (let i = 0; i < count; i++) {
+            if (this._inventory.addCrystal(crystalColor)) granted++;
+        }
+        if (granted > 0) this.syncStore();
+        return granted;
     }
 
     playCardSideways(cardIndex: number, effectType: string): PlayResult | null {

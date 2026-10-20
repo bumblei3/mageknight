@@ -3,6 +3,7 @@
  */
 import { CARD_TYPES } from '../constants';
 import { CARD_DEFINITIONS } from './CardDefinitions';
+import { EFFECT_TYPE_TO_KEY, secondaryEffectKey } from './effectMeta';
 
 export interface CardEffect {
     type?: string;
@@ -13,6 +14,19 @@ export interface CardEffect {
     block?: number;
     influence?: number;
     healing?: number;
+    ranged?: number;
+    siege?: number;
+    /** Cards to draw (Concentration). */
+    draw?: number;
+    /** Mana tokens to gain (Mana Storm). */
+    mana?: number;
+    /** Mana crystals to gain (Crystallize). */
+    crystal?: number;
+    /** Permanent hand-limit increase (Will Focus). */
+    handLimitBonus?: number;
+    /** Secondary typed effect (type2/value2). */
+    type2?: string;
+    value2?: number;
     [key: string]: unknown;
 }
 
@@ -57,19 +71,26 @@ export class Card {
     private normalizeEffect(effect: CardEffect): CardEffect {
         if (!effect) return {};
 
-        const normalized = { ...effect };
+        const normalized: CardEffect = { ...effect };
 
-        // Map common type-based effects to direct property effects used by Hero/UI
-        if (effect.type === 'move' && effect.value !== undefined) {
-            normalized.movement = effect.value;
-        } else if (effect.type === 'attack' && effect.value !== undefined) {
-            normalized.attack = effect.value;
-        } else if (effect.type === 'block' && effect.value !== undefined) {
-            normalized.block = effect.value;
-        } else if (effect.type === 'influence' && effect.value !== undefined) {
-            normalized.influence = effect.value;
-        } else if (effect.type === 'heal' && effect.value !== undefined) {
-            normalized.healing = effect.value;
+        // Primary effect: map the declared type + value onto the direct
+        // properties Hero/UI read (movement, attack, draw, mana, …).
+        const primaryKey = effect.type ? EFFECT_TYPE_TO_KEY[effect.type] : undefined;
+        if (primaryKey && effect.value !== undefined) {
+            normalized[primaryKey] = effect.value;
+        }
+
+        // Secondary typed effect: `type2`/`value2` (e.g. Agility: block 3 + move 2)
+        const secondaryKey = secondaryEffectKey(effect.type2 as string | undefined);
+        if (secondaryKey && effect.value2 !== undefined) {
+            normalized[secondaryKey] =
+                ((normalized[secondaryKey] as number) || 0) + (effect.value2 as number);
+        }
+
+        // Extra movement declared next to a different primary type
+        // (e.g. Rage strong: attack 2 + move 2) must not be dropped.
+        if (effect.move !== undefined) {
+            normalized.movement = ((normalized.movement as number) || 0) + (effect.move as number);
         }
 
         return normalized;

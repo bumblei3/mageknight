@@ -295,6 +295,12 @@ export class InputController {
                         }
                         break;
                     }
+                    case 'TOGGLE_3D': {
+                        const toggleBtn = document.getElementById('toggle-3d-btn');
+                        if (toggleBtn) toggleBtn.click();
+                        e.preventDefault();
+                        break;
+                    }
                 }
             }
 

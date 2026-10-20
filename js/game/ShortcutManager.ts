@@ -21,7 +21,8 @@ export class ShortcutManager {
             'TUTORIAL': { key: 't', label: 'Tutorial' },
             'HELP': { key: 'h', label: 'Hilfe' },
             'CANCEL': { key: 'Escape', label: 'Abbrechen' },
-            'MANA_PANEL': { key: 'm', label: 'Mana anzeigen' }
+            'MANA_PANEL': { key: 'm', label: 'Mana anzeigen' },
+            'TOGGLE_3D': { key: 'v', label: '3D-Ansicht umschalten' }
         };
 
         this.bindings = this.loadBindings();

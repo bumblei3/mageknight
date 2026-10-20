@@ -9,6 +9,7 @@ import { SpawningGroundsHandler } from './sites/SpawningGroundsHandler';
 import { LabyrinthHandler } from './sites/LabyrinthHandler';
 import { MagicGladeHandler } from './sites/MagicGladeHandler';
 import { DenHandler } from './sites/DenHandler';
+import { CityHandler } from './sites/CityHandler';
 import { BaseSiteHandler, SiteOption } from './sites/BaseSiteHandler';
 
 export class SiteInteractionManager {
@@ -33,6 +34,7 @@ export class SiteInteractionManager {
         this.handlers.set(SITE_TYPES.TOMB, new ExplorationHandler(this.game));
         this.handlers.set(SITE_TYPES.LABYRINTH, new LabyrinthHandler(this.game));
         this.handlers.set(SITE_TYPES.SPAWNING_GROUNDS, new SpawningGroundsHandler(this.game));
+        this.handlers.set(SITE_TYPES.CITY, new CityHandler(this.game));
         this.handlers.set(SITE_TYPES.MAGIC_GLADE, new MagicGladeHandler(this.game));
         this.handlers.set(SITE_TYPES.DEN, new DenHandler(this.game));
     }

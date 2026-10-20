@@ -112,6 +112,8 @@ const de = {
         endTurn: {
             confirmTitle: 'Zug beenden?',
             confirmFooter: 'Trotzdem beenden?',
+            hintTitle: '💡 Bevor du den Zug beendest…',
+            dismiss: 'Verstecken',
             mpLeft: 'Noch {points} Bewegungspunkte übrig',
             healAvailable: 'Heilung verfügbar — Wunden könnten geheilt werden',
             siteHere: 'Du stehst an einem Ort — noch besuchen?',

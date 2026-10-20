@@ -6,7 +6,7 @@
 import { t } from '../i18n/index.js';
 import { eventBus } from '../eventBus.js';
 import { COMBAT_PHASES, GAME_EVENTS } from '../constants.js';
-import { confirmEndTurnIfNeeded } from './endTurnGuard.js';
+import { confirmEndTurnIfNeeded, getEndTurnWarnings } from './endTurnGuard.js';
 
 interface ActionButton {
     id: string;
@@ -633,6 +633,34 @@ export class ActionBarManager {
         setTimeout(() => htmlEl.classList.remove('coach-target-pulse'), 1600);
     }
 
+    /**
+     * Show soft "end your turn" warnings (leftover movement points, wounds,
+     * site under you, stranded movement cards) under the action bar —
+     * the one place the player looks before ending a turn.
+     */
+    private renderEndTurnHint(): void {
+        const container = this.hintContainer;
+        if (!container) return;
+        const warnings = getEndTurnWarnings(this.game);
+        if (warnings.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+        const items = warnings.map((w) => `<li>${w.text}</li>`).join('');
+        container.innerHTML = `
+            <div class="action-bar-hint--endturn" role="region" aria-live="polite">
+                <div class="endturn-list">
+                    <div class="endturn-title">💡 ${t('ui.endTurn.hintTitle') || 'Bevor du den Zug beendest…'}</div>
+                    <ul>${items}</ul>
+                    <button class="endturn-dismiss" type="button" data-endturn-dismiss>${t('ui.endTurn.dismiss') || 'Verstecken'}</button>
+                </div>
+            </div>
+        `;
+        container.querySelector('[data-endturn-dismiss]')?.addEventListener('click', () => {
+            container.innerHTML = '';
+        });
+    }
+
     // First-time hint system
     showFirstTimeHint(key: string, element: HTMLElement, message: string, shortcut?: string): void {
         if (this.firstTimeHints.get(key)) return;
@@ -726,6 +754,7 @@ export class ActionBarManager {
             this.container!.appendChild(btn);
         });
 
+        this.renderEndTurnHint();
         this.renderSecondaryHint();
     }
 

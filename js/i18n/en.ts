@@ -112,6 +112,8 @@ const en = {
         endTurn: {
             confirmTitle: 'End turn?',
             confirmFooter: 'End turn anyway?',
+            hintTitle: '💡 Before you end your turn…',
+            dismiss: 'Hide',
             mpLeft: '{points} movement points left',
             healAvailable: 'Healing ready — wounds could be healed',
             siteHere: 'You are on a site — visit first?',

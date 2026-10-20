@@ -82,6 +82,7 @@ export const HERO_SKILLS: HeroSkills = {
                 type: 'active',
                 description: 'Mache eine verbrauchte Einheit wieder bereit.',
                 icon: '🚩',
+                value: 2,
                 cooldown: 'round'
             },
             {
@@ -108,6 +109,14 @@ export const HERO_SKILLS: HeroSkills = {
                 description: '+2 Einfluss in Dörfern und Klöstern.',
                 icon: '👑',
                 value: 2
+            },
+            {
+                id: 'glittering_fortune',
+                name: 'Glitzerndes Glück',
+                type: 'passive',
+                description: 'Erhalte zu Beginn jeder Runde 1 zufälligen Kristall.',
+                icon: '✨',
+                value: 1
             }
         ]
     },

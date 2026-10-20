@@ -30,7 +30,7 @@ describe('Hero Skills — hero.id-driven skill offers (Gap A fix)', () => {
     expect(SKILLS.ARYTHEA.length).toBe(4);
     expect(SKILLS.TOVAK.length).toBe(4);
     expect(SKILLS.GOLDYX.length).toBe(4);
-    expect(SKILLS.NOROWAS.length).toBe(4);
+    expect(SKILLS.NOROWAS.length).toBe(5);
   });
 
   it('getRandomSkills returns the HERO-SPECIFIC pool, not goldyx', () => {

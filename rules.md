@@ -58,14 +58,14 @@ This document serves as a reference for the official game rules (based on *Mage 
     *   ✅ Implemented
 *   **Rampaging Enemies**: Provoke attacks when moving adjacent.
     *   ✅ Implemented in `MapManager` / `InteractionController`.
-*   **Sites**:
+    *   **Sites:**
     *   *Villages*: Heal, Recruit. (✅ Implemented)
     *   *Monasteries*: Train Advanced Actions. (✅ Implemented + **Artifact Reward**)
     *   *Mage Towers*: Recruit Spells. (✅ Implemented + **Artifact Reward after Conquest**)
     *   *Keeps*: Recruit Units. (✅ Implemented + **Artifact Reward after Conquest**)
-    *   *Dungeons/Tombs/Ruins*: Adventure sites. (⚠️ Partial implementation - Reward rules needed)
-    *   *Spawning Grounds*: Brutstätten. (❌ Missing)
-    *   *Mazes/Labyrinths*: (❌ Missing)
+    *   *Dungeons/Tombs/Ruins*: Adventure sites. (✅ Implemented; reward rules forward to real cards/units — see SiteRewards)
+    *   *Spawning Grounds*: Brutstätten. (✅ Implemented — SpawningGroundsHandler)
+    *   *Mazes/Labyrinths*: (✅ Implemented — LabyrinthHandler)
 
 ## 5. UI/UX Suggestions (Planned)
 

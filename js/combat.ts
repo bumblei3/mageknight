@@ -335,6 +335,11 @@ export class Combat {
         return this.attackPhaseController.executeAttack(attackValue, attackElement, targetEnemies);
     }
 
+    /** Destroy enemies outright, ignoring armor (Disintegrate). */
+    destroyEnemies(count: number): any {
+        return this.attackPhaseController.destroyEnemies(count);
+    }
+
     detectCombo(playedCards: Card[]): any {
         return (CombatCombos as any).detectCombo(playedCards);
     }

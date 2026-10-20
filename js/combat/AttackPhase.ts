@@ -57,6 +57,48 @@ export class AttackPhase {
         return result;
     }
 
+    /**
+     * Destroy up to `count` enemies outright, ignoring armor (Disintegrate).
+     * Bosses are immune to instant destruction — the caller decides what a
+     * wasted destroy against a boss means.
+     */
+    public destroyEnemies(count: number): any {
+        if (this.combat.phase !== COMBAT_PHASES.ATTACK) {
+            return { error: t('ui.phases.attack') };
+        }
+
+        const wanted = Math.max(0, Math.floor(count) || 0);
+        const bosses = this.combat.enemies.filter((e: any) => e.isBoss);
+        const doomed = this.combat.enemies.filter((e: any) => !e.isBoss).slice(0, wanted);
+
+        const result: any = {
+            success: doomed.length > 0,
+            destroyed: [],
+            fameGained: 0,
+            unused: wanted - doomed.length,
+            messages: []
+        };
+
+        doomed.forEach((enemy: any) => {
+            this.combat.defeatedEnemies.push(enemy);
+            this.combat.hero.gainFame(enemy.fame || 0);
+            this.combat.enemies = this.combat.enemies.filter((e: any) => e.id !== enemy.id);
+            result.destroyed.push(enemy);
+            result.fameGained += enemy.fame || 0;
+        });
+
+        if (doomed.length > 0) {
+            result.messages.push(t('combat.enemiesDestroyed', { count: doomed.length }));
+        }
+        if (result.unused > 0 && bosses.length > 0) {
+            result.messages.push(t('combat.destroyBossImmune', { enemy: bosses[0].name }));
+        }
+
+        result.message = result.messages.join(' ');
+        result.defeated = result.destroyed;
+        return result;
+    }
+
     private _handleRegularEnemies(regularEnemies: any[], totalAttack: number, attackElement: string, result: any): void {
         // Calculate armor needed for each enemy (considering resistances and block status)
         const enemiesWithArmor = regularEnemies.map(enemy => ({

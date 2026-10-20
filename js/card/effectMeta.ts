@@ -39,7 +39,8 @@ export const EFFECT_TYPE_TO_KEY: Record<string, string> = {
     crystal_effect: 'crystal',
     hand_limit: 'handLimitBonus',
     enhance_next: 'enhanceNext',
-    summon_unit: 'summonUnit'
+    summon_unit: 'summonUnit',
+    destroy_enemy: 'destroyEnemy'
 };
 
 /**
@@ -63,9 +64,31 @@ export const UNHANDLED_EFFECT_LABELS: Record<string, string> = {
     copy_card: 'Karte kopieren',
     spell_effect: 'Beliebigen Zauber wirken',
     wish: 'Wunsch (freie Wahl)',
-    extra_turn: 'Zusätzlicher Zug',
-    destroy_enemy: 'Feind vernichten'
+    extra_turn: 'Zusätzlicher Zug'
 };
+
+/**
+ * Boolean/string flags that modify an effect (no numeric value of their own).
+ * They are applied by the combat engine and shown as extra tooltip rows.
+ */
+export interface EffectFlag {
+    key: string;
+    icon: string;
+    label: string;
+    /** Only render when the value matches. */
+    matches?: (value: unknown) => boolean;
+}
+
+export const EFFECT_FLAGS: EffectFlag[] = [
+    { key: 'area', icon: '🎯', label: 'Trifft jeden Feind', matches: (value) => value === true },
+    { key: 'target', icon: '👥', label: 'Alle Feinde', matches: (value) => value === 'all' },
+    {
+        key: 'element',
+        icon: '🔮',
+        label: 'Element',
+        matches: (value) => typeof value === 'string' && value !== 'physical'
+    }
+];
 
 export const UNHANDLED_EFFECT_TYPES: string[] = [
     ...Object.keys(UNHANDLED_EFFECT_LABELS),
@@ -86,7 +109,8 @@ export const EFFECT_FIELDS: EffectField[] = [
     { key: 'crystal', icon: '💠', label: 'Manakristall' },
     { key: 'handLimitBonus', icon: '🖐️', label: 'Handkarten-Limit' },
     { key: 'enhanceNext', icon: '🚀', label: 'Bonus auf nächste Karte' },
-    { key: 'summonUnit', icon: '👻', label: 'Einheiten beschwören' }
+    { key: 'summonUnit', icon: '👻', label: 'Einheiten beschwören' },
+    { key: 'destroyEnemy', icon: '✨', label: 'Feind vernichten' }
 ];
 
 /**

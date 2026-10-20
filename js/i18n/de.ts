@@ -216,6 +216,8 @@ const de = {
         unitAlreadyActivated: 'Einheit bereits aktiviert',
         unitActivated: '{unit} aktiviert: {applied}',
         enemiesDefeated: '{count} Feinde besiegt!',
+        enemiesDestroyed: '{count} Feind(e) vernichtet!',
+        destroyBossImmune: '{enemy} ist ein Boss und kann nicht vernichtet werden — die Karte verpufft.',
         attackWeak: 'Angriff zu schwach für normale Feinde ({attack} vs {armor})',
         bossDamaged: '{enemy} erleidet {amount} Schaden! ({current}/{max} HP)',
         bossDefeatedAttack: '🏆 {enemy} wurde besiegt! +{amount} Ruhm!',

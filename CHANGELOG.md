@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Kampf-Regeln, die in den Daten standen, aber nie griffen:**
+  - **Element**: Angriffe rechneten immer als „physical", egal was auf der Karte stand. Jetzt sammelt der Kampf das Element der gespielten Karten (Fern und Nah getrennt) und übergibt das Element mit dem größten Angriffsanteil an die Angriffsphase — Feuer-/Eis-Resistenzen der Feinde wirken damit erstmals, ebenso der Treffer-Effekt (`combatClashEffect`).
+  - **Flächenangriffe** (`area: true`, `target: 'all'`): der Kartenwert wurde in den einen gepoolten Angriff addiert. Jetzt trifft die Karte jeden Feind einzeln (Flame Wave, Meteor Storm, Fireball, Disintegrate, Dark Ritual, Disenchant).
+  - **Disintegrate** (`destroy_enemy`, 1 / stark 2): vernichtet beim Angriffs-Resolution bis zu `value` Feinde ohne Rüstungsrechnung, inkl. Fame. Bosse sind immun und werden geloggt.
+  - **Kartentooltip** zeigt jetzt `🎯 Trifft jeden Feind`, `👥 Alle Feinde`, `🔮 Element (Feuer/Eis/Frostfeuer)` und `✨ Feind vernichten`.
 - **Sonder-Effekte, Runde 2:** `enhance_next` und `summon_unit` wirken jetzt (standen vorher im Tooltip als „noch nicht implementiert"):
   - `Concentrate` legt einen Bonus von +2 (stark +5) für die **nächste** Karte des Zuges an. Der Bonus landet auf dem ersten Effekt, den die nächste Karte hat (Bewegung, Angriff, Block, Einfluss, Heilung, Ziehen, Mana, Kristall, Handkarten-Limit, Beschwören), gestapelt bei mehrfacher Nutzung, und verfällt am Zugende. Die Karte selbst wird dabei nicht dauerhaft verstärkt (Effekt-Kopie statt Mutation).
   - `Summon` beschwört `value` Einheiten aus `UNIT_INFO` (stark zwei); das Kommandolimit begrenzt weiterhin, eine nicht passende Beschwörung entfällt.

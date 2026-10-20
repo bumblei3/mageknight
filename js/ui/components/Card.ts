@@ -9,6 +9,7 @@ import { Card as CardClass } from '../../card';
 import { t } from '../../i18n/index';
 import {
     EFFECT_FIELDS,
+    EFFECT_FLAGS,
     UNHANDLED_EFFECT_LABELS,
     CONDITION_REPUTATION_LOSS,
     REPUTATION_LOSS_PER_PLAY
@@ -420,6 +421,17 @@ function effectRowsHTML(effect: any, strongEffect?: any, showStrongDelta = false
                 </div>`;
     }
 
+    for (const flag of EFFECT_FLAGS) {
+        const value = effect[flag.key];
+        if (!value) continue;
+        if (flag.matches && !flag.matches(value)) continue;
+        const shown = flag.key === 'element' ? flagValueLabel(value) : '✓';
+        html += `<div class="effect-row">
+                    <span class="effect-label">${flag.icon} ${flag.label}</span>
+                    <span class="effect-value">${shown}</span>
+                </div>`;
+    }
+
     if (effect.condition === CONDITION_REPUTATION_LOSS) {
         html += `<div class="effect-row">
                     <span class="effect-label">⚖️ Ansehen</span>
@@ -721,6 +733,17 @@ function buildPreviewHTML(params: {
     `;
 
     return html;
+}
+
+/** German label for an element flag value (fire / ice / cold_fire). */
+function flagValueLabel(value: unknown): string {
+    const labels: Record<string, string> = {
+        fire: 'Feuer',
+        ice: 'Eis',
+        cold_fire: 'Frostfeuer',
+        physical: 'Physisch'
+    };
+    return labels[String(value)] || String(value);
 }
 
 function effectTilesHTML(effect: any, strongEffect?: any, strong = false): string {

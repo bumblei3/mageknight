@@ -403,6 +403,8 @@ export class HandRenderer {
         if (effect.crystal) parts.push(`+${effect.crystal} 💠`);
         if (effect.handLimitBonus) parts.push(`+${effect.handLimitBonus} 🖐️`);
         if (effect.enhanceNext) parts.push(`+${effect.enhanceNext} 🚀 nächste Karte`);
+        if (effect.destroyEnemy) parts.push(`✨ ${effect.destroyEnemy} vernichten`);
+        if (effect.area || effect.target === 'all') parts.push('🎯 alle Feinde');
         if (effect.summonUnit) parts.push(`+${effect.summonUnit} 👻`);
         if (effect.enhancedBy) parts.push(`+${effect.enhancedBy} 🚀 Bonus`);
         if (effect.condition === CONDITION_REPUTATION_LOSS) {

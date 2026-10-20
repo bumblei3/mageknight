@@ -49,6 +49,14 @@ export class CombatOrchestrator {
     public activeBlocks: BlockSource[];
     public combatRangedTotal: number;
     public combatSiegeTotal: number;
+    /** Attack value per element from the cards played this fight (element keys). */
+    public combatAttackElements: Record<string, number>;
+    /** Area attacks (`area` / `target: 'all'`): resolved against every enemy on its own. */
+    public combatAreaStrikes: Array<{ value: number; element: string }>;
+    /** Attack value per element from ranged/siege cards of this fight. */
+    public combatRangedElements: Record<string, number>;
+    /** Enemies to destroy outright at attack resolution (Disintegrate). */
+    public pendingDestroyEnemies: number;
     /** Site under the hero when this fight started. Null when the hex has nothing to conquer. */
     private combatSite: any = null;
     /** True after initiateCombat looked at the hero hex, so a stale currentSite is ignored. */
@@ -61,6 +69,53 @@ export class CombatOrchestrator {
         this.activeBlocks = [];
         this.combatRangedTotal = 0;
         this.combatSiegeTotal = 0;
+        this.combatAttackElements = {};
+        this.combatAreaStrikes = [];
+        this.combatRangedElements = {};
+        this.pendingDestroyEnemies = 0;
+    }
+
+    /**
+     * Element of the biggest attack contribution this fight. Cards without an
+     * `element` count as physical, so a fight without elemental cards behaves
+     * exactly as before.
+     */
+    getDominantAttackElement(): string {
+        let best = 'physical';
+        let bestValue = 0;
+        for (const [element, value] of Object.entries(this.combatAttackElements)) {
+            if (value > bestValue) {
+                best = element;
+                bestValue = value;
+            }
+        }
+        return best;
+    }
+
+    /** Element of the biggest ranged/siege contribution this fight. */
+    getDominantRangedElement(): string {
+        let best = 'physical';
+        let bestValue = 0;
+        for (const [element, value] of Object.entries(this.combatRangedElements)) {
+            if (value > bestValue) {
+                best = element;
+                bestValue = value;
+            }
+        }
+        return best;
+    }
+
+    /** Reset the per-fight attack bookkeeping. */
+    private resetCombatAccumulators(): void {
+        this.combatAttackTotal = 0;
+        this.combatBlockTotal = 0;
+        this.combatRangedTotal = 0;
+        this.combatSiegeTotal = 0;
+        this.combatAttackElements = {};
+        this.combatAreaStrikes = [];
+        this.combatRangedElements = {};
+        this.pendingDestroyEnemies = 0;
+        this.activeBlocks = [];
     }
 
     playCardInCombat(index: number, card: Card, useStrong: boolean = false): void {
@@ -88,13 +143,31 @@ export class CombatOrchestrator {
                 element: result.effect.element || 'physical'
             });
         } else if (phase === COMBAT_PHASES.RANGED) {
+            const element = (result.effect.element as string) || 'physical';
             if (result.effect.siege) {
                 this.combatSiegeTotal += (result.effect.attack || 0);
             } else if (result.card.type === 'spell' || result.effect.ranged) {
                 this.combatRangedTotal += (result.effect.attack || 0);
             }
+            this.combatRangedElements[element] =
+                (this.combatRangedElements[element] || 0) + (result.effect.attack || 0);
         } else if ((phase === COMBAT_PHASES.ATTACK || phase === COMBAT_PHASES.DAMAGE) && result.effect.attack) {
-            this.combatAttackTotal += result.effect.attack;
+            const element = (result.effect.element as string) || 'physical';
+            if (result.effect.area || result.effect.target === 'all') {
+                // Area attacks are resolved against each enemy separately instead
+                // of pooling their value into one strike.
+                this.combatAreaStrikes.push({ value: result.effect.attack, element });
+            } else {
+                this.combatAttackTotal += result.effect.attack;
+            }
+            this.combatAttackElements[element] = (this.combatAttackElements[element] || 0) + result.effect.attack;
+        }
+
+        if (
+            (phase === COMBAT_PHASES.ATTACK || phase === COMBAT_PHASES.DAMAGE) &&
+            result.effect.destroyEnemy
+        ) {
+            this.pendingDestroyEnemies += Number(result.effect.destroyEnemy) || 0;
         }
 
         this.game.addLog(t('combat.cardPlayed', { card: result.card.name }), 'combat');
@@ -266,9 +339,11 @@ export class CombatOrchestrator {
 
         if (this.game.actionManager) this.game.actionManager.clearHistory();
 
+        const attackElement = this.getDominantAttackElement();
+
         if (this.game.hexGrid && this.game.particleSystem) {
             const pixelPos = this.game.hexGrid.axialToPixel(this.game.combat.enemy.position.q, this.game.combat.enemy.position.r);
-            this.game.particleSystem.combatClashEffect(pixelPos.x, pixelPos.y, 'physical');
+            this.game.particleSystem.combatClashEffect(pixelPos.x, pixelPos.y, attackElement);
 
             if (this.combatAttackTotal > 0) {
                 this.game.particleSystem.createDamageNumber(pixelPos.x, pixelPos.y, this.combatAttackTotal, this.combatAttackTotal >= 5);
@@ -280,7 +355,27 @@ export class CombatOrchestrator {
             }
         }
 
-        const attackResult = this.game.combat.attackEnemies(this.combatAttackTotal, 'physical');
+        // Disintegrate: destroy enemies outright, ignoring armor
+        if (this.pendingDestroyEnemies > 0) {
+            const destroyResult = this.game.combat.destroyEnemies(this.pendingDestroyEnemies);
+            if (destroyResult && destroyResult.message) {
+                this.game.addLog(destroyResult.message, destroyResult.success ? 'success' : 'warning');
+            }
+            this.pendingDestroyEnemies = 0;
+        }
+
+        // Area attacks (area / target: 'all') hit every enemy on its own
+        this.combatAreaStrikes.forEach((strike) => {
+            [...this.game.combat.enemies].forEach((enemy: any) => {
+                const strikeResult = this.game.combat.attackEnemies(strike.value, strike.element, [enemy]);
+                if (strikeResult && strikeResult.message) {
+                    this.game.addLog(strikeResult.message, strikeResult.success ? 'success' : 'warning');
+                }
+            });
+        });
+        this.combatAreaStrikes = [];
+
+        const attackResult = this.game.combat.attackEnemies(this.combatAttackTotal, attackElement);
 
         if (this.combatAttackTotal > 0) {
             eventBus.emit(GAME_EVENTS.COMBAT_DAMAGE, {
@@ -368,11 +463,7 @@ export class CombatOrchestrator {
         this.game.combat.start();
         this.game.gameState = 'combat';
 
-        this.combatAttackTotal = 0;
-        this.combatBlockTotal = 0;
-        this.combatRangedTotal = 0;
-        this.combatSiegeTotal = 0;
-        this.activeBlocks = [];
+        this.resetCombatAccumulators();
 
         // Skip empty ranged phase when player has no ranged/siege options
         if (this.shouldAutoSkipRangedPhase()) {
@@ -485,11 +576,7 @@ export class CombatOrchestrator {
         const enemy = result.enemy || (this.game.combat ? this.game.combat.enemies[0] : null);
         this.game.combat = null;
 
-        this.combatAttackTotal = 0;
-        this.combatBlockTotal = 0;
-        this.activeBlocks = [];
-        this.combatRangedTotal = 0;
-        this.combatSiegeTotal = 0;
+        this.resetCombatAccumulators();
 
         if (result.victory && enemy) {
             this.game.addLog(t('combat.victoryOver', { enemy: enemy.name }), 'success');
@@ -627,7 +714,8 @@ export class CombatOrchestrator {
         const attackResult = this.game.combat.rangedAttackEnemy(
             enemy,
             this.combatRangedTotal || 0,
-            (this.combatSiegeTotal || 0) + (this.game.hero.hasSkill('siege_mastery') ? 2 : 0)
+            (this.combatSiegeTotal || 0) + (this.game.hero.hasSkill('siege_mastery') ? 2 : 0),
+            this.getDominantRangedElement()
         );
 
         const damageDealt = (this.combatRangedTotal || 0) + (this.combatSiegeTotal || 0);

@@ -27,6 +27,15 @@ export interface CardEffect {
     /** Secondary typed effect (type2/value2). */
     type2?: string;
     value2?: number;
+    /** Combat flags read by CombatOrchestrator. */
+    element?: string;
+    area?: boolean;
+    target?: string;
+    destroyEnemy?: number;
+    summonUnit?: number;
+    enhanceNext?: number;
+    /** Set on the copy handed to the log when Concentrate boosted this play. */
+    enhancedBy?: number;
     [key: string]: unknown;
 }
 

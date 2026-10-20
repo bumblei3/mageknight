@@ -1107,10 +1107,12 @@ describe('CombatOrchestrator - Coverage Boost', () => {
             orchestrator.executeRangedAttack(enemy);
             
             expect(mockActionManager.saveCheckpoint).toHaveBeenCalled();
+            // 4th argument: the element of the ranged cards played this fight
             expect(mockCombat.rangedAttackEnemy).toHaveBeenCalledWith(
                 enemy,
                 4,
-                0
+                0,
+                'physical'
             );
         });
 

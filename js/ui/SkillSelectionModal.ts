@@ -63,6 +63,7 @@ export class SkillSelectionModal {
             el.innerHTML = `
                 <div class="skill-icon">${skill.icon}</div>
                 <div class="skill-name">${skill.name}</div>
+                ${typeof skill.value === 'number' ? `<div class="skill-magnitude">+${skill.value}</div>` : ''}
                 <div class="skill-description">${skill.description}</div>
             `;
 

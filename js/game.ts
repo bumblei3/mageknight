@@ -22,6 +22,7 @@ import { DebugManager } from './debug';
 import AchievementManager from './achievements';
 import { StatisticsManager } from './statistics';
 import SoundManager from './soundManager';
+import AccessibilityManager from './ui/AccessibilityManager';
 import TouchController from './touchController';
 import { eventBus } from './eventBus';
 import { GAME_EVENTS, TIME_OF_DAY } from './constants';
@@ -72,6 +73,7 @@ export class MageKnightGame {
     private _achievementManager: AchievementManagerType | null = null;
     private _statisticsManager: StatisticsManagerType | null = null;
     private _tutorial: TutorialManager | null = null;
+    private _accessibilityManager: AccessibilityManager | null = null;
     public animator: typeof animator;
     public levelUpManager: LevelUpManager;
     public rewardManager: RewardManager;
@@ -344,6 +346,19 @@ export class MageKnightGame {
         this._tutorial = value;
     }
 
+    get accessibilityManager(): AccessibilityManager {
+        if (!this._accessibilityManager) {
+            this._accessibilityManager = new AccessibilityManager();
+            this._accessibilityManager.init();
+            console.log('[Lazy] AccessibilityManager initialized');
+        }
+        return this._accessibilityManager;
+    }
+
+    set accessibilityManager(value: AccessibilityManager) {
+        this._accessibilityManager = value;
+    }
+
     // Combat Totals compatibility getters for UI and Tests
     get combatAttackTotal(): number { return this.combatOrchestrator ? this.combatOrchestrator.combatAttackTotal : 0; }
     set combatAttackTotal(v: number) { if (this.combatOrchestrator) this.combatOrchestrator.combatAttackTotal = v; }
@@ -601,7 +616,10 @@ export class MageKnightGame {
     /**
      * Initiates combat with the given enemy.
      */
-    initiateCombat(enemy: any): void { this.combatOrchestrator.initiateCombat(enemy); }
+    initiateCombat(enemy: any): void {
+        this.combatOrchestrator.initiateCombat(enemy);
+        try { this.accessibilityManager.announce(`Kampf gegen ${enemy?.name || 'Feind'} begonnen`, true); } catch (e) { /* ignore */ }
+    }
 
     /**
      * Plays a card in combat.

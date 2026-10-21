@@ -97,12 +97,17 @@ export class Game3D {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
         this.container.appendChild(this.renderer.domElement);
 
-        // Initialize Post-Processing
-        this.postProcessing = new PostProcessingManager(
-            this.renderer,
-            this.scene!,
-            this.camera!
-        );
+        // Initialize Post-Processing (optional; fall back to direct render if it fails)
+        try {
+            this.postProcessing = new PostProcessingManager(
+                this.renderer,
+                this.scene!,
+                this.camera!
+            );
+        } catch (e) {
+            console.warn('Post-processing init failed, using direct render:', e);
+            this.postProcessing = null;
+        }
 
         // Initialize Particle System
         this.particleSystem = new ParticleSystemManager(this.renderer, this.scene!);

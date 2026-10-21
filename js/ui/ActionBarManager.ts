@@ -730,7 +730,7 @@ export class ActionBarManager {
             btn.onclick = action.onClick;
 
             const tooltipText = action.shortcut ? `${action.label} (${action.shortcut})` : action.label;
-            btn.setAttribute('aria-label', tooltipText);
+            btn.setAttribute('aria-label', action.label);
             btn.setAttribute('title', tooltipText);
             btn.setAttribute('data-tooltip', tooltipText);
 

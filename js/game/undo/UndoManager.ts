@@ -356,13 +356,15 @@ export class UndoManager {
         } else {
             this.undoButton = ButtonPatterns.icon('↩', () => this.undo(), 'Rückgängig (Ctrl+Z)', 'ghost', 'sm');
             this.undoButton.id = 'undo-btn';
-            this.undoButton.setAttribute('aria-label', 'Rückgängig machen (Ctrl+Z)');
+            this.undoButton.setAttribute('aria-label', 'Rückgängig machen');
+            this.undoButton.setAttribute('title', 'Rückgängig machen (Ctrl+Z)');
         }
 
         // Create redo button (no static declaration exists)
         this.redoButton = ButtonPatterns.icon('↪', () => this.redo(), 'Wiederholen (Ctrl+Y)', 'ghost', 'sm');
         this.redoButton.id = 'redo-btn';
-        this.redoButton.setAttribute('aria-label', 'Wiederholen (Ctrl+Y / Ctrl+Shift+Z)');
+        this.redoButton.setAttribute('aria-label', 'Wiederholen');
+        this.redoButton.setAttribute('title', 'Wiederholen (Ctrl+Y / Ctrl+Shift+Z)');
 
         // Create state display
         this.stateDisplay = document.createElement('span');

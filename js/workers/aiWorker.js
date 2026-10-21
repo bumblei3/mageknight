@@ -212,31 +212,45 @@ function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 
     return validMoves[0];
 }
 
+// Simulate a short playout from a candidate move and return the resulting
+// distance to the hero. Uses a greedy step toward the hero (with personality
+// terrain avoidance) instead of a pure random walk, so the evaluation reflects
+// the enemy's actual chasing behaviour.
+function simulatePlayout(startMove, heroPos, hexesMap, config) {
+    let pos = { q: startMove.q, r: startMove.r };
+    for (let step = 0; step < 3; step++) {
+        const nbrs = HexUtils.getNeighbors(pos.q, pos.r);
+        const legal = nbrs.filter(n => {
+            const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
+            if (!hex) return false;
+            if (hex.terrain === 'water' || hex.terrain === 'mountains') return false;
+            if (config.terrainAvoidance > 0.5 && hex.terrain === 'wasteland') return false;
+            if (config.terrainAvoidance > 0.7 && hex.terrain === 'desert') return false;
+            return true;
+        });
+        if (legal.length === 0) break;
+        // Greedy: pick the neighbour that reduces distance to the hero most.
+        legal.sort((a, b) =>
+            HexUtils.distance(a.q, a.r, heroPos.q, heroPos.r) -
+            HexUtils.distance(b.q, b.r, heroPos.q, heroPos.r)
+        );
+        // Blend greed with personality wander (config.wanderWeight).
+        if (Math.random() > (config.chaseWeight || 0.5)) {
+            pos = legal[Math.floor(Math.random() * legal.length)];
+        } else {
+            pos = legal[0];
+        }
+    }
+    return HexUtils.distance(pos.q, pos.r, heroPos.q, heroPos.r);
+}
+
 function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations) {
     const chase = (config.chaseWeight || 0) > 0.5;
-    // Score a candidate move by the average distance to the hero after a short
-    // random playout. Aggressive personalities minimise it, others maximise it.
-    const playout = (startMove) => {
-        let pos = { q: startMove.q, r: startMove.r };
-        for (let step = 0; step < 3; step++) {
-            const nbrs = HexUtils.getNeighbors(pos.q, pos.r);
-            const legal = nbrs.filter(n => {
-                const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
-                if (!hex) return false;
-                if (hex.terrain === 'water' || hex.terrain === 'mountains') return false;
-                return true;
-            });
-            if (legal.length === 0) break;
-            pos = legal[Math.floor(Math.random() * legal.length)];
-        }
-        return HexUtils.distance(pos.q, pos.r, heroPos.q, heroPos.r);
-    };
-
     let best = validMoves[0];
     let bestScore = null;
     for (const move of validMoves) {
         let total = 0;
-        for (let i = 0; i < iterations; i++) total += playout(move);
+        for (let i = 0; i < iterations; i++) total += simulatePlayout(move, heroPos, hexesMap, config);
         const avg = total / iterations;
         if (bestScore === null || (chase ? avg < bestScore : avg > bestScore)) {
             bestScore = avg;
@@ -246,4 +260,4 @@ function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations
     return best;
 }
 
-export { calculateMoves, getBestMove, mctsSelectMove };
+export { calculateMoves, getBestMove, mctsSelectMove, simulatePlayout };

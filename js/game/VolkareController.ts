@@ -58,6 +58,13 @@ export class VolkareController {
             this.checkWinCondition();
         } else {
             // Fallback: greedy step toward target if a path exists through neighbors.
+            if (typeof this.game.hexGrid.getNeighbors !== 'function' ||
+                typeof this.game.hexGrid.hasHex !== 'function' ||
+                typeof this.game.hexGrid.distance !== 'function') {
+                console.log('💀 Volkare is stuck or has arrived!');
+                this.checkWinCondition();
+                return;
+            }
             const nbrs = this.game.hexGrid.getNeighbors(this.position.q, this.position.r);
             const candidates = nbrs
                 .filter((n: any) => this.game.hexGrid.hasHex(n.q, n.r))

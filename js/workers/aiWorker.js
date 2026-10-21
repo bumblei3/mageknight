@@ -252,7 +252,10 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
     const isBlocked = (q, r) => blockedPositions.some(p => p && p.q === q && p.r === r);
     let enemyPos = { q: startMove.q, r: startMove.r };
     let heroP = { q: heroPos.q, r: heroPos.r };
+    let heroWounds = heroStats.wounds || 0;
+    let enemyAlive = true;
     for (let step = 0; step < steps; step++) {
+        if (!enemyAlive) break;
         const nbrs = HexUtils.getNeighbors(enemyPos.q, enemyPos.r);
         const legal = nbrs.filter(n => {
             const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
@@ -271,6 +274,10 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
             });
             enemyPos = (Math.random() > (config.chaseWeight || 0.5)) ? legal[Math.floor(Math.random() * legal.length)] : legal[0];
         }
+        if (HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r) <= 1) {
+            const dmg = Math.max(0, ((enemy && enemy.attack) || 0) - (heroStats.armor || 0));
+            if (dmg > 0) heroWounds += 1;
+        }
         const hNbrs = HexUtils.getNeighbors(heroP.q, heroP.r);
         const hLegal = hNbrs.filter(n => {
             const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
@@ -286,17 +293,19 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
             );
             heroP = (Math.random() < 0.3) ? hLegal[Math.floor(Math.random() * hLegal.length)] : hLegal[0];
         }
-    }
-    const finalDist = HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r);
-    // Combat outcome estimate: if enemy ends adjacent, hero takes estimated damage;
-    // if hero can defeat the enemy (attack >= enemy armor), enemy is at risk.
-    let combatPenalty = 0;
-    if (finalDist <= 1 && enemy) {
-        const dmg = Math.max(0, (enemy.attack || 0) - (heroStats.armor || 0));
-        combatPenalty = dmg / 5;
-        if ((heroStats.attack || 0) >= (enemy.armor || 0) && (enemy.armor || 0) > 0) {
-            combatPenalty -= 10; // enemy would be defeated by hero next turn
+        if (HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r) <= 1) {
+            if ((heroStats.attack || 0) >= (((enemy && enemy.armor) || 0)) && ((enemy && enemy.armor) || 0) > 0) {
+                enemyAlive = false;
+            }
         }
+    }
+    const finalDist = enemyAlive ? HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r) : 99;
+    let combatPenalty = 0;
+    if (enemyAlive) {
+        const dmg = Math.max(0, (((enemy && enemy.attack) || 0)) - (heroStats.armor || 0));
+        combatPenalty = (heroWounds - (heroStats.wounds || 0)) * 2 + dmg / 5;
+    } else {
+        combatPenalty = -10;
     }
     return finalDist - combatPenalty;
 }

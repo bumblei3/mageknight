@@ -730,7 +730,6 @@ export class ActionBarManager {
             btn.onclick = action.onClick;
 
             const tooltipText = action.shortcut ? `${action.label} (${action.shortcut})` : action.label;
-            btn.setAttribute('aria-label', action.label);
             btn.setAttribute('title', tooltipText);
             btn.setAttribute('data-tooltip', tooltipText);
 
@@ -738,6 +737,7 @@ export class ActionBarManager {
                 const iconSpan = document.createElement('span');
                 iconSpan.className = 'action-btn-icon';
                 iconSpan.textContent = action.icon;
+                iconSpan.setAttribute('aria-hidden', 'true');
                 btn.appendChild(iconSpan);
             }
 
@@ -748,6 +748,7 @@ export class ActionBarManager {
             if (action.shortcut) {
                 const kbd = document.createElement('kbd');
                 kbd.textContent = action.shortcut;
+                kbd.setAttribute('aria-hidden', 'true');
                 btn.appendChild(kbd);
             }
 

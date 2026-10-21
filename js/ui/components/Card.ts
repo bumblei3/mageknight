@@ -115,10 +115,6 @@ export function createCard(props: CardProps): HTMLElement {
     wrapper.setAttribute('role', 'button');
     wrapper.setAttribute('tabindex', disabled ? '-1' : '0');
     const reasonSuffix = disabledReason ? `. ${disabledReason}` : '';
-    wrapper.setAttribute(
-        'aria-label',
-        `${name}${wound ? ', Wunde' : ''}, ${type}${color ? `, ${color}` : ''}${reasonSuffix}`
-    );
     if (disabledReason) {
         wrapper.setAttribute('title', disabledReason);
         wrapper.dataset.reason = disabledReason;
@@ -269,9 +265,9 @@ function buildCardHTML(params: {
 
     // Mana cost badge (compact)
     if (showManaCost && color && color !== 'gold' && color !== 'black') {
-        html += `<div class="mk-card__mana-cost mk-card__mana-cost--${color}" aria-label="${color} Mana">${getManaSymbol(color)}</div>`;
+        html += `<div class="mk-card__mana-cost mk-card__mana-cost--${color}" aria-hidden="true" aria-label="${color} Mana">${getManaSymbol(color)}</div>`;
     } else if (showManaCost && (color === 'gold' || color === 'black')) {
-        html += `<div class="mk-card__mana-cost mk-card__mana-cost--${color}" aria-label="${color} Mana">${color === 'gold' ? '★' : '◆'}</div>`;
+        html += `<div class="mk-card__mana-cost mk-card__mana-cost--${color}" aria-hidden="true" aria-label="${color} Mana">${color === 'gold' ? '★' : '◆'}</div>`;
     }
 
     // Art / Icon
@@ -285,7 +281,7 @@ function buildCardHTML(params: {
 
     // Effects (compact play-preview)
     if (effects.length > 0) {
-        html += `<div class="mk-card__effects" title="${escapeHtml(effects.join(' · '))}">${effects
+        html += `<div class="mk-card__effects" aria-hidden="true" title="${escapeHtml(effects.join(' · '))}">${effects
             .slice(0, 3)
             .map((e) => `<span class="mk-card__effect">${escapeHtml(e)}</span>`)
             .join('')}</div>`;
@@ -305,7 +301,7 @@ function buildCardHTML(params: {
 
     // Sideways indicator
     if (showSideways && canPlaySideways) {
-        html += `<div class="mk-card__sideways" title="Seitlich spielen (+1)" aria-label="Seitlich spielbar">↗</div>`;
+        html += `<div class="mk-card__sideways" title="Seitlich spielen (+1)" aria-hidden="true" aria-label="Seitlich spielbar">↗</div>`;
     }
 
     // Played badge

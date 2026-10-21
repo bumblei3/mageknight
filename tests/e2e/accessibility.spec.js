@@ -10,7 +10,7 @@ test.describe('Accessibility (WCAG 2.1 AA)', () => {
         const results = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
             .analyze();
-        expect.soft(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+        expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
     });
 
     test('Settings Modal has no WCAG 2.1 AA violations', async ({ page }) => {
@@ -29,6 +29,6 @@ test.describe('Accessibility (WCAG 2.1 AA)', () => {
         const results = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
             .analyze();
-        expect.soft(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+        expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
     });
 });

@@ -206,7 +206,7 @@ function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 
     if (iterations > 1 && validMoves.length > 1) {
         try {
             return mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations, heroStats);
-        } catch (err) {
+        } catch (_err) {
             // fall through to heuristic
         }
     }
@@ -300,13 +300,9 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
         }
     }
     const finalDist = enemyAlive ? HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r) : 99;
-    let combatPenalty = 0;
-    if (enemyAlive) {
-        const dmg = Math.max(0, (((enemy && enemy.attack) || 0)) - (heroStats.armor || 0));
-        combatPenalty = (heroWounds - (heroStats.wounds || 0)) * 2 + dmg / 5;
-    } else {
-        combatPenalty = -10;
-    }
+    const combatPenalty = enemyAlive
+        ? ((heroWounds - (heroStats.wounds || 0)) * 2 + Math.max(0, (((enemy && enemy.attack) || 0)) - (heroStats.armor || 0)) / 5)
+        : -10;
     return finalDist - combatPenalty;
 }
 

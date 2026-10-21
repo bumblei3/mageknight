@@ -734,7 +734,7 @@ export class MageKnightGame {
     /**
      * Ends the current turn.
      */
-    endTurn(): void { this.phaseManager.endTurn(); }
+    endTurn(): void { this.phaseManager.endTurn(); try { this.accessibilityManager.announce('Zug beendet', false); } catch (e) { /* ignore */ } }
 
     /**
      * Renders the hero's hand in the UI.
@@ -865,6 +865,7 @@ export class MageKnightGame {
 
                 if (levelResult && levelResult.leveledUp) {
                     this.levelUpManager.handleLevelUp(levelResult);
+                    try { this.accessibilityManager.announce(`Level ${levelResult.newLevel} erreicht`, true); } catch (e) { /* ignore */ }
                 }
             }
         });

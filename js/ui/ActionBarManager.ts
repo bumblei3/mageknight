@@ -759,6 +759,14 @@ export class ActionBarManager {
             this.container!.appendChild(btn);
         });
 
+        // Ensure aria-label matches visible text (axe label-content-name-mismatch)
+        limited.forEach((_a, i) => {
+            const b = this.container!.children[i] as HTMLElement;
+            if (b) {
+                b.setAttribute('aria-label', (b.textContent || '').trim());
+            }
+        });
+
         this.renderEndTurnHint();
         this.renderSecondaryHint();
     }

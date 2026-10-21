@@ -88,6 +88,8 @@ function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1)
         const canMoveByPersonality = config.wanderWeight > 0.1 || (config.aggroRadius || 0) > 0;
 
         if (canMoveByType && canMoveByPersonality) {
+            const others = enemies.filter(e => e.id !== enemy.id && e.position).map(e => e.position);
+            enemy._blockedPositions = others;
             const move = getBestMove(enemy, heroPos, enemies, hexesMap, config, iterations);
             if (move) {
                 newPositions.push({ id: enemy.id, position: move });
@@ -246,31 +248,35 @@ function simulatePlayout(startMove, heroPos, hexesMap, config) {
 
 // Richer game-state simulation: enemy chases, hero evades. Returns the final
 // distance between enemy and hero after `steps` simulated turns.
-function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4) {
+function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, blockedPositions = []) {
+    const isBlocked = (q, r) => blockedPositions.some(p => p && p.q === q && p.r === r);
     let enemyPos = { q: startMove.q, r: startMove.r };
     let heroP = { q: heroPos.q, r: heroPos.r };
     for (let step = 0; step < steps; step++) {
-        // Enemy step: greedy toward hero.
         const nbrs = HexUtils.getNeighbors(enemyPos.q, enemyPos.r);
         const legal = nbrs.filter(n => {
             const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
             if (!hex) return false;
             if (hex.terrain === 'water' || hex.terrain === 'mountains') return false;
+            if (config.terrainAvoidance > 0.5 && hex.terrain === 'wasteland') return false;
+            if (config.terrainAvoidance > 0.7 && hex.terrain === 'desert') return false;
+            if (isBlocked(n.q, n.r)) return false;
             return true;
         });
         if (legal.length > 0) {
-            legal.sort((a, b) =>
-                HexUtils.distance(a.q, a.r, heroP.q, heroP.r) -
-                HexUtils.distance(b.q, b.r, heroP.q, heroP.r)
-            );
+            legal.sort((a, b) => {
+                const da = HexUtils.distance(a.q, a.r, heroP.q, heroP.r) + (hexesMap[HexUtils.getHexKey(a.q, a.r)]?.terrain === 'forest' ? 1 : 0);
+                const db = HexUtils.distance(b.q, b.r, heroP.q, heroP.r) + (hexesMap[HexUtils.getHexKey(b.q, b.r)]?.terrain === 'forest' ? 1 : 0);
+                return da - db;
+            });
             enemyPos = (Math.random() > (config.chaseWeight || 0.5)) ? legal[Math.floor(Math.random() * legal.length)] : legal[0];
         }
-        // Hero step: move away (maximise distance) with small randomness.
         const hNbrs = HexUtils.getNeighbors(heroP.q, heroP.r);
         const hLegal = hNbrs.filter(n => {
             const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
             if (!hex) return false;
             if (hex.terrain === 'water' || hex.terrain === 'mountains') return false;
+            if (isBlocked(n.q, n.r)) return false;
             return true;
         });
         if (hLegal.length > 0) {
@@ -290,7 +296,8 @@ function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations
     let bestScore = null;
     for (const move of validMoves) {
         let total = 0;
-        for (let i = 0; i < iterations; i++) total += simulateGameState(move, heroPos, hexesMap, config, 4);
+        const blocked = (enemy._blockedPositions || []);
+        for (let i = 0; i < iterations; i++) total += simulateGameState(move, heroPos, hexesMap, config, 4, blocked);
         const avg = total / iterations;
         if (bestScore === null || (chase ? avg < bestScore : avg > bestScore)) {
             bestScore = avg;

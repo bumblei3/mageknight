@@ -1,4 +1,5 @@
 import { TooltipManager } from './ui/TooltipManager';
+import TutorialManager from './tutorialManager';
 import i18n from './i18n/index';
 const { t } = i18n as any;
 import { NotificationManager } from './ui/NotificationManager';
@@ -767,6 +768,15 @@ export class UI {
                 helpModal.classList.remove('active');
             }
         }, { signal });
+
+        const tutorialBtn = document.getElementById('help-start-tutorial');
+        if (tutorialBtn) {
+            tutorialBtn.addEventListener('click', () => {
+                helpModal.classList.remove('active');
+                TutorialManager.reset();
+                if (this.game) this.game.showTutorial();
+            }, { signal });
+        }
 
         helpTabs.forEach(tab => {
             tab.addEventListener('click', () => {

@@ -244,13 +244,53 @@ function simulatePlayout(startMove, heroPos, hexesMap, config) {
     return HexUtils.distance(pos.q, pos.r, heroPos.q, heroPos.r);
 }
 
+// Richer game-state simulation: enemy chases, hero evades. Returns the final
+// distance between enemy and hero after `steps` simulated turns.
+function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4) {
+    let enemyPos = { q: startMove.q, r: startMove.r };
+    let heroP = { q: heroPos.q, r: heroPos.r };
+    for (let step = 0; step < steps; step++) {
+        // Enemy step: greedy toward hero.
+        const nbrs = HexUtils.getNeighbors(enemyPos.q, enemyPos.r);
+        const legal = nbrs.filter(n => {
+            const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
+            if (!hex) return false;
+            if (hex.terrain === 'water' || hex.terrain === 'mountains') return false;
+            return true;
+        });
+        if (legal.length > 0) {
+            legal.sort((a, b) =>
+                HexUtils.distance(a.q, a.r, heroP.q, heroP.r) -
+                HexUtils.distance(b.q, b.r, heroP.q, heroP.r)
+            );
+            enemyPos = (Math.random() > (config.chaseWeight || 0.5)) ? legal[Math.floor(Math.random() * legal.length)] : legal[0];
+        }
+        // Hero step: move away (maximise distance) with small randomness.
+        const hNbrs = HexUtils.getNeighbors(heroP.q, heroP.r);
+        const hLegal = hNbrs.filter(n => {
+            const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
+            if (!hex) return false;
+            if (hex.terrain === 'water' || hex.terrain === 'mountains') return false;
+            return true;
+        });
+        if (hLegal.length > 0) {
+            hLegal.sort((a, b) =>
+                HexUtils.distance(b.q, b.r, enemyPos.q, enemyPos.r) -
+                HexUtils.distance(a.q, a.r, enemyPos.q, enemyPos.r)
+            );
+            heroP = (Math.random() < 0.3) ? hLegal[Math.floor(Math.random() * hLegal.length)] : hLegal[0];
+        }
+    }
+    return HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r);
+}
+
 function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations) {
     const chase = (config.chaseWeight || 0) > 0.5;
     let best = validMoves[0];
     let bestScore = null;
     for (const move of validMoves) {
         let total = 0;
-        for (let i = 0; i < iterations; i++) total += simulatePlayout(move, heroPos, hexesMap, config);
+        for (let i = 0; i < iterations; i++) total += simulateGameState(move, heroPos, hexesMap, config, 4);
         const avg = total / iterations;
         if (bestScore === null || (chase ? avg < bestScore : avg > bestScore)) {
             bestScore = avg;
@@ -260,4 +300,4 @@ function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations
     return best;
 }
 
-export { calculateMoves, getBestMove, mctsSelectMove, simulatePlayout };
+export { calculateMoves, getBestMove, mctsSelectMove, simulatePlayout, simulateGameState };

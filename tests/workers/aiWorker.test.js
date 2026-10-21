@@ -8,6 +8,7 @@ describe('aiWorker MCTS (pure functions)', () => {
         expect(typeof mod.getBestMove).toBe('function');
         expect(typeof mod.mctsSelectMove).toBe('function');
         expect(typeof mod.simulatePlayout).toBe('function');
+        expect(typeof mod.simulateGameState).toBe('function');
     });
 
     it('calculateMoves returns moves for a roaming enemy with iterations', async () => {
@@ -30,6 +31,16 @@ describe('aiWorker MCTS (pure functions)', () => {
         for (let q = -1; q <= 1; q++) for (let r = -1; r <= 1; r++) hexes[`${q},${r}`] = { terrain: 'plains' };
         const config = { chaseWeight: 0.95, wanderWeight: 0.3, terrainAvoidance: 0.2 };
         const d = simulatePlayout({ q: 1, r: 0 }, { q: 2, r: 0 }, hexes, config);
+        expect(typeof d).toBe('number');
+        expect(d).toBeGreaterThanOrEqual(0);
+    });
+
+    it('simulateGameState returns a non-negative distance', async () => {
+        const { simulateGameState } = await import('../../js/workers/aiWorker.js');
+        const hexes = {};
+        for (let q = -1; q <= 1; q++) for (let r = -1; r <= 1; r++) hexes[`${q},${r}`] = { terrain: 'plains' };
+        const config = { chaseWeight: 0.95, wanderWeight: 0.3, terrainAvoidance: 0.2 };
+        const d = simulateGameState({ q: 1, r: 0 }, { q: 2, r: 0 }, hexes, config, 4);
         expect(typeof d).toBe('number');
         expect(d).toBeGreaterThanOrEqual(0);
     });

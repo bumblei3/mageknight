@@ -341,7 +341,8 @@ export class EnemyAI {
                     enemies: enemyData,
                     heroPos: { q: hero.position.q, r: hero.position.r },
                     hexes: hexesMap,
-                    difficulty: this.difficulty
+                    difficulty: this.difficulty,
+                    iterations: this.difficulty >= 3 ? 15 : this.difficulty >= 2 ? 5 : 1
                 }
             });
         });

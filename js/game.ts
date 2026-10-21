@@ -124,6 +124,7 @@ export class MageKnightGame {
     // Auto-save timer (every 30 seconds during active gameplay)
     private autoSaveInterval: ReturnType<typeof setInterval> | null = null;
     private beforeUnloadHandler: (() => void) | null = null;
+    private syncUnsubscribe: (() => void) | null = null;
 
     /** Start the auto-save timer (every 30s) */
     private startAutoSave(): void {
@@ -133,14 +134,38 @@ export class MageKnightGame {
                  const state = this.getGameState();
                  // Prefer IndexedDB (offline-capable, larger quota), fall back to localStorage.
                  import('./persistence/IndexedDBSaveManager').then(({ IndexedDBSaveManager }) => {
-                     IndexedDBSaveManager.saveGame('auto', state).catch(() => {
+                     IndexedDBSaveManager.saveGame('auto', state).then((ok) => {
+                         if (!ok) {
+                             import('./persistence/SyncQueue').then(({ SyncQueue }) => {
+                                 SyncQueue.enqueue('auto', state);
+                             }).catch(() => { /* ignore */ });
+                             this.stateManager.saveGame('auto');
+                         }
+                     }).catch(() => {
+                         import('./persistence/SyncQueue').then(({ SyncQueue }) => {
+                             SyncQueue.enqueue('auto', state);
+                         }).catch(() => { /* ignore */ });
                          this.stateManager.saveGame('auto');
                      });
                  }).catch(() => {
+                     import('./persistence/SyncQueue').then(({ SyncQueue }) => {
+                         SyncQueue.enqueue('auto', state);
+                     }).catch(() => { /* ignore */ });
                      this.stateManager.saveGame('auto');
                  });
              }
          }, 30000);
+
+         // Register background-sync flush when connectivity returns.
+         if (typeof window !== 'undefined' && !this.isTestEnvironment) {
+             import('./persistence/SyncQueue').then(({ SyncQueue }) => {
+                 import('./persistence/IndexedDBSaveManager').then(({ IndexedDBSaveManager }) => {
+                     const saver = (slot: string, state: any) => IndexedDBSaveManager.saveGame(slot, state);
+                     const unsub = SyncQueue.onOnline(saver);
+                     this.syncUnsubscribe = unsub;
+                 }).catch(() => { /* ignore */ });
+             }).catch(() => { /* ignore */ });
+         }
 
          // Persist on tab close / reload (best-effort, synchronous fallback).
          if (typeof window !== 'undefined' && !this.isTestEnvironment) {
@@ -162,6 +187,10 @@ export class MageKnightGame {
          if (this.beforeUnloadHandler && typeof window !== 'undefined') {
              window.removeEventListener('beforeunload', this.beforeUnloadHandler);
              this.beforeUnloadHandler = null;
+         }
+         if (this.syncUnsubscribe) {
+             this.syncUnsubscribe();
+             this.syncUnsubscribe = null;
          }
      }
 

@@ -147,6 +147,17 @@ export class ManaRenderer {
             manaEl.className = `mana-die mini ${color}`;
             manaEl.textContent = this.getManaIcon(color);
             manaEl.title = color.toUpperCase();
+
+            // Attach styled tooltip (intuitive: explain what each mana color does)
+            const manaInfo = this.getManaTooltipInfo(color);
+            let tooltipContent = '';
+            if (this.tooltipManager && typeof this.tooltipManager.createStatTooltipHTML === 'function') {
+                tooltipContent = this.tooltipManager.createStatTooltipHTML(manaInfo.title, manaInfo.desc);
+            }
+            if (tooltipContent) {
+                this.tooltipManager.attachToElement(manaEl, tooltipContent);
+            }
+
             heroManaEl!.appendChild(manaEl);
         });
     }

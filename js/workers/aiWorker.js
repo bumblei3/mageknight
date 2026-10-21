@@ -75,7 +75,7 @@ if (typeof self !== 'undefined' && typeof self.postMessage === 'function') {
     };
 }
 
-function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0 }) {
+function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0, manaCount: 0 }) {
     const moveLog = [];
     const newPositions = [];
 
@@ -101,7 +101,7 @@ function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1,
     return { newPositions, moveLog };
 }
 
-function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 1, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0 }) {
+function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 1, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0, manaCount: 0 }) {
     if (!enemy.position) return null;
 
     const currentQ = enemy.position.q;
@@ -248,12 +248,13 @@ function simulatePlayout(startMove, heroPos, hexesMap, config) {
 
 // Richer game-state simulation: enemy chases, hero evades. Returns the final
 // distance between enemy and hero after `steps` simulated turns.
-function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, blockedPositions = [], enemy = null, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0 }) {
+function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, blockedPositions = [], enemy = null, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0, manaCount: 0 }) {
     const isBlocked = (q, r) => blockedPositions.some(p => p && p.q === q && p.r === r);
     let enemyPos = { q: startMove.q, r: startMove.r };
     let heroP = { q: heroPos.q, r: heroPos.r };
     let heroWounds = heroStats.wounds || 0;
     let heroMP = heroStats.movementPoints || 0;
+    let heroMana = heroStats.manaCount || 0;
     let enemyAlive = true;
     for (let step = 0; step < steps; step++) {
         if (!enemyAlive) break;
@@ -296,7 +297,9 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
             heroMP -= 1;
         }
         if (HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r) <= 1) {
-            if ((heroStats.attack || 0) >= (((enemy && enemy.armor) || 0)) && ((enemy && enemy.armor) || 0) > 0) {
+            const heroAtk = (heroStats.attack || 0) + (heroMana > 0 ? 1 : 0);
+            if (heroMana > 0) heroMana -= 1;
+            if (heroAtk >= (((enemy && enemy.armor) || 0)) && ((enemy && enemy.armor) || 0) > 0) {
                 enemyAlive = false;
             }
         }
@@ -308,7 +311,7 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
     return finalDist - combatPenalty;
 }
 
-function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0 }) {
+function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations, heroStats = { armor: 0, wounds: 0, attack: 0, movementPoints: 0, manaCount: 0 }) {
     const chase = (config.chaseWeight || 0) > 0.5;
     let best = validMoves[0];
     let bestScore = null;

@@ -123,15 +123,34 @@ export class MageKnightGame {
 
     // Auto-save timer (every 30 seconds during active gameplay)
     private autoSaveInterval: ReturnType<typeof setInterval> | null = null;
+    private beforeUnloadHandler: (() => void) | null = null;
 
     /** Start the auto-save timer (every 30s) */
     private startAutoSave(): void {
          this.stopAutoSave();
          this.autoSaveInterval = setInterval(() => {
              if (this.gameState === 'playing' && !this.isTestEnvironment) {
-                 this.stateManager.saveGame('auto');
+                 const state = this.getGameState();
+                 // Prefer IndexedDB (offline-capable, larger quota), fall back to localStorage.
+                 import('./persistence/IndexedDBSaveManager').then(({ IndexedDBSaveManager }) => {
+                     IndexedDBSaveManager.saveGame('auto', state).catch(() => {
+                         this.stateManager.saveGame('auto');
+                     });
+                 }).catch(() => {
+                     this.stateManager.saveGame('auto');
+                 });
              }
          }, 30000);
+
+         // Persist on tab close / reload (best-effort, synchronous fallback).
+         if (typeof window !== 'undefined' && !this.isTestEnvironment) {
+             this.beforeUnloadHandler = () => {
+                 if (this.gameState === 'playing') {
+                     try { this.stateManager.saveGame('auto'); } catch { /* ignore */ }
+                 }
+             };
+             window.addEventListener('beforeunload', this.beforeUnloadHandler);
+         }
      }
 
      /** Stop the auto-save timer */
@@ -139,6 +158,10 @@ export class MageKnightGame {
          if (this.autoSaveInterval) {
              clearInterval(this.autoSaveInterval);
              this.autoSaveInterval = null;
+         }
+         if (this.beforeUnloadHandler && typeof window !== 'undefined') {
+             window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+             this.beforeUnloadHandler = null;
          }
      }
 

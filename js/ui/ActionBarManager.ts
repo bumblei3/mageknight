@@ -727,6 +727,10 @@ export class ActionBarManager {
             btn.dataset.actionId = action.id;
             if (action.id === 'end-turn') btn.id = 'action-bar-end-turn';
             btn.disabled = action.disabled ?? false;
+            // Intuitive: pulse end-turn when no movement points left (out of combat)
+            if (action.id === 'end-turn' && !this.game.combat && (this.game.hero?.movementPoints ?? 0) === 0) {
+                btn.classList.add('pulse');
+            }
             btn.onclick = action.onClick;
 
             const tooltipText = action.shortcut ? `${action.label} (${action.shortcut})` : action.label;

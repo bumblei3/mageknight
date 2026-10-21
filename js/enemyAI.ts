@@ -331,7 +331,9 @@ export class EnemyAI {
                     position: e.position ? { q: e.position.q, r: e.position.r } : null,
                     isDefeated,
                     aiPersonality: e.aiPersonality,
-                    aiConfig: e.aiConfig
+                    aiConfig: e.aiConfig,
+                    attack: e.attack || 0,
+                    armor: e.armor || 0
                 };
             });
 
@@ -340,6 +342,7 @@ export class EnemyAI {
                 payload: {
                     enemies: enemyData,
                     heroPos: { q: hero.position.q, r: hero.position.r },
+                    heroStats: { armor: hero.armor || 0, wounds: (hero.wounds || []).length },
                     hexes: hexesMap,
                     difficulty: this.difficulty,
                     iterations: this.difficulty >= 3 ? 15 : this.difficulty >= 2 ? 5 : 1

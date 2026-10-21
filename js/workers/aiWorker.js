@@ -75,7 +75,7 @@ if (typeof self !== 'undefined' && typeof self.postMessage === 'function') {
     };
 }
 
-function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1) {
+function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1, heroStats = { armor: 0, wounds: 0 }) {
     const moveLog = [];
     const newPositions = [];
 
@@ -90,7 +90,7 @@ function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1)
         if (canMoveByType && canMoveByPersonality) {
             const others = enemies.filter(e => e.id !== enemy.id && e.position).map(e => e.position);
             enemy._blockedPositions = others;
-            const move = getBestMove(enemy, heroPos, enemies, hexesMap, config, iterations);
+            const move = getBestMove(enemy, heroPos, enemies, hexesMap, config, iterations, heroStats);
             if (move) {
                 newPositions.push({ id: enemy.id, position: move });
                 moveLog.push(`${enemy.name} bewegt sich.`);
@@ -101,7 +101,7 @@ function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1)
     return { newPositions, moveLog };
 }
 
-function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 1) {
+function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 1, heroStats = { armor: 0, wounds: 0 }) {
     if (!enemy.position) return null;
 
     const currentQ = enemy.position.q;
@@ -205,7 +205,7 @@ function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 
     // on any error or when iterations <= 1.
     if (iterations > 1 && validMoves.length > 1) {
         try {
-            return mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations);
+            return mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations, heroStats);
         } catch (err) {
             // fall through to heuristic
         }
@@ -248,7 +248,7 @@ function simulatePlayout(startMove, heroPos, hexesMap, config) {
 
 // Richer game-state simulation: enemy chases, hero evades. Returns the final
 // distance between enemy and hero after `steps` simulated turns.
-function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, blockedPositions = []) {
+function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, blockedPositions = [], enemy = null, heroStats = { armor: 0, wounds: 0 }) {
     const isBlocked = (q, r) => blockedPositions.some(p => p && p.q === q && p.r === r);
     let enemyPos = { q: startMove.q, r: startMove.r };
     let heroP = { q: heroPos.q, r: heroPos.r };
@@ -287,17 +287,24 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
             heroP = (Math.random() < 0.3) ? hLegal[Math.floor(Math.random() * hLegal.length)] : hLegal[0];
         }
     }
-    return HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r);
+    const finalDist = HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r);
+    // Combat outcome estimate: if enemy ends adjacent, hero takes estimated damage.
+    let combatPenalty = 0;
+    if (finalDist <= 1 && enemy) {
+        const dmg = Math.max(0, (enemy.attack || 0) - (heroStats.armor || 0));
+        combatPenalty = dmg / 5;
+    }
+    return finalDist - combatPenalty;
 }
 
-function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations) {
+function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations, heroStats = { armor: 0, wounds: 0 }) {
     const chase = (config.chaseWeight || 0) > 0.5;
     let best = validMoves[0];
     let bestScore = null;
+    const blocked = (enemy._blockedPositions || []);
     for (const move of validMoves) {
         let total = 0;
-        const blocked = (enemy._blockedPositions || []);
-        for (let i = 0; i < iterations; i++) total += simulateGameState(move, heroPos, hexesMap, config, 4, blocked);
+        for (let i = 0; i < iterations; i++) total += simulateGameState(move, heroPos, hexesMap, config, 4, blocked, enemy, heroStats);
         const avg = total / iterations;
         if (bestScore === null || (chase ? avg < bestScore : avg > bestScore)) {
             bestScore = avg;

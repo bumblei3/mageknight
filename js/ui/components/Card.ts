@@ -133,7 +133,8 @@ export function createCard(props: CardProps): HTMLElement {
         showSideways: compact && showSideways && canPlaySideways && !(wound ?? false),
         showManaCost: compact && showManaCost && !(wound ?? false),
         played,
-        strongAffordable
+        strongAffordable,
+        disabledReason
     });
 
     if (strongAffordable === true) wrapper.classList.add('mk-card--strong-ok');
@@ -220,6 +221,7 @@ function buildCardHTML(params: {
     showManaCost: boolean;
     played: boolean;
     strongAffordable?: boolean | null;
+    disabledReason?: string;
 }): string {
     const {
         name,
@@ -232,7 +234,8 @@ function buildCardHTML(params: {
         showSideways,
         showManaCost,
         played,
-        strongAffordable = null
+        strongAffordable = null,
+        disabledReason
     } = params;
 
     if (wound) {
@@ -278,6 +281,11 @@ function buildCardHTML(params: {
 
     // Type
     html += `<div class="mk-card__type">${typeLabel}</div>`;
+
+    // Disabled reason badge (intuitive: show why a card can't be played)
+    if (disabledReason) {
+        html += `<div class="mk-card__disabled-reason" aria-hidden="true">${escapeHtml(disabledReason)}</div>`;
+    }
 
     // Effects (compact play-preview)
     if (effects.length > 0) {

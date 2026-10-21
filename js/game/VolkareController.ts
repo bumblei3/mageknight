@@ -57,8 +57,28 @@ export class VolkareController {
             this.notifyUpdate();
             this.checkWinCondition();
         } else {
-            console.log('💀 Volkare is stuck or has arrived!');
-            this.checkWinCondition();
+            // Fallback: greedy step toward target if a path exists through neighbors.
+            const nbrs = this.game.hexGrid.getNeighbors(this.position.q, this.position.r);
+            const candidates = nbrs
+                .filter((n: any) => this.game.hexGrid.hasHex(n.q, n.r))
+                .sort((a: any, b: any) =>
+                    this.game.hexGrid.distance(a.q, a.r, this.target!.q, this.target!.r) -
+                    this.game.hexGrid.distance(b.q, b.r, this.target!.q, this.target!.r)
+                );
+            if (candidates.length > 0 && this.game.hexGrid.distance(candidates[0].q, candidates[0].r, this.target!.q, this.target!.r) <
+                this.game.hexGrid.distance(this.position.q, this.position.r, this.target!.q, this.target!.r)) {
+                this.position = candidates[0];
+                console.log(`💀 Volkare moves (greedy) to [${this.position!.q},${this.position!.r}]`);
+                eventBus.emit(GAME_EVENTS.LOG_ADDED, {
+                    message: `Volkare marches to [${this.position!.q},${this.position!.r}]!`,
+                    type: 'bad'
+                });
+                this.notifyUpdate();
+                this.checkWinCondition();
+            } else {
+                console.log('💀 Volkare is stuck or has arrived!');
+                this.checkWinCondition();
+            }
         }
     }
 

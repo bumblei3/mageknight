@@ -97,9 +97,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq \\
-            libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \\
-            patchelf libatk1.0-dev libgdk-pixbuf-2.0-dev
+          sudo apt-get install -y -qq libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libatk1.0-dev libgdk-pixbuf-2.0-dev
 
       - name: Install npm dependencies
         run: npm ci

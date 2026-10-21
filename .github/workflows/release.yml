@@ -77,3 +77,42 @@ jobs:
         run: |
           echo "Release ${{ github.ref_name }} created successfully"
           echo "Download: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
+
+  tauri-build:
+    name: Build Tauri Desktop Bundles
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \\
+            libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \\
+            patchelf libatk1.0-dev libgdk-pixbuf-2.0-dev
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build Tauri bundles
+        run: npm run tauri:build
+
+      - name: Upload Tauri artifacts to release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+            src-tauri/target/release/bundle/appimage/*.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

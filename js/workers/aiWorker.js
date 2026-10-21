@@ -75,7 +75,7 @@ if (typeof self !== 'undefined' && typeof self.postMessage === 'function') {
     };
 }
 
-function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1, heroStats = { armor: 0, wounds: 0 }) {
+function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1, heroStats = { armor: 0, wounds: 0, attack: 0 }) {
     const moveLog = [];
     const newPositions = [];
 
@@ -101,7 +101,7 @@ function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1,
     return { newPositions, moveLog };
 }
 
-function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 1, heroStats = { armor: 0, wounds: 0 }) {
+function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 1, heroStats = { armor: 0, wounds: 0, attack: 0 }) {
     if (!enemy.position) return null;
 
     const currentQ = enemy.position.q;
@@ -248,7 +248,7 @@ function simulatePlayout(startMove, heroPos, hexesMap, config) {
 
 // Richer game-state simulation: enemy chases, hero evades. Returns the final
 // distance between enemy and hero after `steps` simulated turns.
-function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, blockedPositions = [], enemy = null, heroStats = { armor: 0, wounds: 0 }) {
+function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, blockedPositions = [], enemy = null, heroStats = { armor: 0, wounds: 0, attack: 0 }) {
     const isBlocked = (q, r) => blockedPositions.some(p => p && p.q === q && p.r === r);
     let enemyPos = { q: startMove.q, r: startMove.r };
     let heroP = { q: heroPos.q, r: heroPos.r };
@@ -288,16 +288,20 @@ function simulateGameState(startMove, heroPos, hexesMap, config, steps = 4, bloc
         }
     }
     const finalDist = HexUtils.distance(enemyPos.q, enemyPos.r, heroP.q, heroP.r);
-    // Combat outcome estimate: if enemy ends adjacent, hero takes estimated damage.
+    // Combat outcome estimate: if enemy ends adjacent, hero takes estimated damage;
+    // if hero can defeat the enemy (attack >= enemy armor), enemy is at risk.
     let combatPenalty = 0;
     if (finalDist <= 1 && enemy) {
         const dmg = Math.max(0, (enemy.attack || 0) - (heroStats.armor || 0));
         combatPenalty = dmg / 5;
+        if ((heroStats.attack || 0) >= (enemy.armor || 0) && (enemy.armor || 0) > 0) {
+            combatPenalty -= 10; // enemy would be defeated by hero next turn
+        }
     }
     return finalDist - combatPenalty;
 }
 
-function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations, heroStats = { armor: 0, wounds: 0 }) {
+function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations, heroStats = { armor: 0, wounds: 0, attack: 0 }) {
     const chase = (config.chaseWeight || 0) > 0.5;
     let best = validMoves[0];
     let bestScore = null;

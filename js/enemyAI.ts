@@ -342,7 +342,7 @@ export class EnemyAI {
                 payload: {
                     enemies: enemyData,
                     heroPos: { q: hero.position.q, r: hero.position.r },
-                    heroStats: { armor: hero.armor || 0, wounds: (hero.wounds || []).length },
+                    heroStats: { armor: hero.armor || 0, wounds: (hero.wounds || []).length, attack: hero.attackPoints || 0 },
                     hexes: hexesMap,
                     difficulty: this.difficulty,
                     iterations: this.difficulty >= 3 ? 15 : this.difficulty >= 2 ? 5 : 1

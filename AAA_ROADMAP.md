@@ -1,6 +1,6 @@
 # Mage Knight - AAA Roadmap
 
-*Status: Stand 2026-07-15 | Basis: 2500+ Unit Tests, 20 e2e-Specs, Coverage-Gate 80% grün (global ~88% branch), CSS-Token-System konsolidiert. Phase1 Visual AAA + Foundation-Hardening abgeschlossen. Multiplayer gestrichen (kein Interesse, Solo-Fokus). Echte Content-Zahlen siehe CONTENT_GAP_REPORT.md.*
+*Status: Stand 2026-10-20 | Basis: 3490 Unit Tests (239 Dateien), 80%-Coverage-Gate grün (94.9% Stmts / 85.9% Branch), CI grün (Lint, Typecheck, Build, E2E, Deploy). Phase1 Visual AAA + Foundation-Hardening abgeschlossen. Solo-Fokus (kein Multiplayer). Echte Content-Zahlen: `npx tsx scripts/count_content.mts` (4 Helden, 20 Feinde, 8 Szenarien, 16 Spells, 24 Actions, 11 Unit-Typen, 12 Artefakte, 4 Skill-Gruppen).*
 
 *Letzte echte Anpassung (2026-07-15): Skill-Gap A geschlossen — arythea + tovak haben jetzt eigene Skill-Gruppen (zuvor hard-coded 'goldyx' in HeroController + LevelUpManager).*
 
@@ -21,10 +21,10 @@
 | Dimension | Aktuell | AAA-Ziel |
 |-----------|---------|----------|
 | **Graphics** | Premium CSS/Canvas, 3D opt. | Cinematic Shaders, Particle Systems, Sprite Animation |
-| **Audio** | Keine | Adaptive Musik, SFX, Spatial Audio |
-| **Rules Coverage** | ~95% (Core) | 100% (Alle Feindfähigkeiten, Sites, Szenarien) |
+| **Audio** | Adaptive Musik + SFX (AdaptiveMusicManager) | Spatial Audio, Polish |
+| **Rules Coverage** | ~99% (Core) — 24/24 Actions, 16/16 Spells, 10 Site-Handler, alle Unit-Typen | 100% (Spell Mastery `spell_effect` noch offen) |
 | **AI** | Worker-basiert, regelbasiert + MCTS-Andockpunkt | MCTS/Neural, Schwierigkeitsgrade, Personality |
-| **Content** | 4 Helden, 18 Feinde, 8 Szenarien, 24/24 Actions, 15/16 Spells, 11 Unit-Typen, 12 Artefakte | 5. Held, 20+ Feinde, vollst. Spell/Action-Pool |
+| **Content** | 4 Helden, 20 Feinde, 8 Szenarien, 24/24 Actions, 16/16 Spells, 11 Unit-Typen, 12 Artefakte, 4 Skill-Gruppen | 5. Held (optional), Modding-API |
 | **Multiplayer** | Nein (Solo-Fokus, bewusst) | Nein (bewusst ausgeschlossen) |
 | **Accessibility** | Basis (Shortcuts, ARIA) | WCAG 2.1 AA, Screenreader, Colorblind, Remapping |
 | **Platform** | Web (Desktop/Mobile) | PWA, Desktop (Tauri), Konsolen-Port möglich |
@@ -74,15 +74,15 @@
 ### 2.1 Missing Rules Implementation
 | Feature | Status | Aufwand |
 |---------|--------|---------|
-| **Poison (vollständig)** | ⚠️ Partial | 3 Tage |
-| **Assassinate (Unit Assignment)** | ⚠️ Partial | 5 Tage |
-| **Spawning Grounds** | ❌ Missing | 1 Woche |
-| **Mazes/Labyrinths** | ❌ Missing | 1 Woche |
-| **Dungeon/Tomb/Ruin Rewards** | ⚠️ Partial | 5 Tage |
+| **Poison (vollständig)** | ✅ Done | — |
+| **Assassinate (Unit Assignment)** | ✅ Done | — |
+| **Spawning Grounds** | ✅ Done | — |
+| **Mazes/Labyrinths** | ✅ Done | — |
+| **Dungeon/Tomb/Ruin Rewards** | ✅ Done | — |
 | **Coop Rules (2-Player)** | ❌ Missing | 3 Wochen |
-| **Advanced Actions (alle 24)** | ~60% | 2 Wochen |
-| **Spells (alle 16)** | ~50% | 2 Wochen |
-| **Units (alle 8 Typen)** | ~70% | 1 Woche |
+| **Advanced Actions (alle 24)** | ✅ 24/24 | — |
+| **Spells (alle 16)** | ✅ 16/16 | — |
+| **Units (alle 8 Typen)** | ✅ 11/11 | — |
 
 ### 2.2 AI Upgrade: From Scripted → Intelligent
 | Meilenstein | Ansatz | Aufwand |
@@ -193,7 +193,7 @@
 | Meilenstein | Success Criteria |
 |-------------|------------------|
 | **M1: Visual AAA** ✅ | 3D-Pipeline, Particles, Sprite-Anim, Dynamic Lighting, Adaptive Music/SFX, 13 Artefakte, Touch-Controller |
-| **M2: Rules Complete** ⚠️ ~95% | 24/24 Actions, 15/16 Spells, 11 Unit-Typen, 8 Szenarien, 10 Site-Handler, 18 Feinde; Lücke: 1 Spell + 2 Feinde + arythea/tovak Skills (jetzt geschlossen) |
+| **M2: Rules Complete** ⚠️ ~99% | 24/24 Actions, 16/16 Spells, 11 Unit-Typen, 8 Szenarien, 10 Site-Handler, 20 Feinde, 4 Skill-Gruppen; Lücke: `spell_effect` (Spell Mastery) |
 | **M3: AI 2.0** | MCTS schlägt 80% der Spieler auf "Normal" |
 | **M4: Accessibility Audit** | Externes Audit: WCAG 2.1 AA Pass |
 | **M5: Desktop Release** | Tauri App, < 1% Crash Rate |
@@ -204,9 +204,9 @@
 
 ## 🚀 Next Steps (diese Woche)
 
-1. **Content-Gap schließen** (siehe CONTENT_GAP_REPORT.md): arythea/tovak Skills ✅ erledigt; 1 Spell + 2 Feinde + Site-Handler für magic_glade/den offen.
-2. **Test-Suite entrümpeln**: 0-Assertion-Stubs + redundante `_coverage_boost`-Files radikal löschen (Gate grün halten).
-3. **Accessibility**: Colorblind-Paletten, Screenreader-Live-Regions, Full Key-Remapping.
+1. **Spell Mastery schließen**: `spell_effect` ist der letzte unimplementierte Effekt-Typ (`UNHANDLED_EFFECT_LABELS`). Card-Choice-Flow für „beliebigen Zauber wirken" analog zu `wish`/`copy_card` ergänzen (Hero-Methode + UI-Default + Tests).
+2. **Accessibility**: Colorblind-Paletten, Screenreader-Live-Regions, Full Key-Remapping (WCAG 2.1 AA).
+3. **Performance-Budget**: Bundle-Size + FPS + Load-Time messen und in CI als Budget-Gate (Phase4.3).
 
 ---
 

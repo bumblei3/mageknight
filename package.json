@@ -12,12 +12,17 @@
         "lint:fix": "eslint \"js/**/*.{js,ts}\" --fix",
         "typecheck": "tsc --noEmit",
         "build": "vite build",
-        "check:bundle": "node scripts/check-bundle-size.mjs"
+        "check:bundle": "node scripts/check-bundle-size.mjs",
+        "tauri": "tauri",
+        "tauri:dev": "tauri dev",
+        "tauri:build": "tauri build"
     },
     "devDependencies": {
         "@axe-core/playwright": "^4.14.0",
         "@eslint/js": "^10.0.1",
         "@playwright/test": "^1.64.1",
+        "@tauri-apps/api": "^2.12.4",
+        "@tauri-apps/cli": "^2.12.3",
         "@types/node": "^26.2.0",
         "@types/pngjs": "^6.0.5",
         "@types/three": "^0.185.4",

@@ -11,7 +11,8 @@
         "lint": "eslint \"js/**/*.{js,ts}\"",
         "lint:fix": "eslint \"js/**/*.{js,ts}\" --fix",
         "typecheck": "tsc --noEmit",
-        "build": "vite build"
+        "build": "vite build",
+        "check:bundle": "node scripts/check-bundle-size.mjs"
     },
     "devDependencies": {
         "@axe-core/playwright": "^4.14.0",

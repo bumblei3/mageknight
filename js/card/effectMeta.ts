@@ -43,7 +43,8 @@ export const EFFECT_TYPE_TO_KEY: Record<string, string> = {
     destroy_enemy: 'destroyEnemy',
     wish: 'wish',
     copy_card: 'copyCard',
-    extra_turn: 'extraTurn'
+    extra_turn: 'extraTurn',
+    spell_effect: 'spellEffect'
 };
 
 /**
@@ -63,9 +64,7 @@ export const EFFECT_TYPES_HANDLED_ELSEWHERE: string[] = [
  * that do not exist yet (extra turn, destroy enemy). Labelled here so the gap
  * is visible in the UI and testable instead of silent.
  */
-export const UNHANDLED_EFFECT_LABELS: Record<string, string> = {
-    spell_effect: 'Beliebigen Zauber wirken'
-};
+export const UNHANDLED_EFFECT_LABELS: Record<string, string> = {};
 
 /**
  * Effects that stop to ask the player (`CardChoiceFlow`): the value is the
@@ -182,7 +181,8 @@ export const EFFECT_FIELDS: EffectField[] = [
     { key: 'destroyEnemy', icon: '✨', label: 'Feind vernichten' },
     { key: 'wish', icon: '🪄', label: 'Wunsch (Auswahl)' },
     { key: 'copyCard', icon: '📋', label: 'Karte aus der Ablage' },
-    { key: 'extraTurn', icon: '⏳', label: 'Zusätzliche Züge' }
+    { key: 'extraTurn', icon: '⏳', label: 'Zusätzliche Züge' },
+    { key: 'spellEffect', icon: '📜', label: 'Freie Zauberwürfe' }
 ];
 
 /**

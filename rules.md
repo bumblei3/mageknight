@@ -135,9 +135,8 @@ Kartendaten deklarieren Effekte als `{ type, value, … }`. `Card.normalizeEffec
 | `area: true` bzw. `target: 'all'` | Angriff trifft jeden Feind einzeln statt gepoolt (Flame Wave, Meteor Storm, Fireball) |
 
 Noch ohne Engine-Wirkung (im Tooltip als „noch nicht implementiert" markiert):
-nur noch `spell_effect` (Spell Mastery — beliebigen Zauber wirken). Ebenfalls
-noch nicht simuliert: die Schlüsselwörter `vampirism`, `cleanse`, `keep`,
-`iceBlock`, `fireAttack`, `unitRecruitment`.
+keine — alle Effekt-Typen sind implementiert. Spell Mastery (`spell_effect`)
+gewährt `value` freie Zauberwürfe in diesem Zug (kein Mana nötig).
 
 ### Karten-IDs beim Speichern
 

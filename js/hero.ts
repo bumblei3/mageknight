@@ -118,6 +118,8 @@ export interface HeroState {
     commandLimit: number;
     /** Pending extra turns granted by Time Walk. */
     extraTurns?: number;
+    /** Spell Mastery: free spell casts remaining this turn. */
+    freeSpellCasts?: number;
     position: Position;
     deck: string[];
     hand: string[];
@@ -155,6 +157,8 @@ export class Hero {
     extraTurns: number;
     /** Soul Stealer: heals the hero for each enemy the artifact attack defeats. */
     vampirism: number;
+    /** Spell Mastery: free spell casts remaining this turn. */
+    freeSpellCasts: number;
     /**
      * Cards drawn by Concentration's "keep" rule. They stay in the hand when
      * the turn ends instead of going to the discard pile, and are dropped from
@@ -221,6 +225,7 @@ export class Hero {
         this.nextCardBonus = 0;
         this.extraTurns = 0;
         this.vampirism = 0;
+        this.freeSpellCasts = 0;
         this.keptCardIds = new Set();
 
         this.initializeDeck();
@@ -307,11 +312,18 @@ export class Hero {
 
         const card = this.hand[cardIndex];
 
-        if (useStrong) {
+        // Spell Mastery: a free spell cast skips the mana cost.
+        const freeCast = card.type === 'spell' && this.freeSpellCasts > 0;
+
+        if (useStrong && !freeCast) {
             const success = this.spendMana(card.color as ManaColor, isNight);
             if (!success) {
                 return null;
             }
+        }
+
+        if (freeCast) {
+            this.freeSpellCasts = Math.max(0, this.freeSpellCasts - 1);
         }
 
         this.hand.splice(cardIndex, 1);
@@ -363,6 +375,7 @@ export class Hero {
         if (effect.handLimitBonus) this.handLimit += effect.handLimitBonus as number;
         if (effect.summonUnit) this.summonUnits(effect.summonUnit as number);
         if (effect.extraTurn) this.extraTurns += Number(effect.extraTurn) || 0;
+        if (effect.spellEffect) this.freeSpellCasts += Number(effect.spellEffect) || 0;
         if (effect.condition === CONDITION_REPUTATION_LOSS) {
             this.changeReputation(REPUTATION_LOSS_PER_PLAY);
         }
@@ -474,6 +487,7 @@ export class Hero {
      */
     clearTurnBonus(): void {
         this.nextCardBonus = 0;
+        this.freeSpellCasts = 0;
     }
 
     /**
@@ -901,6 +915,7 @@ export class Hero {
         this.nextCardBonus = 0;
         this.extraTurns = 0;
         this.vampirism = 0;
+        this.freeSpellCasts = 0;
         this.keptCardIds = new Set();
 
         this.initializeDeck();
@@ -953,6 +968,7 @@ export class Hero {
             handLimit: this.handLimit,
             commandLimit: this.commandLimit,
             extraTurns: this.extraTurns,
+            freeSpellCasts: this.freeSpellCasts,
             position: { ...this.position },
             deck: this.deck.map(c => c.id),
             hand: this.hand.map(c => c.id),
@@ -981,6 +997,7 @@ export class Hero {
         if (state.handLimit !== undefined) this.handLimit = state.handLimit;
         if (state.commandLimit !== undefined) this.commandLimit = state.commandLimit;
         if (state.extraTurns !== undefined) this.extraTurns = state.extraTurns;
+        if (state.freeSpellCasts !== undefined) this.freeSpellCasts = state.freeSpellCasts;
         if (state.position) this.position = { ...state.position };
         this.displayPosition = { ...this.position };
         // Convert string IDs back to Card objects

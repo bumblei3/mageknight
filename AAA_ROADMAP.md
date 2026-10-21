@@ -22,7 +22,7 @@
 |-----------|---------|----------|
 | **Graphics** | Premium CSS/Canvas, 3D opt. | Cinematic Shaders, Particle Systems, Sprite Animation |
 | **Audio** | Adaptive Musik + SFX (AdaptiveMusicManager) | Spatial Audio, Polish |
-| **Rules Coverage** | ~99% (Core) — 24/24 Actions, 16/16 Spells, 10 Site-Handler, alle Unit-Typen | 100% (Spell Mastery `spell_effect` noch offen) |
+| **Rules Coverage** | 100% (Core) — 24/24 Actions, 16/16 Spells, 10 Site-Handler, alle Unit-Typen, alle Effekt-Typen | — |
 | **AI** | Worker-basiert, regelbasiert + MCTS-Andockpunkt | MCTS/Neural, Schwierigkeitsgrade, Personality |
 | **Content** | 4 Helden, 20 Feinde, 8 Szenarien, 24/24 Actions, 16/16 Spells, 11 Unit-Typen, 12 Artefakte, 4 Skill-Gruppen | 5. Held (optional), Modding-API |
 | **Multiplayer** | Nein (Solo-Fokus, bewusst) | Nein (bewusst ausgeschlossen) |
@@ -193,7 +193,7 @@
 | Meilenstein | Success Criteria |
 |-------------|------------------|
 | **M1: Visual AAA** ✅ | 3D-Pipeline, Particles, Sprite-Anim, Dynamic Lighting, Adaptive Music/SFX, 13 Artefakte, Touch-Controller |
-| **M2: Rules Complete** ⚠️ ~99% | 24/24 Actions, 16/16 Spells, 11 Unit-Typen, 8 Szenarien, 10 Site-Handler, 20 Feinde, 4 Skill-Gruppen; Lücke: `spell_effect` (Spell Mastery) |
+| **M2: Rules Complete** ✅ | 24/24 Actions, 16/16 Spells, 11 Unit-Typen, 8 Szenarien, 10 Site-Handler, 20 Feinde, 4 Skill-Gruppen, alle Effekt-Typen (incl. Spell Mastery) |
 | **M3: AI 2.0** | MCTS schlägt 80% der Spieler auf "Normal" |
 | **M4: Accessibility Audit** | Externes Audit: WCAG 2.1 AA Pass |
 | **M5: Desktop Release** | Tauri App, < 1% Crash Rate |
@@ -204,9 +204,8 @@
 
 ## 🚀 Next Steps (diese Woche)
 
-1. **Spell Mastery schließen**: `spell_effect` ist der letzte unimplementierte Effekt-Typ (`UNHANDLED_EFFECT_LABELS`). Card-Choice-Flow für „beliebigen Zauber wirken" analog zu `wish`/`copy_card` ergänzen (Hero-Methode + UI-Default + Tests).
-2. **Accessibility**: Colorblind-Paletten, Screenreader-Live-Regions, Full Key-Remapping (WCAG 2.1 AA).
-3. **Performance-Budget**: Bundle-Size + FPS + Load-Time messen und in CI als Budget-Gate (Phase4.3).
+1. **Accessibility**: Colorblind-Paletten, Screenreader-Live-Regions, Full Key-Remapping (WCAG 2.1 AA).
+2. **Performance-Budget**: Bundle-Size/FPS/Load-Time messen und in CI als Budget-Gate (Phase4.3).
 
 ---
 

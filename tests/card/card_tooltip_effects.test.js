@@ -66,8 +66,8 @@ describe('card tooltip — effect rows', () => {
     it('marks effect types without an engine handler as not implemented', () => {
         const text = tooltipTextOf('spell_mastery'); // spell_effect
 
-        expect(text).toContain('Beliebigen Zauber wirken');
-        expect(text).toContain('noch nicht implementiert');
+        expect(text).toContain('Freie Zauberwürfe');
+        expect(text).not.toContain('noch nicht implementiert');
     });
 
     it('describes Wish as a player choice', () => {

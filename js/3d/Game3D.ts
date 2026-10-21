@@ -21,7 +21,9 @@ export class Game3D {
     private controls: OrbitControls | null = null;
     private animationId: number | null = null;
 
-    private hexMeshes: Map<string, THREE.Mesh> = new Map();
+    // Geometry cache for performance (reuse across renders)
+    private geometryCache: Map<string, THREE.BufferGeometry> = new Map();
+    private hexMeshes: Map<string, THREE.Group> = new Map();
     private clock: THREE.Clock = new THREE.Clock();
     private waterMaterials: THREE.ShaderMaterial[] = [];
 
@@ -369,36 +371,42 @@ export class Game3D {
         group.userData = { isHex: true, q: hex.q, r: hex.r }; // Metadata for interaction
         const baseSize = hexSize * 0.95 * scale;
 
-        let geometry: THREE.BufferGeometry;
         let material: THREE.Material = new THREE.MeshBasicMaterial(); // placeholder, will be replaced
         let yOffset = 0;
 
-        // Custom Geometries based on Terrain
-        if (hex.terrain === 'mountains') {
-            // Pyntagonal Pyramid for mountains
-            geometry = new THREE.ConeGeometry(baseSize, baseSize * 2, 5);
-            yOffset = baseSize; // Sit on ground
-        } else if (hex.terrain === 'hills') {
-            // Smooth dome (Sphere segment)
-            geometry = new THREE.SphereGeometry(baseSize, 8, 8, 0, Math.PI * 2, 0, Math.PI / 2);
-            yOffset = 0;
-        } else if (hex.terrain === 'water') {
-            // Animated Water using ShaderMaterial
-            geometry = new THREE.CylinderGeometry(baseSize, baseSize, 0.1, 6);
-            yOffset = -0.05;
-            material = this.createWaterMaterial();
-        } else {
-            // Standard flat hex
-            geometry = new THREE.CylinderGeometry(baseSize, baseSize, 0.2, 6);
-            yOffset = 0;
+        // Custom Geometries based on Terrain (cached for performance)
+        const cacheKey = hex.terrain;
+        let geometry = this.geometryCache.get(cacheKey);
+        if (!geometry) {
+            if (hex.terrain === 'mountains') {
+                geometry = new THREE.ConeGeometry(baseSize, baseSize * 2, 5);
+                yOffset = baseSize;
+            } else if (hex.terrain === 'hills') {
+                geometry = new THREE.SphereGeometry(baseSize, 8, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+                yOffset = 0;
+            } else if (hex.terrain === 'water') {
+                geometry = new THREE.CylinderGeometry(baseSize, baseSize, 0.1, 6);
+                yOffset = -0.05;
+            } else {
+                geometry = new THREE.CylinderGeometry(baseSize, baseSize, 0.2, 6);
+                yOffset = 0;
+            }
+            this.geometryCache.set(cacheKey, geometry!);
         }
 
+        // Set yOffset based on terrain (independent of cache)
+        if (hex.terrain === 'mountains') yOffset = baseSize;
+        else if (hex.terrain === 'water') yOffset = -0.05;
+        else yOffset = 0;
+
         // Use Shader Material for all terrain types (including water fallback)
-        if (!material) {
+        if (hex.terrain === 'water') {
+            material = this.createWaterMaterial();
+        } else {
             material = this.shaderManager.getMaterial(hex.terrain);
         }
 
-        const mesh = new THREE.Mesh(geometry, material);
+        const mesh = new THREE.Mesh(geometry!, material);
         mesh.position.y = yOffset;
         mesh.castShadow = true;
         mesh.receiveShadow = true;

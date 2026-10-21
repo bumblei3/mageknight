@@ -63,17 +63,19 @@ function getPersonalityConfig(personality) {
     return PERSONALITY_CONFIGS[personality] || PERSONALITY_CONFIGS.balanced;
 }
 
-self.onmessage = function (e) {
-    const { action, payload } = e.data;
+if (typeof self !== 'undefined' && typeof self.postMessage === 'function') {
+    self.onmessage = function (e) {
+        const { action, payload } = e.data;
 
-    if (action === 'calculateMoves') {
-        const { enemies, heroPos, hexes, difficulty } = payload;
-        const results = calculateMoves(enemies, heroPos, hexes, difficulty);
-        self.postMessage({ action: 'movesCalculated', payload: results });
-    }
-};
+        if (action === 'calculateMoves') {
+            const { enemies, heroPos, hexes, difficulty, iterations } = payload;
+            const results = calculateMoves(enemies, heroPos, hexes, difficulty, iterations || 1);
+            self.postMessage({ action: 'movesCalculated', payload: results });
+        }
+    };
+}
 
-function calculateMoves(enemies, heroPos, hexesMap, _difficulty) {
+function calculateMoves(enemies, heroPos, hexesMap, _difficulty, iterations = 1) {
     const moveLog = [];
     const newPositions = [];
 
@@ -86,7 +88,7 @@ function calculateMoves(enemies, heroPos, hexesMap, _difficulty) {
         const canMoveByPersonality = config.wanderWeight > 0.1 || (config.aggroRadius || 0) > 0;
 
         if (canMoveByType && canMoveByPersonality) {
-            const move = getBestMove(enemy, heroPos, enemies, hexesMap, config);
+            const move = getBestMove(enemy, heroPos, enemies, hexesMap, config, iterations);
             if (move) {
                 newPositions.push({ id: enemy.id, position: move });
                 moveLog.push(`${enemy.name} bewegt sich.`);
@@ -97,7 +99,7 @@ function calculateMoves(enemies, heroPos, hexesMap, _difficulty) {
     return { newPositions, moveLog };
 }
 
-function getBestMove(enemy, heroPos, allEnemies, hexesMap, config) {
+function getBestMove(enemy, heroPos, allEnemies, hexesMap, config, iterations = 1) {
     if (!enemy.position) return null;
 
     const currentQ = enemy.position.q;
@@ -195,5 +197,53 @@ function getBestMove(enemy, heroPos, allEnemies, hexesMap, config) {
         }
     }
 
+    // Monte Carlo Tree Search: when more than one playout is requested, evaluate
+    // each candidate move by simulating a few random future steps and pick the
+    // one with the best average outcome. Falls back to the heuristic ordering
+    // on any error or when iterations <= 1.
+    if (iterations > 1 && validMoves.length > 1) {
+        try {
+            return mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations);
+        } catch (err) {
+            // fall through to heuristic
+        }
+    }
+
     return validMoves[0];
 }
+
+function mctsSelectMove(enemy, heroPos, validMoves, hexesMap, config, iterations) {
+    const chase = (config.chaseWeight || 0) > 0.5;
+    // Score a candidate move by the average distance to the hero after a short
+    // random playout. Aggressive personalities minimise it, others maximise it.
+    const playout = (startMove) => {
+        let pos = { q: startMove.q, r: startMove.r };
+        for (let step = 0; step < 3; step++) {
+            const nbrs = HexUtils.getNeighbors(pos.q, pos.r);
+            const legal = nbrs.filter(n => {
+                const hex = hexesMap[HexUtils.getHexKey(n.q, n.r)];
+                if (!hex) return false;
+                if (hex.terrain === 'water' || hex.terrain === 'mountains') return false;
+                return true;
+            });
+            if (legal.length === 0) break;
+            pos = legal[Math.floor(Math.random() * legal.length)];
+        }
+        return HexUtils.distance(pos.q, pos.r, heroPos.q, heroPos.r);
+    };
+
+    let best = validMoves[0];
+    let bestScore = null;
+    for (const move of validMoves) {
+        let total = 0;
+        for (let i = 0; i < iterations; i++) total += playout(move);
+        const avg = total / iterations;
+        if (bestScore === null || (chase ? avg < bestScore : avg > bestScore)) {
+            bestScore = avg;
+            best = move;
+        }
+    }
+    return best;
+}
+
+export { calculateMoves, getBestMove, mctsSelectMove };

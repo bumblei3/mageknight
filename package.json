@@ -34,7 +34,7 @@
         "globals": "^17.11.0",
         "http-server": "^14.1.1",
         "jsdom": "^30.0.1",
-        "pixelmatch": "^7.2.0",
+        "pixelmatch": "^8.0.0",
         "pngjs": "^7.0.0",
         "terser": "^5.50.0",
         "typescript": "^7.0.2",

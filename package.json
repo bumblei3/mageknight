@@ -84,7 +84,7 @@
         "statements": 80
     },
     "dependencies": {
-        "three": "^0.185.1",
+        "three": "^0.186.1",
         "zod": "^4.6.7"
     }
 }
